@@ -72,6 +72,27 @@ There is no automated staging pipeline yet — this is a manual step, not someth
 execute anywhere until this repo has git history and a GitHub remote — that's a manual setup step
 (`git init`, initial commit, create + push to a GitHub repo), intentionally not done automatically.
 
+### Auth setup
+
+`/api/auth/login`, `/api/auth/me`, and `/api/auth/logout` are served by the Worker itself
+(`worker/auth.ts`) — a single operator credential, stateless HS256 session tokens, no database.
+Auth returns 503 until these three secrets are configured:
+
+```bash
+node scripts/hash-password.mjs "<your passphrase>"   # prints the OPERATOR_PASSWORD_HASH value
+
+wrangler secret put OPERATOR_CALLSIGN        # your login callsign
+wrangler secret put OPERATOR_PASSWORD_HASH   # paste the hash from the script
+wrangler secret put AUTH_SIGNING_KEY         # any long random string (e.g. 32+ hex chars)
+```
+
+Add `--env staging` to each `secret put` for the staging Worker. For local `wrangler dev`, put
+the same three values in `.dev.vars` (gitignored — see the committed example values' format in
+this README's history, never commit the file itself).
+
+`OPERATOR_ROLE` / `OPERATOR_ACCESS_LEVEL` in `wrangler.jsonc` are display-only labels rolled
+into the session token; nothing enforces them (no RBAC, per `SCOPE-LOCK.md`).
+
 ### Rollback
 
 See [ROLLBACK.md](./ROLLBACK.md).

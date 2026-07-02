@@ -7,5 +7,9 @@ worker-configuration.d.ts
 .env.*
 !.env.example
 
+# Local wrangler dev secrets (auth credentials) — never commit
+.dev.vars
+.dev.vars.*
+
 # Local machine config, not project config (e.g. Windows script-shell overrides)
 .npmrc

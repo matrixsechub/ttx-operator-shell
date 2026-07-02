@@ -2,9 +2,11 @@
 // into worker-configuration.d.ts — do not hand-write the binding shape here.
 
 import { CATALOG_ITEMS } from "./catalogData";
+import { handleAuthRoute } from "./auth";
 
 const API_PREFIX = "/api/";
 const CATALOG_PATH = "/api/marketplace/catalog";
+const AUTH_PREFIX = "/api/auth/";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
@@ -43,6 +45,13 @@ export default {
       }
       if (url.pathname === CATALOG_PATH) {
         return serveCatalog(request);
+      }
+
+      if (url.pathname.startsWith(AUTH_PREFIX)) {
+        const authResponse = await handleAuthRoute(request, url.pathname, env);
+        if (authResponse) return authResponse;
+        // Unhandled /api/auth/* paths fall through to the Engine proxy,
+        // preserving their pre-Phase-15 graceful degradation.
       }
 
       return proxyToEngine(request, url, env);

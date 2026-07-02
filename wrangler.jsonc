@@ -14,13 +14,21 @@
     "run_worker_first": ["/api/*"]
   },
   "vars": {
-    "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev"
+    "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
+    // Display-only identity labels rolled into the auth token — never
+    // enforced against anything (no RBAC, per scope lock). Secrets
+    // (OPERATOR_CALLSIGN, OPERATOR_PASSWORD_HASH, AUTH_SIGNING_KEY) are NOT
+    // set here: use `wrangler secret put` for deploys, .dev.vars locally.
+    "OPERATOR_ROLE": "operator",
+    "OPERATOR_ACCESS_LEVEL": "internal"
   },
   "env": {
     "staging": {
       "name": "ttx-operator-shell-staging",
       "vars": {
-        "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev"
+        "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
+        "OPERATOR_ROLE": "operator",
+        "OPERATOR_ACCESS_LEVEL": "internal"
       }
     }
   }
