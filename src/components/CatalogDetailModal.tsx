@@ -90,6 +90,22 @@ export function CatalogDetailModal({ item, onClose }: { item: CatalogItem; onClo
           </div>
         )}
 
+        {item.capabilities && item.capabilities.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Capabilities</h3>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {item.capabilities.map((capability) => (
+                <span
+                  key={capability}
+                  className="rounded-sm border border-op-accent-2/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-op-accent-2/80"
+                >
+                  {capability}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {item.compliance_tags && item.compliance_tags.length > 0 && (
           <div className="mt-4">
             <h3 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Compliance Metadata</h3>

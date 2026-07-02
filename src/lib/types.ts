@@ -16,6 +16,8 @@ export interface CatalogItem {
   access_level?: string;
   source?: string;
   lastUpdated?: string;
+  /** Descriptive labels only (e.g. "recon", "telemetry") — not executable capabilities, no runtime negotiation. */
+  capabilities?: string[];
 }
 
 export interface CatalogResponse {
