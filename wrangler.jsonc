@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mshops-storefront",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-06-30",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev"
+  },
+  "env": {
+    "staging": {
+      "name": "mshops-storefront-staging",
+      "vars": {
+        "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev"
+      }
+    }
+  }
+}
