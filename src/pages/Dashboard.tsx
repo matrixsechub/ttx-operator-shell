@@ -9,6 +9,8 @@ import { AlertSystem } from "./dashboard/AlertSystem";
 import { OperatorStatusRail } from "./dashboard/OperatorStatusRail";
 import { AINodeConsole } from "./dashboard/AINodeConsole";
 import { OperatorInventory } from "./dashboard/OperatorInventory";
+import { OperatorSignals } from "./dashboard/OperatorSignals";
+import { TTXStatusPanel } from "./dashboard/TTXStatusPanel";
 
 export function Dashboard() {
   return (
@@ -61,6 +63,8 @@ export function Dashboard() {
             <AlertSystem />
             <AINodeConsole />
             <OperatorInventory />
+            <OperatorSignals />
+            <TTXStatusPanel />
           </div>
         </div>
       </div>

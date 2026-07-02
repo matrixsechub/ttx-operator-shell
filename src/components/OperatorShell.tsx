@@ -1,7 +1,8 @@
 import { NavLink } from "react-router-dom";
 import type { ReactNode } from "react";
+import { CommandPalette } from "./CommandPalette";
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", glyph: "01" },
   { to: "/marketplace", label: "Marketplace", glyph: "02" },
   { to: "/status", label: "Status", glyph: "03" },
@@ -20,10 +21,17 @@ export function OperatorShell({ children, telemetry }: { children: ReactNode; te
           <span className="text-base">&#9650;</span>
           MSH&nbsp;OPS
         </NavLink>
-        <span className="hidden text-[11px] uppercase tracking-widest text-op-text-dim sm:inline">
-          operator terminal // session active
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="hidden text-[11px] uppercase tracking-widest text-op-text-dim sm:inline">
+            operator terminal // session active
+          </span>
+          <span className="hidden rounded-sm border border-op-border-bright px-2 py-1 text-[10px] uppercase tracking-widest text-op-text-dim sm:inline">
+            &#8984;K quick nav
+          </span>
+        </div>
       </header>
+
+      <CommandPalette />
 
       <div className="grid min-h-0 flex-1 grid-cols-[auto_1fr] xl:grid-cols-[208px_1fr_320px]">
         <nav className="flex flex-col gap-1 border-r border-op-border p-3">
