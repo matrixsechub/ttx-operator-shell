@@ -54,6 +54,8 @@ export interface Operator {
 
 export interface LoginResponse {
   token: string;
+  /** Present from login/refresh; absent from a plain /api/auth/me response reuse of this shape. */
+  refreshToken?: string;
   operator?: Operator;
   [key: string]: unknown;
 }

@@ -22,6 +22,12 @@
     "OPERATOR_ROLE": "operator",
     "OPERATOR_ACCESS_LEVEL": "internal"
   },
+  // Revoked-refresh-token denylist (Phase 16). Real Cloudflare KV namespace,
+  // created via `wrangler kv namespace create AUTH_REVOCATION`. Shared
+  // across local dev / production / staging rather than provisioning three
+  // separate namespaces — a deliberate simplification for a single-developer
+  // storefront, not an oversight.
+  "kv_namespaces": [{ "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" }],
   "env": {
     "staging": {
       "name": "ttx-operator-shell-staging",
@@ -29,7 +35,8 @@
         "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
         "OPERATOR_ROLE": "operator",
         "OPERATOR_ACCESS_LEVEL": "internal"
-      }
+      },
+      "kv_namespaces": [{ "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" }]
     }
   }
 }

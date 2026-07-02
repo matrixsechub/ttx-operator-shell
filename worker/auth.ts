@@ -3,27 +3,30 @@
 // sessions are stateless HS256 JWTs signed and verified in-Worker. Same
 // intercept-before-proxy pattern as the Phase 14 catalog endpoint.
 //
-// Deliberately absent, per scope decisions:
-// - No refresh tokens: rotation needs a server-side store to revoke
-//   against, and nothing in the SPA calls /api/auth/refresh. Tokens expire
-//   after TOKEN_TTL_SECONDS; re-login after that.
+// Still deliberately absent, per scope decisions:
 // - No roles/RBAC: role and access_level ride along in the token payload
 //   as display-only labels, never checked against anything.
+// - No full user/session database: refresh-token revocation (Phase 16)
+//   uses a KV denylist keyed by token jti, not a positive session store —
+//   the smallest primitive that makes "revocable" true without a DB.
 
 // Note: PBKDF2 iteration count lives in the stored hash string itself
 // (pbkdf2$<iterations>$...), set by scripts/hash-password.mjs — verification
 // reads it from there, so there's no constant to keep in sync here.
-const TOKEN_TTL_SECONDS = 12 * 60 * 60;
+const ACCESS_TOKEN_TTL_SECONDS = 12 * 60 * 60;
+const REFRESH_TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60;
 
 // All-optional on purpose: production values arrive via `wrangler secret put`
 // (unknown to typegen), local dev values via .dev.vars. Handlers return 503
-// when unconfigured — same pattern as the ENGINE_API_URL check.
+// when unconfigured — same pattern as the ENGINE_API_URL check. AUTH_REVOCATION
+// is a real binding (typegen knows it), never undefined once configured.
 export interface AuthEnv {
   OPERATOR_CALLSIGN?: string;
   OPERATOR_PASSWORD_HASH?: string;
   AUTH_SIGNING_KEY?: string;
   OPERATOR_ROLE?: string;
   OPERATOR_ACCESS_LEVEL?: string;
+  AUTH_REVOCATION: KVNamespace;
 }
 
 interface OperatorProfile {
@@ -33,9 +36,22 @@ interface OperatorProfile {
   access_level?: string;
 }
 
-interface TokenPayload extends OperatorProfile {
+// `type` prevents an access token being handed to /refresh (only accepts
+// "refresh") or a refresh token being handed to /me (only accepts "access")
+// — both signed with the same key, so without this they'd otherwise verify
+// as interchangeable.
+interface AccessTokenPayload extends OperatorProfile {
+  type: "access";
   exp: number;
 }
+
+interface RefreshTokenPayload extends OperatorProfile {
+  type: "refresh";
+  jti: string;
+  exp: number;
+}
+
+type TokenPayload = AccessTokenPayload | RefreshTokenPayload;
 
 const encoder = new TextEncoder();
 
@@ -89,6 +105,43 @@ async function verifyToken(token: string, secret: string): Promise<TokenPayload 
   }
 }
 
+async function signAccessToken(operator: OperatorProfile, secret: string): Promise<string> {
+  const payload: AccessTokenPayload = {
+    ...operator,
+    type: "access",
+    exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_TTL_SECONDS,
+  };
+  return signToken(payload, secret);
+}
+
+async function signRefreshToken(operator: OperatorProfile, secret: string): Promise<{ token: string; jti: string }> {
+  const jti = crypto.randomUUID();
+  const payload: RefreshTokenPayload = {
+    ...operator,
+    type: "refresh",
+    jti,
+    exp: Math.floor(Date.now() / 1000) + REFRESH_TOKEN_TTL_SECONDS,
+  };
+  return { token: await signToken(payload, secret), jti };
+}
+
+// KV holds only revoked jtis (a denylist), not a positive session store —
+// an unrevoked, unexpired, correctly-signed refresh token is valid by
+// construction. TTL matches the refresh token's own lifetime so an entry
+// always outlives whatever remained of the token it revoked.
+async function isRevoked(jti: string, kv: KVNamespace): Promise<boolean> {
+  return (await kv.get(jti)) !== null;
+}
+
+async function revoke(jti: string, kv: KVNamespace): Promise<void> {
+  await kv.put(jti, "revoked", { expirationTtl: REFRESH_TOKEN_TTL_SECONDS });
+}
+
+function bearerToken(request: Request): string | null {
+  const authorization = request.headers.get("Authorization");
+  return authorization?.startsWith("Bearer ") ? authorization.slice("Bearer ".length) : null;
+}
+
 async function pbkdf2(password: string, salt: Uint8Array, iterations: number): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, key, 256);
@@ -129,13 +182,14 @@ function operatorFromEnv(env: AuthEnv): OperatorProfile {
   return operator;
 }
 
-// Returns null for /api/auth/* paths this module doesn't own (e.g. a future
-// /api/auth/refresh) so the caller falls through to the Engine proxy — the
-// same graceful degradation those paths had before this file existed.
+// Returns null for /api/auth/* paths this module doesn't own so the caller
+// falls through to the Engine proxy — the same graceful degradation those
+// paths had before this file existed.
 export async function handleAuthRoute(request: Request, pathname: string, env: AuthEnv): Promise<Response | null> {
   if (pathname === "/api/auth/login") return handleLogin(request, env);
   if (pathname === "/api/auth/me") return handleMe(request, env);
-  if (pathname === "/api/auth/logout") return handleLogout(request);
+  if (pathname === "/api/auth/logout") return handleLogout(request, env);
+  if (pathname === "/api/auth/refresh") return handleRefresh(request, env);
   return null;
 }
 
@@ -165,11 +219,9 @@ async function handleLogin(request: Request, env: AuthEnv): Promise<Response> {
   }
 
   const operator = operatorFromEnv(env);
-  const token = await signToken(
-    { ...operator, exp: Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS },
-    env.AUTH_SIGNING_KEY,
-  );
-  return Response.json({ token, operator });
+  const token = await signAccessToken(operator, env.AUTH_SIGNING_KEY);
+  const { token: refreshToken } = await signRefreshToken(operator, env.AUTH_SIGNING_KEY);
+  return Response.json({ token, refreshToken, operator });
 }
 
 async function handleMe(request: Request, env: AuthEnv): Promise<Response> {
@@ -180,29 +232,78 @@ async function handleMe(request: Request, env: AuthEnv): Promise<Response> {
     return Response.json({ error: "Auth is not configured on this deployment" }, { status: 503 });
   }
 
-  const authorization = request.headers.get("Authorization");
-  const token = authorization?.startsWith("Bearer ") ? authorization.slice("Bearer ".length) : null;
+  const token = bearerToken(request);
   if (!token) {
     return Response.json({ error: "Missing bearer token" }, { status: 401 });
   }
 
   const payload = await verifyToken(token, env.AUTH_SIGNING_KEY);
-  if (!payload) {
+  if (!payload || payload.type !== "access") {
     return Response.json({ error: "Invalid or expired token" }, { status: 401 });
   }
 
-  const { exp, ...operator } = payload;
+  const { exp, type, ...operator } = payload;
   void exp;
+  void type;
   return Response.json({ operator });
 }
 
-function handleLogout(request: Request): Response {
+async function handleRefresh(request: Request, env: AuthEnv): Promise<Response> {
   if (request.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
   }
-  // Stateless tokens + no DB means there's nothing server-side to revoke.
-  // The SPA discards its token (AuthContext.logout) and TOKEN_TTL_SECONDS
-  // bounds the remaining window. A real revocation list needs KV/D1 —
-  // deliberately out of scope per the no-database decision.
+  if (!env.AUTH_SIGNING_KEY) {
+    return Response.json({ error: "Auth is not configured on this deployment" }, { status: 503 });
+  }
+
+  const token = bearerToken(request);
+  if (!token) {
+    return Response.json({ error: "Missing bearer token" }, { status: 401 });
+  }
+
+  const payload = await verifyToken(token, env.AUTH_SIGNING_KEY);
+  if (!payload || payload.type !== "refresh") {
+    return Response.json({ error: "Invalid or expired refresh token" }, { status: 401 });
+  }
+  if (await isRevoked(payload.jti, env.AUTH_REVOCATION)) {
+    return Response.json({ error: "Refresh token has been revoked" }, { status: 401 });
+  }
+
+  // Rotate: the presented refresh token is single-use. Revoke it before
+  // issuing replacements so a network retry can't reuse it.
+  await revoke(payload.jti, env.AUTH_REVOCATION);
+
+  const { exp, jti, type, ...operator } = payload;
+  void exp;
+  void jti;
+  void type;
+
+  const newAccessToken = await signAccessToken(operator, env.AUTH_SIGNING_KEY);
+  const { token: newRefreshToken } = await signRefreshToken(operator, env.AUTH_SIGNING_KEY);
+  return Response.json({ token: newAccessToken, refreshToken: newRefreshToken, operator });
+}
+
+async function handleLogout(request: Request, env: AuthEnv): Promise<Response> {
+  if (request.method !== "POST") {
+    return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
+  }
+
+  // Best-effort: revoke the refresh token if one was sent, but logout always
+  // succeeds locally either way (the SPA discards both tokens regardless —
+  // see AuthContext.logout). No body, a malformed body, or a token that
+  // fails to verify are all treated the same as "nothing to revoke", not
+  // an error — logout shouldn't be blockable by a bad request.
+  try {
+    const body = (await request.json()) as { refreshToken?: unknown };
+    if (typeof body.refreshToken === "string" && env.AUTH_SIGNING_KEY) {
+      const payload = await verifyToken(body.refreshToken, env.AUTH_SIGNING_KEY);
+      if (payload?.type === "refresh") {
+        await revoke(payload.jti, env.AUTH_REVOCATION);
+      }
+    }
+  } catch {
+    // No/invalid JSON body — nothing to revoke, not an error.
+  }
+
   return Response.json({ ok: true });
 }

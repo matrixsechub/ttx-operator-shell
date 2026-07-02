@@ -1,7 +1,16 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { api } from "./apiClient";
-import { getToken, setToken, clearToken, setStoredIdentity, clearStoredIdentity } from "./authToken";
-import type { LoginPayload, Operator } from "./types";
+import {
+  getToken,
+  setToken,
+  clearToken,
+  getRefreshToken,
+  setRefreshToken,
+  clearRefreshToken,
+  setStoredIdentity,
+  clearStoredIdentity,
+} from "./authToken";
+import type { LoginPayload, LoginResponse, Operator } from "./types";
 
 interface AuthContextValue {
   operator: Operator | null;
@@ -28,23 +37,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loggingIn, setLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
+  // Stores a fresh access+refresh token pair and the operator profile that
+  // came with them — shared by login() and the silent-refresh rehydration
+  // path below, since both consume the same LoginResponse shape.
+  function commitSession(data: LoginResponse, operator: Operator): void {
+    setToken(data.token);
+    if (data.refreshToken) setRefreshToken(data.refreshToken);
+    setOperator(operator);
+    applyOperator(operator);
+  }
+
+  function clearSession(): void {
+    clearToken();
+    clearRefreshToken();
+    clearStoredIdentity();
+    setOperator(null);
+  }
+
   useEffect(() => {
     let cancelled = false;
 
     async function rehydrate() {
-      if (!getToken()) {
+      if (getToken()) {
+        const result = await api.me();
+        if (cancelled) return;
+        if (result.ok) {
+          setOperator(result.data.operator);
+          applyOperator(result.data.operator);
+          setInitializing(false);
+          return;
+        }
+        // Access token missing/expired/invalid — fall through to a silent
+        // refresh attempt before giving up on the session entirely.
+      }
+
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        clearSession();
         setInitializing(false);
         return;
       }
-      const result = await api.me();
+
+      const refreshResult = await api.refresh(refreshToken);
       if (cancelled) return;
-      if (result.ok) {
-        setOperator(result.data.operator);
-        applyOperator(result.data.operator);
+      if (refreshResult.ok && refreshResult.data.operator) {
+        commitSession(refreshResult.data, refreshResult.data.operator);
       } else {
-        // Stale/invalid token — drop it rather than pretend we're logged in.
-        clearToken();
-        clearStoredIdentity();
+        // Refresh token expired, revoked, or otherwise invalid — nothing
+        // silent left to try. Drop everything and return to logged-out.
+        clearSession();
       }
       setInitializing(false);
     }
@@ -53,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function login(payload: LoginPayload): Promise<boolean> {
@@ -66,10 +108,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false;
     }
 
-    setToken(result.data.token);
     const operator = result.data.operator ?? { id: payload.username, handle: payload.username };
-    setOperator(operator);
-    applyOperator(operator);
+    commitSession(result.data, operator);
     return true;
   }
 
@@ -93,11 +133,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function logout() {
-    // Best-effort server-side invalidation — local logout succeeds either way.
-    void api.logout();
-    clearToken();
-    clearStoredIdentity();
-    setOperator(null);
+    // Best-effort server-side revocation of the refresh token — local
+    // logout succeeds either way, since tokens are cleared regardless.
+    void api.logout(getRefreshToken() ?? undefined);
+    clearSession();
   }
 
   return (

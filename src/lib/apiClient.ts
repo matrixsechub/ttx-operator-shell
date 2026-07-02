@@ -31,10 +31,12 @@ async function attempt<T>(path: string, init: RequestInit | undefined, timeoutMs
   // The Worker forwards these straight through to the Engine (new
   // Request(target, request) copies headers) — no Worker-side session
   // storage involved, and no enforcement happens here or in the Worker;
-  // that's left to the Engine once it exists.
+  // that's left to the Engine once it exists. If the caller already set
+  // its own Authorization header (api.refresh sends the refresh token,
+  // not the access token), that takes precedence — don't clobber it.
   const headers = new Headers(init?.headers);
   const token = getToken();
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  if (token && !headers.has("Authorization")) headers.set("Authorization", `Bearer ${token}`);
   const identity = getStoredIdentity();
   if (identity?.role) headers.set("X-Operator-Role", identity.role);
   if (identity?.access_level) headers.set("X-Operator-Access-Level", identity.access_level);
@@ -93,5 +95,15 @@ export const api = {
       body: JSON.stringify(payload),
     }),
   me: () => request<{ operator: Operator }>("/api/auth/me"),
-  logout: () => request<{ ok: true }>("/api/auth/logout", { method: "POST" }),
+  refresh: (refreshToken: string) =>
+    request<LoginResponse>("/api/auth/refresh", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${refreshToken}` },
+    }),
+  logout: (refreshToken?: string) =>
+    request<{ ok: true }>("/api/auth/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+    }),
 };
