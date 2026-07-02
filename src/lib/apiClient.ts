@@ -45,11 +45,17 @@ async function attempt<T>(path: string, init: RequestInit | undefined, timeoutMs
     const response = await fetch(path, { ...init, headers, signal: controller.signal });
 
     if (!response.ok) {
-      return {
-        ok: false,
-        status: response.status,
-        error: `Request failed with status ${response.status}`,
-      };
+      // Prefer the server's own explanation (e.g. auth.ts's "Invalid
+      // credentials" / "Refresh token has been revoked") over a generic
+      // status-code string — this was previously discarded entirely.
+      let message = `Request failed with status ${response.status}`;
+      try {
+        const body = (await response.json()) as { error?: unknown };
+        if (typeof body.error === "string" && body.error.trim()) message = body.error;
+      } catch {
+        // Response body wasn't JSON (or was empty) — keep the generic message.
+      }
+      return { ok: false, status: response.status, error: message };
     }
 
     const data = (await response.json()) as T;

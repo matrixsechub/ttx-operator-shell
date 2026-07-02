@@ -10,7 +10,7 @@ export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [token, setTokenInput] = useState("");
-  const { login, loginWithToken, loggingIn, loginError, isAuthenticated } = useAuth();
+  const { login, loginWithToken, loggingIn, loginError, sessionEndedReason, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,6 +47,12 @@ export function Login() {
           <h1 className="mt-2 text-lg uppercase tracking-widest text-op-accent">Operator Login</h1>
           <p className="mt-1 text-xs text-op-text-dim">Authenticate the link to enter the system.</p>
         </div>
+
+        {sessionEndedReason && (
+          <p className="rounded-sm border border-op-amber/40 bg-op-amber/5 px-3 py-2 text-xs text-op-amber">
+            {sessionEndedReason}
+          </p>
+        )}
 
         <div className="flex gap-1.5 text-[10px] uppercase tracking-widest">
           <button
