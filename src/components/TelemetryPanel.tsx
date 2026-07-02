@@ -1,0 +1,73 @@
+import { StatusPill } from "./StatusPill";
+import { InfoCard } from "./InfoCard";
+import { useTelemetry } from "../lib/useTelemetry";
+
+// Single-glance consolidation of signals that otherwise live on separate
+// pages/widgets (EngineStatusIndicator, Status.tsx, Marketplace.tsx) — this
+// doesn't replace any of those, it's a summary view. Every section renders
+// from its own resource's state independently, so one failing endpoint
+// (the external Engine call degrades gracefully today) never blanks the
+// rest of the panel.
+export function TelemetryPanel() {
+  const { workerHealth, engineVersion, externalStatus, catalog, operator } = useTelemetry();
+
+  const workerOnline = workerHealth.result?.ok && workerHealth.result.data.status === "ok";
+  const versionLabel = engineVersion.result?.ok ? `v${engineVersion.result.data.version}` : "unknown";
+  const itemCount = catalog.result?.ok ? catalog.result.data.items.length : null;
+
+  return (
+    <div id="telemetry-panel" className="op-panel rounded-sm p-4">
+      <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Telemetry</h2>
+
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <InfoCard label="Worker">
+          <div className="flex items-center justify-between">
+            <StatusPill tone={!workerHealth.result ? "neutral" : workerOnline ? "ok" : "danger"}>
+              {!workerHealth.result ? "checking…" : workerOnline ? "Online" : "Unknown"}
+            </StatusPill>
+            <span className="text-xs text-op-text-dim">{versionLabel}</span>
+          </div>
+        </InfoCard>
+
+        <InfoCard label="External Engine">
+          {!externalStatus.result ? (
+            <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : !externalStatus.result.ok ? (
+            <span className="text-xs italic text-op-text-dim">unreachable — {externalStatus.result.error}</span>
+          ) : (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-op-text">
+                {externalStatus.result.data.harness?.detail ?? "No detail reported"}
+              </span>
+              <StatusPill tone={externalStatus.result.data.harness?.state === "online" ? "ok" : "warn"}>
+                {externalStatus.result.data.harness?.state ?? "unknown"}
+              </StatusPill>
+            </div>
+          )}
+        </InfoCard>
+
+        <InfoCard label="Operator Identity">
+          {operator ? (
+            <div className="flex flex-col gap-0.5 text-xs">
+              <span className="text-op-text">{operator.handle}</span>
+              {operator.role && <span className="text-op-text-dim">role: {operator.role}</span>}
+              {operator.access_level && <span className="text-op-text-dim">access: {operator.access_level}</span>}
+            </div>
+          ) : (
+            <span className="text-xs italic text-op-text-dim">no operator identity</span>
+          )}
+        </InfoCard>
+
+        <InfoCard label="Marketplace">
+          {!catalog.result ? (
+            <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : !catalog.result.ok ? (
+            <span className="text-xs italic text-op-text-dim">unavailable — {catalog.result.error}</span>
+          ) : (
+            <span className="text-xs text-op-text">{itemCount} items available</span>
+          )}
+        </InfoCard>
+      </div>
+    </div>
+  );
+}

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { OperatorShell } from "../components/OperatorShell";
 import { SystemTelemetryPanel } from "../components/SystemTelemetryPanel";
 import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
+import { TelemetryPanel } from "../components/TelemetryPanel";
 import { OperatorTimeline } from "./dashboard/OperatorTimeline";
 import { MissionBoard } from "./dashboard/MissionBoard";
 import { TelemetryRails } from "./dashboard/TelemetryRails";
@@ -25,6 +26,8 @@ export function Dashboard() {
           </div>
           <EngineStatusIndicator />
         </div>
+
+        <TelemetryPanel />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <div className="op-panel rounded-sm p-4">
