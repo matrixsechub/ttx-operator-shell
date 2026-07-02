@@ -14,14 +14,31 @@
 // route ever reads it back to the browser. The webhook URL itself needs
 // no backend endpoint either; it's just this Worker's own origin +
 // /api/webhooks/ingest, computable client-side from window.location.
+//
+// Pagination (Phase 22): "cursor" here is an offset encoded as a string,
+// not KV's native list() cursor. KV's cursor walks keys in ascending
+// (oldest-first) order and can't reverse — but retention keeps the total
+// dataset at <= MAX_STORED_EVENTS, so listing everything, sorting newest-
+// first, and slicing in memory is simpler and correct, where chaining
+// KV's own cursor would fight the ordering the operator actually wants.
+
+import { hasValidAccessToken, type AuthEnv } from "./auth";
 
 const MAX_STORED_EVENTS = 50;
+const DEFAULT_PAGE_SIZE = 20;
 const EVENT_TTL_SECONDS = 7 * 24 * 60 * 60;
 
 export interface WebhookTriggerEnv {
   WEBHOOK_SECRET?: string;
   WEBHOOK_EVENTS: KVNamespace;
 }
+
+// handleWebhookRoute takes WebhookTriggerEnv & AuthEnv rather than just
+// WebhookTriggerEnv, since /api/webhooks/clear needs hasValidAccessToken's
+// full env shape too. worker/index.ts always passes the real generated
+// Env, which satisfies both — this intersection just says so explicitly
+// instead of duplicating AuthEnv's fields here and risking drift.
+type Env = WebhookTriggerEnv & AuthEnv;
 
 export interface WebhookEvent {
   id: string;
@@ -84,6 +101,28 @@ function extractSourceAndType(payload: unknown): { source?: string; type?: strin
   return result;
 }
 
+// Enforces the retention cap by deleting the oldest excess events after a
+// store. Fixes a real bug, not just adding a nice-to-have: the old
+// handleEvents did kv.list({limit: 50}) with no cursor, which returns the
+// lexicographically-*first* (= chronologically oldest) 50 keys once more
+// than 50 exist — silently showing stale events and hiding new ones
+// entirely. Keeping the stored count at <= MAX_STORED_EVENTS at all times
+// means that bug can no longer occur, and pagination below can safely
+// assume the full dataset is small.
+async function enforceRetention(kv: KVNamespace): Promise<void> {
+  try {
+    const listed = await kv.list({ prefix: "event:", limit: 1000 });
+    if (listed.keys.length <= MAX_STORED_EVENTS) return;
+    const excess = listed.keys.length - MAX_STORED_EVENTS;
+    const oldestKeys = listed.keys.slice(0, excess); // ascending order = oldest first
+    await Promise.all(oldestKeys.map((key) => kv.delete(key.name)));
+  } catch (err) {
+    // Non-fatal — the event this call followed is already stored. Worst
+    // case the store briefly exceeds the cap until the next successful run.
+    console.error("webhookTrigger: retention cleanup failed", err instanceof Error ? err.message : err);
+  }
+}
+
 // KV writes/reads aren't expected to fail under normal operation, but if
 // they do, callers should get a clean 500 instead of an uncaught throw
 // bubbling out of the fetch handler. console.error here is genuinely new —
@@ -103,19 +142,21 @@ async function storeEvent(event: WebhookEvent, kv: KVNamespace): Promise<void> {
     console.error("webhookTrigger: failed to store event", event.id, err instanceof Error ? err.message : err);
     throw err;
   }
+  await enforceRetention(kv);
 }
 
-export async function handleWebhookRoute(request: Request, pathname: string, env: WebhookTriggerEnv): Promise<Response | null> {
+export async function handleWebhookRoute(request: Request, pathname: string, env: Env): Promise<Response | null> {
   if (pathname === "/api/webhooks/ingest") return handleIngest(request, env);
   if (pathname === "/api/webhooks/test") return handleTest(request, env);
   if (pathname === "/api/webhooks/events") return handleEvents(request, env);
+  if (pathname === "/api/webhooks/clear") return handleClear(request, env);
   return null;
 }
 
 // External, signed ingestion — the real webhook receiver. Not gated by
 // operator auth (an external system posting here has no operator login
 // token); the HMAC signature is the actual authentication mechanism.
-async function handleIngest(request: Request, env: WebhookTriggerEnv): Promise<Response> {
+async function handleIngest(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
   }
@@ -151,7 +192,7 @@ async function handleIngest(request: Request, env: WebhookTriggerEnv): Promise<R
 // the RequireAuth-gated Dashboard), not an external system, so HMAC
 // wouldn't make sense here even though it's still an unauthenticated
 // Worker route by this repo's existing convention (see serveCatalog).
-async function handleTest(request: Request, env: WebhookTriggerEnv): Promise<Response> {
+async function handleTest(request: Request, env: Env): Promise<Response> {
   if (request.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
   }
@@ -174,7 +215,7 @@ async function handleTest(request: Request, env: WebhookTriggerEnv): Promise<Res
   return Response.json({ ok: true, id: event.id }, { status: 200 });
 }
 
-async function handleEvents(request: Request, env: WebhookTriggerEnv): Promise<Response> {
+async function handleEvents(request: Request, env: Env): Promise<Response> {
   if (request.method !== "GET") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "GET" } });
   }
@@ -182,9 +223,15 @@ async function handleEvents(request: Request, env: WebhookTriggerEnv): Promise<R
   const url = new URL(request.url);
   const sourceFilter = url.searchParams.get("source");
   const typeFilter = url.searchParams.get("type");
+  const offset = Math.max(0, Number(url.searchParams.get("cursor") ?? "0") || 0);
+  const pageSizeParam = Number(url.searchParams.get("pageSize"));
+  const pageSize = Number.isInteger(pageSizeParam) && pageSizeParam > 0 ? Math.min(pageSizeParam, MAX_STORED_EVENTS) : DEFAULT_PAGE_SIZE;
 
-  let validEvents: WebhookEvent[];
+  let allEvents: WebhookEvent[];
   try {
+    // Retention keeps this at <= MAX_STORED_EVENTS, so one unpaginated
+    // list() always returns the complete dataset — pagination below is
+    // an in-memory slice, not repeated KV calls.
     const listed = await env.WEBHOOK_EVENTS.list({ prefix: "event:", limit: MAX_STORED_EVENTS });
     const events = await Promise.all(
       listed.keys.map(async (key) => {
@@ -197,7 +244,7 @@ async function handleEvents(request: Request, env: WebhookTriggerEnv): Promise<R
         }
       }),
     );
-    validEvents = events.filter((event): event is WebhookEvent => event !== null).reverse(); // newest first
+    allEvents = events.filter((event): event is WebhookEvent => event !== null).reverse(); // newest first
   } catch (err) {
     console.error("webhookTrigger: failed to list events", err instanceof Error ? err.message : err);
     return Response.json({ error: "Failed to retrieve events" }, { status: 500 });
@@ -205,8 +252,36 @@ async function handleEvents(request: Request, env: WebhookTriggerEnv): Promise<R
 
   // Filtering happens after listing, not via a KV query — at MAX_STORED_EVENTS
   // (50) that's trivial in-memory work, and KV has no native field querying.
-  if (sourceFilter) validEvents = validEvents.filter((event) => event.source === sourceFilter);
-  if (typeFilter) validEvents = validEvents.filter((event) => event.type === typeFilter);
+  if (sourceFilter) allEvents = allEvents.filter((event) => event.source === sourceFilter);
+  if (typeFilter) allEvents = allEvents.filter((event) => event.type === typeFilter);
 
-  return Response.json({ events: validEvents });
+  const total = allEvents.length;
+  const page = allEvents.slice(offset, offset + pageSize);
+  const nextOffset = offset + pageSize;
+  const nextCursor = nextOffset < total ? String(nextOffset) : undefined;
+
+  return Response.json({ events: page, nextCursor, total });
+}
+
+// Destructive, so gated behind a valid operator session — see auth.ts's
+// hasValidAccessToken. Unlike /ingest (signature-authenticated) and /test
+// (unauthenticated, matches this repo's convention for non-destructive
+// data routes), clearing all history warrants proving you're logged in.
+async function handleClear(request: Request, env: Env): Promise<Response> {
+  if (request.method !== "POST") {
+    return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
+  }
+  if (!(await hasValidAccessToken(request, env))) {
+    return Response.json({ error: "Missing or invalid operator session" }, { status: 401 });
+  }
+
+  try {
+    const listed = await env.WEBHOOK_EVENTS.list({ prefix: "event:", limit: 1000 });
+    await Promise.all(listed.keys.map((key) => env.WEBHOOK_EVENTS.delete(key.name)));
+  } catch (err) {
+    console.error("webhookTrigger: failed to clear events", err instanceof Error ? err.message : err);
+    return Response.json({ error: "Failed to clear events" }, { status: 500 });
+  }
+
+  return Response.json({ cleared: true });
 }

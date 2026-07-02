@@ -182,6 +182,20 @@ function operatorFromEnv(env: AuthEnv): OperatorProfile {
   return operator;
 }
 
+// Reusable by other route handlers that need "is there a currently valid
+// operator session" without duplicating token verification — not RBAC
+// (there's one operator, no role decision), just authentication. First
+// consumer: Phase 22's POST /api/webhooks/clear, a destructive action that
+// (unlike the rest of this repo's unauthenticated GET/POST data routes)
+// genuinely warrants requiring a valid session first.
+export async function hasValidAccessToken(request: Request, env: AuthEnv): Promise<boolean> {
+  if (!env.AUTH_SIGNING_KEY) return false;
+  const token = bearerToken(request);
+  if (!token) return false;
+  const payload = await verifyToken(token, env.AUTH_SIGNING_KEY);
+  return payload?.type === "access";
+}
+
 // Returns null for /api/auth/* paths this module doesn't own so the caller
 // falls through to the Engine proxy — the same graceful degradation those
 // paths had before this file existed.

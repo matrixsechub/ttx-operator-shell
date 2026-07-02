@@ -15,3 +15,19 @@ export interface WebhookEventFilter {
   source?: string;
   type?: string;
 }
+
+export interface WebhookEventQuery extends WebhookEventFilter {
+  /** Offset-as-string, opaque to callers — pass back whatever the previous response's nextCursor was. */
+  cursor?: string;
+  pageSize?: number;
+}
+
+// Response envelope for GET /api/webhooks/events — kept separate from
+// WebhookEvent itself since this describes the paginated response shape,
+// not an event.
+export interface WebhookEventsPage {
+  events: WebhookEvent[];
+  nextCursor?: string;
+  /** Total matching events (after filtering, before pagination) — drives "Showing X of Y". */
+  total: number;
+}

@@ -14,7 +14,18 @@ export function TelemetryPanel() {
   const workerOnline = workerHealth.result?.ok && workerHealth.result.data.status === "ok";
   const versionLabel = engineVersion.result?.ok ? `v${engineVersion.result.data.version}` : "unknown";
   const itemCount = catalog.result?.ok ? catalog.result.data.items.length : null;
-  const webhookEventCount = webhookEvents.result?.ok ? webhookEvents.result.data.events.length : null;
+
+  // .total (all matching events), not .events.length (capped at page size,
+  // 20 by default since Phase 22) — the accurate count for this summary.
+  const webhookEventTotal = webhookEvents.result?.ok ? webhookEvents.result.data.total : null;
+  const recentEvents = webhookEvents.result?.ok ? webhookEvents.result.data.events : [];
+  const lastEvent = recentEvents[0]; // already newest-first
+  // Simple, honest rate over whatever's in the current (already newest-
+  // first, up-to-page-size) fetch — not a true continuous-stream rate,
+  // just "how many of the events we can currently see arrived in the last
+  // 60s". Good enough for an at-a-glance cockpit signal.
+  const oneMinuteAgo = Date.now() - 60_000;
+  const eventsPerMinute = recentEvents.filter((event) => new Date(event.receivedAt).getTime() >= oneMinuteAgo).length;
 
   return (
     <div id="telemetry-panel" className="op-panel rounded-sm p-4">
@@ -75,7 +86,18 @@ export function TelemetryPanel() {
           ) : !webhookEvents.result.ok ? (
             <span className="text-xs italic text-op-text-dim">unavailable — {webhookEvents.result.error}</span>
           ) : (
-            <span className="text-xs text-op-text">{webhookEventCount} events received</span>
+            <div className="flex flex-col gap-0.5 text-xs">
+              <span className="text-op-text">
+                {webhookEventTotal} events received
+                {eventsPerMinute > 0 && <span className="text-op-text-dim"> · {eventsPerMinute}/min recent</span>}
+              </span>
+              {lastEvent && (
+                <span className="text-op-text-dim">
+                  last: {lastEvent.source ?? "unknown"}
+                  {lastEvent.type && ` / ${lastEvent.type}`}
+                </span>
+              )}
+            </div>
           )}
         </InfoCard>
       </div>
