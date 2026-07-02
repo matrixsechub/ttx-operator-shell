@@ -1,5 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { RequireAuth } from "../lib/RequireAuth";
 import { Landing } from "../pages/Landing";
+import { Login } from "../pages/Login";
 import { Dashboard } from "../pages/Dashboard";
 import { Marketplace } from "../pages/Marketplace";
 import { Status } from "../pages/Status";
@@ -27,34 +29,41 @@ import { FutureModulePage } from "../future/FutureModulePage";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Landing /> },
-  { path: "/dashboard", element: <Dashboard /> },
-  { path: "/marketplace", element: <Marketplace /> },
-  { path: "/marketplace/:category", element: <MarketplaceCategoryPage /> },
-  { path: "/status", element: <Status /> },
-  { path: "/about", element: <AboutPage /> },
-
-  { path: "/divisions", element: <DivisionsIndex /> },
-  { path: "/divisions/:slug", element: <DivisionPage /> },
-
-  { path: "/systems", element: <SystemsIndex /> },
-  { path: "/systems/:slug", element: <SystemDetail /> },
+  { path: "/login", element: <Login /> },
 
   {
-    path: "/ttx",
-    element: <TTXShell />,
+    element: <RequireAuth />,
     children: [
-      { index: true, element: <Navigate to="/ttx/builder" replace /> },
-      { path: "builder", element: <TTXBuilder /> },
-      { path: "injects", element: <TTXInjects /> },
-      { path: "timeline", element: <TTXTimeline /> },
-      { path: "roles", element: <TTXRoles /> },
-      { path: "score", element: <TTXScore /> },
-      { path: "packs", element: <TTXPacksCategory embedded /> },
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/marketplace", element: <Marketplace /> },
+      { path: "/marketplace/:category", element: <MarketplaceCategoryPage /> },
+      { path: "/status", element: <Status /> },
+      { path: "/about", element: <AboutPage /> },
+
+      { path: "/divisions", element: <DivisionsIndex /> },
+      { path: "/divisions/:slug", element: <DivisionPage /> },
+
+      { path: "/systems", element: <SystemsIndex /> },
+      { path: "/systems/:slug", element: <SystemDetail /> },
+
+      {
+        path: "/ttx",
+        element: <TTXShell />,
+        children: [
+          { index: true, element: <Navigate to="/ttx/builder" replace /> },
+          { path: "builder", element: <TTXBuilder /> },
+          { path: "injects", element: <TTXInjects /> },
+          { path: "timeline", element: <TTXTimeline /> },
+          { path: "roles", element: <TTXRoles /> },
+          { path: "score", element: <TTXScore /> },
+          { path: "packs", element: <TTXPacksCategory embedded /> },
+        ],
+      },
+
+      { path: "/future", element: <FutureIndex /> },
+      { path: "/future/:slug", element: <FutureModulePage /> },
     ],
   },
-
-  { path: "/future", element: <FutureIndex /> },
-  { path: "/future/:slug", element: <FutureModulePage /> },
 
   { path: "*", element: <NotFound /> },
 ]);

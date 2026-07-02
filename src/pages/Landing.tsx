@@ -24,7 +24,7 @@ export function Landing() {
         </p>
         <button
           type="button"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/login")}
           className="group relative overflow-hidden rounded-sm border border-op-accent/60 px-8 py-3 text-sm uppercase tracking-[0.3em] text-op-accent transition-colors hover:bg-op-accent/10"
         >
           Enter the System

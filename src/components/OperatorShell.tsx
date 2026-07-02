@@ -1,6 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { CommandPalette } from "./CommandPalette";
+import { useAuth } from "../lib/AuthContext";
 
 export const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", glyph: "01" },
@@ -14,6 +15,14 @@ export const NAV_ITEMS = [
 ];
 
 export function OperatorShell({ children, telemetry }: { children: ReactNode; telemetry?: ReactNode }) {
+  const { operator, logout } = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate("/login");
+  }
+
   return (
     <div className="flex h-dvh w-full flex-col overflow-hidden bg-op-bg text-op-text">
       <header className="flex shrink-0 items-center justify-between border-b border-op-border px-4 py-2.5 sm:px-6">
@@ -22,12 +31,21 @@ export function OperatorShell({ children, telemetry }: { children: ReactNode; te
           MSH&nbsp;OPS
         </NavLink>
         <div className="flex items-center gap-3">
-          <span className="hidden text-[11px] uppercase tracking-widest text-op-text-dim sm:inline">
-            operator terminal // session active
-          </span>
+          {operator && (
+            <span className="hidden text-[11px] uppercase tracking-widest text-op-text-dim sm:inline">
+              operator // {operator.handle}
+            </span>
+          )}
           <span className="hidden rounded-sm border border-op-border-bright px-2 py-1 text-[10px] uppercase tracking-widest text-op-text-dim sm:inline">
             &#8984;K quick nav
           </span>
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-sm border border-op-border-bright px-2 py-1 text-[10px] uppercase tracking-widest text-op-text-dim transition-colors hover:border-op-danger/50 hover:text-op-danger"
+          >
+            Logout
+          </button>
         </div>
       </header>
 
