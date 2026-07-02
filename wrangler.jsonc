@@ -32,7 +32,13 @@
   // across local dev / production / staging rather than provisioning three
   // separate namespaces — a deliberate simplification for a single-developer
   // storefront, not an oversight.
-  "kv_namespaces": [{ "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" }],
+  "kv_namespaces": [
+    { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },
+    // Webhook Trigger event storage (Phase 20). Real KV namespace, created
+    // via `wrangler kv namespace create WEBHOOK_EVENTS`. Same shared-across-
+    // environments simplification as AUTH_REVOCATION.
+    { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" }
+  ],
   "env": {
     "staging": {
       "name": "ttx-operator-shell-staging",
@@ -43,7 +49,10 @@
         "DEPLOY_ENV": "staging",
         "APP_VERSION": "0.1.0"
       },
-      "kv_namespaces": [{ "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" }]
+      "kv_namespaces": [
+        { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },
+        { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" }
+      ]
     }
   }
 }

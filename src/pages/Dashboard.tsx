@@ -14,6 +14,7 @@ import { OperatorInventory } from "./dashboard/OperatorInventory";
 import { OperatorSignals } from "./dashboard/OperatorSignals";
 import { TTXStatusPanel } from "./dashboard/TTXStatusPanel";
 import { TelemetryFeed } from "./dashboard/TelemetryFeed";
+import { WebhookTriggerPanel } from "./dashboard/WebhookTriggerPanel";
 
 export function Dashboard() {
   return (
@@ -74,6 +75,7 @@ export function Dashboard() {
             <OperatorSignals />
             <TTXStatusPanel />
             <TelemetryFeed />
+            <WebhookTriggerPanel />
           </div>
         </div>
       </div>
