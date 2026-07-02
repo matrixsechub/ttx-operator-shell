@@ -11,6 +11,7 @@ import { AINodeConsole } from "./dashboard/AINodeConsole";
 import { OperatorInventory } from "./dashboard/OperatorInventory";
 import { OperatorSignals } from "./dashboard/OperatorSignals";
 import { TTXStatusPanel } from "./dashboard/TTXStatusPanel";
+import { TelemetryFeed } from "./dashboard/TelemetryFeed";
 
 export function Dashboard() {
   return (
@@ -65,6 +66,7 @@ export function Dashboard() {
             <OperatorInventory />
             <OperatorSignals />
             <TTXStatusPanel />
+            <TelemetryFeed />
           </div>
         </div>
       </div>
