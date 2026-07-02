@@ -6,3 +6,6 @@ worker-configuration.d.ts
 .env
 .env.*
 !.env.example
+
+# Local machine config, not project config (e.g. Windows script-shell overrides)
+.npmrc
