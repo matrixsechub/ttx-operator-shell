@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { OperatorShell } from "../components/OperatorShell";
 import { SystemTelemetryPanel } from "../components/SystemTelemetryPanel";
+import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
 import { OperatorTimeline } from "./dashboard/OperatorTimeline";
 import { MissionBoard } from "./dashboard/MissionBoard";
 import { TelemetryRails } from "./dashboard/TelemetryRails";
@@ -17,9 +18,12 @@ export function Dashboard() {
   return (
     <OperatorShell telemetry={<SystemTelemetryPanel />}>
       <div className="flex flex-col gap-6">
-        <div>
-          <h1 className="text-lg uppercase tracking-widest text-op-accent">Operator Cockpit</h1>
-          <p className="mt-1 text-xs text-op-text-dim">Session overview and quick actions.</p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-lg uppercase tracking-widest text-op-accent">Operator Cockpit</h1>
+            <p className="mt-1 text-xs text-op-text-dim">Session overview and quick actions.</p>
+          </div>
+          <EngineStatusIndicator />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

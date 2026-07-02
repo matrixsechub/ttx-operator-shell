@@ -1,4 +1,4 @@
-import type { CatalogResponse, LoginPayload, LoginResponse, Operator, SystemStatus } from "./types";
+import type { CatalogResponse, EngineHealth, EngineVersion, LoginPayload, LoginResponse, Operator, SystemStatus } from "./types";
 import { getToken, getStoredIdentity } from "./authToken";
 
 export interface ApiSuccess<T> {
@@ -106,4 +106,10 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
     }),
+  // Worker self-health/version — unauthenticated, no external calls on the
+  // Worker side. Any stored token/identity headers still ride along
+  // automatically (same as every request() call), but engine.ts ignores
+  // them entirely; nothing here depends on being logged in.
+  engineHealth: () => request<EngineHealth>("/api/engine/health"),
+  engineVersion: () => request<EngineVersion>("/api/engine/version"),
 };

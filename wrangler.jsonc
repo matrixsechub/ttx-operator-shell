@@ -20,7 +20,12 @@
     // (OPERATOR_CALLSIGN, OPERATOR_PASSWORD_HASH, AUTH_SIGNING_KEY) are NOT
     // set here: use `wrangler secret put` for deploys, .dev.vars locally.
     "OPERATOR_ROLE": "operator",
-    "OPERATOR_ACCESS_LEVEL": "internal"
+    "OPERATOR_ACCESS_LEVEL": "internal",
+    // Phase 17: /api/engine/health and /api/engine/version read these.
+    // APP_VERSION is a manual mirror of package.json's "version" field —
+    // bump both together, no build-step sync exists for this.
+    "DEPLOY_ENV": "production",
+    "APP_VERSION": "0.1.0"
   },
   // Revoked-refresh-token denylist (Phase 16). Real Cloudflare KV namespace,
   // created via `wrangler kv namespace create AUTH_REVOCATION`. Shared
@@ -34,7 +39,9 @@
       "vars": {
         "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
         "OPERATOR_ROLE": "operator",
-        "OPERATOR_ACCESS_LEVEL": "internal"
+        "OPERATOR_ACCESS_LEVEL": "internal",
+        "DEPLOY_ENV": "staging",
+        "APP_VERSION": "0.1.0"
       },
       "kv_namespaces": [{ "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" }]
     }

@@ -59,3 +59,14 @@ export interface LoginResponse {
   operator?: Operator;
   [key: string]: unknown;
 }
+
+/** Worker's own liveness, not the external Engine's — see worker/engine.ts. */
+export interface EngineHealth {
+  status: string;
+  timestamp: string;
+  env: string;
+}
+
+export interface EngineVersion {
+  version: string;
+}

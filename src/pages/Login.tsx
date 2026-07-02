@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate, type Location } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
+import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
 
 type LoginMode = "password" | "token";
 
@@ -120,6 +121,12 @@ export function Login() {
           {loggingIn ? "authenticating…" : "Enter the System"}
         </button>
       </form>
+
+      {/* Public route, no auth required to reach it — proves the engine
+          status endpoint is genuinely callable while logged out. */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+        <EngineStatusIndicator />
+      </div>
     </div>
   );
 }

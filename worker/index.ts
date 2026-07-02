@@ -3,10 +3,12 @@
 
 import { CATALOG_ITEMS } from "./catalogData";
 import { handleAuthRoute } from "./auth";
+import { handleEngineRoute } from "./engine";
 
 const API_PREFIX = "/api/";
 const CATALOG_PATH = "/api/marketplace/catalog";
 const AUTH_PREFIX = "/api/auth/";
+const ENGINE_PREFIX = "/api/engine/";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
@@ -45,6 +47,12 @@ export default {
       }
       if (url.pathname === CATALOG_PATH) {
         return serveCatalog(request);
+      }
+
+      if (url.pathname.startsWith(ENGINE_PREFIX)) {
+        const engineResponse = handleEngineRoute(request, url.pathname, env);
+        if (engineResponse) return engineResponse;
+        // Unhandled /api/engine/* paths fall through to the Engine proxy.
       }
 
       if (url.pathname.startsWith(AUTH_PREFIX)) {
