@@ -1,5 +1,5 @@
 import { request, type ApiResult } from "../../lib/apiClient";
-import type { TTXInject, TTXOperatorRole, TTXScenario, TTXScoreEntry, TTXScoringRubric } from "./types";
+import type { TTXInject, TTXOperatorRole, TTXScenario, TTXScenarioStatus, TTXScoreEntry, TTXScoringRubric } from "./types";
 
 // API client stubs for the TTX SaaS module. These call /api/ttx/* through the
 // existing Worker proxy (worker/index.ts) the same way the rest of the
@@ -29,4 +29,11 @@ export const ttxService = {
 
   getRubric: (scenarioId: string): Promise<ApiResult<{ rubric: TTXScoringRubric }>> =>
     request(`/api/ttx/scenarios/${encodeURIComponent(scenarioId)}/rubric`),
+
+  updateScenarioStatus: (scenarioId: string, status: TTXScenarioStatus): Promise<ApiResult<{ scenario: TTXScenario }>> =>
+    request(`/api/ttx/scenarios/${encodeURIComponent(scenarioId)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    }),
 };
