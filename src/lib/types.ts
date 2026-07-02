@@ -43,7 +43,14 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface Operator {
+  id: string;
+  handle: string;
+  [key: string]: unknown;
+}
+
 export interface LoginResponse {
   token: string;
+  operator?: Operator;
   [key: string]: unknown;
 }

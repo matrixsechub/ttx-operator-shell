@@ -1,4 +1,5 @@
-import type { CatalogResponse, LoginPayload, LoginResponse, SystemStatus } from "./types";
+import type { CatalogResponse, LoginPayload, LoginResponse, Operator, SystemStatus } from "./types";
+import { getToken } from "./authToken";
 
 export interface ApiSuccess<T> {
   ok: true;
@@ -26,8 +27,15 @@ async function attempt<T>(path: string, init: RequestInit | undefined, timeoutMs
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
+  // Attach the operator's bearer token, if one exists. The Worker forwards
+  // this straight through to the Engine (new Request(target, request)
+  // copies headers) — no Worker-side session storage involved.
+  const headers = new Headers(init?.headers);
+  const token = getToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
   try {
-    const response = await fetch(path, { ...init, signal: controller.signal });
+    const response = await fetch(path, { ...init, headers, signal: controller.signal });
 
     if (!response.ok) {
       return {
@@ -79,4 +87,6 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     }),
+  me: () => request<{ operator: Operator }>("/api/auth/me"),
+  logout: () => request<{ ok: true }>("/api/auth/logout", { method: "POST" }),
 };
