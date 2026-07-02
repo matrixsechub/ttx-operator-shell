@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { api } from "./apiClient";
-import { getToken, setToken, clearToken } from "./authToken";
+import { getToken, setToken, clearToken, setStoredIdentity, clearStoredIdentity } from "./authToken";
 import type { LoginPayload, Operator } from "./types";
 
 interface AuthContextValue {
@@ -11,7 +11,13 @@ interface AuthContextValue {
   loggingIn: boolean;
   loginError: string | null;
   login: (payload: LoginPayload) => Promise<boolean>;
+  /** Log in with an existing operator token directly (no username/password). */
+  loginWithToken: (token: string) => Promise<boolean>;
   logout: () => void;
+}
+
+function applyOperator(operator: Operator): void {
+  setStoredIdentity({ role: operator.role, access_level: operator.access_level });
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -34,9 +40,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (cancelled) return;
       if (result.ok) {
         setOperator(result.data.operator);
+        applyOperator(result.data.operator);
       } else {
         // Stale/invalid token — drop it rather than pretend we're logged in.
         clearToken();
+        clearStoredIdentity();
       }
       setInitializing(false);
     }
@@ -59,7 +67,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     setToken(result.data.token);
-    setOperator(result.data.operator ?? { id: payload.username, handle: payload.username });
+    const operator = result.data.operator ?? { id: payload.username, handle: payload.username };
+    setOperator(operator);
+    applyOperator(operator);
+    return true;
+  }
+
+  async function loginWithToken(token: string): Promise<boolean> {
+    setLoggingIn(true);
+    setLoginError(null);
+    setToken(token);
+
+    const result = await api.me();
+    setLoggingIn(false);
+
+    if (!result.ok) {
+      clearToken();
+      setLoginError(result.error);
+      return false;
+    }
+
+    setOperator(result.data.operator);
+    applyOperator(result.data.operator);
     return true;
   }
 
@@ -67,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Best-effort server-side invalidation — local logout succeeds either way.
     void api.logout();
     clearToken();
+    clearStoredIdentity();
     setOperator(null);
   }
 
@@ -79,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loggingIn,
         loginError,
         login,
+        loginWithToken,
         logout,
       }}
     >

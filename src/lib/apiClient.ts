@@ -1,5 +1,5 @@
 import type { CatalogResponse, LoginPayload, LoginResponse, Operator, SystemStatus } from "./types";
-import { getToken } from "./authToken";
+import { getToken, getStoredIdentity } from "./authToken";
 
 export interface ApiSuccess<T> {
   ok: true;
@@ -27,12 +27,17 @@ async function attempt<T>(path: string, init: RequestInit | undefined, timeoutMs
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
-  // Attach the operator's bearer token, if one exists. The Worker forwards
-  // this straight through to the Engine (new Request(target, request)
-  // copies headers) — no Worker-side session storage involved.
+  // Attach the operator's bearer token plus role/access_level, if present.
+  // The Worker forwards these straight through to the Engine (new
+  // Request(target, request) copies headers) — no Worker-side session
+  // storage involved, and no enforcement happens here or in the Worker;
+  // that's left to the Engine once it exists.
   const headers = new Headers(init?.headers);
   const token = getToken();
   if (token) headers.set("Authorization", `Bearer ${token}`);
+  const identity = getStoredIdentity();
+  if (identity?.role) headers.set("X-Operator-Role", identity.role);
+  if (identity?.access_level) headers.set("X-Operator-Access-Level", identity.access_level);
 
   try {
     const response = await fetch(path, { ...init, headers, signal: controller.signal });

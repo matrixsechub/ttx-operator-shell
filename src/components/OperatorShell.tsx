@@ -34,6 +34,7 @@ export function OperatorShell({ children, telemetry }: { children: ReactNode; te
           {operator && (
             <span className="hidden text-[11px] uppercase tracking-widest text-op-text-dim sm:inline">
               operator // {operator.handle}
+              {operator.role && <span className="text-op-text-dim/60"> · {operator.role}</span>}
             </span>
           )}
           <span className="hidden rounded-sm border border-op-border-bright px-2 py-1 text-[10px] uppercase tracking-widest text-op-text-dim sm:inline">

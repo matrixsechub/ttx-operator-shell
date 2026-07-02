@@ -2,10 +2,14 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate, type Location } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
 
+type LoginMode = "password" | "token";
+
 export function Login() {
+  const [mode, setMode] = useState<LoginMode>("password");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loggingIn, loginError, isAuthenticated } = useAuth();
+  const [token, setTokenInput] = useState("");
+  const { login, loginWithToken, loggingIn, loginError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -18,7 +22,7 @@ export function Login() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    const ok = await login({ username, password });
+    const ok = mode === "password" ? await login({ username, password }) : await loginWithToken(token);
     if (ok) navigate(from, { replace: true });
   }
 
@@ -43,30 +47,68 @@ export function Login() {
           <p className="mt-1 text-xs text-op-text-dim">Authenticate the link to enter the system.</p>
         </div>
 
-        <label className="flex flex-col gap-1 text-xs text-op-text-dim">
-          Callsign
-          <input
-            type="text"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            required
-            autoFocus
-            autoComplete="username"
-            className="op-panel rounded-sm px-3 py-2 text-sm text-op-text placeholder:text-op-text-dim/60 focus:border-op-accent/60 focus:outline-none"
-          />
-        </label>
+        <div className="flex gap-1.5 text-[10px] uppercase tracking-widest">
+          <button
+            type="button"
+            onClick={() => setMode("password")}
+            className={`flex-1 rounded-sm border px-2 py-1.5 transition-colors ${
+              mode === "password" ? "border-op-accent/60 text-op-accent" : "border-op-border-bright text-op-text-dim"
+            }`}
+          >
+            Password
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("token")}
+            className={`flex-1 rounded-sm border px-2 py-1.5 transition-colors ${
+              mode === "token" ? "border-op-accent/60 text-op-accent" : "border-op-border-bright text-op-text-dim"
+            }`}
+          >
+            Token
+          </button>
+        </div>
 
-        <label className="flex flex-col gap-1 text-xs text-op-text-dim">
-          Passphrase
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            autoComplete="current-password"
-            className="op-panel rounded-sm px-3 py-2 text-sm text-op-text placeholder:text-op-text-dim/60 focus:border-op-accent/60 focus:outline-none"
-          />
-        </label>
+        {mode === "password" ? (
+          <>
+            <label className="flex flex-col gap-1 text-xs text-op-text-dim">
+              Callsign
+              <input
+                type="text"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                required
+                autoFocus
+                autoComplete="username"
+                className="op-panel rounded-sm px-3 py-2 text-sm text-op-text placeholder:text-op-text-dim/60 focus:border-op-accent/60 focus:outline-none"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1 text-xs text-op-text-dim">
+              Passphrase
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+                autoComplete="current-password"
+                className="op-panel rounded-sm px-3 py-2 text-sm text-op-text placeholder:text-op-text-dim/60 focus:border-op-accent/60 focus:outline-none"
+              />
+            </label>
+          </>
+        ) : (
+          <label className="flex flex-col gap-1 text-xs text-op-text-dim">
+            Operator token
+            <input
+              type="password"
+              value={token}
+              onChange={(event) => setTokenInput(event.target.value)}
+              required
+              autoFocus
+              placeholder="Paste an existing operator token"
+              className="op-panel rounded-sm px-3 py-2 text-sm text-op-text placeholder:text-op-text-dim/60 focus:border-op-accent/60 focus:outline-none"
+            />
+          </label>
+        )}
 
         {loginError && <p className="text-xs text-op-danger">Authentication failed — {loginError}</p>}
 

@@ -46,6 +46,9 @@ export interface LoginPayload {
 export interface Operator {
   id: string;
   handle: string;
+  /** Descriptive only — no RBAC enforcement in this app. Same display-only philosophy as CatalogItem.access_level. */
+  role?: string;
+  access_level?: string;
   [key: string]: unknown;
 }
 
