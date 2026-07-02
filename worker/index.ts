@@ -6,6 +6,7 @@ import { handleAuthRoute } from "./auth";
 import { handleEngineRoute } from "./engine";
 import { handleWebhookRoute } from "./webhookTrigger";
 import { handleSecurityRoute } from "./security";
+import { handleTtxRoute } from "./ttx";
 
 const API_PREFIX = "/api/";
 const CATALOG_PATH = "/api/marketplace/catalog";
@@ -13,6 +14,7 @@ const AUTH_PREFIX = "/api/auth/";
 const ENGINE_PREFIX = "/api/engine/";
 const WEBHOOK_PREFIX = "/api/webhooks/";
 const SECURITY_PREFIX = "/api/security/";
+const TTX_PREFIX = "/api/ttx/";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
@@ -69,6 +71,14 @@ export default {
         const securityResponse = await handleSecurityRoute(request, url.pathname, env);
         if (securityResponse) return securityResponse;
         // Unhandled /api/security/* paths fall through to the Engine proxy.
+      }
+
+      if (url.pathname.startsWith(TTX_PREFIX)) {
+        const ttxResponse = await handleTtxRoute(request, url.pathname, env);
+        if (ttxResponse) return ttxResponse;
+        // Unhandled /api/ttx/* paths (scenarios, roles, sessions/*/score —
+        // the existing TTX SaaS scaffold's routes) fall through to the
+        // Engine proxy, unchanged from before this file existed.
       }
 
       if (url.pathname.startsWith(AUTH_PREFIX)) {

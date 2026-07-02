@@ -3,6 +3,7 @@ import { useApiResource } from "./useApiResource";
 import { useAuth } from "./AuthContext";
 import { webhookTriggerService } from "./webhookTriggerService";
 import { securityService } from "./securityService";
+import { ttxEngineService } from "./ttxService";
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -32,7 +33,11 @@ export function useTelemetry() {
   const securityEvents = useApiResource(() => securityService.fetchSecurityEvents(), {
     pollIntervalMs: POLL_INTERVAL_MS,
   });
+  // Phase 24 — same reasoning as webhookEvents/securityEvents above: one
+  // more useApiResource call feeding current phase / last inject, no new
+  // hook needed.
+  const ttxState = useApiResource(() => ttxEngineService.getState(), { pollIntervalMs: POLL_INTERVAL_MS });
   const { operator } = useAuth();
 
-  return { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, operator };
+  return { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, ttxState, operator };
 }

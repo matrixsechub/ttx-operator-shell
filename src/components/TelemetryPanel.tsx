@@ -9,7 +9,7 @@ import { useTelemetry } from "../lib/useTelemetry";
 // (the external Engine call degrades gracefully today) never blanks the
 // rest of the panel.
 export function TelemetryPanel() {
-  const { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, operator } =
+  const { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, ttxState, operator } =
     useTelemetry();
 
   const workerOnline = workerHealth.result?.ok && workerHealth.result.data.status === "ok";
@@ -35,6 +35,10 @@ export function TelemetryPanel() {
   const securityEventCount = securityEvents.result?.ok ? securityEvents.result.data.events.length : null;
   const lastSecurityEvent = securityEvents.result?.ok ? securityEvents.result.data.events[0] : undefined;
   const lastSecurityEventType = lastSecurityEvent?.type;
+
+  // Phase 24
+  const ttxCurrentPhase = ttxState.result?.ok ? ttxState.result.data : null;
+  const ttxLastInject = ttxCurrentPhase?.inject ?? null;
 
   return (
     <div id="telemetry-panel" className="op-panel rounded-sm p-4">
@@ -123,6 +127,25 @@ export function TelemetryPanel() {
                   last: {lastSecurityEventType} at {new Date(lastSecurityEvent.timestamp).toLocaleTimeString()}
                 </span>
               )}
+            </div>
+          )}
+        </InfoCard>
+
+        <InfoCard label="TTX Scenario">
+          {!ttxState.result ? (
+            <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : !ttxState.result.ok ? (
+            <span className="text-xs italic text-op-text-dim">unavailable — {ttxState.result.error}</span>
+          ) : !ttxCurrentPhase || ttxCurrentPhase.phaseIndex < 0 ? (
+            <span className="text-xs italic text-op-text-dim">not started</span>
+          ) : ttxCurrentPhase.done ? (
+            <span className="text-xs text-op-accent">complete</span>
+          ) : (
+            <div className="flex flex-col gap-0.5 text-xs">
+              <span className="text-op-text">
+                phase {ttxCurrentPhase.phaseIndex + 1} of {ttxCurrentPhase.total}
+              </span>
+              {ttxLastInject && <span className="text-op-text-dim">{ttxLastInject}</span>}
             </div>
           )}
         </InfoCard>

@@ -41,7 +41,12 @@
     // Security signal storage (Phase 23) — failed logins, invalid tokens,
     // malformed/duplicate/spiking webhook events. Same shared-across-
     // environments simplification as the other two namespaces.
-    { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" }
+    { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" },
+    // TTX scenario engine state (Phase 24) — a single hardcoded scenario's
+    // current phase index, not to be confused with the separate
+    // src/operator/ttx/ "TTX SaaS" scaffold (scenarios/roles/scoring),
+    // which still proxies to an Engine that doesn't exist yet.
+    { "binding": "TTX_STATE", "id": "b86a60440f2a4b3db5f949eebf420e56" }
   ],
   "env": {
     "staging": {
@@ -56,7 +61,8 @@
       "kv_namespaces": [
         { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },
         { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" },
-        { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" }
+        { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" },
+        { "binding": "TTX_STATE", "id": "b86a60440f2a4b3db5f949eebf420e56" }
       ]
     }
   }
