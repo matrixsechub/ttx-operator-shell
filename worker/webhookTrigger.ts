@@ -28,6 +28,9 @@ export interface WebhookEvent {
   receivedAt: string;
   payload: unknown;
   test?: boolean;
+  /** Lifted from payload.source / payload.type when present, for display/filtering — the full payload is kept as-is either way. */
+  source?: string;
+  type?: string;
 }
 
 const encoder = new TextEncoder();
@@ -69,13 +72,37 @@ function normalizePayload(rawBody: string): unknown {
   }
 }
 
+// Lifts payload.source / payload.type to top-level fields when the caller's
+// JSON has them, purely for cheap filtering/display in the cockpit — the
+// full payload is stored unchanged either way, this doesn't strip anything.
+function extractSourceAndType(payload: unknown): { source?: string; type?: string } {
+  if (typeof payload !== "object" || payload === null) return {};
+  const record = payload as Record<string, unknown>;
+  const result: { source?: string; type?: string } = {};
+  if (typeof record.source === "string") result.source = record.source;
+  if (typeof record.type === "string") result.type = record.type;
+  return result;
+}
+
+// KV writes/reads aren't expected to fail under normal operation, but if
+// they do, callers should get a clean 500 instead of an uncaught throw
+// bubbling out of the fetch handler. console.error here is genuinely new —
+// neither auth.ts nor engine.ts logs anything, because neither has had a
+// failure path worth logging before. This repo's observability config
+// (wrangler.jsonc) has been capturing nothing since Phase 11; this is the
+// first thing that actually emits to it.
 async function storeEvent(event: WebhookEvent, kv: KVNamespace): Promise<void> {
-  // ISO 8601 timestamps sort lexicographically in the same order they sort
-  // chronologically, so a prefix listing on "event:" naturally comes back
-  // oldest-first without needing a separate index.
-  await kv.put(`event:${event.receivedAt}:${event.id}`, JSON.stringify(event), {
-    expirationTtl: EVENT_TTL_SECONDS,
-  });
+  try {
+    // ISO 8601 timestamps sort lexicographically in the same order they
+    // sort chronologically, so a prefix listing on "event:" naturally
+    // comes back oldest-first without needing a separate index.
+    await kv.put(`event:${event.receivedAt}:${event.id}`, JSON.stringify(event), {
+      expirationTtl: EVENT_TTL_SECONDS,
+    });
+  } catch (err) {
+    console.error("webhookTrigger: failed to store event", event.id, err instanceof Error ? err.message : err);
+    throw err;
+  }
 }
 
 export async function handleWebhookRoute(request: Request, pathname: string, env: WebhookTriggerEnv): Promise<Response | null> {
@@ -102,12 +129,19 @@ async function handleIngest(request: Request, env: WebhookTriggerEnv): Promise<R
     return Response.json({ error: "Invalid or missing signature" }, { status: 401 });
   }
 
+  const payload = normalizePayload(rawBody);
   const event: WebhookEvent = {
     id: crypto.randomUUID(),
     receivedAt: new Date().toISOString(),
-    payload: normalizePayload(rawBody),
+    payload,
+    ...extractSourceAndType(payload),
   };
-  await storeEvent(event, env.WEBHOOK_EVENTS);
+
+  try {
+    await storeEvent(event, env.WEBHOOK_EVENTS);
+  } catch {
+    return Response.json({ error: "Failed to store event" }, { status: 500 });
+  }
 
   return Response.json({ ok: true, id: event.id }, { status: 200 });
 }
@@ -127,8 +161,15 @@ async function handleTest(request: Request, env: WebhookTriggerEnv): Promise<Res
     receivedAt: new Date().toISOString(),
     payload: { message: "Test event triggered from the Cockpit" },
     test: true,
+    source: "cockpit",
+    type: "test",
   };
-  await storeEvent(event, env.WEBHOOK_EVENTS);
+
+  try {
+    await storeEvent(event, env.WEBHOOK_EVENTS);
+  } catch {
+    return Response.json({ error: "Failed to store event" }, { status: 500 });
+  }
 
   return Response.json({ ok: true, id: event.id }, { status: 200 });
 }
@@ -138,19 +179,34 @@ async function handleEvents(request: Request, env: WebhookTriggerEnv): Promise<R
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "GET" } });
   }
 
-  const listed = await env.WEBHOOK_EVENTS.list({ prefix: "event:", limit: MAX_STORED_EVENTS });
-  const events = await Promise.all(
-    listed.keys.map(async (key) => {
-      const raw = await env.WEBHOOK_EVENTS.get(key.name);
-      if (!raw) return null;
-      try {
-        return JSON.parse(raw) as WebhookEvent;
-      } catch {
-        return null;
-      }
-    }),
-  );
+  const url = new URL(request.url);
+  const sourceFilter = url.searchParams.get("source");
+  const typeFilter = url.searchParams.get("type");
 
-  const validEvents = events.filter((event): event is WebhookEvent => event !== null).reverse(); // newest first
+  let validEvents: WebhookEvent[];
+  try {
+    const listed = await env.WEBHOOK_EVENTS.list({ prefix: "event:", limit: MAX_STORED_EVENTS });
+    const events = await Promise.all(
+      listed.keys.map(async (key) => {
+        const raw = await env.WEBHOOK_EVENTS.get(key.name);
+        if (!raw) return null;
+        try {
+          return JSON.parse(raw) as WebhookEvent;
+        } catch {
+          return null;
+        }
+      }),
+    );
+    validEvents = events.filter((event): event is WebhookEvent => event !== null).reverse(); // newest first
+  } catch (err) {
+    console.error("webhookTrigger: failed to list events", err instanceof Error ? err.message : err);
+    return Response.json({ error: "Failed to retrieve events" }, { status: 500 });
+  }
+
+  // Filtering happens after listing, not via a KV query — at MAX_STORED_EVENTS
+  // (50) that's trivial in-memory work, and KV has no native field querying.
+  if (sourceFilter) validEvents = validEvents.filter((event) => event.source === sourceFilter);
+  if (typeFilter) validEvents = validEvents.filter((event) => event.type === typeFilter);
+
   return Response.json({ events: validEvents });
 }

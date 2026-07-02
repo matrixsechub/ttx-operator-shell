@@ -9,11 +9,12 @@ import { useTelemetry } from "../lib/useTelemetry";
 // (the external Engine call degrades gracefully today) never blanks the
 // rest of the panel.
 export function TelemetryPanel() {
-  const { workerHealth, engineVersion, externalStatus, catalog, operator } = useTelemetry();
+  const { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, operator } = useTelemetry();
 
   const workerOnline = workerHealth.result?.ok && workerHealth.result.data.status === "ok";
   const versionLabel = engineVersion.result?.ok ? `v${engineVersion.result.data.version}` : "unknown";
   const itemCount = catalog.result?.ok ? catalog.result.data.items.length : null;
+  const webhookEventCount = webhookEvents.result?.ok ? webhookEvents.result.data.events.length : null;
 
   return (
     <div id="telemetry-panel" className="op-panel rounded-sm p-4">
@@ -65,6 +66,16 @@ export function TelemetryPanel() {
             <span className="text-xs italic text-op-text-dim">unavailable — {catalog.result.error}</span>
           ) : (
             <span className="text-xs text-op-text">{itemCount} items available</span>
+          )}
+        </InfoCard>
+
+        <InfoCard label="Webhook Events">
+          {!webhookEvents.result ? (
+            <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : !webhookEvents.result.ok ? (
+            <span className="text-xs italic text-op-text-dim">unavailable — {webhookEvents.result.error}</span>
+          ) : (
+            <span className="text-xs text-op-text">{webhookEventCount} events received</span>
           )}
         </InfoCard>
       </div>

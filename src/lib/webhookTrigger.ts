@@ -7,4 +7,11 @@ export interface WebhookEvent {
   receivedAt: string;
   payload: unknown;
   test?: boolean;
+  source?: string;
+  type?: string;
+}
+
+export interface WebhookEventFilter {
+  source?: string;
+  type?: string;
 }
