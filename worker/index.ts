@@ -5,12 +5,14 @@ import { CATALOG_ITEMS } from "./catalogData";
 import { handleAuthRoute } from "./auth";
 import { handleEngineRoute } from "./engine";
 import { handleWebhookRoute } from "./webhookTrigger";
+import { handleSecurityRoute } from "./security";
 
 const API_PREFIX = "/api/";
 const CATALOG_PATH = "/api/marketplace/catalog";
 const AUTH_PREFIX = "/api/auth/";
 const ENGINE_PREFIX = "/api/engine/";
 const WEBHOOK_PREFIX = "/api/webhooks/";
+const SECURITY_PREFIX = "/api/security/";
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 60;
@@ -61,6 +63,12 @@ export default {
         const webhookResponse = await handleWebhookRoute(request, url.pathname, env);
         if (webhookResponse) return webhookResponse;
         // Unhandled /api/webhooks/* paths fall through to the Engine proxy.
+      }
+
+      if (url.pathname.startsWith(SECURITY_PREFIX)) {
+        const securityResponse = await handleSecurityRoute(request, url.pathname, env);
+        if (securityResponse) return securityResponse;
+        // Unhandled /api/security/* paths fall through to the Engine proxy.
       }
 
       if (url.pathname.startsWith(AUTH_PREFIX)) {

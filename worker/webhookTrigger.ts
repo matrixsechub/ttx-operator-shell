@@ -23,6 +23,7 @@
 // KV's own cursor would fight the ordering the operator actually wants.
 
 import { hasValidAccessToken, type AuthEnv } from "./auth";
+import { recordSecurityEvent, type SecurityEnv } from "./security";
 
 const MAX_STORED_EVENTS = 50;
 const DEFAULT_PAGE_SIZE = 20;
@@ -33,12 +34,80 @@ export interface WebhookTriggerEnv {
   WEBHOOK_EVENTS: KVNamespace;
 }
 
-// handleWebhookRoute takes WebhookTriggerEnv & AuthEnv rather than just
-// WebhookTriggerEnv, since /api/webhooks/clear needs hasValidAccessToken's
-// full env shape too. worker/index.ts always passes the real generated
-// Env, which satisfies both — this intersection just says so explicitly
-// instead of duplicating AuthEnv's fields here and risking drift.
-type Env = WebhookTriggerEnv & AuthEnv;
+// handleWebhookRoute takes WebhookTriggerEnv & AuthEnv & SecurityEnv rather
+// than just WebhookTriggerEnv: /api/webhooks/clear needs hasValidAccessToken's
+// full env shape, and Phase 23's anomaly signals need SECURITY_EVENTS.
+// worker/index.ts always passes the real generated Env, which satisfies all
+// three — this intersection just says so explicitly instead of duplicating
+// their fields here and risking drift.
+type Env = WebhookTriggerEnv & AuthEnv & SecurityEnv;
+
+// Best-effort, single-isolate anomaly counters (Phase 23) — same caveat as
+// index.ts's Phase 11 rate limiter: Workers isolates don't share memory, so
+// under real multi-instance load this is operator situational awareness,
+// not a hard cross-instance guarantee. Only tracked for /ingest (real
+// external traffic) — /test is cockpit-triggered synthetic traffic, not
+// something worth flagging as anomalous.
+const SPIKE_WINDOW_MS = 10_000;
+const SPIKE_THRESHOLD = 20;
+let spikeWindowStart = 0;
+let spikeWindowCount = 0;
+let spikeFlaggedThisWindow = false;
+
+const DUPLICATE_WINDOW_MS = 60_000;
+const DUPLICATE_THRESHOLD = 3;
+const payloadHashSeen = new Map<string, { count: number; windowStart: number; flagged: boolean }>();
+
+const BURST_WINDOW_MS = 10_000;
+const BURST_THRESHOLD = 5;
+const sourceTypeSeen = new Map<string, { count: number; windowStart: number; flagged: boolean }>();
+
+async function hashPayload(rawBody: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", encoder.encode(rawBody));
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+// Tumbling window, flags once per window (not once per event past
+// threshold) — a 60-event spike should produce one webhook_spike signal,
+// not forty.
+function checkSpike(): boolean {
+  const now = Date.now();
+  if (now - spikeWindowStart >= SPIKE_WINDOW_MS) {
+    spikeWindowStart = now;
+    spikeWindowCount = 0;
+    spikeFlaggedThisWindow = false;
+  }
+  spikeWindowCount += 1;
+  if (spikeWindowCount > SPIKE_THRESHOLD && !spikeFlaggedThisWindow) {
+    spikeFlaggedThisWindow = true;
+    return true;
+  }
+  return false;
+}
+
+// Shared by both the duplicate-payload and source/type-burst counters —
+// same tumbling-window, flag-once shape as checkSpike, just keyed per value.
+function checkRepeat(
+  map: Map<string, { count: number; windowStart: number; flagged: boolean }>,
+  key: string,
+  windowMs: number,
+  threshold: number,
+): boolean {
+  const now = Date.now();
+  const entry = map.get(key);
+  if (!entry || now - entry.windowStart >= windowMs) {
+    map.set(key, { count: 1, windowStart: now, flagged: false });
+    return false;
+  }
+  entry.count += 1;
+  if (entry.count > threshold && !entry.flagged) {
+    entry.flagged = true;
+    return true;
+  }
+  return false;
+}
 
 export interface WebhookEvent {
   id: string;
@@ -79,13 +148,14 @@ async function verifySignature(rawBody: string, signatureHex: string, secret: st
   }
 }
 
-function normalizePayload(rawBody: string): unknown {
+function normalizePayload(rawBody: string): { payload: unknown; malformed: boolean } {
   try {
-    return JSON.parse(rawBody);
+    return { payload: JSON.parse(rawBody), malformed: false };
   } catch {
     // Not JSON — store as a raw string rather than rejecting. Ingestion
-    // shouldn't assume every external caller sends a JSON body.
-    return { raw: rawBody };
+    // shouldn't assume every external caller sends a JSON body, but it's
+    // still a signal worth surfacing (Phase 23).
+    return { payload: { raw: rawBody }, malformed: true };
   }
 }
 
@@ -167,10 +237,17 @@ async function handleIngest(request: Request, env: Env): Promise<Response> {
   const rawBody = await request.text();
   const signature = request.headers.get("X-Webhook-Signature");
   if (!signature || !(await verifySignature(rawBody, signature, env.WEBHOOK_SECRET))) {
+    await recordSecurityEvent(env.SECURITY_EVENTS, "webhook_signature_failed", {
+      reason: signature ? "invalid" : "missing",
+    });
     return Response.json({ error: "Invalid or missing signature" }, { status: 401 });
   }
 
-  const payload = normalizePayload(rawBody);
+  const { payload, malformed } = normalizePayload(rawBody);
+  if (malformed) {
+    await recordSecurityEvent(env.SECURITY_EVENTS, "webhook_malformed", { length: rawBody.length });
+  }
+
   const event: WebhookEvent = {
     id: crypto.randomUUID(),
     receivedAt: new Date().toISOString(),
@@ -182,6 +259,23 @@ async function handleIngest(request: Request, env: Env): Promise<Response> {
     await storeEvent(event, env.WEBHOOK_EVENTS);
   } catch {
     return Response.json({ error: "Failed to store event" }, { status: 500 });
+  }
+
+  if (checkSpike()) {
+    await recordSecurityEvent(env.SECURITY_EVENTS, "webhook_spike", {
+      windowMs: SPIKE_WINDOW_MS,
+      threshold: SPIKE_THRESHOLD,
+    });
+  }
+  const payloadHash = await hashPayload(rawBody);
+  if (checkRepeat(payloadHashSeen, payloadHash, DUPLICATE_WINDOW_MS, DUPLICATE_THRESHOLD)) {
+    await recordSecurityEvent(env.SECURITY_EVENTS, "webhook_duplicate_payload", { hash: payloadHash.slice(0, 12) });
+  }
+  if (event.source || event.type) {
+    const sourceTypeKey = `${event.source ?? ""}:${event.type ?? ""}`;
+    if (checkRepeat(sourceTypeSeen, sourceTypeKey, BURST_WINDOW_MS, BURST_THRESHOLD)) {
+      await recordSecurityEvent(env.SECURITY_EVENTS, "webhook_burst", { source: event.source, type: event.type });
+    }
   }
 
   return Response.json({ ok: true, id: event.id }, { status: 200 });

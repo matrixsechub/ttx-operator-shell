@@ -9,6 +9,13 @@
 // - No full user/session database: refresh-token revocation (Phase 16)
 //   uses a KV denylist keyed by token jti, not a positive session store —
 //   the smallest primitive that makes "revocable" true without a DB.
+//
+// Phase 23: failed logins and invalid-token verifications now also record a
+// lightweight security signal (see ./security) — situational awareness for
+// the operator, not a lockout/throttling mechanism. Nothing here blocks a
+// request because of prior failures.
+
+import { recordSecurityEvent, type SecurityEnv } from "./security";
 
 // Note: PBKDF2 iteration count lives in the stored hash string itself
 // (pbkdf2$<iterations>$...), set by scripts/hash-password.mjs — verification
@@ -188,18 +195,26 @@ function operatorFromEnv(env: AuthEnv): OperatorProfile {
 // consumer: Phase 22's POST /api/webhooks/clear, a destructive action that
 // (unlike the rest of this repo's unauthenticated GET/POST data routes)
 // genuinely warrants requiring a valid session first.
-export async function hasValidAccessToken(request: Request, env: AuthEnv): Promise<boolean> {
+export async function hasValidAccessToken(request: Request, env: AuthEnv & SecurityEnv): Promise<boolean> {
   if (!env.AUTH_SIGNING_KEY) return false;
   const token = bearerToken(request);
   if (!token) return false;
   const payload = await verifyToken(token, env.AUTH_SIGNING_KEY);
-  return payload?.type === "access";
+  if (payload?.type === "access") return true;
+  // Only a present-but-invalid token counts as a signal — a missing token
+  // is just an anonymous request, not an anomaly.
+  await recordSecurityEvent(env.SECURITY_EVENTS, "invalid_token", {});
+  return false;
 }
 
 // Returns null for /api/auth/* paths this module doesn't own so the caller
 // falls through to the Engine proxy — the same graceful degradation those
 // paths had before this file existed.
-export async function handleAuthRoute(request: Request, pathname: string, env: AuthEnv): Promise<Response | null> {
+export async function handleAuthRoute(
+  request: Request,
+  pathname: string,
+  env: AuthEnv & SecurityEnv,
+): Promise<Response | null> {
   if (pathname === "/api/auth/login") return handleLogin(request, env);
   if (pathname === "/api/auth/me") return handleMe(request, env);
   if (pathname === "/api/auth/logout") return handleLogout(request, env);
@@ -207,7 +222,7 @@ export async function handleAuthRoute(request: Request, pathname: string, env: A
   return null;
 }
 
-async function handleLogin(request: Request, env: AuthEnv): Promise<Response> {
+async function handleLogin(request: Request, env: AuthEnv & SecurityEnv): Promise<Response> {
   if (request.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
   }
@@ -229,6 +244,9 @@ async function handleLogin(request: Request, env: AuthEnv): Promise<Response> {
   // 401 for a wrong callsign as for a wrong passphrase — don't reveal which.
   const passwordOk = await verifyPassword(body.password, env.OPERATOR_PASSWORD_HASH);
   if (body.username !== env.OPERATOR_CALLSIGN || !passwordOk) {
+    // Username only, never the password — details are stored in KV and
+    // surfaced in the cockpit feed.
+    await recordSecurityEvent(env.SECURITY_EVENTS, "auth_failed", { username: body.username });
     return Response.json({ error: "Invalid credentials" }, { status: 401 });
   }
 

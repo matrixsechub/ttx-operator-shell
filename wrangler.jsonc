@@ -37,7 +37,11 @@
     // Webhook Trigger event storage (Phase 20). Real KV namespace, created
     // via `wrangler kv namespace create WEBHOOK_EVENTS`. Same shared-across-
     // environments simplification as AUTH_REVOCATION.
-    { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" }
+    { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" },
+    // Security signal storage (Phase 23) — failed logins, invalid tokens,
+    // malformed/duplicate/spiking webhook events. Same shared-across-
+    // environments simplification as the other two namespaces.
+    { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" }
   ],
   "env": {
     "staging": {
@@ -51,7 +55,8 @@
       },
       "kv_namespaces": [
         { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },
-        { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" }
+        { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" },
+        { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" }
       ]
     }
   }

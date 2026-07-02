@@ -2,6 +2,7 @@ import { api } from "./apiClient";
 import { useApiResource } from "./useApiResource";
 import { useAuth } from "./AuthContext";
 import { webhookTriggerService } from "./webhookTriggerService";
+import { securityService } from "./securityService";
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -26,7 +27,12 @@ export function useTelemetry() {
   const externalStatus = useApiResource(api.getSystemStatus, { pollIntervalMs: POLL_INTERVAL_MS });
   const catalog = useApiResource(api.getCatalog, { pollIntervalMs: POLL_INTERVAL_MS });
   const webhookEvents = useApiResource(() => webhookTriggerService.getEvents(), { pollIntervalMs: POLL_INTERVAL_MS });
+  // Phase 23 — one more useApiResource call feeding security event count/
+  // last-event, same reasoning as webhookEvents above: no new hook needed.
+  const securityEvents = useApiResource(() => securityService.fetchSecurityEvents(), {
+    pollIntervalMs: POLL_INTERVAL_MS,
+  });
   const { operator } = useAuth();
 
-  return { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, operator };
+  return { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, operator };
 }

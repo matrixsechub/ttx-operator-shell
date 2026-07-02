@@ -3,6 +3,7 @@ import { OperatorShell } from "../components/OperatorShell";
 import { SystemTelemetryPanel } from "../components/SystemTelemetryPanel";
 import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
 import { TelemetryPanel } from "../components/TelemetryPanel";
+import { SecurityPanel } from "../components/SecurityPanel";
 import { OperatorTimeline } from "./dashboard/OperatorTimeline";
 import { MissionBoard } from "./dashboard/MissionBoard";
 import { TelemetryRails } from "./dashboard/TelemetryRails";
@@ -76,6 +77,7 @@ export function Dashboard() {
             <TTXStatusPanel />
             <TelemetryFeed />
             <WebhookTriggerPanel />
+            <SecurityPanel />
           </div>
         </div>
       </div>

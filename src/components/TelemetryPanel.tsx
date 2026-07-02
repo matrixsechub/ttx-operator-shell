@@ -9,7 +9,8 @@ import { useTelemetry } from "../lib/useTelemetry";
 // (the external Engine call degrades gracefully today) never blanks the
 // rest of the panel.
 export function TelemetryPanel() {
-  const { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, operator } = useTelemetry();
+  const { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, operator } =
+    useTelemetry();
 
   const workerOnline = workerHealth.result?.ok && workerHealth.result.data.status === "ok";
   const versionLabel = engineVersion.result?.ok ? `v${engineVersion.result.data.version}` : "unknown";
@@ -26,6 +27,14 @@ export function TelemetryPanel() {
   // 60s". Good enough for an at-a-glance cockpit signal.
   const oneMinuteAgo = Date.now() - 60_000;
   const eventsPerMinute = recentEvents.filter((event) => new Date(event.receivedAt).getTime() >= oneMinuteAgo).length;
+
+  // Phase 23 — security feed has no .total (no pagination on that endpoint,
+  // see worker/security.ts), so the count is the currently-loaded feed
+  // length (already capped at 20 server-side), not a distinct "recent vs
+  // all" split like webhook events above.
+  const securityEventCount = securityEvents.result?.ok ? securityEvents.result.data.events.length : null;
+  const lastSecurityEvent = securityEvents.result?.ok ? securityEvents.result.data.events[0] : undefined;
+  const lastSecurityEventType = lastSecurityEvent?.type;
 
   return (
     <div id="telemetry-panel" className="op-panel rounded-sm p-4">
@@ -95,6 +104,23 @@ export function TelemetryPanel() {
                 <span className="text-op-text-dim">
                   last: {lastEvent.source ?? "unknown"}
                   {lastEvent.type && ` / ${lastEvent.type}`}
+                </span>
+              )}
+            </div>
+          )}
+        </InfoCard>
+
+        <InfoCard label="Security Signals">
+          {!securityEvents.result ? (
+            <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : !securityEvents.result.ok ? (
+            <span className="text-xs italic text-op-text-dim">unavailable — {securityEvents.result.error}</span>
+          ) : (
+            <div className="flex flex-col gap-0.5 text-xs">
+              <span className="text-op-text">{securityEventCount} recent events</span>
+              {lastSecurityEvent && (
+                <span className="text-op-text-dim">
+                  last: {lastSecurityEventType} at {new Date(lastSecurityEvent.timestamp).toLocaleTimeString()}
                 </span>
               )}
             </div>
