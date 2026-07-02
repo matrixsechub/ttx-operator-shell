@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mshops-storefront",
+  "name": "ttx-operator-shell",
   "main": "worker/index.ts",
   "compatibility_date": "2026-06-30",
   "observability": {
@@ -18,7 +18,7 @@
   },
   "env": {
     "staging": {
-      "name": "mshops-storefront-staging",
+      "name": "ttx-operator-shell-staging",
       "vars": {
         "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev"
       }

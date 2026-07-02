@@ -49,7 +49,7 @@ npm run typecheck
 npm run deploy         # builds, then `wrangler deploy`
 ```
 
-This deploys `mshops-storefront` as defined in `wrangler.jsonc`. To point the production
+This deploys `ttx-operator-shell` as defined in `wrangler.jsonc`. To point the production
 `ENGINE_API_URL` at a different backend, edit `wrangler.jsonc` `vars.ENGINE_API_URL` (non-secret)
 or use `wrangler secret put` for anything sensitive.
 
@@ -60,7 +60,7 @@ there first as a manual pre-production check:
 
 ```bash
 npm run build
-wrangler deploy --env staging   # deploys mshops-storefront-staging
+wrangler deploy --env staging   # deploys ttx-operator-shell-staging
 ```
 
 Smoke-test the staging URL, then promote with `npm run deploy` (no `--env` flag) once satisfied.

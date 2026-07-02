@@ -10,7 +10,7 @@ versioning model directly.
 wrangler deployments list
 ```
 
-Shows recent deployments for `mshops-storefront` (or pass `--env staging` for the staging Worker),
+Shows recent deployments for `ttx-operator-shell` (or pass `--env staging` for the staging Worker),
 newest first, with deployment IDs.
 
 ## Roll back
