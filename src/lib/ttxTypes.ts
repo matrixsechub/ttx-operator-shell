@@ -172,3 +172,19 @@ export interface TtxScorePacket {
   roleActions: TtxScoreRoleActions;
   computedAt: string;
 }
+
+// --- Session history (Phase 34) ---
+// Mirrors worker/ttxHistory.ts's HistoryPacket exactly — a read-only join
+// over existing score + analytics packets, not a separately-stored thing.
+
+export type TtxScoreBand = "strong" | "mixed" | "degraded";
+
+export interface TtxHistoryPacket {
+  sessionId: string;
+  scenarioId: string;
+  scenarioName: string;
+  startedAt: string;
+  completedAt: string;
+  score: number;
+  band: TtxScoreBand;
+}

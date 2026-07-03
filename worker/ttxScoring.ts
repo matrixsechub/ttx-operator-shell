@@ -31,7 +31,11 @@ export type ScoringEnv = AnalyticsEnv & LocalScenarioEnv;
 
 const SCORE_PREFIX = "score:";
 const SCORE_TTL_SECONDS = 7 * 24 * 60 * 60; // matches session/analytics TTL
-const MAX_STORED_SCORES = 50; // same retention shape as webhook/security events
+// 100 (Phase 34) — bumped from Phase 32's original 50 to satisfy the
+// history engine's "last 100 sessions" retention ask. History (see
+// worker/ttxHistory.ts) is derived from this same list rather than
+// stored separately, so one retention cap serves both features.
+const MAX_STORED_SCORES = 100;
 
 export interface ScoreBreakdown {
   correctChoices: number;
@@ -185,6 +189,20 @@ async function handleGetScore(request: Request, env: ScoringEnv): Promise<Respon
   return Response.json(packet);
 }
 
+// Shared by handleListScores below and worker/ttxHistory.ts (Phase 34) —
+// history is derived from this exact list rather than stored as its own
+// packet, so both features read through one function.
+export async function listScorePackets(kv: KVNamespace): Promise<ScorePacket[]> {
+  try {
+    const listed = await kv.list({ prefix: SCORE_PREFIX, limit: MAX_STORED_SCORES });
+    const raw = await Promise.all(listed.keys.map((key) => kv.get(key.name)));
+    return raw.filter((value): value is string => value !== null).map((value) => JSON.parse(value) as ScorePacket);
+  } catch (err) {
+    console.error("ttxScoring: failed to list scores", err instanceof Error ? err.message : err);
+    return [];
+  }
+}
+
 // Feeds TelemetryPanel's "average score"/"last score" (Phase 32) — the one
 // list-style endpoint in this file. Retention already caps the dataset at
 // MAX_STORED_SCORES, so this is a small, bounded in-memory computation,
@@ -194,13 +212,6 @@ async function handleListScores(request: Request, env: ScoringEnv): Promise<Resp
   if (request.method !== "GET") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "GET" } });
   }
-  try {
-    const listed = await env.TTX_STATE.list({ prefix: SCORE_PREFIX, limit: MAX_STORED_SCORES });
-    const raw = await Promise.all(listed.keys.map((key) => env.TTX_STATE.get(key.name)));
-    const scores = raw.filter((value): value is string => value !== null).map((value) => JSON.parse(value) as ScorePacket);
-    return Response.json({ scores });
-  } catch (err) {
-    console.error("ttxScoring: failed to list scores", err instanceof Error ? err.message : err);
-    return Response.json({ error: "Failed to list scores" }, { status: 500 });
-  }
+  const scores = await listScorePackets(env.TTX_STATE);
+  return Response.json({ scores });
 }

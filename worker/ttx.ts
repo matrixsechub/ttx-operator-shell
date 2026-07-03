@@ -64,14 +64,19 @@
 // on-demand from the analytics packet, stored separately, exposed via
 // POST/GET /api/ttx/sessions/score (see that file's header for why this
 // isn't /sessions/:id/score as originally specified).
+//
+// Phase 34 adds session history (worker/ttxHistory.ts) — a read-only join
+// over existing score + analytics packets (no new KV writes), exposed via
+// GET /api/ttx/sessions/history, optionally filtered by ?scenarioId=.
 
 import { entryNode, step } from "./scenarioGraph";
 import { SCENARIO_DEFINITIONS, type ScenarioDefinition } from "./scenarioManifest";
 import { getScenarioById, handleLocalScenarioRoute, listAuthoredScenarios, type LocalScenarioEnv } from "./localScenarioRoutes";
 import { recordAnalyticsFinalize, recordAnalyticsStart, recordAnalyticsTransition, handleAnalyticsRoute, type AnalyticsEnv } from "./ttxAnalytics";
 import { handleScoringRoute, type ScoringEnv } from "./ttxScoring";
+import { handleHistoryRoute, type HistoryEnv } from "./ttxHistory";
 
-export type TtxEnv = LocalScenarioEnv & AnalyticsEnv & ScoringEnv;
+export type TtxEnv = LocalScenarioEnv & AnalyticsEnv & ScoringEnv & HistoryEnv;
 
 const SESSION_PREFIX = "session:";
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -160,6 +165,9 @@ export async function handleTtxRoute(request: Request, pathname: string, env: Tt
 
   const scoringResponse = await handleScoringRoute(request, pathname, env);
   if (scoringResponse) return scoringResponse;
+
+  const historyResponse = await handleHistoryRoute(request, pathname, env);
+  if (historyResponse) return historyResponse;
 
   if (pathname === "/api/ttx/sessions/scenarios") return handleScenarios(request, env);
   if (pathname === "/api/ttx/sessions/start") return handleStart(request, env);

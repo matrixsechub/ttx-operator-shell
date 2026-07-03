@@ -186,7 +186,9 @@ export function TelemetryPanel() {
             <span className="text-xs italic text-op-text-dim">no scored sessions yet</span>
           ) : (
             <div className="flex flex-col gap-0.5 text-xs">
-              <span className="text-op-text">average: {ttxAverageScore}</span>
+              <span className="text-op-text">
+                {ttxScoreList.length} sessions completed · average {ttxAverageScore}
+              </span>
               {ttxLastScore && <span className="text-op-text-dim">last: {ttxLastScore.score}</span>}
             </div>
           )}
