@@ -85,3 +85,29 @@ export interface TtxScenarioDraft {
 export interface TtxLocalScenario extends TtxScenarioDraft {
   id: string;
 }
+
+// --- Execution analytics (Phase 27) ---
+// Mirrors worker/ttxAnalytics.ts's AnalyticsPacket exactly. moduleTags is
+// always [] today — see that file's header comment for why the field
+// exists without a module-tag concept behind it yet.
+
+export interface TtxAnalyticsTransition {
+  fromNodeId: string;
+  toNodeId: string;
+  choice: string;
+  at: string;
+}
+
+export interface TtxAnalyticsPacket {
+  sessionId: string;
+  scenarioId: string;
+  scenarioSource: "builtin" | "authored";
+  entryNode: string;
+  transitions: TtxAnalyticsTransition[];
+  terminalNode: string | null;
+  roleTags: string[];
+  moduleTags: string[];
+  startedAt: string;
+  endedAt: string | null;
+  durationMs: number | null;
+}

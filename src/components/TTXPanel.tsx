@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { InfoCard } from "./InfoCard";
+import { AnalyticsCard } from "./AnalyticsCard";
 import { useApiResource } from "../lib/useApiResource";
 import { ttxSessionService } from "../lib/ttxSessionService";
+import { ttxAnalyticsService } from "../lib/ttxAnalyticsService";
 import { getCurrentSessionId, setCurrentSessionId, clearCurrentSessionId } from "../lib/ttxSessionStorage";
 import type { ApiResult } from "../lib/apiClient";
-import type { TtxSessionState } from "../lib/ttxTypes";
+import type { TtxAnalyticsPacket, TtxSessionState } from "../lib/ttxTypes";
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -46,6 +48,19 @@ export function TTXPanel() {
   );
 
   const state = stateResult?.ok ? stateResult.data : null;
+
+  // Analytics is only meaningful once a session has actually ended — shown
+  // below the phase card, not polled while the session is still live
+  // (fetched fresh on refresh(), matching every other action in this
+  // panel; no separate poll interval).
+  const { result: analyticsResult } = useApiResource(
+    () =>
+      sessionId && state?.done
+        ? ttxAnalyticsService.getAnalytics(sessionId)
+        : Promise.resolve<ApiResult<TtxAnalyticsPacket>>({ ok: false, error: "Session not complete" }),
+    { pollIntervalMs: POLL_INTERVAL_MS },
+  );
+  const analytics = analyticsResult?.ok ? analyticsResult.data : null;
 
   async function handleStart() {
     if (!selectedScenarioId) return;
@@ -201,6 +216,8 @@ export function TTXPanel() {
           </ul>
         </div>
       )}
+
+      {analytics && <AnalyticsCard packet={analytics} />}
     </div>
   );
 }

@@ -51,12 +51,21 @@
 // calls the existing untouched ttxService.listScenarios() alongside this
 // file's own /api/ttx/sessions/scenarios, and labels each result's
 // source for display) — see that file for the full reasoning.
+//
+// Phase 27 adds lightweight execution analytics (worker/ttxAnalytics.ts) —
+// one append-only, KV-backed packet per session, recorded alongside every
+// handleStart/handleNext call but never able to affect their outcome (see
+// that file's fail-soft-by-design note). Exposed read-only via
+// GET /api/ttx/analytics?sessionId=... (query param, not a :sessionId
+// path segment — this Worker has no router library, every multi-value
+// read route in this repo uses a query string, e.g. .../sessions/state).
 
 import { entryNode, step } from "./scenarioGraph";
 import { SCENARIO_DEFINITIONS, type ScenarioDefinition } from "./scenarioManifest";
 import { getScenarioById, handleLocalScenarioRoute, listAuthoredScenarios, type LocalScenarioEnv } from "./localScenarioRoutes";
+import { recordAnalyticsFinalize, recordAnalyticsStart, recordAnalyticsTransition, handleAnalyticsRoute, type AnalyticsEnv } from "./ttxAnalytics";
 
-export type TtxEnv = LocalScenarioEnv;
+export type TtxEnv = LocalScenarioEnv & AnalyticsEnv;
 
 const SESSION_PREFIX = "session:";
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -140,6 +149,9 @@ export async function handleTtxRoute(request: Request, pathname: string, env: Tt
   const localScenarioResponse = await handleLocalScenarioRoute(request, pathname, env);
   if (localScenarioResponse) return localScenarioResponse;
 
+  const analyticsResponse = await handleAnalyticsRoute(request, pathname, env);
+  if (analyticsResponse) return analyticsResponse;
+
   if (pathname === "/api/ttx/sessions/scenarios") return handleScenarios(request, env);
   if (pathname === "/api/ttx/sessions/start") return handleStart(request, env);
   if (pathname === "/api/ttx/sessions/next") return handleNext(request, env);
@@ -204,6 +216,7 @@ async function handleStart(request: Request, env: TtxEnv): Promise<Response> {
   } catch {
     return Response.json({ error: "Failed to start session" }, { status: 500 });
   }
+  await recordAnalyticsStart(env.TTX_STATE, state.sessionId, scenario, entry.id);
   return Response.json(toResponse(state, scenario));
 }
 
@@ -261,6 +274,26 @@ async function handleNext(request: Request, env: TtxEnv): Promise<Response> {
   } catch {
     return Response.json({ error: "Failed to advance session" }, { status: 500 });
   }
+
+  // Analytics recording never affects the response above — see
+  // ttxAnalytics.ts's fail-soft-by-design note.
+  if (result.status === "done") {
+    // The current node had zero transitions to begin with (a trivial
+    // scenario whose entry is immediately terminal) — no new node was
+    // visited this call, so there's no transition to append, only a
+    // finalize. The common case (arriving at a terminal node) is handled
+    // in the branch below instead.
+    await recordAnalyticsFinalize(env.TTX_STATE, sessionId, state.nodeId);
+  } else {
+    const node = result.node;
+    const currentNode = scenario.nodes[state.nodeId];
+    const takenChoice = currentNode.transitions.length > 1 ? (choice as string) : currentNode.transitions[0].choice;
+    await recordAnalyticsTransition(env.TTX_STATE, sessionId, state.nodeId, node.id, takenChoice, node.role);
+    if (node.transitions.length === 0) {
+      await recordAnalyticsFinalize(env.TTX_STATE, sessionId, node.id);
+    }
+  }
+
   return Response.json(toResponse(next, scenario));
 }
 
