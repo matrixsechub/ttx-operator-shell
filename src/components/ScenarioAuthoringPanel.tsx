@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { StatusPill } from "./StatusPill";
 import { ScenarioNotesModal } from "./ScenarioNotesModal";
 import { useApiResource } from "../lib/useApiResource";
@@ -171,6 +171,24 @@ function looksLikeExportBlob(value: unknown): value is TtxScenarioExportBlob {
 const inputClass =
   "op-panel rounded-sm px-2 py-1 text-xs text-op-text placeholder:text-op-text-dim/50 focus:border-op-accent/60 focus:outline-none";
 
+// Wraps the first case-insensitive match of `query` in `text` with a
+// highlight span — display only, doesn't affect the underlying filter
+// logic in searchedScenarios above. Only highlights the first match per
+// string, which is enough for a short title/tag in a list row.
+function highlightMatch(text: string, query: string): ReactNode {
+  if (!query.trim()) return text;
+  const index = text.toLowerCase().indexOf(query.trim().toLowerCase());
+  if (index === -1) return text;
+  const end = index + query.trim().length;
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark className="rounded-sm bg-op-accent/30 text-op-text">{text.slice(index, end)}</mark>
+      {text.slice(end)}
+    </>
+  );
+}
+
 // Scenario authoring surface (Phase 26) — create/edit/delete
 // operator-authored scenarios that the TTX session engine (worker/ttx.ts)
 // can run alongside the builtins. Also renders the "SaaS bridge": the
@@ -203,6 +221,21 @@ export function ScenarioAuthoringPanel() {
     () => (tagFilter ? localScenarios.filter((s) => (s.tags ?? []).includes(tagFilter)) : localScenarios),
     [localScenarios, tagFilter],
   );
+
+  // Phase 31 — client-side only, same "purely descriptive, no new fetch"
+  // status as tag filtering above; composes with it (search narrows
+  // whatever the tag filter already produced), not a replacement for it.
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchedScenarios = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return filteredScenarios;
+    return filteredScenarios.filter((scenario) => {
+      if (scenario.title.toLowerCase().includes(query)) return true;
+      if ((scenario.tags ?? []).some((tag) => tag.toLowerCase().includes(query))) return true;
+      if (scenario.notes && scenario.notes.toLowerCase().includes(query)) return true;
+      return false;
+    });
+  }, [filteredScenarios, searchQuery]);
 
   const [draft, setDraft] = useState<Draft | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -527,6 +560,20 @@ export function ScenarioAuthoringPanel() {
 
       {!draft ? (
         <div className="mt-3">
+          <div className="mb-2 flex items-center gap-2">
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by title, tag, or notes…"
+              className={`${inputClass} w-full sm:w-64`}
+            />
+            {searchQuery && (
+              <button type="button" onClick={() => setSearchQuery("")} className="text-[10px] text-op-accent hover:underline">
+                clear
+              </button>
+            )}
+          </div>
+
           {allTags.length > 0 && (
             <div className="mb-2 flex items-center gap-2">
               <span className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Filter</span>
@@ -550,17 +597,21 @@ export function ScenarioAuthoringPanel() {
             </div>
           )}
 
-          {filteredScenarios.length === 0 ? (
+          {searchedScenarios.length === 0 ? (
             <p className="text-xs italic text-op-text-dim">
-              {localScenarios.length === 0 ? "No authored scenarios yet." : "No scenarios match this tag."}
+              {localScenarios.length === 0
+                ? "No authored scenarios yet."
+                : searchQuery
+                  ? "No scenarios match this search."
+                  : "No scenarios match this tag."}
             </p>
           ) : (
             <ul className="flex flex-col gap-1.5">
-              {filteredScenarios.map((scenario) => (
+              {searchedScenarios.map((scenario) => (
                 <li key={scenario.id} className="rounded-sm border border-op-border-bright px-2.5 py-1.5 text-xs">
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5 text-op-text">
-                      {scenario.title}
+                      {highlightMatch(scenario.title, searchQuery)}
                       {scenario.notes && (
                         <button
                           type="button"
@@ -603,7 +654,7 @@ export function ScenarioAuthoringPanel() {
                           key={tag}
                           className="rounded-sm border border-op-border-bright px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-op-text-dim"
                         >
-                          {tag}
+                          {highlightMatch(tag, searchQuery)}
                         </span>
                       ))}
                     </div>
