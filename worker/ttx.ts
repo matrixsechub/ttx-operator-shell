@@ -59,13 +59,19 @@
 // GET /api/ttx/analytics?sessionId=... (query param, not a :sessionId
 // path segment — this Worker has no router library, every multi-value
 // read route in this repo uses a query string, e.g. .../sessions/state).
+//
+// Phase 32 adds session scoring (worker/ttxScoring.ts) — computed
+// on-demand from the analytics packet, stored separately, exposed via
+// POST/GET /api/ttx/sessions/score (see that file's header for why this
+// isn't /sessions/:id/score as originally specified).
 
 import { entryNode, step } from "./scenarioGraph";
 import { SCENARIO_DEFINITIONS, type ScenarioDefinition } from "./scenarioManifest";
 import { getScenarioById, handleLocalScenarioRoute, listAuthoredScenarios, type LocalScenarioEnv } from "./localScenarioRoutes";
 import { recordAnalyticsFinalize, recordAnalyticsStart, recordAnalyticsTransition, handleAnalyticsRoute, type AnalyticsEnv } from "./ttxAnalytics";
+import { handleScoringRoute, type ScoringEnv } from "./ttxScoring";
 
-export type TtxEnv = LocalScenarioEnv & AnalyticsEnv;
+export type TtxEnv = LocalScenarioEnv & AnalyticsEnv & ScoringEnv;
 
 const SESSION_PREFIX = "session:";
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -151,6 +157,9 @@ export async function handleTtxRoute(request: Request, pathname: string, env: Tt
 
   const analyticsResponse = await handleAnalyticsRoute(request, pathname, env);
   if (analyticsResponse) return analyticsResponse;
+
+  const scoringResponse = await handleScoringRoute(request, pathname, env);
+  if (scoringResponse) return scoringResponse;
 
   if (pathname === "/api/ttx/sessions/scenarios") return handleScenarios(request, env);
   if (pathname === "/api/ttx/sessions/start") return handleStart(request, env);

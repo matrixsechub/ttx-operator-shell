@@ -132,6 +132,15 @@ export async function recordAnalyticsFinalize(kv: KVNamespace, sessionId: string
   await writeAnalytics(kv, packet);
 }
 
+// Exported read access for worker/ttxScoring.ts (Phase 32) — scoring needs
+// "what choices were actually taken and did the session finish", which is
+// exactly what an analytics packet already records. Scoring doesn't touch
+// worker/ttx.ts's SessionState at all; the analytics packet is sufficient
+// and keeps the two files' KV access independent.
+export async function getAnalyticsPacket(kv: KVNamespace, sessionId: string): Promise<AnalyticsPacket | null> {
+  return readAnalytics(kv, sessionId);
+}
+
 export async function handleAnalyticsRoute(request: Request, pathname: string, env: AnalyticsEnv): Promise<Response | null> {
   if (pathname !== "/api/ttx/analytics") return null;
   if (request.method !== "GET") {

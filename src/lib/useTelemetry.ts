@@ -4,6 +4,7 @@ import { useAuth } from "./AuthContext";
 import { webhookTriggerService } from "./webhookTriggerService";
 import { securityService } from "./securityService";
 import { ttxSessionService } from "./ttxSessionService";
+import { ttxScoringService } from "./ttxScoringService";
 import { getCurrentSessionId } from "./ttxSessionStorage";
 import type { ApiResult } from "./apiClient";
 import type { TtxSessionState } from "./ttxTypes";
@@ -52,7 +53,20 @@ export function useTelemetry() {
     },
     { pollIntervalMs: POLL_INTERVAL_MS },
   );
+  // Phase 32 — same reasoning as every other resource above: one more
+  // useApiResource call feeding average/last score, no new hook needed.
+  const ttxScores = useApiResource(() => ttxScoringService.listScores(), { pollIntervalMs: POLL_INTERVAL_MS });
   const { operator } = useAuth();
 
-  return { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, ttxState, operator };
+  return {
+    workerHealth,
+    engineVersion,
+    externalStatus,
+    catalog,
+    webhookEvents,
+    securityEvents,
+    ttxState,
+    ttxScores,
+    operator,
+  };
 }

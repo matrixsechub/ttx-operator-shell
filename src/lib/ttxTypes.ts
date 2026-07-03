@@ -71,6 +71,16 @@ export interface TtxScenarioNode {
   transitions: TtxScenarioTransition[];
 }
 
+// Phase 32 — author-defined choice-key classifications consumed by
+// worker/ttxScoring.ts after a session completes. Unlike tags/notes/role,
+// this data IS read by something, but only after the fact — never during
+// a session, never changing what an operator sees or can choose.
+export interface TtxScenarioScoringMetadata {
+  recommendedActions?: string[];
+  riskActions?: string[];
+  delayActions?: string[];
+}
+
 // id is absent for a brand-new scenario (the Worker generates one on
 // create) and present when editing/submitting an update. tags (Phase 29)
 // and notes (Phase 30) are purely descriptive — authoring-plane
@@ -84,6 +94,7 @@ export interface TtxScenarioDraft {
   nodes: Record<string, TtxScenarioNode>;
   tags?: string[];
   notes?: string;
+  scoring?: TtxScenarioScoringMetadata;
 }
 
 export interface TtxLocalScenario extends TtxScenarioDraft {
@@ -135,4 +146,29 @@ export interface TtxScenarioExportBlob {
   signature: string;
   tags?: string[];
   notes?: string;
+  scoring?: TtxScenarioScoringMetadata;
+}
+
+// --- Session scoring (Phase 32) ---
+// Mirrors worker/ttxScoring.ts's ScorePacket exactly.
+
+export interface TtxScoreBreakdown {
+  correctChoices: number;
+  riskEscalations: number;
+  mitigations: number;
+  delays: number;
+}
+
+export interface TtxScoreRoleActions {
+  recommendedTaken: string[];
+  recommendedMissed: string[];
+}
+
+export interface TtxScorePacket {
+  sessionId: string;
+  scenarioId: string;
+  score: number;
+  breakdown: TtxScoreBreakdown;
+  roleActions: TtxScoreRoleActions;
+  computedAt: string;
 }

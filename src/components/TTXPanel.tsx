@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { InfoCard } from "./InfoCard";
 import { AnalyticsCard } from "./AnalyticsCard";
+import { TTXScorePanel } from "./TTXScorePanel";
 import { useApiResource } from "../lib/useApiResource";
 import { ttxSessionService } from "../lib/ttxSessionService";
 import { ttxAnalyticsService } from "../lib/ttxAnalyticsService";
+import { ttxScoringService } from "../lib/ttxScoringService";
 import { getCurrentSessionId, setCurrentSessionId, clearCurrentSessionId } from "../lib/ttxSessionStorage";
 import type { ApiResult } from "../lib/apiClient";
-import type { TtxAnalyticsPacket, TtxSessionState } from "../lib/ttxTypes";
+import type { TtxAnalyticsPacket, TtxScorePacket, TtxSessionState } from "../lib/ttxTypes";
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -61,6 +63,33 @@ export function TTXPanel() {
     { pollIntervalMs: POLL_INTERVAL_MS },
   );
   const analytics = analyticsResult?.ok ? analyticsResult.data : null;
+
+  // Score (Phase 32) — same "only fetched once the session has actually
+  // ended" shape as analytics above. Auto-computes once if the session
+  // just finished and no packet exists yet (a fresh 404 from the real
+  // GET, gated on state?.done so the placeholder branch never triggers
+  // this); scoreComputeAttempted stops it from retrying forever if
+  // computation itself keeps failing.
+  const { result: scoreResult, refresh: refreshScore } = useApiResource(
+    () =>
+      sessionId && state?.done
+        ? ttxScoringService.getScore(sessionId)
+        : Promise.resolve<ApiResult<TtxScorePacket>>({ ok: false, error: "Session not complete" }),
+    { pollIntervalMs: POLL_INTERVAL_MS },
+  );
+  const score = scoreResult?.ok ? scoreResult.data : null;
+  const [scoreComputeAttempted, setScoreComputeAttempted] = useState(false);
+
+  useEffect(() => {
+    setScoreComputeAttempted(false);
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (sessionId && state?.done && scoreResult?.ok === false && !scoreComputeAttempted) {
+      setScoreComputeAttempted(true);
+      void ttxScoringService.computeScore(sessionId).then(() => refreshScore());
+    }
+  }, [sessionId, state?.done, scoreResult, scoreComputeAttempted, refreshScore]);
 
   async function handleStart() {
     if (!selectedScenarioId) return;
@@ -218,6 +247,7 @@ export function TTXPanel() {
       )}
 
       {analytics && <AnalyticsCard packet={analytics} />}
+      {score && <TTXScorePanel packet={score} />}
     </div>
   );
 }

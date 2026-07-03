@@ -193,6 +193,7 @@ interface ScenarioExportPayload {
   exportedAt: string;
   tags?: string[];
   notes?: string;
+  scoring?: ScenarioDefinition["scoring"];
 }
 
 interface ScenarioExportBlob extends ScenarioExportPayload {
@@ -283,6 +284,7 @@ async function handleExport(request: Request, env: LocalScenarioEnv): Promise<Re
     exportedAt: new Date().toISOString(),
     ...(scenario.tags && scenario.tags.length > 0 ? { tags: scenario.tags } : {}),
     ...(scenario.notes ? { notes: scenario.notes } : {}),
+    ...(scenario.scoring ? { scoring: scenario.scoring } : {}),
   };
 
   const signature = await signPayload(payload, env.TTX_EXPORT_SIGNING_KEY);
@@ -302,6 +304,7 @@ const ALLOWED_EXPORT_FIELDS = new Set([
   "signature",
   "tags",
   "notes",
+  "scoring",
 ]);
 
 async function handleImport(request: Request, env: LocalScenarioEnv): Promise<Response> {
@@ -364,6 +367,7 @@ async function handleImport(request: Request, env: LocalScenarioEnv): Promise<Re
       nodes: record.nodes,
       tags: record.tags,
       notes: record.notes,
+      scoring: record.scoring,
     },
     { requireId: false },
   );

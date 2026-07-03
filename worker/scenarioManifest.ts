@@ -36,7 +36,19 @@
 // executable, authoring-plane-only status as `tags`. Never read by the
 // session engine (worker/ttx.ts never looks at it), never exported to the
 // SaaS scaffold, builtins never carry it.
-
+//
+// Phase 32 adds `scoring` — optional, author-defined choice-key
+// classifications consumed by worker/ttxScoring.ts after a session
+// completes. Unlike `tags`/`notes`/`role`, this data IS read by something
+// (the scoring module), but still never changes engine behavior — it's
+// read only after the fact, never during a session, and a scenario with
+// no `scoring` block plays and scores exactly the same as before this
+// phase existed (every choice defaults to "mitigating"). `delayActions`
+// isn't in the original two-field sketch handed down for this phase, but
+// the phase's own scoring rule ("-5 for delays, if defined") requires
+// some way to mark a choice as a delay distinct from a risk escalation,
+// so it's added here as the minimal missing piece, following the exact
+// same shape as riskActions/recommendedActions.
 import { validateScenarioGraph } from "./scenarioGraph";
 
 export interface ScenarioTransition {
@@ -53,6 +65,12 @@ export interface ScenarioNode {
   transitions: ScenarioTransition[];
 }
 
+export interface ScenarioScoringMetadata {
+  recommendedActions?: string[];
+  riskActions?: string[];
+  delayActions?: string[];
+}
+
 export interface ScenarioDefinition {
   id: string;
   title: string;
@@ -62,6 +80,7 @@ export interface ScenarioDefinition {
   nodes: Record<string, ScenarioNode>;
   tags?: string[];
   notes?: string;
+  scoring?: ScenarioScoringMetadata;
 }
 
 export const SCENARIO_DEFINITIONS: Record<string, ScenarioDefinition> = {
@@ -136,12 +155,15 @@ export interface ScenarioValidationOptions {
 
 export type ScenarioValidationResult = { ok: true; value: ScenarioDefinition } | { ok: false; error: string };
 
-const ALLOWED_SCENARIO_FIELDS = new Set(["id", "title", "description", "roles", "entry", "nodes", "tags", "notes"]);
+const ALLOWED_SCENARIO_FIELDS = new Set(["id", "title", "description", "roles", "entry", "nodes", "tags", "notes", "scoring"]);
 const ALLOWED_NODE_FIELDS = new Set(["id", "title", "inject", "role", "transitions"]);
 const ALLOWED_TRANSITION_FIELDS = new Set(["choice", "label", "next"]);
+const ALLOWED_SCORING_FIELDS = new Set(["recommendedActions", "riskActions", "delayActions"]);
 const MAX_TAG_LENGTH = 64;
 const MAX_TAGS = 16;
 const MAX_NOTES_LENGTH = 5000;
+const MAX_SCORING_ACTION_LENGTH = 64;
+const MAX_SCORING_ACTIONS_PER_LIST = 32;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -188,6 +210,30 @@ export function validateScenarioDefinition(input: unknown, options: ScenarioVali
     if (typeof input.notes !== "string") return { ok: false, error: "notes must be a string" };
     if (input.notes.trim().length > MAX_NOTES_LENGTH) {
       return { ok: false, error: `notes must be ${MAX_NOTES_LENGTH} characters or fewer` };
+    }
+  }
+  let scoring: ScenarioScoringMetadata | undefined;
+  if (input.scoring !== undefined) {
+    if (!isPlainObject(input.scoring) || !hasOnlyAllowedFields(input.scoring, ALLOWED_SCORING_FIELDS)) {
+      return { ok: false, error: "scoring has an invalid shape" };
+    }
+    scoring = {};
+    for (const key of ["recommendedActions", "riskActions", "delayActions"] as const) {
+      const list = input.scoring[key];
+      if (list === undefined) continue;
+      if (!Array.isArray(list)) return { ok: false, error: `scoring.${key} must be an array of strings` };
+      if (list.length > MAX_SCORING_ACTIONS_PER_LIST) {
+        return { ok: false, error: `scoring.${key} may have at most ${MAX_SCORING_ACTIONS_PER_LIST} entries` };
+      }
+      for (const action of list) {
+        if (typeof action !== "string" || !action.trim()) {
+          return { ok: false, error: `scoring.${key} must contain non-empty strings` };
+        }
+        if (action.length > MAX_SCORING_ACTION_LENGTH) {
+          return { ok: false, error: `scoring.${key} entries must be ${MAX_SCORING_ACTION_LENGTH} characters or fewer` };
+        }
+      }
+      scoring[key] = (list as string[]).map((action) => action.trim());
     }
   }
   if (typeof input.entry !== "string" || !input.entry.trim()) return { ok: false, error: "entry is required" };
@@ -251,6 +297,7 @@ export function validateScenarioDefinition(input: unknown, options: ScenarioVali
     nodes,
     ...(Array.isArray(input.tags) ? { tags: (input.tags as string[]).map((tag) => tag.trim()) } : {}),
     ...(typeof input.notes === "string" ? { notes: input.notes.trim() } : {}),
+    ...(scoring ? { scoring } : {}),
   };
 
   const graphCheck = validateScenarioGraph(scenario);

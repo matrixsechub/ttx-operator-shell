@@ -40,6 +40,12 @@ interface Draft {
   nodes: DraftNode[];
   tags: string[];
   notes: string;
+  // Phase 32 — comma-separated choice keys, same input pattern as `roles`
+  // above (a full chip editor wasn't judged necessary for a rarely-edited,
+  // advanced/optional field). Converted to string[] only at submit time.
+  riskActions: string;
+  delayActions: string;
+  recommendedActions: string;
 }
 
 const MAX_TAG_LENGTH = 64;
@@ -62,6 +68,9 @@ function emptyDraft(): Draft {
     nodes: [{ key: nodeKey, id: "", title: "", inject: "", role: "", transitions: [] }],
     tags: [],
     notes: "",
+    riskActions: "",
+    delayActions: "",
+    recommendedActions: "",
   };
 }
 
@@ -83,6 +92,9 @@ function draftFromScenario(scenario: TtxLocalScenario): Draft {
     nodes,
     tags: scenario.tags ?? [],
     notes: scenario.notes ?? "",
+    riskActions: (scenario.scoring?.riskActions ?? []).join(", "),
+    delayActions: (scenario.scoring?.delayActions ?? []).join(", "),
+    recommendedActions: (scenario.scoring?.recommendedActions ?? []).join(", "),
   };
 }
 
@@ -138,6 +150,12 @@ function toPayload(draft: Draft): TtxScenarioDraft {
   }
   const roles = Array.from(new Set(draft.roles.split(",").map((r) => r.trim()).filter(Boolean)));
   const tags = Array.from(new Set(draft.tags.map((t) => t.trim()).filter(Boolean)));
+  const riskActions = Array.from(new Set(draft.riskActions.split(",").map((a) => a.trim()).filter(Boolean)));
+  const delayActions = Array.from(new Set(draft.delayActions.split(",").map((a) => a.trim()).filter(Boolean)));
+  const recommendedActions = Array.from(
+    new Set(draft.recommendedActions.split(",").map((a) => a.trim()).filter(Boolean)),
+  );
+  const hasScoring = riskActions.length > 0 || delayActions.length > 0 || recommendedActions.length > 0;
   return {
     ...(draft.id ? { id: draft.id } : {}),
     title: draft.title.trim(),
@@ -147,6 +165,15 @@ function toPayload(draft: Draft): TtxScenarioDraft {
     nodes,
     ...(tags.length > 0 ? { tags } : {}),
     ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
+    ...(hasScoring
+      ? {
+          scoring: {
+            ...(riskActions.length > 0 ? { riskActions } : {}),
+            ...(delayActions.length > 0 ? { delayActions } : {}),
+            ...(recommendedActions.length > 0 ? { recommendedActions } : {}),
+          },
+        }
+      : {}),
   };
 }
 
@@ -742,6 +769,36 @@ export function ScenarioAuthoringPanel() {
               rows={4}
               className={`${inputClass} mt-1 w-full`}
             />
+          </div>
+
+          <div>
+            <h4 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">
+              Scoring (optional — choice keys, comma-separated)
+            </h4>
+            <p className="mt-0.5 text-[10px] text-op-text-dim/60">
+              Read only after a session completes (worker/ttxScoring.ts) — never affects what an operator sees or can
+              choose during the session itself.
+            </p>
+            <div className="mt-1 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <input
+                value={draft.riskActions}
+                onChange={(e) => updateDraft({ riskActions: e.target.value })}
+                placeholder="Risk-escalating choices"
+                className={inputClass}
+              />
+              <input
+                value={draft.delayActions}
+                onChange={(e) => updateDraft({ delayActions: e.target.value })}
+                placeholder="Delay choices"
+                className={inputClass}
+              />
+              <input
+                value={draft.recommendedActions}
+                onChange={(e) => updateDraft({ recommendedActions: e.target.value })}
+                placeholder="Recommended choices"
+                className={inputClass}
+              />
+            </div>
           </div>
 
           <div>

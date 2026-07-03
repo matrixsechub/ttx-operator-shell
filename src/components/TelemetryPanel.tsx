@@ -9,8 +9,17 @@ import { useTelemetry } from "../lib/useTelemetry";
 // (the external Engine call degrades gracefully today) never blanks the
 // rest of the panel.
 export function TelemetryPanel() {
-  const { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, ttxState, operator } =
-    useTelemetry();
+  const {
+    workerHealth,
+    engineVersion,
+    externalStatus,
+    catalog,
+    webhookEvents,
+    securityEvents,
+    ttxState,
+    ttxScores,
+    operator,
+  } = useTelemetry();
 
   const workerOnline = workerHealth.result?.ok && workerHealth.result.data.status === "ok";
   const versionLabel = engineVersion.result?.ok ? `v${engineVersion.result.data.version}` : "unknown";
@@ -44,6 +53,17 @@ export function TelemetryPanel() {
   const ttxCurrentPhase = ttxState.result?.ok ? ttxState.result.data : null;
   const ttxNotStarted = ttxState.result?.ok === false && ttxState.result.error === "No active session";
   const ttxLastInject = ttxCurrentPhase?.inject ?? null;
+
+  // Phase 32 — average across whatever's currently in the retention-capped
+  // list (worker/ttxScoring.ts caps at 50), not a true all-time average;
+  // same "honest recent signal" reasoning as webhook events' rate above.
+  // KV's list() order is by key (score:<sessionId>, a random UUID), not
+  // chronological, so "last score" has to be found by sorting on
+  // computedAt explicitly — array order alone would be meaningless here.
+  const ttxScoreList = ttxScores.result?.ok ? ttxScores.result.data.scores : [];
+  const ttxAverageScore =
+    ttxScoreList.length > 0 ? Math.round(ttxScoreList.reduce((sum, s) => sum + s.score, 0) / ttxScoreList.length) : null;
+  const ttxLastScore = [...ttxScoreList].sort((a, b) => b.computedAt.localeCompare(a.computedAt))[0];
 
   return (
     <div id="telemetry-panel" className="op-panel rounded-sm p-4">
@@ -153,6 +173,21 @@ export function TelemetryPanel() {
                 {ttxCurrentPhase.scenarioTitle} ({ttxCurrentPhase.scenarioSource}) — {ttxCurrentPhase.title}
               </span>
               {ttxLastInject && <span className="text-op-text-dim">{ttxLastInject}</span>}
+            </div>
+          )}
+        </InfoCard>
+
+        <InfoCard label="TTX Scoring">
+          {!ttxScores.result ? (
+            <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : !ttxScores.result.ok ? (
+            <span className="text-xs italic text-op-text-dim">unavailable — {ttxScores.result.error}</span>
+          ) : ttxScoreList.length === 0 ? (
+            <span className="text-xs italic text-op-text-dim">no scored sessions yet</span>
+          ) : (
+            <div className="flex flex-col gap-0.5 text-xs">
+              <span className="text-op-text">average: {ttxAverageScore}</span>
+              {ttxLastScore && <span className="text-op-text-dim">last: {ttxLastScore.score}</span>}
             </div>
           )}
         </InfoCard>
