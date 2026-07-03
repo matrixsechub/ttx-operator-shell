@@ -1,5 +1,5 @@
 import { request, type ApiResult } from "./apiClient";
-import type { TtxLocalScenario, TtxScenarioDraft } from "./ttxTypes";
+import type { TtxLocalScenario, TtxScenarioDraft, TtxScenarioExportBlob } from "./ttxTypes";
 
 // Calls /api/ttx/local-scenarios* (worker/localScenarioRoutes.ts) — CRUD
 // for operator-authored scenarios. Separate from ttxSessionService (which
@@ -28,5 +28,16 @@ export const ttxLocalScenarioService = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
+    }),
+
+  // Phase 28
+  exportScenario: (id: string): Promise<ApiResult<TtxScenarioExportBlob>> =>
+    request(`/api/ttx/local-scenarios/export?id=${encodeURIComponent(id)}`),
+
+  importScenario: (blob: TtxScenarioExportBlob): Promise<ApiResult<{ scenario: TtxLocalScenario }>> =>
+    request("/api/ttx/local-scenarios/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(blob),
     }),
 };

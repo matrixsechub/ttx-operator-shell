@@ -111,3 +111,22 @@ export interface TtxAnalyticsPacket {
   endedAt: string | null;
   durationMs: number | null;
 }
+
+// --- Export / Import (Phase 28) ---
+// Mirrors worker/localScenarioRoutes.ts's ScenarioExportBlob exactly. This
+// is the one shape in this file that intentionally IS a raw pass-through
+// (fetched, downloaded as a file, later re-uploaded and posted back
+// unmodified) rather than an editable draft — the frontend never
+// constructs or mutates it, only displays it and ships it to /import.
+
+export interface TtxScenarioExportBlob {
+  version: number;
+  scenarioId: string;
+  title: string;
+  description?: string;
+  roles: string[];
+  entry: string;
+  nodes: Record<string, TtxScenarioNode>;
+  exportedAt: string;
+  signature: string;
+}

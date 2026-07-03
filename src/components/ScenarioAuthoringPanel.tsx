@@ -1,10 +1,16 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { StatusPill } from "./StatusPill";
 import { useApiResource } from "../lib/useApiResource";
 import { ttxLocalScenarioService } from "../lib/ttxLocalScenarioService";
 import { ttxSessionService } from "../lib/ttxSessionService";
 import { ttxService } from "../operator/ttx/service";
-import type { TtxLocalScenario, TtxScenarioDraft, TtxScenarioNode, TtxScenarioTransition } from "../lib/ttxTypes";
+import type {
+  TtxLocalScenario,
+  TtxScenarioDraft,
+  TtxScenarioExportBlob,
+  TtxScenarioNode,
+  TtxScenarioTransition,
+} from "../lib/ttxTypes";
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -125,6 +131,24 @@ function toPayload(draft: Draft): TtxScenarioDraft {
     entry: draft.entry,
     nodes,
   };
+}
+
+// Structural pre-check only — does this file even look like an export
+// blob (right top-level fields, right types)? Real validation (schema,
+// deterministic-only graph, signature) happens server-side in
+// worker/localScenarioRoutes.ts's handleImport; this just avoids showing
+// a preview for something that obviously isn't an export blob at all.
+function looksLikeExportBlob(value: unknown): value is TtxScenarioExportBlob {
+  if (typeof value !== "object" || value === null) return false;
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.version === "number" &&
+    typeof record.title === "string" &&
+    typeof record.entry === "string" &&
+    typeof record.nodes === "object" &&
+    record.nodes !== null &&
+    typeof record.signature === "string"
+  );
 }
 
 const inputClass =
@@ -264,20 +288,154 @@ export function ScenarioAuthoringPanel() {
     setBusy(false);
   }
 
+  // --- Export / Import (Phase 28) ---
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [showImport, setShowImport] = useState(false);
+  const [importPreview, setImportPreview] = useState<TtxScenarioExportBlob | null>(null);
+  const [importParseError, setImportParseError] = useState<string | null>(null);
+  const [importSubmitError, setImportSubmitError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  async function handleExport(id: string, title: string) {
+    setExportError(null);
+    const response = await ttxLocalScenarioService.exportScenario(id);
+    if (!response.ok) {
+      setExportError(response.error);
+      return;
+    }
+    const json = JSON.stringify(response.data, null, 2);
+    const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${title.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-") || "scenario"}.ttx-scenario.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function openImport() {
+    setShowImport(true);
+    setImportPreview(null);
+    setImportParseError(null);
+    setImportSubmitError(null);
+  }
+
+  function cancelImport() {
+    setShowImport(false);
+    setImportPreview(null);
+    setImportParseError(null);
+    setImportSubmitError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function handleFileSelected(file: File) {
+    setImportParseError(null);
+    setImportSubmitError(null);
+    setImportPreview(null);
+    try {
+      const text = await file.text();
+      const parsed: unknown = JSON.parse(text);
+      if (!looksLikeExportBlob(parsed)) {
+        setImportParseError("This file doesn't look like a scenario export.");
+        return;
+      }
+      setImportPreview(parsed);
+    } catch {
+      setImportParseError("Couldn't parse this file as JSON.");
+    }
+  }
+
+  // Explicit operator action — the file is only parsed for preview above;
+  // nothing is imported until this button is clicked.
+  async function handleImportConfirm() {
+    if (!importPreview) return;
+    setBusy(true);
+    setImportSubmitError(null);
+    const response = await ttxLocalScenarioService.importScenario(importPreview);
+    if (response.ok) {
+      cancelImport();
+      await refreshLocal();
+    } else {
+      setImportSubmitError(response.error);
+    }
+    setBusy(false);
+  }
+
   return (
     <div id="scenario-authoring-panel" className="op-panel rounded-sm p-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Scenario Authoring</h2>
         {!draft && (
-          <button
-            type="button"
-            onClick={startCreate}
-            className="text-[10px] uppercase tracking-widest text-op-accent hover:underline"
-          >
-            + New Scenario
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={openImport}
+              className="text-[10px] uppercase tracking-widest text-op-accent hover:underline"
+            >
+              Import Scenario
+            </button>
+            <button
+              type="button"
+              onClick={startCreate}
+              className="text-[10px] uppercase tracking-widest text-op-accent hover:underline"
+            >
+              + New Scenario
+            </button>
+          </div>
         )}
       </div>
+
+      {showImport && (
+        <div className="mt-3 flex flex-col gap-2 rounded-sm border border-op-border-bright p-3">
+          <h3 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Import Scenario</h3>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handleFileSelected(file);
+            }}
+            className="text-xs text-op-text-dim file:mr-2 file:rounded-sm file:border file:border-op-border-bright file:bg-transparent file:px-2 file:py-1 file:text-[11px] file:uppercase file:tracking-widest file:text-op-text-dim"
+          />
+
+          {importParseError && <p className="text-[11px] italic text-op-danger">{importParseError}</p>}
+
+          {importPreview && (
+            <div className="rounded-sm border border-op-border-bright px-2.5 py-1.5 text-xs">
+              <p className="text-op-text">{importPreview.title}</p>
+              {importPreview.description && <p className="mt-0.5 text-[10px] text-op-text-dim">{importPreview.description}</p>}
+              <p className="mt-0.5 text-[10px] text-op-text-dim/70">
+                {Object.keys(importPreview.nodes).length} phases
+                {importPreview.roles.length > 0 ? `, roles: ${importPreview.roles.join(", ")}` : ""} — exported{" "}
+                {new Date(importPreview.exportedAt).toLocaleString()}
+              </p>
+            </div>
+          )}
+
+          {importSubmitError && <p className="text-[11px] italic text-op-danger">{importSubmitError}</p>}
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={busy || !importPreview}
+              onClick={handleImportConfirm}
+              className="rounded-sm border border-op-border-bright px-3 py-1.5 text-[11px] uppercase tracking-widest text-op-text-dim transition-colors hover:border-op-accent/50 hover:text-op-accent disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {busy ? "importing…" : "Import"}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={cancelImport}
+              className="rounded-sm border border-op-border-bright px-3 py-1.5 text-[11px] uppercase tracking-widest text-op-text-dim transition-colors hover:border-op-danger/50 hover:text-op-danger disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {exportError && <p className="mt-2 text-[11px] italic text-op-danger">{exportError}</p>}
 
       <div className="mt-3">
         <h3 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Available Sources</h3>
@@ -306,6 +464,13 @@ export function ScenarioAuthoringPanel() {
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-op-text">{scenario.title}</span>
                     <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleExport(scenario.id, scenario.title)}
+                        className="text-op-accent hover:underline"
+                      >
+                        export
+                      </button>
                       <button type="button" onClick={() => startEdit(scenario)} className="text-op-accent hover:underline">
                         edit
                       </button>
