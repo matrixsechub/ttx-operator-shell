@@ -18,6 +18,10 @@
 
   --animate-scan: scan 6s linear infinite;
   --animate-pulse-glow: pulse-glow 2.4s ease-in-out infinite;
+  /* Phase 33 — entrance motion for the post-session score reveal. `both`
+     holds the pre-animation frame at opacity 0 so staggered children
+     (via animation-delay) don't flash before their delay elapses. */
+  --animate-rise: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes scan {
@@ -36,6 +40,17 @@
   }
   50% {
     opacity: 0.45;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
