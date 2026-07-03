@@ -3,7 +3,10 @@ import { useApiResource } from "./useApiResource";
 import { useAuth } from "./AuthContext";
 import { webhookTriggerService } from "./webhookTriggerService";
 import { securityService } from "./securityService";
-import { ttxEngineService } from "./ttxService";
+import { ttxSessionService } from "./ttxSessionService";
+import { getCurrentSessionId } from "./ttxSessionStorage";
+import type { ApiResult } from "./apiClient";
+import type { TtxSessionState } from "./ttxTypes";
 
 const POLL_INTERVAL_MS = 30_000;
 
@@ -33,10 +36,22 @@ export function useTelemetry() {
   const securityEvents = useApiResource(() => securityService.fetchSecurityEvents(), {
     pollIntervalMs: POLL_INTERVAL_MS,
   });
-  // Phase 24 — same reasoning as webhookEvents/securityEvents above: one
+  // Phase 25 — same reasoning as webhookEvents/securityEvents above: one
   // more useApiResource call feeding current phase / last inject, no new
-  // hook needed.
-  const ttxState = useApiResource(() => ttxEngineService.getState(), { pollIntervalMs: POLL_INTERVAL_MS });
+  // hook needed. Sessions are per-instance now (not a global singleton
+  // like Phase 24), so this reads whichever session id TTXPanel last
+  // stored client-side (see ttxSessionStorage.ts) — if none, the fetcher
+  // resolves to a plain "no active session" failure rather than calling
+  // the Worker with an empty id.
+  const ttxState = useApiResource(
+    () => {
+      const sessionId = getCurrentSessionId();
+      return sessionId
+        ? ttxSessionService.getState(sessionId)
+        : Promise.resolve<ApiResult<TtxSessionState>>({ ok: false, error: "No active session" });
+    },
+    { pollIntervalMs: POLL_INTERVAL_MS },
+  );
   const { operator } = useAuth();
 
   return { workerHealth, engineVersion, externalStatus, catalog, webhookEvents, securityEvents, ttxState, operator };

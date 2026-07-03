@@ -37,7 +37,12 @@ export function TelemetryPanel() {
   const lastSecurityEventType = lastSecurityEvent?.type;
 
   // Phase 24
+  // Phase 25 — getState() resolves to a plain ok:false when no session id
+  // is stored client-side (see useTelemetry.ts), so "not started" and a
+  // genuine backend error both come through as !ok. Distinguish them by
+  // that specific message rather than adding a second signal.
   const ttxCurrentPhase = ttxState.result?.ok ? ttxState.result.data : null;
+  const ttxNotStarted = ttxState.result?.ok === false && ttxState.result.error === "No active session";
   const ttxLastInject = ttxCurrentPhase?.inject ?? null;
 
   return (
@@ -134,16 +139,18 @@ export function TelemetryPanel() {
         <InfoCard label="TTX Scenario">
           {!ttxState.result ? (
             <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : ttxNotStarted ? (
+            <span className="text-xs italic text-op-text-dim">not started</span>
           ) : !ttxState.result.ok ? (
             <span className="text-xs italic text-op-text-dim">unavailable — {ttxState.result.error}</span>
-          ) : !ttxCurrentPhase || ttxCurrentPhase.phaseIndex < 0 ? (
+          ) : !ttxCurrentPhase ? (
             <span className="text-xs italic text-op-text-dim">not started</span>
           ) : ttxCurrentPhase.done ? (
             <span className="text-xs text-op-accent">complete</span>
           ) : (
             <div className="flex flex-col gap-0.5 text-xs">
               <span className="text-op-text">
-                phase {ttxCurrentPhase.phaseIndex + 1} of {ttxCurrentPhase.total}
+                {ttxCurrentPhase.scenarioTitle} — {ttxCurrentPhase.title}
               </span>
               {ttxLastInject && <span className="text-op-text-dim">{ttxLastInject}</span>}
             </div>
