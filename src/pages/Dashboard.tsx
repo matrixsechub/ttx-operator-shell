@@ -5,6 +5,7 @@ import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
 import { TelemetryPanel } from "../components/TelemetryPanel";
 import { SecurityPanel } from "../components/SecurityPanel";
 import { TTXPanel } from "../components/TTXPanel";
+import { ScenarioAuthoringPanel } from "../components/ScenarioAuthoringPanel";
 import { OperatorTimeline } from "./dashboard/OperatorTimeline";
 import { MissionBoard } from "./dashboard/MissionBoard";
 import { TelemetryRails } from "./dashboard/TelemetryRails";
@@ -80,6 +81,7 @@ export function Dashboard() {
             <WebhookTriggerPanel />
             <SecurityPanel />
             <TTXPanel />
+            <ScenarioAuthoringPanel />
           </div>
         </div>
       </div>

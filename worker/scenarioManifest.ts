@@ -15,6 +15,18 @@
 //   restrict content from anyone; every operator sees every node. This
 //   mirrors how `access_level`/`compliance_tags` already work on
 //   CatalogItem — a label, not an enforcement mechanism.
+//
+// Phase 26 adds operator-authored scenarios (see worker/localScenarioRoutes.ts)
+// using this exact same shape, persisted in KV rather than hardcoded here —
+// `description` below exists for their benefit (the builtins don't need it).
+// validateScenarioDefinition is the gate every authored scenario passes
+// through before being stored: it strictly allow-lists fields (rejecting
+// any payload that tries to smuggle in a probability/weight field on a
+// transition, keeping "deterministic only" true by construction, not just
+// by convention) and defers structural graph checks to
+// scenarioGraph.ts's validateScenarioGraph.
+
+import { validateScenarioGraph } from "./scenarioGraph";
 
 export interface ScenarioTransition {
   choice: string;
@@ -33,6 +45,7 @@ export interface ScenarioNode {
 export interface ScenarioDefinition {
   id: string;
   title: string;
+  description?: string;
   roles: string[];
   entry: string;
   nodes: Record<string, ScenarioNode>;
@@ -103,3 +116,113 @@ export const SCENARIO_DEFINITIONS: Record<string, ScenarioDefinition> = {
     },
   },
 };
+
+export interface ScenarioValidationOptions {
+  requireId: boolean;
+}
+
+export type ScenarioValidationResult = { ok: true; value: ScenarioDefinition } | { ok: false; error: string };
+
+const ALLOWED_SCENARIO_FIELDS = new Set(["id", "title", "description", "roles", "entry", "nodes"]);
+const ALLOWED_NODE_FIELDS = new Set(["id", "title", "inject", "role", "transitions"]);
+const ALLOWED_TRANSITION_FIELDS = new Set(["choice", "label", "next"]);
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function hasOnlyAllowedFields(obj: Record<string, unknown>, allowed: Set<string>): boolean {
+  return Object.keys(obj).every((key) => allowed.has(key));
+}
+
+// Gate every authored scenario passes through before being stored (see
+// worker/localScenarioRoutes.ts). Strictly allow-lists fields at every
+// level — a payload that adds e.g. `probability` or `weight` to a
+// transition is rejected outright, not silently ignored, so "deterministic
+// only" holds by construction. Structural checks (dangling edges, no
+// terminal node) are delegated to scenarioGraph.ts's validateScenarioGraph.
+export function validateScenarioDefinition(input: unknown, options: ScenarioValidationOptions): ScenarioValidationResult {
+  if (!isPlainObject(input)) return { ok: false, error: "Scenario must be an object" };
+  if (!hasOnlyAllowedFields(input, ALLOWED_SCENARIO_FIELDS)) {
+    return {
+      ok: false,
+      error: "Scenario contains unsupported fields (deterministic-only: no probability/weight fields allowed)",
+    };
+  }
+
+  if (options.requireId && (typeof input.id !== "string" || !input.id.trim())) {
+    return { ok: false, error: "id is required" };
+  }
+  if (typeof input.title !== "string" || !input.title.trim()) return { ok: false, error: "title is required" };
+  if (input.description !== undefined && typeof input.description !== "string") {
+    return { ok: false, error: "description must be a string" };
+  }
+  if (input.roles !== undefined && (!Array.isArray(input.roles) || !input.roles.every((role) => typeof role === "string"))) {
+    return { ok: false, error: "roles must be an array of strings" };
+  }
+  if (typeof input.entry !== "string" || !input.entry.trim()) return { ok: false, error: "entry is required" };
+  if (!isPlainObject(input.nodes) || Object.keys(input.nodes).length === 0) {
+    return { ok: false, error: "nodes must be a non-empty object" };
+  }
+
+  const nodes: Record<string, ScenarioNode> = {};
+  for (const [nodeId, rawNode] of Object.entries(input.nodes)) {
+    if (!isPlainObject(rawNode) || !hasOnlyAllowedFields(rawNode, ALLOWED_NODE_FIELDS)) {
+      return { ok: false, error: `Node "${nodeId}" has an invalid shape` };
+    }
+    if (typeof rawNode.id !== "string" || rawNode.id !== nodeId) {
+      return { ok: false, error: `Node "${nodeId}" id must match its key` };
+    }
+    if (typeof rawNode.title !== "string" || !rawNode.title.trim()) {
+      return { ok: false, error: `Node "${nodeId}" is missing a title` };
+    }
+    if (typeof rawNode.inject !== "string" || !rawNode.inject.trim()) {
+      return { ok: false, error: `Node "${nodeId}" is missing inject text` };
+    }
+    if (rawNode.role !== undefined && typeof rawNode.role !== "string") {
+      return { ok: false, error: `Node "${nodeId}" role must be a string` };
+    }
+    if (!Array.isArray(rawNode.transitions)) {
+      return { ok: false, error: `Node "${nodeId}" transitions must be an array` };
+    }
+
+    const transitions: ScenarioTransition[] = [];
+    for (const rawTransition of rawNode.transitions) {
+      if (!isPlainObject(rawTransition) || !hasOnlyAllowedFields(rawTransition, ALLOWED_TRANSITION_FIELDS)) {
+        return { ok: false, error: `Node "${nodeId}" has a transition with an invalid shape (deterministic-only)` };
+      }
+      if (typeof rawTransition.choice !== "string" || !rawTransition.choice.trim()) {
+        return { ok: false, error: `Node "${nodeId}" has a transition missing "choice"` };
+      }
+      if (typeof rawTransition.label !== "string" || !rawTransition.label.trim()) {
+        return { ok: false, error: `Node "${nodeId}" has a transition missing "label"` };
+      }
+      if (typeof rawTransition.next !== "string" || !rawTransition.next.trim()) {
+        return { ok: false, error: `Node "${nodeId}" has a transition missing "next"` };
+      }
+      transitions.push({ choice: rawTransition.choice, label: rawTransition.label, next: rawTransition.next });
+    }
+
+    nodes[nodeId] = {
+      id: rawNode.id,
+      title: rawNode.title,
+      inject: rawNode.inject,
+      ...(typeof rawNode.role === "string" ? { role: rawNode.role } : {}),
+      transitions,
+    };
+  }
+
+  const scenario: ScenarioDefinition = {
+    id: options.requireId ? (input.id as string) : "", // filled in by the caller (create generates a fresh id)
+    title: input.title,
+    ...(typeof input.description === "string" ? { description: input.description } : {}),
+    roles: Array.isArray(input.roles) ? (input.roles as string[]) : [],
+    entry: input.entry,
+    nodes,
+  };
+
+  const graphCheck = validateScenarioGraph(scenario);
+  if (!graphCheck.ok) return { ok: false, error: graphCheck.error };
+
+  return { ok: true, value: scenario };
+}

@@ -106,7 +106,8 @@ export function TTXPanel() {
             {scenarios.length === 0 && <option value="">loading scenarios…</option>}
             {scenarios.map((scenario) => (
               <option key={scenario.id} value={scenario.id}>
-                {scenario.title} ({scenario.phaseCount} phases{scenario.roles.length > 0 ? `, ${scenario.roles.join("/")}` : ""})
+                [{scenario.source}] {scenario.title} ({scenario.phaseCount} phases
+                {scenario.roles.length > 0 ? `, ${scenario.roles.join("/")}` : ""})
               </option>
             ))}
           </select>
@@ -127,6 +128,11 @@ export function TTXPanel() {
               {state?.role && (
                 <span className="rounded-sm border border-op-accent-2/40 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-op-accent-2">
                   {state.role}
+                </span>
+              )}
+              {state && (
+                <span className="rounded-sm border border-op-border-bright px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-op-text-dim">
+                  {state.scenarioSource}
                 </span>
               )}
             </div>

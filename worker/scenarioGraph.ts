@@ -44,3 +44,33 @@ export function step(scenario: ScenarioDefinition, currentNodeId: string, choice
   if (!next) return { status: "error", message: "Transition target not found" };
   return { status: "moved", node: next };
 }
+
+export type GraphValidationResult = { ok: true } | { ok: false; error: string };
+
+// Structural checks for a graph before it's accepted as an authored
+// scenario (Phase 26) — the builtins in scenarioManifest.ts are trusted by
+// construction and never run through this, but anything coming from the
+// authoring panel does. Checks: the entry node exists, every transition
+// points at a real node (no dangling edges), and at least one node has no
+// outgoing transitions (otherwise the scenario could never end — step()
+// would always find more transitions to take).
+export function validateScenarioGraph(scenario: ScenarioDefinition): GraphValidationResult {
+  if (!scenario.nodes[scenario.entry]) {
+    return { ok: false, error: `Entry node "${scenario.entry}" does not exist` };
+  }
+
+  let hasTerminal = false;
+  for (const node of Object.values(scenario.nodes)) {
+    if (node.transitions.length === 0) hasTerminal = true;
+    for (const transition of node.transitions) {
+      if (!scenario.nodes[transition.next]) {
+        return { ok: false, error: `Node "${node.id}" has a transition to unknown node "${transition.next}"` };
+      }
+    }
+  }
+
+  if (!hasTerminal) {
+    return { ok: false, error: "Scenario has no terminal node — it would never end" };
+  }
+  return { ok: true };
+}

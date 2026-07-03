@@ -32,13 +32,31 @@
 // matching role) was explicitly dropped — SCOPE-LOCK.md retires RBAC and
 // permission systems outright. `role` on a node is carried through to the
 // response as a display tag only; every operator sees every node.
+//
+// Phase 26 adds operator-authored scenarios (worker/localScenarioRoutes.ts,
+// KV-backed, same TTX_STATE namespace, same ScenarioDefinition shape as the
+// builtins) and lets sessions run against either kind — see
+// getScenarioById, the single lookup point this file uses instead of
+// reaching into SCENARIO_DEFINITIONS directly. This file only claims the
+// exact sub-paths listed above (plus, via handleLocalScenarioRoute,
+// /api/ttx/local-scenarios and its /create, /update, /delete children) —
+// still no path collision with the SaaS scaffold's /api/ttx/scenarios,
+// /api/ttx/roles, or /api/ttx/sessions/:id/score.
+//
+// "SaaS Bridge": the SaaS scaffold's own GET /api/ttx/scenarios route is
+// deliberately NOT touched here — Phase 26's instructions say both "extend
+// /api/ttx/scenarios" and "do not modify or intercept SaaS proxy
+// behavior," which is only satisfiable by not claiming that path. The
+// bridge is implemented frontend-side instead (ScenarioAuthoringPanel.tsx
+// calls the existing untouched ttxService.listScenarios() alongside this
+// file's own /api/ttx/sessions/scenarios, and labels each result's
+// source for display) — see that file for the full reasoning.
 
 import { entryNode, step } from "./scenarioGraph";
-import { SCENARIO_DEFINITIONS } from "./scenarioManifest";
+import { SCENARIO_DEFINITIONS, type ScenarioDefinition } from "./scenarioManifest";
+import { getScenarioById, handleLocalScenarioRoute, listAuthoredScenarios, type LocalScenarioEnv } from "./localScenarioRoutes";
 
-export interface TtxEnv {
-  TTX_STATE: KVNamespace;
-}
+export type TtxEnv = LocalScenarioEnv;
 
 const SESSION_PREFIX = "session:";
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -64,6 +82,7 @@ interface SessionResponse {
   sessionId: string;
   scenarioId: string;
   scenarioTitle: string;
+  scenarioSource: "builtin" | "authored";
   nodeId: string | null;
   title: string | null;
   inject: string | null;
@@ -97,13 +116,16 @@ async function writeSession(kv: KVNamespace, state: SessionState): Promise<void>
   }
 }
 
-function toResponse(state: SessionState): SessionResponse {
-  const scenario = SCENARIO_DEFINITIONS[state.scenarioId];
-  const node = state.nodeId ? scenario?.nodes[state.nodeId] : undefined;
+// Takes the already-resolved scenario (rather than looking it up itself)
+// so callers that fetched it from KV (authored scenarios) don't pay for a
+// second lookup, and so this function itself stays synchronous.
+function toResponse(state: SessionState, scenario: ScenarioDefinition | null): SessionResponse {
+  const node = state.nodeId && scenario ? scenario.nodes[state.nodeId] : undefined;
   return {
     sessionId: state.sessionId,
     scenarioId: state.scenarioId,
     scenarioTitle: scenario?.title ?? state.scenarioId,
+    scenarioSource: scenario && SCENARIO_DEFINITIONS[scenario.id] ? "builtin" : "authored",
     nodeId: state.nodeId,
     title: node?.title ?? null,
     inject: node?.inject ?? null,
@@ -115,7 +137,10 @@ function toResponse(state: SessionState): SessionResponse {
 }
 
 export async function handleTtxRoute(request: Request, pathname: string, env: TtxEnv): Promise<Response | null> {
-  if (pathname === "/api/ttx/sessions/scenarios") return handleScenarios(request);
+  const localScenarioResponse = await handleLocalScenarioRoute(request, pathname, env);
+  if (localScenarioResponse) return localScenarioResponse;
+
+  if (pathname === "/api/ttx/sessions/scenarios") return handleScenarios(request, env);
   if (pathname === "/api/ttx/sessions/start") return handleStart(request, env);
   if (pathname === "/api/ttx/sessions/next") return handleNext(request, env);
   if (pathname === "/api/ttx/sessions/reset") return handleReset(request, env);
@@ -123,17 +148,26 @@ export async function handleTtxRoute(request: Request, pathname: string, env: Tt
   return null;
 }
 
-function handleScenarios(request: Request): Response {
+async function handleScenarios(request: Request, env: TtxEnv): Promise<Response> {
   if (request.method !== "GET") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "GET" } });
   }
-  const scenarios = Object.values(SCENARIO_DEFINITIONS).map((scenario) => ({
+  const builtins = Object.values(SCENARIO_DEFINITIONS).map((scenario) => ({
     id: scenario.id,
     title: scenario.title,
     roles: scenario.roles,
     phaseCount: Object.keys(scenario.nodes).length,
+    source: "builtin" as const,
   }));
-  return Response.json({ scenarios });
+  const authored = await listAuthoredScenarios(env.TTX_STATE);
+  const authoredSummaries = authored.map((scenario) => ({
+    id: scenario.id,
+    title: scenario.title,
+    roles: scenario.roles,
+    phaseCount: Object.keys(scenario.nodes).length,
+    source: "authored" as const,
+  }));
+  return Response.json({ scenarios: [...builtins, ...authoredSummaries] });
 }
 
 async function handleStart(request: Request, env: TtxEnv): Promise<Response> {
@@ -149,7 +183,7 @@ async function handleStart(request: Request, env: TtxEnv): Promise<Response> {
   }
 
   const scenarioId = typeof body.scenarioId === "string" ? body.scenarioId : undefined;
-  const scenario = scenarioId ? SCENARIO_DEFINITIONS[scenarioId] : undefined;
+  const scenario = scenarioId ? await getScenarioById(env.TTX_STATE, scenarioId) : null;
   if (!scenario) {
     return Response.json({ error: "Unknown scenarioId" }, { status: 400 });
   }
@@ -170,7 +204,7 @@ async function handleStart(request: Request, env: TtxEnv): Promise<Response> {
   } catch {
     return Response.json({ error: "Failed to start session" }, { status: 500 });
   }
-  return Response.json(toResponse(state));
+  return Response.json(toResponse(state, scenario));
 }
 
 async function handleNext(request: Request, env: TtxEnv): Promise<Response> {
@@ -193,9 +227,11 @@ async function handleNext(request: Request, env: TtxEnv): Promise<Response> {
 
   // Idempotent once done — repeated /next calls after the last node don't
   // error, they just keep returning the same completed state.
-  if (state.done || !state.nodeId) return Response.json(toResponse(state));
+  if (state.done || !state.nodeId) {
+    return Response.json(toResponse(state, await getScenarioById(env.TTX_STATE, state.scenarioId)));
+  }
 
-  const scenario = SCENARIO_DEFINITIONS[state.scenarioId];
+  const scenario = await getScenarioById(env.TTX_STATE, state.scenarioId);
   if (!scenario) return Response.json({ error: "Unknown scenario for this session" }, { status: 500 });
 
   const choice = typeof body.choice === "string" ? body.choice : undefined;
@@ -225,7 +261,7 @@ async function handleNext(request: Request, env: TtxEnv): Promise<Response> {
   } catch {
     return Response.json({ error: "Failed to advance session" }, { status: 500 });
   }
-  return Response.json(toResponse(next));
+  return Response.json(toResponse(next, scenario));
 }
 
 async function handleReset(request: Request, env: TtxEnv): Promise<Response> {
@@ -263,5 +299,5 @@ async function handleState(request: Request, env: TtxEnv): Promise<Response> {
 
   const state = await readSession(env.TTX_STATE, sessionId);
   if (!state) return Response.json({ error: "Session not found" }, { status: 404 });
-  return Response.json(toResponse(state));
+  return Response.json(toResponse(state, await getScenarioById(env.TTX_STATE, state.scenarioId)));
 }

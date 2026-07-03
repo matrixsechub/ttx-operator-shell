@@ -150,7 +150,7 @@ export function TelemetryPanel() {
           ) : (
             <div className="flex flex-col gap-0.5 text-xs">
               <span className="text-op-text">
-                {ttxCurrentPhase.scenarioTitle} — {ttxCurrentPhase.title}
+                {ttxCurrentPhase.scenarioTitle} ({ttxCurrentPhase.scenarioSource}) — {ttxCurrentPhase.title}
               </span>
               {ttxLastInject && <span className="text-op-text-dim">{ttxLastInject}</span>}
             </div>
