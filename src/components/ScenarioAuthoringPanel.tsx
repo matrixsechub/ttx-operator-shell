@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { StatusPill } from "./StatusPill";
+import { ScenarioNotesModal } from "./ScenarioNotesModal";
 import { useApiResource } from "../lib/useApiResource";
 import { ttxLocalScenarioService } from "../lib/ttxLocalScenarioService";
 import { ttxSessionService } from "../lib/ttxSessionService";
@@ -38,10 +39,12 @@ interface Draft {
   entry: string;
   nodes: DraftNode[];
   tags: string[];
+  notes: string;
 }
 
 const MAX_TAG_LENGTH = 64;
 const MAX_TAGS = 16;
+const MAX_NOTES_LENGTH = 5000;
 
 let localKeyCounter = 0;
 function nextKey(): string {
@@ -58,6 +61,7 @@ function emptyDraft(): Draft {
     entry: "",
     nodes: [{ key: nodeKey, id: "", title: "", inject: "", role: "", transitions: [] }],
     tags: [],
+    notes: "",
   };
 }
 
@@ -78,6 +82,7 @@ function draftFromScenario(scenario: TtxLocalScenario): Draft {
     entry: scenario.entry,
     nodes,
     tags: scenario.tags ?? [],
+    notes: scenario.notes ?? "",
   };
 }
 
@@ -114,6 +119,9 @@ function validateDraft(draft: Draft): string | null {
   if (!draft.nodes.some((node) => node.transitions.length === 0)) {
     return "At least one phase must have no transitions (a terminal phase), or the scenario would never end.";
   }
+  if (draft.notes.trim().length > MAX_NOTES_LENGTH) {
+    return `Notes must be ${MAX_NOTES_LENGTH} characters or fewer.`;
+  }
   return null;
 }
 
@@ -138,6 +146,7 @@ function toPayload(draft: Draft): TtxScenarioDraft {
     entry: draft.entry,
     nodes,
     ...(tags.length > 0 ? { tags } : {}),
+    ...(draft.notes.trim() ? { notes: draft.notes.trim() } : {}),
   };
 }
 
@@ -201,6 +210,9 @@ export function ScenarioAuthoringPanel() {
   const [busy, setBusy] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [tagInputError, setTagInputError] = useState<string | null>(null);
+  // Phase 30 — notes are read-only outside the authoring form; this just
+  // tracks which scenario's notes are currently shown in the modal.
+  const [notesModalScenario, setNotesModalScenario] = useState<TtxLocalScenario | null>(null);
 
   const isEditing = draft?.id !== undefined;
 
@@ -547,7 +559,20 @@ export function ScenarioAuthoringPanel() {
               {filteredScenarios.map((scenario) => (
                 <li key={scenario.id} className="rounded-sm border border-op-border-bright px-2.5 py-1.5 text-xs">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-op-text">{scenario.title}</span>
+                    <span className="flex items-center gap-1.5 text-op-text">
+                      {scenario.title}
+                      {scenario.notes && (
+                        <button
+                          type="button"
+                          onClick={() => setNotesModalScenario(scenario)}
+                          aria-label={`View notes for ${scenario.title}`}
+                          title="Has notes"
+                          className="rounded-sm border border-op-border-bright px-1 py-0.5 text-[9px] uppercase tracking-wider text-op-text-dim hover:text-op-accent"
+                        >
+                          notes
+                        </button>
+                      )}
+                    </span>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -648,6 +673,24 @@ export function ScenarioAuthoringPanel() {
               </button>
             </div>
             {tagInputError && <p className="mt-1 text-[11px] italic text-op-danger">{tagInputError}</p>}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Notes (optional)</h4>
+              <span
+                className={`text-[10px] ${draft.notes.length > MAX_NOTES_LENGTH ? "text-op-danger" : "text-op-text-dim/60"}`}
+              >
+                {draft.notes.length}/{MAX_NOTES_LENGTH}
+              </span>
+            </div>
+            <textarea
+              value={draft.notes}
+              onChange={(e) => updateDraft({ notes: e.target.value })}
+              placeholder="Free-text commentary for other operators — never used by the engine."
+              rows={4}
+              className={`${inputClass} mt-1 w-full`}
+            />
           </div>
 
           <div>
@@ -785,6 +828,14 @@ export function ScenarioAuthoringPanel() {
             </button>
           </div>
         </div>
+      )}
+
+      {notesModalScenario && notesModalScenario.notes && (
+        <ScenarioNotesModal
+          title={notesModalScenario.title}
+          notes={notesModalScenario.notes}
+          onClose={() => setNotesModalScenario(null)}
+        />
       )}
     </div>
   );

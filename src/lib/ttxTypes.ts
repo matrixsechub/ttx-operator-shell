@@ -73,8 +73,8 @@ export interface TtxScenarioNode {
 
 // id is absent for a brand-new scenario (the Worker generates one on
 // create) and present when editing/submitting an update. tags (Phase 29)
-// is purely descriptive — authoring-plane organization/filtering only,
-// never used by the session engine.
+// and notes (Phase 30) are purely descriptive — authoring-plane
+// organization/commentary only, never used by the session engine.
 export interface TtxScenarioDraft {
   id?: string;
   title: string;
@@ -83,6 +83,7 @@ export interface TtxScenarioDraft {
   entry: string;
   nodes: Record<string, TtxScenarioNode>;
   tags?: string[];
+  notes?: string;
 }
 
 export interface TtxLocalScenario extends TtxScenarioDraft {
@@ -133,4 +134,5 @@ export interface TtxScenarioExportBlob {
   exportedAt: string;
   signature: string;
   tags?: string[];
+  notes?: string;
 }

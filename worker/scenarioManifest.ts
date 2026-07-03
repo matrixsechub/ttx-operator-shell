@@ -31,6 +31,11 @@
 // `role` above. Builtins never carry tags (there's no authoring UI for
 // them, and nothing here adds tags to SCENARIO_DEFINITIONS); tags only
 // ever come from an authored scenario's create/update/import payload.
+//
+// Phase 30 adds `notes` — free-text operator commentary, same non-
+// executable, authoring-plane-only status as `tags`. Never read by the
+// session engine (worker/ttx.ts never looks at it), never exported to the
+// SaaS scaffold, builtins never carry it.
 
 import { validateScenarioGraph } from "./scenarioGraph";
 
@@ -56,6 +61,7 @@ export interface ScenarioDefinition {
   entry: string;
   nodes: Record<string, ScenarioNode>;
   tags?: string[];
+  notes?: string;
 }
 
 export const SCENARIO_DEFINITIONS: Record<string, ScenarioDefinition> = {
@@ -130,11 +136,12 @@ export interface ScenarioValidationOptions {
 
 export type ScenarioValidationResult = { ok: true; value: ScenarioDefinition } | { ok: false; error: string };
 
-const ALLOWED_SCENARIO_FIELDS = new Set(["id", "title", "description", "roles", "entry", "nodes", "tags"]);
+const ALLOWED_SCENARIO_FIELDS = new Set(["id", "title", "description", "roles", "entry", "nodes", "tags", "notes"]);
 const ALLOWED_NODE_FIELDS = new Set(["id", "title", "inject", "role", "transitions"]);
 const ALLOWED_TRANSITION_FIELDS = new Set(["choice", "label", "next"]);
 const MAX_TAG_LENGTH = 64;
 const MAX_TAGS = 16;
+const MAX_NOTES_LENGTH = 5000;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -175,6 +182,12 @@ export function validateScenarioDefinition(input: unknown, options: ScenarioVali
     for (const tag of input.tags) {
       if (typeof tag !== "string" || !tag.trim()) return { ok: false, error: "tags must be non-empty strings" };
       if (tag.length > MAX_TAG_LENGTH) return { ok: false, error: `Tags must be ${MAX_TAG_LENGTH} characters or fewer` };
+    }
+  }
+  if (input.notes !== undefined) {
+    if (typeof input.notes !== "string") return { ok: false, error: "notes must be a string" };
+    if (input.notes.trim().length > MAX_NOTES_LENGTH) {
+      return { ok: false, error: `notes must be ${MAX_NOTES_LENGTH} characters or fewer` };
     }
   }
   if (typeof input.entry !== "string" || !input.entry.trim()) return { ok: false, error: "entry is required" };
@@ -237,6 +250,7 @@ export function validateScenarioDefinition(input: unknown, options: ScenarioVali
     entry: input.entry,
     nodes,
     ...(Array.isArray(input.tags) ? { tags: (input.tags as string[]).map((tag) => tag.trim()) } : {}),
+    ...(typeof input.notes === "string" ? { notes: input.notes.trim() } : {}),
   };
 
   const graphCheck = validateScenarioGraph(scenario);
