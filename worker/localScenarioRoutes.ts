@@ -191,6 +191,7 @@ interface ScenarioExportPayload {
   entry: string;
   nodes: ScenarioDefinition["nodes"];
   exportedAt: string;
+  tags?: string[];
 }
 
 interface ScenarioExportBlob extends ScenarioExportPayload {
@@ -279,6 +280,7 @@ async function handleExport(request: Request, env: LocalScenarioEnv): Promise<Re
     entry: scenario.entry,
     nodes: scenario.nodes,
     exportedAt: new Date().toISOString(),
+    ...(scenario.tags && scenario.tags.length > 0 ? { tags: scenario.tags } : {}),
   };
 
   const signature = await signPayload(payload, env.TTX_EXPORT_SIGNING_KEY);
@@ -296,6 +298,7 @@ const ALLOWED_EXPORT_FIELDS = new Set([
   "nodes",
   "exportedAt",
   "signature",
+  "tags",
 ]);
 
 async function handleImport(request: Request, env: LocalScenarioEnv): Promise<Response> {
@@ -350,7 +353,14 @@ async function handleImport(request: Request, env: LocalScenarioEnv): Promise<Re
   // because import always mints a fresh id below, regardless of what
   // scenarioId was in the blob (see header comment for why).
   const validated = validateScenarioDefinition(
-    { title: record.title, description: record.description, roles: record.roles, entry: record.entry, nodes: record.nodes },
+    {
+      title: record.title,
+      description: record.description,
+      roles: record.roles,
+      entry: record.entry,
+      nodes: record.nodes,
+      tags: record.tags,
+    },
     { requireId: false },
   );
   if (!validated.ok) return Response.json({ error: validated.error }, { status: 400 });

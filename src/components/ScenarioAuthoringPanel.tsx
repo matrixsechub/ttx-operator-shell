@@ -37,7 +37,11 @@ interface Draft {
   roles: string;
   entry: string;
   nodes: DraftNode[];
+  tags: string[];
 }
+
+const MAX_TAG_LENGTH = 64;
+const MAX_TAGS = 16;
 
 let localKeyCounter = 0;
 function nextKey(): string {
@@ -53,6 +57,7 @@ function emptyDraft(): Draft {
     roles: "",
     entry: "",
     nodes: [{ key: nodeKey, id: "", title: "", inject: "", role: "", transitions: [] }],
+    tags: [],
   };
 }
 
@@ -72,6 +77,7 @@ function draftFromScenario(scenario: TtxLocalScenario): Draft {
     roles: scenario.roles.join(", "),
     entry: scenario.entry,
     nodes,
+    tags: scenario.tags ?? [],
   };
 }
 
@@ -123,6 +129,7 @@ function toPayload(draft: Draft): TtxScenarioDraft {
     };
   }
   const roles = Array.from(new Set(draft.roles.split(",").map((r) => r.trim()).filter(Boolean)));
+  const tags = Array.from(new Set(draft.tags.map((t) => t.trim()).filter(Boolean)));
   return {
     ...(draft.id ? { id: draft.id } : {}),
     title: draft.title.trim(),
@@ -130,6 +137,7 @@ function toPayload(draft: Draft): TtxScenarioDraft {
     roles,
     entry: draft.entry,
     nodes,
+    ...(tags.length > 0 ? { tags } : {}),
   };
 }
 
@@ -175,10 +183,24 @@ export function ScenarioAuthoringPanel() {
   const localScenarios = localResult?.ok ? localResult.data.scenarios : [];
   const engineScenarios = engineResult?.ok ? engineResult.data.scenarios : [];
 
+  // Phase 29 — tags are purely descriptive, authoring-plane-only
+  // organization/filtering; nothing here reaches the session engine.
+  const [tagFilter, setTagFilter] = useState("");
+  const allTags = useMemo(
+    () => Array.from(new Set(localScenarios.flatMap((s) => s.tags ?? []))).sort(),
+    [localScenarios],
+  );
+  const filteredScenarios = useMemo(
+    () => (tagFilter ? localScenarios.filter((s) => (s.tags ?? []).includes(tagFilter)) : localScenarios),
+    [localScenarios, tagFilter],
+  );
+
   const [draft, setDraft] = useState<Draft | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [tagInput, setTagInput] = useState("");
+  const [tagInputError, setTagInputError] = useState<string | null>(null);
 
   const isEditing = draft?.id !== undefined;
 
@@ -186,18 +208,56 @@ export function ScenarioAuthoringPanel() {
     setDraft(emptyDraft());
     setValidationError(null);
     setSubmitError(null);
+    setTagInput("");
+    setTagInputError(null);
   }
 
   function startEdit(scenario: TtxLocalScenario) {
     setDraft(draftFromScenario(scenario));
     setValidationError(null);
     setSubmitError(null);
+    setTagInput("");
+    setTagInputError(null);
   }
 
   function cancelEdit() {
     setDraft(null);
     setValidationError(null);
     setSubmitError(null);
+    setTagInput("");
+    setTagInputError(null);
+  }
+
+  // Normalizes to lowercase so "Fraud" and "fraud" are treated as the same
+  // tag — consistent, not case-preserving, per the phase's "your choice,
+  // but be consistent" instruction. Mirrors worker/scenarioManifest.ts's
+  // length/count limits for immediate feedback; the Worker is still the
+  // actual authority on submit.
+  function addTag() {
+    const tag = tagInput.trim().toLowerCase();
+    setTagInputError(null);
+    if (!tag) return;
+    if (tag.length > MAX_TAG_LENGTH) {
+      setTagInputError(`Tags must be ${MAX_TAG_LENGTH} characters or fewer.`);
+      return;
+    }
+    setDraft((prev) => {
+      if (!prev) return prev;
+      if (prev.tags.includes(tag)) {
+        setTagInputError(`"${tag}" is already added.`);
+        return prev;
+      }
+      if (prev.tags.length >= MAX_TAGS) {
+        setTagInputError(`A scenario may have at most ${MAX_TAGS} tags.`);
+        return prev;
+      }
+      return { ...prev, tags: [...prev.tags, tag] };
+    });
+    setTagInput("");
+  }
+
+  function removeTag(tag: string) {
+    setDraft((prev) => (prev ? { ...prev, tags: prev.tags.filter((t) => t !== tag) } : prev));
   }
 
   function updateDraft(patch: Partial<Draft>) {
@@ -455,11 +515,36 @@ export function ScenarioAuthoringPanel() {
 
       {!draft ? (
         <div className="mt-3">
-          {localScenarios.length === 0 ? (
-            <p className="text-xs italic text-op-text-dim">No authored scenarios yet.</p>
+          {allTags.length > 0 && (
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Filter</span>
+              <select
+                value={tagFilter}
+                onChange={(e) => setTagFilter(e.target.value)}
+                className="op-panel rounded-sm px-1.5 py-1 text-xs text-op-text focus:border-op-accent/60 focus:outline-none"
+              >
+                <option value="">All tags</option>
+                {allTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {tag}
+                  </option>
+                ))}
+              </select>
+              {tagFilter && (
+                <button type="button" onClick={() => setTagFilter("")} className="text-[10px] text-op-accent hover:underline">
+                  clear
+                </button>
+              )}
+            </div>
+          )}
+
+          {filteredScenarios.length === 0 ? (
+            <p className="text-xs italic text-op-text-dim">
+              {localScenarios.length === 0 ? "No authored scenarios yet." : "No scenarios match this tag."}
+            </p>
           ) : (
             <ul className="flex flex-col gap-1.5">
-              {localScenarios.map((scenario) => (
+              {filteredScenarios.map((scenario) => (
                 <li key={scenario.id} className="rounded-sm border border-op-border-bright px-2.5 py-1.5 text-xs">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-op-text">{scenario.title}</span>
@@ -486,6 +571,18 @@ export function ScenarioAuthoringPanel() {
                   </div>
                   {scenario.description && <p className="mt-0.5 text-[10px] text-op-text-dim">{scenario.description}</p>}
                   <p className="mt-0.5 text-[10px] text-op-text-dim/70">{Object.keys(scenario.nodes).length} phases</p>
+                  {scenario.tags && scenario.tags.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {scenario.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-sm border border-op-border-bright px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-op-text-dim"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -514,6 +611,44 @@ export function ScenarioAuthoringPanel() {
             rows={2}
             className={inputClass}
           />
+
+          <div>
+            <h4 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Tags</h4>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              {draft.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="flex items-center gap-1 rounded-sm border border-op-border-bright px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-op-text-dim"
+                >
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    aria-label={`Remove tag ${tag}`}
+                    className="text-op-danger hover:text-op-danger/70"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              <input
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag();
+                  }
+                }}
+                placeholder="Add a tag…"
+                className={`${inputClass} w-32`}
+              />
+              <button type="button" onClick={addTag} className="text-[10px] text-op-accent hover:underline">
+                Add tag
+              </button>
+            </div>
+            {tagInputError && <p className="mt-1 text-[11px] italic text-op-danger">{tagInputError}</p>}
+          </div>
 
           <div>
             <h4 className="text-[10px] uppercase tracking-widest text-op-text-dim/70">Entry Phase</h4>

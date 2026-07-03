@@ -25,6 +25,12 @@
 // transition, keeping "deterministic only" true by construction, not just
 // by convention) and defers structural graph checks to
 // scenarioGraph.ts's validateScenarioGraph.
+//
+// Phase 29 adds `tags` — purely descriptive labels for authoring-plane
+// organization/filtering, same "display-only, never enforced" status as
+// `role` above. Builtins never carry tags (there's no authoring UI for
+// them, and nothing here adds tags to SCENARIO_DEFINITIONS); tags only
+// ever come from an authored scenario's create/update/import payload.
 
 import { validateScenarioGraph } from "./scenarioGraph";
 
@@ -49,6 +55,7 @@ export interface ScenarioDefinition {
   roles: string[];
   entry: string;
   nodes: Record<string, ScenarioNode>;
+  tags?: string[];
 }
 
 export const SCENARIO_DEFINITIONS: Record<string, ScenarioDefinition> = {
@@ -123,9 +130,11 @@ export interface ScenarioValidationOptions {
 
 export type ScenarioValidationResult = { ok: true; value: ScenarioDefinition } | { ok: false; error: string };
 
-const ALLOWED_SCENARIO_FIELDS = new Set(["id", "title", "description", "roles", "entry", "nodes"]);
+const ALLOWED_SCENARIO_FIELDS = new Set(["id", "title", "description", "roles", "entry", "nodes", "tags"]);
 const ALLOWED_NODE_FIELDS = new Set(["id", "title", "inject", "role", "transitions"]);
 const ALLOWED_TRANSITION_FIELDS = new Set(["choice", "label", "next"]);
+const MAX_TAG_LENGTH = 64;
+const MAX_TAGS = 16;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -159,6 +168,14 @@ export function validateScenarioDefinition(input: unknown, options: ScenarioVali
   }
   if (input.roles !== undefined && (!Array.isArray(input.roles) || !input.roles.every((role) => typeof role === "string"))) {
     return { ok: false, error: "roles must be an array of strings" };
+  }
+  if (input.tags !== undefined) {
+    if (!Array.isArray(input.tags)) return { ok: false, error: "tags must be an array of strings" };
+    if (input.tags.length > MAX_TAGS) return { ok: false, error: `A scenario may have at most ${MAX_TAGS} tags` };
+    for (const tag of input.tags) {
+      if (typeof tag !== "string" || !tag.trim()) return { ok: false, error: "tags must be non-empty strings" };
+      if (tag.length > MAX_TAG_LENGTH) return { ok: false, error: `Tags must be ${MAX_TAG_LENGTH} characters or fewer` };
+    }
   }
   if (typeof input.entry !== "string" || !input.entry.trim()) return { ok: false, error: "entry is required" };
   if (!isPlainObject(input.nodes) || Object.keys(input.nodes).length === 0) {
@@ -219,6 +236,7 @@ export function validateScenarioDefinition(input: unknown, options: ScenarioVali
     roles: Array.isArray(input.roles) ? (input.roles as string[]) : [],
     entry: input.entry,
     nodes,
+    ...(Array.isArray(input.tags) ? { tags: (input.tags as string[]).map((tag) => tag.trim()) } : {}),
   };
 
   const graphCheck = validateScenarioGraph(scenario);
