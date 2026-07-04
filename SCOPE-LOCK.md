@@ -64,3 +64,25 @@ This rule applies starting now, through Master Packet v1.4 and every phase after
 ## CONFIRMATION
 
 MatrixSecHub is a frontend SPA with a marketplace, registries, a TTX module, and non-certifying governance metadata — not an AI agent platform. The fictional platform is retired. Future synthesis work applies this scope lock automatically.
+
+---
+
+## AMENDMENTS
+
+### 2026-07-04 — `OPERATOR_ROLE` / `OPERATOR_ACCESS_LEVEL` reaffirmed display-only
+
+Reaffirming the existing RBAC retirement (see RETIRED list above) against the specific fields that
+tempt reversal in practice: `OPERATOR_ROLE` and `OPERATOR_ACCESS_LEVEL` (`wrangler.jsonc` vars,
+carried into the session token by `worker/auth.ts`, echoed as `X-Operator-Role` /
+`X-Operator-Access-Level` headers by `src/lib/apiClient.ts`, and used as a UI display filter on
+`CatalogItem.access_level`).
+
+**Decision:** these remain display-only labels. No code path may branch on them to grant, deny, or
+gate access to any route, API response, or UI affordance. This applies to the Worker, the Engine
+proxy contract, and the frontend alike.
+
+Do not reintroduce RBAC by reversing this decision piecemeal (e.g. "just gate this one admin
+panel," "just filter this one list server-side by role") — that is the same scope drift the
+RETIRED list already forbids, just introduced a field at a time instead of as a named system. Any
+future phase that adds enforcement behind these fields must first amend this document explicitly,
+not just ship the code.

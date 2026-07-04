@@ -121,6 +121,11 @@ tokens (`worker/auth.ts`, `src/lib/jwt.ts`), refresh tokens with KV-backed revoc
 `SCOPE-LOCK.md`: no RBAC, no multi-operator identity model). Don't add permission checks based on
 these fields; that would be scope drift.
 
+**Reaffirmed 2026-07-04 (see `SCOPE-LOCK.md` Amendments):** keep `OPERATOR_ROLE` /
+`OPERATOR_ACCESS_LEVEL` display-only. Do not reverse this into RBAC enforcement, even
+incrementally (e.g. gating a single panel or filtering one list server-side by role) — that is
+scope drift and requires an explicit `SCOPE-LOCK.md` amendment before any code, not after.
+
 Auth returns 503 until three secrets are set — see README.md's "Auth setup" section
 (`wrangler secret put OPERATOR_CALLSIGN / OPERATOR_PASSWORD_HASH / AUTH_SIGNING_KEY`, or
 `.dev.vars` locally, gitignored).
