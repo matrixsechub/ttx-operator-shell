@@ -188,3 +188,21 @@ export interface TtxHistoryPacket {
   score: number;
   band: TtxScoreBand;
 }
+
+// --- Intelligence (Phase 35) ---
+// Mirrors worker/ttxIntelligence.ts's IntelligencePacket exactly — an
+// aggregate view derived on read over every scored session, no separate
+// storage of its own.
+
+export type TtxDecisionType = "mitigating" | "risk-escalating" | "delay";
+export type TtxIntelligenceTrend = "improving" | "stable" | "declining";
+
+export interface TtxIntelligencePacket {
+  sessionsAnalyzed: number;
+  averageScore: number | null;
+  scoreBand: TtxScoreBand | null;
+  strongestDecisionType: TtxDecisionType | null;
+  weakestDecisionType: TtxDecisionType | null;
+  trend: TtxIntelligenceTrend;
+  computedAt: string;
+}

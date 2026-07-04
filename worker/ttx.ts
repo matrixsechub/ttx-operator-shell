@@ -68,6 +68,10 @@
 // Phase 34 adds session history (worker/ttxHistory.ts) — a read-only join
 // over existing score + analytics packets (no new KV writes), exposed via
 // GET /api/ttx/sessions/history, optionally filtered by ?scenarioId=.
+//
+// Phase 35 adds an aggregate intelligence view (worker/ttxIntelligence.ts)
+// over every scored session — also derive-on-read, reusing history's own
+// join rather than a fourth one, exposed via GET /api/ttx/intelligence.
 
 import { entryNode, step } from "./scenarioGraph";
 import { SCENARIO_DEFINITIONS, type ScenarioDefinition } from "./scenarioManifest";
@@ -75,8 +79,9 @@ import { getScenarioById, handleLocalScenarioRoute, listAuthoredScenarios, type 
 import { recordAnalyticsFinalize, recordAnalyticsStart, recordAnalyticsTransition, handleAnalyticsRoute, type AnalyticsEnv } from "./ttxAnalytics";
 import { handleScoringRoute, type ScoringEnv } from "./ttxScoring";
 import { handleHistoryRoute, type HistoryEnv } from "./ttxHistory";
+import { handleIntelligenceRoute, type IntelligenceEnv } from "./ttxIntelligence";
 
-export type TtxEnv = LocalScenarioEnv & AnalyticsEnv & ScoringEnv & HistoryEnv;
+export type TtxEnv = LocalScenarioEnv & AnalyticsEnv & ScoringEnv & HistoryEnv & IntelligenceEnv;
 
 const SESSION_PREFIX = "session:";
 const SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -168,6 +173,9 @@ export async function handleTtxRoute(request: Request, pathname: string, env: Tt
 
   const historyResponse = await handleHistoryRoute(request, pathname, env);
   if (historyResponse) return historyResponse;
+
+  const intelligenceResponse = await handleIntelligenceRoute(request, pathname, env);
+  if (intelligenceResponse) return intelligenceResponse;
 
   if (pathname === "/api/ttx/sessions/scenarios") return handleScenarios(request, env);
   if (pathname === "/api/ttx/sessions/start") return handleStart(request, env);

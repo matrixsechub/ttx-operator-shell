@@ -40,8 +40,10 @@ export interface HistoryPacket {
 
 // Mirrors src/components/TTXScorePanel.tsx's bandFor() thresholds exactly
 // — small, deliberate duplication across the Worker/frontend boundary,
-// same as every other cross-project type mirror in this repo.
-function bandForScore(score: number): ScoreBand {
+// same as every other cross-project type mirror in this repo. Exported
+// for worker/ttxIntelligence.ts (Phase 35), which bands an aggregate
+// average rather than a single session's score.
+export function bandForScore(score: number): ScoreBand {
   if (score >= 70) return "strong";
   if (score >= 40) return "mixed";
   return "degraded";
@@ -73,6 +75,20 @@ async function buildHistoryPacket(
   };
 }
 
+// Shared by handleHistoryRoute below and worker/ttxIntelligence.ts (Phase
+// 35), which needs the same score+analytics+scenario join for its trend
+// computation rather than re-implementing it.
+export async function listHistoryPackets(env: HistoryEnv, scenarioFilter?: string | null): Promise<HistoryPacket[]> {
+  const scores = await listScorePackets(env.TTX_STATE);
+  const scenarioTitleCache = new Map<string, string>();
+  const packets = await Promise.all(scores.map((score) => buildHistoryPacket(env.TTX_STATE, scenarioTitleCache, score)));
+
+  return packets
+    .filter((packet): packet is HistoryPacket => packet !== null)
+    .filter((packet) => !scenarioFilter || packet.scenarioId === scenarioFilter)
+    .sort((a, b) => b.completedAt.localeCompare(a.completedAt)); // newest first
+}
+
 export async function handleHistoryRoute(request: Request, pathname: string, env: HistoryEnv): Promise<Response | null> {
   if (pathname !== "/api/ttx/sessions/history") return null;
   if (request.method !== "GET") {
@@ -81,15 +97,6 @@ export async function handleHistoryRoute(request: Request, pathname: string, env
 
   const url = new URL(request.url);
   const scenarioFilter = url.searchParams.get("scenarioId");
-
-  const scores = await listScorePackets(env.TTX_STATE);
-  const scenarioTitleCache = new Map<string, string>();
-  const packets = await Promise.all(scores.map((score) => buildHistoryPacket(env.TTX_STATE, scenarioTitleCache, score)));
-
-  const history = packets
-    .filter((packet): packet is HistoryPacket => packet !== null)
-    .filter((packet) => !scenarioFilter || packet.scenarioId === scenarioFilter)
-    .sort((a, b) => b.completedAt.localeCompare(a.completedAt)); // newest first
-
+  const history = await listHistoryPackets(env, scenarioFilter);
   return Response.json({ history });
 }
