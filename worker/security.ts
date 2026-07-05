@@ -34,7 +34,7 @@ export interface SecurityEvent {
 // enforceRetention — kept as its own copy rather than a shared helper since
 // the two operate on different KV namespaces/prefixes and the logic is only
 // five lines; extracting it would be more indirection than it saves.
-async function enforceRetention(kv: KVNamespace): Promise<void> {
+export async function enforceRetention(kv: KVNamespace): Promise<void> {
   try {
     const listed = await kv.list({ prefix: "sec:", limit: 1000 });
     if (listed.keys.length <= MAX_STORED_SECURITY_EVENTS) return;

@@ -72,7 +72,7 @@ async function hashPayload(rawBody: string): Promise<string> {
 // Tumbling window, flags once per window (not once per event past
 // threshold) — a 60-event spike should produce one webhook_spike signal,
 // not forty.
-function checkSpike(): boolean {
+export function checkSpike(): boolean {
   const now = Date.now();
   if (now - spikeWindowStart >= SPIKE_WINDOW_MS) {
     spikeWindowStart = now;
@@ -89,7 +89,7 @@ function checkSpike(): boolean {
 
 // Shared by both the duplicate-payload and source/type-burst counters —
 // same tumbling-window, flag-once shape as checkSpike, just keyed per value.
-function checkRepeat(
+export function checkRepeat(
   map: Map<string, { count: number; windowStart: number; flagged: boolean }>,
   key: string,
   windowMs: number,
@@ -138,7 +138,7 @@ function hexToBytes(hex: string): Uint8Array | null {
   }
 }
 
-async function verifySignature(rawBody: string, signatureHex: string, secret: string): Promise<boolean> {
+export async function verifySignature(rawBody: string, signatureHex: string, secret: string): Promise<boolean> {
   const signatureBytes = hexToBytes(signatureHex);
   if (!signatureBytes) return false;
   try {

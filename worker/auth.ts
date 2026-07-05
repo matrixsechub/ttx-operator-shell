@@ -36,7 +36,7 @@ export interface AuthEnv {
   AUTH_REVOCATION: KVNamespace;
 }
 
-interface OperatorProfile {
+export interface OperatorProfile {
   id: string;
   handle: string;
   role?: string;
@@ -47,18 +47,18 @@ interface OperatorProfile {
 // "refresh") or a refresh token being handed to /me (only accepts "access")
 // — both signed with the same key, so without this they'd otherwise verify
 // as interchangeable.
-interface AccessTokenPayload extends OperatorProfile {
+export interface AccessTokenPayload extends OperatorProfile {
   type: "access";
   exp: number;
 }
 
-interface RefreshTokenPayload extends OperatorProfile {
+export interface RefreshTokenPayload extends OperatorProfile {
   type: "refresh";
   jti: string;
   exp: number;
 }
 
-type TokenPayload = AccessTokenPayload | RefreshTokenPayload;
+export type TokenPayload = AccessTokenPayload | RefreshTokenPayload;
 
 const encoder = new TextEncoder();
 
@@ -82,7 +82,7 @@ function hmacKey(secret: string): Promise<CryptoKey> {
   ]);
 }
 
-async function signToken(payload: TokenPayload, secret: string): Promise<string> {
+export async function signToken(payload: TokenPayload, secret: string): Promise<string> {
   const header = bytesToBase64Url(encoder.encode(JSON.stringify({ alg: "HS256", typ: "JWT" })));
   const body = bytesToBase64Url(encoder.encode(JSON.stringify(payload)));
   const data = `${header}.${body}`;
@@ -90,7 +90,7 @@ async function signToken(payload: TokenPayload, secret: string): Promise<string>
   return `${data}.${bytesToBase64Url(new Uint8Array(signature))}`;
 }
 
-async function verifyToken(token: string, secret: string): Promise<TokenPayload | null> {
+export async function verifyToken(token: string, secret: string): Promise<TokenPayload | null> {
   const parts = token.split(".");
   if (parts.length !== 3) return null;
 
@@ -156,7 +156,7 @@ async function pbkdf2(password: string, salt: Uint8Array, iterations: number): P
 }
 
 // Constant-time comparison — don't leak match position via timing.
-function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
+export function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
@@ -165,7 +165,7 @@ function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
 
 // Stored format: pbkdf2$<iterations>$<saltB64Url>$<hashB64Url>
 // (generate with scripts/hash-password.mjs)
-async function verifyPassword(password: string, stored: string): Promise<boolean> {
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
   const parts = stored.split("$");
   if (parts.length !== 4 || parts[0] !== "pbkdf2") return false;
   const iterations = Number(parts[1]);

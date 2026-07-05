@@ -8,6 +8,7 @@
     "build": "npm run cf-typegen && tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "npm run cf-typegen && tsc -b --noEmit",
+    "test": "vitest run",
     "worker:dev": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types"
@@ -27,6 +28,7 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.0",
+    "vitest": "^4.1.9",
     "wrangler": "^4.0.0"
   }
 }
