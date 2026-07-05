@@ -47,7 +47,7 @@ const DECISION_WEIGHTS: Record<DecisionType, number> = {
   delay: -5,
 };
 
-function rankDecisionTypes(totals: Record<DecisionType, number>): {
+export function rankDecisionTypes(totals: Record<DecisionType, number>): {
   strongest: DecisionType | null;
   weakest: DecisionType | null;
 } {
@@ -61,7 +61,7 @@ function rankDecisionTypes(totals: Record<DecisionType, number>): {
   return { strongest: sorted[0].type, weakest: sorted[sorted.length - 1].type };
 }
 
-function computeTrend(scoresChronological: number[]): IntelligenceTrend {
+export function computeTrend(scoresChronological: number[]): IntelligenceTrend {
   if (scoresChronological.length < 2) return "stable";
 
   const midpoint = Math.floor(scoresChronological.length / 2);
