@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS Mission Control</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/mission.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <main class="mission-shell page-shell">
+      <section class="hero-panel bracket">
+        <div class="bracket-inner">
+          <p class="section-label mono">[ MISSION_CONTROL :: UCIP ]</p>
+          <h1>Unified Cloudflare intelligence mission board.</h1>
+          <p class="hero-sub">
+            Single advisory view synthesized from all federation layers — no per-layer route fan-out required.
+          </p>
+          <div class="cta-row">
+            <button class="button primary" type="button" id="mission-refresh">[ REFRESH ]</button>
+            <a class="button secondary" href="/os">[ OS ]</a>
+            <a class="button ghost" href="/operator">[ OPERATOR ]</a>
+            <a class="button ghost" href="/docs/cloudflare-federation">[ CF DOCS ]</a>
+            <a class="button ghost" href="/">[ LANDING ]</a>
+          </div>
+          <p class="form-status mono mission-status" id="mission-status">Loading UCIP signals...</p>
+          <div class="cinematic-hook" data-cinematic hidden></div>
+          <div class="motion-scan" data-motion-scan hidden></div>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ UCIP_STRIP ]</p>
+          <h2>Unified Cloudflare Intelligence Plane</h2>
+        </div>
+        <div class="mission-ucip-strip" id="mission-ucip-strip" aria-live="polite">
+          <article class="mission-ucip-segment green" data-ucip="green">
+            <p class="section-label mono">[ GREEN ]</p>
+            <h3>GREEN</h3>
+          </article>
+          <article class="mission-ucip-segment yellow" data-ucip="yellow">
+            <p class="section-label mono">[ YELLOW ]</p>
+            <h3>YELLOW</h3>
+          </article>
+          <article class="mission-ucip-segment orange" data-ucip="orange">
+            <p class="section-label mono">[ ORANGE ]</p>
+            <h3>ORANGE</h3>
+          </article>
+          <article class="mission-ucip-segment red" data-ucip="red">
+            <p class="section-label mono">[ RED ]</p>
+            <h3>RED</h3>
+          </article>
+        </div>
+        <p class="mission-advisory-note mono">Advisory-only :: does not block pipelines, releases, or operator actions.</p>
+        <p class="cf-panel-help mono mission-strip-help">
+          UCIP: GREEN = stable · YELLOW = caution/watch · ORANGE = hold/alert/prioritize · RED = degraded/fallback.
+        </p>
+        <ul class="mission-ucip-actions" id="mission-ucip-actions"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ UCIP_SUMMARY ]</p>
+          <h2>Synthesized federation snapshot</h2>
+        </div>
+        <div class="mission-signal-grid telemetry-grid" id="mission-ucip-grid"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ UCIP_REASONS ]</p>
+          <h2>Unified advisories</h2>
+        </div>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <ul class="mission-reasons" id="mission-ucip-reasons"></ul>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ AMG_STRIP ]</p>
+          <h2>Autonomous Meta-Governance</h2>
+        </div>
+        <div class="mission-amg-strip" id="mission-amg-strip" aria-live="polite">
+          <article class="mission-amg-segment govern_green" data-amg="govern_green">
+            <p class="section-label mono">[ GOVERN_GREEN ]</p>
+            <h3>STABLE</h3>
+          </article>
+          <article class="mission-amg-segment govern_yellow" data-amg="govern_yellow">
+            <p class="section-label mono">[ GOVERN_YELLOW ]</p>
+            <h3>CAUTION</h3>
+          </article>
+          <article class="mission-amg-segment govern_orange" data-amg="govern_orange">
+            <p class="section-label mono">[ GOVERN_ORANGE ]</p>
+            <h3>ALERT</h3>
+          </article>
+          <article class="mission-amg-segment govern_red" data-amg="govern_red">
+            <p class="section-label mono">[ GOVERN_RED ]</p>
+            <h3>FALLBACK</h3>
+          </article>
+        </div>
+        <p class="section-copy mono mission-strip-help">
+          AMG: GOVERN_GREEN = stable UCIP · GOVERN_YELLOW = caution · GOVERN_ORANGE = alert · GOVERN_RED = degraded/fallback.
+        </p>
+        <ul class="mission-amg-items" id="mission-amg-items"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CBA_STRIP ]</p>
+          <h2>Behavioral Autonomy</h2>
+        </div>
+        <div class="mission-cba-strip" id="mission-cba-strip" aria-live="polite">
+          <article class="mission-cba-segment behavior_green" data-cba="behavior_green">
+            <p class="section-label mono">[ BEHAVIOR_GREEN ]</p>
+            <h3>STABLE</h3>
+          </article>
+          <article class="mission-cba-segment behavior_yellow" data-cba="behavior_yellow">
+            <p class="section-label mono">[ BEHAVIOR_YELLOW ]</p>
+            <h3>DRIFT</h3>
+          </article>
+          <article class="mission-cba-segment behavior_orange" data-cba="behavior_orange">
+            <p class="section-label mono">[ BEHAVIOR_ORANGE ]</p>
+            <h3>ALERT</h3>
+          </article>
+          <article class="mission-cba-segment behavior_red" data-cba="behavior_red">
+            <p class="section-label mono">[ BEHAVIOR_RED ]</p>
+            <h3>FALLBACK</h3>
+          </article>
+        </div>
+        <p class="section-copy mono mission-strip-help">
+          CBA: BEHAVIOR_GREEN = aligned · BEHAVIOR_YELLOW = mild drift · BEHAVIOR_ORANGE = significant drift · BEHAVIOR_RED = degraded/severe.
+        </p>
+        <ul class="mission-cba-items" id="mission-cba-items"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CAL_STRIP ]</p>
+          <h2>Cognitive Alignment</h2>
+        </div>
+        <div class="mission-cal-strip" id="mission-cal-strip" aria-live="polite">
+          <article class="mission-cal-segment align_green" data-cal="align_green">
+            <p class="section-label mono">[ ALIGN_GREEN ]</p>
+            <h3>ALIGNED</h3>
+          </article>
+          <article class="mission-cal-segment align_yellow" data-cal="align_yellow">
+            <p class="section-label mono">[ ALIGN_YELLOW ]</p>
+            <h3>PARTIAL</h3>
+          </article>
+          <article class="mission-cal-segment align_orange" data-cal="align_orange">
+            <p class="section-label mono">[ ALIGN_ORANGE ]</p>
+            <h3>MISALIGNED</h3>
+          </article>
+          <article class="mission-cal-segment align_red" data-cal="align_red">
+            <p class="section-label mono">[ ALIGN_RED ]</p>
+            <h3>FALLBACK</h3>
+          </article>
+        </div>
+        <p class="section-copy mono mission-strip-help">
+          CAL: ALIGN_GREEN = aligned · ALIGN_YELLOW = partial · ALIGN_ORANGE = significant misalignment · ALIGN_RED = degraded/severe.
+        </p>
+        <ul class="mission-cal-items" id="mission-cal-items"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ IHL_STRIP ]</p>
+          <h2>Intent Harmonization</h2>
+        </div>
+        <div class="mission-ihl-strip" id="mission-ihl-strip" aria-live="polite">
+          <article class="mission-ihl-segment intent_green" data-ihl="intent_green">
+            <p class="section-label mono">[ INTENT_GREEN ]</p>
+            <h3>HARMONIZED</h3>
+          </article>
+          <article class="mission-ihl-segment intent_yellow" data-ihl="intent_yellow">
+            <p class="section-label mono">[ INTENT_YELLOW ]</p>
+            <h3>PARTIAL</h3>
+          </article>
+          <article class="mission-ihl-segment intent_orange" data-ihl="intent_orange">
+            <p class="section-label mono">[ INTENT_ORANGE ]</p>
+            <h3>CONFLICT</h3>
+          </article>
+          <article class="mission-ihl-segment intent_red" data-ihl="intent_red">
+            <p class="section-label mono">[ INTENT_RED ]</p>
+            <h3>FALLBACK</h3>
+          </article>
+        </div>
+        <p class="section-copy mono mission-strip-help">
+          IHL: INTENT_GREEN = harmonized · INTENT_YELLOW = partial · INTENT_ORANGE = significant conflict · INTENT_RED = degraded/severe.
+        </p>
+        <ul class="mission-ihl-items" id="mission-ihl-items"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ IARL_STRIP ]</p>
+          <h2>Intent-to-Action Resonance</h2>
+        </div>
+        <div class="mission-iarl-strip" id="mission-iarl-strip" aria-live="polite">
+          <article class="mission-iarl-segment resonance_green" data-iarl="resonance_green">
+            <p class="section-label mono">[ RESONANCE_GREEN ]</p>
+            <h3>RESONANT</h3>
+          </article>
+          <article class="mission-iarl-segment resonance_yellow" data-iarl="resonance_yellow">
+            <p class="section-label mono">[ RESONANCE_YELLOW ]</p>
+            <h3>PARTIAL</h3>
+          </article>
+          <article class="mission-iarl-segment resonance_orange" data-iarl="resonance_orange">
+            <p class="section-label mono">[ RESONANCE_ORANGE ]</p>
+            <h3>MISMATCH</h3>
+          </article>
+          <article class="mission-iarl-segment resonance_red" data-iarl="resonance_red">
+            <p class="section-label mono">[ RESONANCE_RED ]</p>
+            <h3>FALLBACK</h3>
+          </article>
+        </div>
+        <p class="section-copy mono mission-strip-help">
+          IARL: RESONANCE_GREEN = strong resonance · RESONANCE_YELLOW = partial · RESONANCE_ORANGE = significant mismatch · RESONANCE_RED = degraded/severe.
+        </p>
+        <ul class="mission-iarl-items" id="mission-iarl-items"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ ACL_STRIP ]</p>
+          <h2>Autonomous Coherence</h2>
+        </div>
+        <div class="mission-acl-strip" id="mission-acl-strip" aria-live="polite">
+          <article class="mission-acl-segment coherence_green" data-acl="coherence_green">
+            <p class="section-label mono">[ COHERENCE_GREEN ]</p>
+            <h3>COHERENT</h3>
+          </article>
+          <article class="mission-acl-segment coherence_yellow" data-acl="coherence_yellow">
+            <p class="section-label mono">[ COHERENCE_YELLOW ]</p>
+            <h3>PARTIAL</h3>
+          </article>
+          <article class="mission-acl-segment coherence_orange" data-acl="coherence_orange">
+            <p class="section-label mono">[ COHERENCE_ORANGE ]</p>
+            <h3>FRAGMENTED</h3>
+          </article>
+          <article class="mission-acl-segment coherence_red" data-acl="coherence_red">
+            <p class="section-label mono">[ COHERENCE_RED ]</p>
+            <h3>FALLBACK</h3>
+          </article>
+        </div>
+        <p class="section-copy mono mission-strip-help">
+          ACL: COHERENCE_GREEN = strong coherence · COHERENCE_YELLOW = partial · COHERENCE_ORANGE = significant fragmentation · COHERENCE_RED = degraded/severe.
+        </p>
+        <ul class="mission-acl-items" id="mission-acl-items"></ul>
+      </section>
+    </main>
+
+    <script src="/cloudflare-federation-shared.js" defer></script>
+    <script src="/mission.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

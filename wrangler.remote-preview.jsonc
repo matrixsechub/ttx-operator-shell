@@ -1,0 +1,143 @@
+{
+  "$schema": "https://developers.cloudflare.com/workers/wrangler/config-schema.json",
+  "name": "mshops-public",
+  "main": "./worker/index.js",
+  "workers_dev": true,
+  "compatibility_date": "2026-07-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "kv_namespaces": [
+    {
+      "binding": "PAYLOADS",
+      "id": "4bb8eb014a2c48e498c898cc39365ffe",
+      "preview_id": "c6eb10a085374a0da8203510a8b30aa5"
+    },
+    {
+      "binding": "ESCALATIONS",
+      "id": "b8395b11e23f462ea4b0f286bdcbddb5",
+      "preview_id": "70012e225fec4741b7091b0e8f8f419b"
+    },
+    {
+      "binding": "MODULES",
+      "id": "7e3485adf6eb4802b4ac069e142008d1",
+      "preview_id": "15fc5fd7617c4e2085225b308ab43130"
+    },
+    {
+      "binding": "ROUTING_LOGS",
+      "id": "32ca6aed14564354a1b65b57d2a958fd",
+      "preview_id": "e45ef3052c9b45288c7056f3ad1595f0"
+    },
+    {
+      "binding": "SEARCH_LOGS",
+      "id": "5e0151aa51a643c492de1cf71914ac50",
+      "preview_id": "2ef786e641524157bb9a4157ff2a6be9"
+    },
+    {
+      "binding": "EVENTS",
+      "id": "125c20bad7c049e482289b555f67d275",
+      "preview_id": "4a2da288c6f9444ab3feede4af71e0b2"
+    },
+    {
+      "binding": "AUTONOMY_LOGS",
+      "id": "5dd390f368e043eeb52556d8620582e8",
+      "preview_id": "2601529dd22b4e2d84ec897d31e8b56c"
+    },
+    {
+      "binding": "ECOSYSTEM",
+      "id": "40c4e2cff1f047ee9633d8ac3d5a4e2d",
+      "preview_id": "9e2fc7ab16d04a0faaa89d627fca7ae9"
+    },
+    {
+      "binding": "NOTIFICATIONS",
+      "id": "5836c7b3041441bfaa44c69def11ae40",
+      "preview_id": "64bf9a5e24ce4878af5da462dce0850b"
+    },
+    {
+      "binding": "AUDIT",
+      "id": "5abe3e53e29545d1a71f6a0e5d23e504",
+      "preview_id": "a14e4598a46e4f04a386778b5c400e60"
+    },
+    {
+      "binding": "SCENARIOS",
+      "id": "dd40ed9c55904256bd3e03a1e594ba7e",
+      "preview_id": "a34a9eb075c14bcba1634b4d0cb24945"
+    },
+    {
+      "binding": "HEARTBEAT",
+      "id": "849e873d83e04004af1331bf0b4d807e",
+      "preview_id": "295df0b9d7a446af95a4240232f046b7"
+    },
+    {
+      "binding": "OS_ROUTING",
+      "id": "0223979de94045feb79da3e8f590c3c8",
+      "preview_id": "8bca0b466fb54806a0ab006c9d8cb1af"
+    },
+    {
+      "binding": "DIVISION_MEMORY",
+      "id": "572f7ab7a87d42f7b6bedf04c492fc0c",
+      "preview_id": "73b30206aac84a6abffa7cb8a8e4086d"
+    },
+    {
+      "binding": "OPERATOR_INTENTS",
+      "id": "ccfd9cfd220148e68079b4bc3a567f93",
+      "preview_id": "561c5b4faf8f40f18899df823a28467d"
+    },
+    {
+      "binding": "PIPELINES",
+      "id": "2a419c6dce98484bafb5b372a202fa00",
+      "preview_id": "c02d5f390f794eccab7fecca7afa867c"
+    },
+    {
+      "binding": "SANDBOX_LOGS",
+      "id": "8cd30e33797841cb8ea24bf1db14904e",
+      "preview_id": "3d4bd8f69b7646af82ba17c7013de7d5"
+    },
+    {
+      "binding": "OS_CONFIG",
+      "id": "e9bb7b8206594224876a42745c0c493f",
+      "preview_id": "c85c78cbd69d48b09e8f1d5d5b7aaffa"
+    },
+    {
+      "binding": "PUBLIC_SCENARIOS",
+      "id": "6a052ebe31fe4dc6a1ca121a5bfd2838",
+      "preview_id": "d48825f87ed54e669f5cd239062d35c5"
+    },
+    {
+      "binding": "TELEMETRY",
+      "id": "bd6a5315f68b4e61b4c0caaa7f54f9db",
+      "preview_id": "278bc6b453544756a86a5a271c56ac11"
+    },
+    {
+      "binding": "GOVERNANCE",
+      "id": "999485439898462a83181ace91fc5e8c",
+      "preview_id": "8c78343515204e89b3bf07a226e5ad99"
+    },
+    {
+      "binding": "RELEASES",
+      "id": "90eb155d1be24c1fa07904b71cfeaa06",
+      "preview_id": "2f75901f1cac45ed9d508576676f3ddd"
+    },
+    {
+      "binding": "INTEGRATIONS",
+      "id": "5cb835b6e39341df899d6e1106addee0",
+      "preview_id": "a7e3cc1786034c2583fa2e88279cc42d"
+    },
+    {
+      "binding": "CERTIFICATION",
+      "id": "adb7123df83b4505823b62d2f77ae378",
+      "preview_id": "7cf4d79fe8f0430ca03d38512d5585ad"
+    }
+  ],
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "vars": {
+    "UPSTREAM_ENGINE_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev"
+  }
+}

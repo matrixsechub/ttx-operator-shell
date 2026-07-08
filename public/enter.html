@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>MSHOPS.NET | Operator Access Gateway</title>
+    <meta
+      name="description"
+      content="Schedule a briefing, preserve service-selector, audit-lite, prompt-injection, agent-readiness, automation-roi, and rag-risk context, and submit lead intake through the MSHOPS gateway."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body class="intro-body">
+    <div class="intro-grid" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Operator Access Gateway</span>
+        </span>
+      </a>
+      <nav class="topbar-nav">
+        <a href="/">Public Homepage</a>
+        <a href="/services">AI Services</a>
+      </nav>
+    </header>
+    <main class="page-shell division-shell">
+      <section class="hero-shell division-hero bracket reveal" data-reveal="up">
+        <div class="bracket-inner">
+          <span class="hud-tag">Status // Ready</span>
+          <p class="section-label mono">[ OPERATOR_FUNNEL :: ENTRY_SURFACE ]</p>
+          <h1 class="glow-pulse">Book the operator, transmit the brief, enter the system.</h1>
+          <p class="hero-subcopy">
+            This gateway restores the original funnel path: schedule a briefing, submit lead context, and move into
+            the operator intake flow only when your service context is ready to route.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#operator-briefing" data-scroll-target="operator-briefing">Book Briefing</a>
+            <a class="button secondary" href="#lead-capture" data-scroll-target="lead-capture">Send Lead Context</a>
+            <a class="button ghost" href="/services">Review Services</a>
+          </div>
+          <div class="ticker-strip mono" aria-label="Gateway markers">
+            <span>SCHEDULE</span>
+            <span>BRIEF</span>
+            <span>ESCALATE</span>
+            <span>ENTER</span>
+            <span>OPERATOR OVERSIGHT</span>
+          </div>
+          <div class="cinematic-hook" data-cinematic hidden></div>
+          <div class="motion-scan" data-motion-scan hidden></div>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ ACCESS_SEQUENCE ]</p>
+          <h2>Dedicated gateway route, no public homepage replacement.</h2>
+        </div>
+        <div class="telemetry-grid">
+          <article class="stat-panel bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="stat-label mono">[ STEP_01 ]</p>
+              <p class="stat-num">Calendly</p>
+              <p class="stat-copy mono">Reserve an operator slot without leaving the gateway surface.</p>
+            </div>
+          </article>
+          <article class="stat-panel bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="stat-label mono">[ STEP_02 ]</p>
+              <p class="stat-num">Lead Capture</p>
+              <p class="stat-copy mono">Transmit contact, organization, urgency, and mission brief into intake.</p>
+            </div>
+          </article>
+          <article class="stat-panel bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="stat-label mono">[ STEP_03 ]</p>
+              <p class="stat-num">Operator Review</p>
+              <p class="stat-copy mono">The intake routes into operator-managed review without exposing private surfaces in public navigation.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="operator-briefing">
+        <div class="section-heading">
+          <p class="section-label mono">[ BRIEFING + INTAKE ]</p>
+          <h2>Schedule and transmit in one pass.</h2>
+          <p class="section-copy">
+            The left lane handles calendar intake. The right lane captures the structured lead brief against the
+            existing engagement endpoint.
+          </p>
+        </div>
+        <div class="contact-layout">
+          <article class="calendly-card bracket reveal" data-reveal="left">
+            <div class="bracket-inner">
+              <div class="form-toggle-bar">
+                <p class="section-label mono">[ CALENDLY ]</p>
+                <span class="toggle-chip mono">LIVE SCHEDULER</span>
+              </div>
+              <h3>Operator briefing calendar</h3>
+              <p class="card-copy">
+                Use the embedded scheduler to reserve a briefing window before the intake is reviewed by the operator team.
+              </p>
+              <iframe
+                title="MSHOPS Operator Briefing"
+                src="https://calendly.com/matrixsechub/operator-briefing?hide_event_type_details=1&hide_gdpr_banner=1"
+                loading="lazy"
+              ></iframe>
+            </div>
+          </article>
+
+          <article class="contact-form-shell bracket reveal" data-reveal="right" id="lead-capture">
+            <div class="bracket-inner">
+              <div class="form-toggle-bar">
+                <p class="section-label mono">[ LEAD_CAPTURE ]</p>
+                <span class="toggle-chip mono">LIVE INTAKE</span>
+              </div>
+              <h3 id="enter-context-heading">Transmit operator context</h3>
+              <p class="card-copy">
+                This intake submits directly into the existing engagement creation route without altering Worker topology.
+              </p>
+              <p class="form-status mono" id="enter-context-badge">Standard operator briefing intake.</p>
+              <form class="contact-form" id="enter-lead-form">
+                <label>
+                  <span>Operator handle</span>
+                  <input id="operator-handle" name="operator_handle" type="text" autocomplete="name" required />
+                </label>
+
+                <label>
+                  <span>Contact email</span>
+                  <input id="contact-email" name="contact_email" type="email" autocomplete="email" required />
+                </label>
+
+                <label>
+                  <span>Organization</span>
+                  <input id="organization" name="organization" type="text" autocomplete="organization" />
+                </label>
+
+                <label>
+                  <span>Module or engagement interest</span>
+                  <input id="module-interest" name="module_interest" type="text" placeholder="Multi-Agent Cockpit, Scenario Engine, Red Team" />
+                </label>
+
+                <label>
+                  <span>Urgency</span>
+                  <select id="urgency" name="urgency">
+                    <option value="routine">Routine</option>
+                    <option value="priority">Priority</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Mission brief</span>
+                  <textarea
+                    id="transmission"
+                    name="transmission"
+                    rows="7"
+                    placeholder="Mission context, threat model, desired operator support, or engagement objectives."
+                    required
+                  ></textarea>
+                </label>
+
+                <input id="hidden-service" name="service" type="hidden" />
+                <input id="hidden-priority" name="priority" type="hidden" />
+                <input id="hidden-source" name="source" type="hidden" />
+                <input id="hidden-selector-id" name="selector_id" type="hidden" />
+                <input id="hidden-audit-id" name="audit_id" type="hidden" />
+                <input id="hidden-scan-id" name="scan_id" type="hidden" />
+                <input id="hidden-agent-check-id" name="agent_check_id" type="hidden" />
+                <input id="hidden-automation-roi-id" name="automation_roi_id" type="hidden" />
+                <input id="hidden-rag-risk-id" name="rag_risk_id" type="hidden" />
+                <input id="hidden-risk-score" name="risk_score" type="hidden" />
+                <input id="hidden-injection-score" name="injection_score" type="hidden" />
+                <input id="hidden-risk-tier" name="risk_tier" type="hidden" />
+                <input id="hidden-readiness-score" name="readiness_score" type="hidden" />
+                <input id="hidden-readiness-tier" name="readiness_tier" type="hidden" />
+                <input id="hidden-roi-score" name="roi_score" type="hidden" />
+                <input id="hidden-roi-tier" name="roi_tier" type="hidden" />
+                <input id="hidden-rag-risk-score" name="rag_risk_score" type="hidden" />
+                <input id="hidden-rag-risk-tier" name="rag_risk_tier" type="hidden" />
+                <input id="hidden-estimated-monthly-savings" name="estimated_monthly_savings" type="hidden" />
+                <input id="hidden-estimated-annual-savings" name="estimated_annual_savings" type="hidden" />
+                <input id="hidden-hours-saved-per-month" name="hours_saved_per_month" type="hidden" />
+                <input id="hidden-retrieval-exposure-level" name="retrieval_exposure_level" type="hidden" />
+                <input id="hidden-access-control-level" name="access_control_level" type="hidden" />
+                <input id="hidden-governance-maturity" name="governance_maturity" type="hidden" />
+                <input id="hidden-build-complexity" name="build_complexity" type="hidden" />
+                <input id="hidden-automation-complexity" name="automation_complexity" type="hidden" />
+                <input id="hidden-safety-level" name="safety_level" type="hidden" />
+
+                <div class="hero-actions">
+                  <button class="button primary" type="submit" id="enter-submit">[ TRANSMIT LEAD CONTEXT ]</button>
+                  <a class="button ghost" href="/services">[ BACK TO SERVICES ]</a>
+                </div>
+              </form>
+              <p class="form-status mono" id="enter-form-status" role="status" aria-live="polite">
+                Intake channel standing by.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ GATEWAY_LINKS ]</p>
+          <h2>Route where you need to go next.</h2>
+        </div>
+        <div class="telemetry-grid">
+          <article class="stat-panel bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="stat-label mono">[ PUBLIC ]</p>
+              <p class="stat-num">/</p>
+              <p class="stat-copy mono">Return to the main public landing page without loading operator surfaces.</p>
+              <a class="button ghost" href="/">Back to Homepage</a>
+            </div>
+          </article>
+          <article class="stat-panel bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="stat-label mono">[ SERVICES ]</p>
+              <p class="stat-num">/services</p>
+              <p class="stat-copy mono">Return to the AI Service Selector if you need to adjust the recommended path.</p>
+              <a class="button ghost" href="/services">Open Services</a>
+            </div>
+          </article>
+          <article class="stat-panel bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="stat-label mono">[ CONTACT ]</p>
+              <p class="stat-num">EMAIL</p>
+              <p class="stat-copy mono">Use direct contact when the intake requires supporting material or operator follow-up.</p>
+              <a class="button ghost" href="mailto:matrixsechub@outlook.com?subject=MSHOPS%20Service%20Intake">Email Team</a>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script src="/enter.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

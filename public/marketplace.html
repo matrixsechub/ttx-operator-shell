@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS Marketplace | v3.5 OS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/marketplace.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="marketplace-header">
+      <a class="back-link mono" href="/">[ MSHOPS.NET :: V3.5 OS ]</a>
+      <nav class="marketplace-nav mono">
+        <a href="/">Home</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/api-explorer">API Explorer</a>
+        <a href="/os">OS</a>
+        <a href="/operator">Operator</a>
+      </nav>
+    </header>
+
+    <main class="marketplace-main">
+      <section class="marketplace-hero bracket reveal" data-reveal="up">
+        <div class="bracket-inner">
+          <span class="hud-tag">Signal // Live</span>
+          <p class="section-label mono">[ MARKETPLACE_UI :: V3_5_OS ]</p>
+          <h1 class="glow-pulse">MSHOPS v3.5 marketplace surface.</h1>
+          <p class="lede">
+            Live module registry, governance posture, version state, certification, release, integration,
+            and federation synthesis for the public marketplace surface.
+          </p>
+          <div class="cinematic-hook" data-cinematic hidden></div>
+          <div class="motion-scan" data-motion-scan hidden></div>
+          <div class="filter-row mono" id="filter-row">
+            <a class="filter-chip" href="/marketplace?view=all" data-view="all">ALL MODULES</a>
+            <a class="filter-chip" href="/marketplace?view=operator" data-view="operator">OPERATOR ACCESS</a>
+            <a class="filter-chip" href="/marketplace?view=public" data-view="public">PUBLIC BRIEFS</a>
+            <a class="filter-chip" href="/marketplace?view=restricted" data-view="restricted">RESTRICTED</a>
+          </div>
+          <p class="section-copy mono">Icons and badges indicate module function, readiness, and advisory posture.</p>
+        </div>
+      </section>
+
+      <section class="summary-shell reveal" data-reveal="up">
+        <div class="section-heading">
+          <p class="section-label mono">[ REGISTRY_SYNC :: STATUS_PLANE ]</p>
+          <h2>Registry status at a glance.</h2>
+        </div>
+        <div class="summary-grid" id="summary-grid"></div>
+      </section>
+
+      <section class="summary-shell" id="ecosystem-shell">
+        <div class="section-heading">
+          <p class="section-label mono">[ ECOSYSTEM_OVERVIEW ]</p>
+          <h2>Ecosystem overview.</h2>
+          <p class="lede">Derived categories, recent publishes, and trending modules.</p>
+        </div>
+        <div class="summary-grid" id="ecosystem-grid"></div>
+      </section>
+
+      <section class="catalog-shell">
+        <div class="section-heading">
+          <p class="section-label mono">[ FILTERS_AND_SEARCH ]</p>
+          <h2>Marketplace controls.</h2>
+        </div>
+        <form class="marketplace-controls bracket" id="marketplace-controls-form">
+          <div class="bracket-inner marketplace-controls-grid">
+            <label>
+              <span class="section-label mono">[ SEARCH ]</span>
+              <input id="search-input" type="search" placeholder="Search modules, summaries, or content." />
+            </label>
+            <label>
+              <span class="section-label mono">[ AGENT ]</span>
+              <select id="agent-filter">
+                <option value="all">all</option>
+                <option value="registry">registry</option>
+                <option value="marketplace-sync">marketplace-sync</option>
+              </select>
+            </label>
+            <label>
+              <span class="section-label mono">[ DATE ]</span>
+              <select id="date-filter">
+                <option value="all">all time</option>
+                <option value="30">last 30 days</option>
+                <option value="7">last 7 days</option>
+              </select>
+            </label>
+            <label>
+              <span class="section-label mono">[ SEVERITY ]</span>
+              <select id="severity-filter">
+                <option value="all">all</option>
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+                <option value="critical">critical</option>
+              </select>
+            </label>
+            <label>
+              <span class="section-label mono">[ PUBLISH_STATE ]</span>
+              <select id="publish-filter">
+                <option value="all">all</option>
+                <option value="published">published</option>
+                <option value="unpublished">unpublished</option>
+              </select>
+            </label>
+            <div class="cta-row">
+              <button class="button primary" type="submit">[ APPLY FILTERS ]</button>
+              <button class="button ghost" type="button" id="reset-filters">[ RESET ]</button>
+            </div>
+          </div>
+        </form>
+        <p class="form-status mono" id="marketplace-status" role="status" aria-live="polite">Marketplace controls idle.</p>
+      </section>
+
+      <section class="catalog-shell reveal" data-reveal="up">
+        <div class="section-heading">
+          <p class="section-label mono">[ REGISTRY_VIEW :: MARKETPLACE_INDEX ]</p>
+          <h2>Marketplace index.</h2>
+          <p id="view-description">All validated modules currently exposed by the live registry.</p>
+        </div>
+        <div class="module-grid" id="module-grid"></div>
+      </section>
+
+      <section class="catalog-shell reveal" data-reveal="up">
+        <div class="section-heading">
+          <p class="section-label mono">[ SERVICE_MODULES :: OPERATOR_ONLY ]</p>
+          <h2>Internal service modules.</h2>
+          <p class="lede">Private service-intake cards aligned to the selector, funnel, and operator queue.</p>
+        </div>
+        <div class="module-grid" id="service-module-grid"></div>
+        <div class="marketplace-growth-hook" data-marketplace-entry hidden></div>
+        <div class="a11y-hook" data-a11y-override hidden></div>
+        <div class="ds-enforce" data-ds-enforce hidden></div>
+      </section>
+
+      <section class="summary-shell">
+        <div class="section-heading">
+          <p class="section-label mono">[ SCENARIO_EXAMPLES ]</p>
+          <h2>Public scenario examples.</h2>
+          <p class="lede">Recent public scenarios routed through the OS layer.</p>
+        </div>
+        <div class="summary-grid" id="scenario-examples-grid"></div>
+      </section>
+
+      <section class="summary-shell">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_CONSTELLATION ]</p>
+          <h2>Cloudflare integration badges.</h2>
+          <p class="lede">Optional Cloudflare MCP readiness across the module constellation.</p>
+        </div>
+        <div class="summary-grid" id="cloudflare-badges-grid"></div>
+      </section>
+
+      <section class="summary-shell">
+        <div class="section-heading">
+          <p class="section-label mono">[ HEARTBEAT_AND_TRENDS ]</p>
+          <h2>Runtime heartbeat.</h2>
+        </div>
+        <div class="summary-grid" id="heartbeat-grid"></div>
+      </section>
+
+      <section class="summary-shell">
+        <div class="section-heading">
+          <p class="section-label mono">[ OS_GOVERNANCE_AND_VERSION ]</p>
+          <h2>Governance, versioning, releases, and integrations.</h2>
+        </div>
+        <div class="summary-grid" id="os-governance-grid"></div>
+      </section>
+    </main>
+
+    <footer class="marketplace-footer mono">
+      <div class="footer-copy">
+        <span>[ MSH OPS ]</span>
+        <span>[ PUBLIC MARKETPLACE :: LIVE REGISTRY ]</span>
+      </div>
+      <div
+        class="audio-player"
+        data-audio-player
+        data-audio-src="https://example.com/mshops-final-boss-interior.mp3"
+      >
+        <button class="audio-toggle" type="button" data-audio-toggle aria-pressed="false">[ PLAY ]</button>
+        <div class="audio-meta">
+          <span class="audio-title">[ INTERIOR_BOSS_THEME ]</span>
+          <span class="audio-status" data-audio-status aria-live="polite">[ FINAL BOSS INTERIOR :: USER ACTIVATED ]</span>
+        </div>
+        <audio preload="none"></audio>
+      </div>
+    </footer>
+
+    <script src="/cloudflare-federation-shared.js" defer></script>
+    <script src="/marketplace.js" defer></script>
+    <script src="/player.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Operator OS Dashboard</title>
+    <meta
+      name="description"
+      content="MSHOPS.NET v3.5 operator OS dashboard for governance, safety, releases, integrations, certification, heartbeat, and Cloudflare federation."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Operator OS Dashboard</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="#os-summary">Summary</a>
+        <a href="#federation-strip">Federation</a>
+        <a href="#surface-links">Surfaces</a>
+        <a href="/os">OS</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/api-explorer">API Explorer</a>
+        <a href="/">Public</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ OPERATOR_ROUTE :: V3_5_OS_DASHBOARD ]</p>
+            <p class="section-label mono" id="os-version-badge">[ OS_VERSION :: LOADING ]</p>
+            <p class="section-label mono" id="os-heartbeat-badge">[ OS_HEARTBEAT :: LOADING ]</p>
+            <h1>MSHOPS.NET v3.5 operator OS</h1>
+            <p class="hero-sub">
+              Governance, safety, releases, integrations, certification, heartbeat, identity, and advisory-only
+              Cloudflare federation for the operator surface.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/os">[ OPEN OS SURFACE ]</a>
+              <a class="button secondary" href="/marketplace">[ OPEN MARKETPLACE ]</a>
+              <a class="button secondary" href="/api-explorer">[ OPEN API EXPLORER ]</a>
+              <a class="button" href="/">[ RETURN TO PUBLIC ]</a>
+            </div>
+            <div class="hero-stats">
+              <article class="stat-panel bracket">
+                <div class="bracket-inner">
+                  <p class="stat-label mono">[ GOVERNANCE ]</p>
+                  <p class="stat-num" id="governance-health-stat">--</p>
+                  <p class="stat-copy mono" id="governance-copy">Loading governance summary.</p>
+                </div>
+              </article>
+              <article class="stat-panel bracket">
+                <div class="bracket-inner">
+                  <p class="stat-label mono">[ SAFETY ]</p>
+                  <p class="stat-num" id="safety-health-stat">--</p>
+                  <p class="stat-copy mono" id="safety-copy">Loading safety state.</p>
+                </div>
+              </article>
+              <article class="stat-panel bracket">
+                <div class="bracket-inner">
+                  <p class="stat-label mono">[ HEARTBEAT ]</p>
+                  <p class="stat-num" id="heartbeat-health-stat">--</p>
+                  <p class="stat-copy mono" id="heartbeat-copy">Loading heartbeat telemetry.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="os-summary">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SYSTEM_SUMMARY ]</p>
+            <h2>v3.5 Operating System status</h2>
+          </div>
+          <button class="button secondary" type="button" id="refresh-dashboard">[ REFRESH STATUS ]</button>
+        </div>
+        <div class="telemetry-grid" id="system-status-grid"></div>
+      </section>
+
+      <section class="section-block" id="federation-strip">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ CLOUDFLARE_FEDERATION ]</p>
+            <h2>UCIP through ACL remains advisory-only</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <p class="system-copy">
+              Federation layers remain non-executing. This strip reports synthesis mode only and does not alter Worker
+              topology, bindings, or secrets.
+            </p>
+            <div class="chip-row" id="federation-chip-row"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="surface-links">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SURFACE_MAP ]</p>
+            <h2>Operator entry surface</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid" id="surface-link-grid">
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /OS ]</p>
+              <h3>OS Surface</h3>
+              <p class="system-copy">Dedicated operating system summary surface with subsystem panels and supporting detail.</p>
+              <a class="button primary" href="/os">[ OPEN /OS ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /MARKETPLACE ]</p>
+              <h3>Operator Marketplace</h3>
+              <p class="system-copy">Published modules, ecosystem navigation, and operator marketplace controls.</p>
+              <a class="button primary" href="/marketplace">[ OPEN /MARKETPLACE ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /API-EXPLORER ]</p>
+              <h3>API Explorer</h3>
+              <p class="system-copy">Public-safe endpoint explorer for identity, telemetry, governance, and federation signals.</p>
+              <a class="button primary" href="/api-explorer">[ OPEN /API-EXPLORER ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /OPERATOR/SERVICE-INTAKE ]</p>
+              <h3>Service Intake Queue</h3>
+              <p class="system-copy">Private intake queue for service-selector matches and funnel-to-operator engagement handoff.</p>
+              <a class="button primary" href="/operator/service-intake">[ OPEN SERVICE INTAKE ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /OPERATOR/AUDIT-LITE ]</p>
+              <h3>AI Security Audit Lite Queue</h3>
+              <p class="system-copy">Private queue for free diagnostic audit submissions and full-audit intake handoff.</p>
+              <a class="button primary" href="/operator/audit-lite">[ OPEN AUDIT LITE QUEUE ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /OPERATOR/PROMPT-INJECTION-SCANS ]</p>
+              <h3>Prompt Injection Scan Queue</h3>
+              <p class="system-copy">Private queue for prompt injection scanner submissions and prompt-review intake handoff.</p>
+              <a class="button primary" href="/operator/prompt-injection-scans">[ OPEN PROMPT INJECTION QUEUE ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /OPERATOR/AGENT-READINESS ]</p>
+              <h3>AI Agent Readiness Queue</h3>
+              <p class="system-copy">Private queue for AI agent readiness submissions and build-review intake handoff.</p>
+              <a class="button primary" href="/operator/agent-readiness">[ OPEN AGENT READINESS QUEUE ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /OPERATOR/AUTOMATION-ROI ]</p>
+              <h3>Automation ROI Queue</h3>
+              <p class="system-copy">Private queue for automation ROI submissions and automation-build intake handoff.</p>
+              <a class="button primary" href="/operator/automation-roi">[ OPEN AUTOMATION ROI QUEUE ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ /OPERATOR/RAG-RISK ]</p>
+              <h3>RAG Risk Queue</h3>
+              <p class="system-copy">Private queue for RAG risk submissions and governance-review intake handoff.</p>
+              <a class="button primary" href="/operator/rag-risk">[ OPEN RAG RISK QUEUE ]</a>
+            </div>
+          </article>
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ / ]</p>
+              <h3>Public Homepage</h3>
+              <p class="system-copy">Normal visitor landing page with no operator surfaces exposed.</p>
+              <a class="button primary" href="/">[ OPEN / ]</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner footer-architecture">
+            <div class="section-heading">
+              <div>
+                <p class="section-label mono">[ CLOUDFLARE_FEDERATION_STRIP ]</p>
+                <h2>UCIP -> AMG -> CBA -> CAL -> IHL -> IARL -> ACL</h2>
+              </div>
+            </div>
+            <div class="architecture-grid">
+              <article class="architecture-card">
+                <p class="section-label mono">[ UCIP ]</p>
+                <p>Unified Cloudflare intelligence plane</p>
+              </article>
+              <article class="architecture-card">
+                <p class="section-label mono">[ AMG ]</p>
+                <p>Autonomous meta-governance guidance</p>
+              </article>
+              <article class="architecture-card">
+                <p class="section-label mono">[ CBA ]</p>
+                <p>Behavioral autonomy signal synthesis</p>
+              </article>
+              <article class="architecture-card">
+                <p class="section-label mono">[ CAL ]</p>
+                <p>Cognitive alignment assessment</p>
+              </article>
+              <article class="architecture-card">
+                <p class="section-label mono">[ IHL ]</p>
+                <p>Intent harmonization layer</p>
+              </article>
+              <article class="architecture-card">
+                <p class="section-label mono">[ IARL ]</p>
+                <p>Intent-to-action resonance layer</p>
+              </article>
+              <article class="architecture-card">
+                <p class="section-label mono">[ ACL ]</p>
+                <p>Autonomous coherence layer</p>
+              </article>
+              <article class="architecture-card">
+                <p class="section-label mono">[ MODE ]</p>
+                <p>Advisory-only federation with no autonomous topology changes</p>
+              </article>
+            </div>
+          </div>
+        </article>
+      </section>
+      <section class="operator-surface-hook" data-operator-surface hidden>
+        <div class="operator-panel-hook"></div>
+      </section>
+      <div class="a11y-hook" data-a11y-override hidden></div>
+      <div class="ds-enforce" data-ds-enforce hidden></div>
+      <div class="hud-scan" data-hud-scan hidden></div>
+    </main>
+
+    <footer class="footer mono">
+      <span>MSHOPS.NET operator OS route</span>
+      <span>Governance, safety, releases, integrations, certification, versioning, heartbeat, federation</span>
+    </footer>
+
+    <script src="/app.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

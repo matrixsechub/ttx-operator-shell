@@ -1,0 +1,6 @@
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mCould not find zone for `mshops-public.sogellagepul.workers.dev`. Make sure the domain is set up to be proxied by Cloudflare.[0m
+
+  For more details, refer to [4mhttps://developers.cloudflare.com/workers/configuration/routing/routes/#set-up-a-route[0m
+
+
+🪵  Logs were written to "C:\Users\wevrw\.wrangler-config\.wrangler\logs\wrangler-2026-07-08_06-14-22_510.log"

@@ -1,0 +1,506 @@
+/**
+ * RGB+GOLD OPERATOR DESIGN SYSTEM — COMPONENTS
+ * -----------------------------------------------------------------------
+ * New component classes that mirror the shared marketing-site design
+ * system's naming (.btn, .badge-status, .badge-critical, .card, .hud-card,
+ * .pricing-tier, .pricing-premium). None of these names collide with the
+ * app's existing component classes:
+ *   - .button (existing)  vs  .btn (new)      -> different name, no clash
+ *   - .badge (existing)   vs  .badge-status / .badge-critical (new)
+ *   - .marketplace-card / .panel-card (existing) vs .card / .hud-card (new)
+ *   - no existing .pricing-tier / .pricing-premium in this app
+ * The existing classes are left completely untouched; use these new ones
+ * for any NEW UI you build so it draws from the shared system, without
+ * requiring a risky rename of the app's current, live components.
+ *
+ * Depends on: rgbgold-tokens.css.
+ *
+ * DRIFT-MARKER: layer=components file=public/styles/rgbgold-components.css version=1.0
+ */
+
+/* =========================================================================
+   BUTTONS
+   ========================================================================= */
+
+.btn {
+  border: none;
+  border-radius: var(--rgbgold-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rgbgold-space-2);
+  font-weight: 700;
+  padding: 0.82rem 1.4rem;
+  cursor: pointer;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform var(--rgbgold-ease-standard), box-shadow var(--rgbgold-ease-standard), border-color var(--rgbgold-ease-standard);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  color: #03111f;
+  background: var(--rgbgold-gradient-main);
+  box-shadow: var(--rgbgold-shadow-glow);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 0 1px rgba(60, 242, 255, 0.68), 0 0 32px rgba(245, 196, 81, 0.5), 0 18px 34px rgba(211, 75, 255, 0.3);
+}
+
+.btn-gold {
+  color: #241505;
+  background: var(--rgbgold-gradient-gold);
+  box-shadow: var(--rgbgold-shadow-gold);
+}
+
+.btn-gold:hover {
+  box-shadow: 0 0 0 1px rgba(245, 196, 81, 0.8), 0 0 34px rgba(245, 196, 81, 0.6), 0 18px 34px rgba(245, 196, 81, 0.32);
+}
+
+.btn-secondary {
+  color: inherit;
+  border: 1px solid rgba(137, 168, 230, 0.35);
+  background: rgba(19, 34, 60, 0.65);
+}
+
+.btn-secondary:hover {
+  border-color: rgba(60, 242, 255, 0.62);
+  box-shadow: 0 0 0 1px rgba(60, 242, 255, 0.35) inset;
+}
+
+/* =========================================================================
+   BADGES
+   ========================================================================= */
+
+.badge-status {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  background: rgba(60, 242, 255, 0.15);
+  color: var(--rgbgold-cyan);
+  border: 1px solid rgba(60, 242, 255, 0.4);
+  border-radius: var(--rgbgold-radius-pill);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.badge-critical {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  background: rgba(255, 84, 112, 0.16);
+  color: var(--rgbgold-critical-soft);
+  border: 1px solid rgba(255, 84, 112, 0.55);
+  border-radius: var(--rgbgold-radius-pill);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* =========================================================================
+   CARDS
+   Usage: .card is a lightweight glass surface for new content blocks;
+   .hud-card adds an animated RGB+gold hairline border (own ::before, does
+   not collide with the app's .hud-frame corner-bracket pseudo-elements).
+   ========================================================================= */
+
+.card {
+  position: relative;
+  border-radius: var(--rgbgold-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+  padding: var(--rgbgold-space-5);
+}
+
+.hud-card {
+  position: relative;
+}
+
+.hud-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--rgbgold-gradient-rgbgold);
+  background-size: 300% 300%;
+  animation: rgbgoldBorderFlow var(--rgbgold-duration-border-flow) linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   PRICING
+   ========================================================================= */
+
+.pricing-tier {
+  position: relative;
+  border-radius: var(--rgbgold-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+  padding: var(--rgbgold-space-5);
+  transition: transform var(--rgbgold-ease-standard), box-shadow var(--rgbgold-ease-standard);
+}
+
+.pricing-tier:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--rgbgold-shadow-glow);
+}
+
+.pricing-premium {
+  border-color: rgba(245, 196, 81, 0.48);
+  box-shadow: var(--rgbgold-shadow-gold);
+}
+
+.pricing-premium:hover {
+  box-shadow: var(--rgbgold-shadow-premium);
+}
+
+.pricing-premium .price-tag {
+  background: var(--rgbgold-gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* =========================================================================
+   MODULE & OPERATOR PANEL READINESS
+   Reusable "bundle" primitives for future marketplace modules and operator
+   surfaces. Self-contained animated ::before border (same pattern as
+   .hud-card above), so they stay compatible with this app's .hud-frame
+   (::after, different pseudo-element) and with .reveal/.glow-pulse/
+   .hud-tag from the rest of this system - see the pseudo-element budget
+   table in rgbgold-hud.css before combining with other ::before classes.
+   Neither name collides with any existing class in this app.
+
+   .module-card - a generic entry tile for future marketplace/module grids
+   (automation packs, scenario modules, agent listings).
+
+   Usage:
+     <article class="module-card hud-card reveal" data-reveal="up">
+       <span class="hud-tag">Module // Ready</span>
+       <h3>Automation Pack: Inventory Sync</h3>
+       <p>Short module description.</p>
+       <button class="btn btn-secondary">View module</button>
+     </article>
+
+   .operator-panel - a generic panel for future operator-facing cockpit
+   surfaces (dashboards, queues, telemetry). Larger padding than
+   .module-card since it's meant to host dense UI (tables, stat grids).
+
+   Usage:
+     <section class="operator-panel reveal" data-reveal="up">
+       <span class="hud-tag">Operator // Live</span>
+       <h2>Queue Status</h2>
+       ...dense content...
+     </section>
+   ========================================================================= */
+
+.module-card {
+  position: relative;
+  border-radius: var(--rgbgold-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+  padding: var(--rgbgold-space-5);
+  transition: transform var(--rgbgold-ease-standard), box-shadow var(--rgbgold-ease-standard);
+}
+
+.module-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--rgbgold-gradient-rgbgold);
+  background-size: 300% 300%;
+  animation: rgbgoldBorderFlow var(--rgbgold-duration-border-flow) linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.module-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--rgbgold-shadow-glow);
+}
+
+.operator-panel {
+  position: relative;
+  border-radius: var(--rgbgold-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.95), rgba(9, 12, 16, 0.97));
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+  padding: var(--rgbgold-space-6);
+}
+
+.operator-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--rgbgold-gradient-rgbgold);
+  background-size: 300% 300%;
+  animation: rgbgoldBorderFlow var(--rgbgold-duration-border-flow) linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* =========================================================================
+   MODULE SHELL  (ecosystem scaffolding for future modules)
+   Reusable outer wrapper + header pattern for future modules dropped into
+   this console. Composes cleanly with .hud-frame/.hud-card (::before/
+   ::after, see the budget table in rgbgold-hud.css), .hud-tag, .reveal,
+   and .operator-panel (a module shell can wrap one or more
+   .operator-panel/.module-card children). Not used by any current page -
+   forward scaffolding only. See /public/DESIGN_SYSTEM.md (marketing repo)
+   §15 for the shared HTML pattern and the accessibility hook
+   (.a11y-module-shell) that ships alongside it in a11y.css.
+
+   NAMING NOTE: the marketing repo's equivalent component is named
+   `.module-shell` (unprefixed). Here it is `.rgbgold-module-shell` instead
+   because this app's existing `/public/modules/module.css` ALREADY defines
+   a live `.module-shell` class (the layout wrapper used by all 5 current
+   module pages: width/margin/padding only, no background/border/shadow).
+   Reusing that name here would have silently added a background, border,
+   and box-shadow to those live pages the moment rgbgold-components.css
+   loaded - a real visual regression, not just a harmless duplicate name.
+   Prefixing avoids it entirely while keeping the same shape/usage pattern
+   as the marketing repo's version.
+
+   Usage:
+     <section class="rgbgold-module-shell hud-frame reveal" data-reveal="up" data-version="1.0">
+       <header class="rgbgold-module-shell-header">
+         <span class="hud-tag">Module // Ready</span>
+         <h2>Module Title</h2>
+       </header>
+       <div class="rgbgold-module-shell-body">
+         <!-- .operator-panel / .module-card children -->
+       </div>
+     </section>
+   ========================================================================= */
+
+.rgbgold-module-shell {
+  position: relative;
+  padding: var(--rgbgold-space-6);
+  border-radius: var(--rgbgold-radius-lg);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.95), rgba(9, 12, 16, 0.97));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+}
+
+.rgbgold-module-shell-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rgbgold-space-2);
+  margin-bottom: var(--rgbgold-space-5);
+}
+
+.rgbgold-module-shell-header h2,
+.rgbgold-module-shell-header h3 {
+  margin: 0;
+}
+
+.rgbgold-module-shell-body {
+  display: grid;
+  gap: var(--rgbgold-space-4);
+}
+
+/* =========================================================================
+   MARKETPLACE ENTRY  (future services/agents listing variant)
+   Lighter-weight sibling to this app's existing `.marketplace-card` for
+   dense listing contexts (agent directories, service catalogs). No
+   animated border by default; add `.marketplace-entry-premium` for a
+   gold-accented featured row. Not used by any current page - forward
+   scaffolding. See /public/DESIGN_SYSTEM.md (marketing repo) §16.
+
+   Usage:
+     <div class="marketplace-entry reveal" data-reveal="up" data-version="1.0">
+       <span class="badge-status">Agent</span>
+       <h3>Inventory Sync Agent</h3>
+     </div>
+
+     <div class="marketplace-entry marketplace-entry-premium reveal" data-reveal="up" data-version="1.0">
+       <span class="badge-status">Featured</span>
+       <h3>Premium Scenario Pack</h3>
+     </div>
+   ========================================================================= */
+
+.marketplace-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rgbgold-space-4);
+  padding: var(--rgbgold-space-3) var(--rgbgold-space-5);
+  border-radius: var(--rgbgold-radius-md);
+  background: rgba(16, 20, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform var(--rgbgold-ease-standard), border-color var(--rgbgold-ease-standard), box-shadow var(--rgbgold-ease-standard);
+}
+
+.marketplace-entry:hover {
+  transform: translateX(4px);
+  border-color: rgba(60, 242, 255, 0.4);
+  box-shadow: var(--rgbgold-shadow-glow);
+}
+
+.marketplace-entry-premium {
+  border-color: rgba(245, 196, 81, 0.48);
+  box-shadow: var(--rgbgold-shadow-gold);
+}
+
+.marketplace-entry-premium:hover {
+  box-shadow: var(--rgbgold-shadow-premium);
+}
+
+/* =========================================================================
+   OPERATOR SURFACE  (top-level scaffolding for future operator pages)
+   `.operator-surface` is the page-level wrapper for a future operator
+   console page; `.operator-surface-section` divides it into labeled
+   sub-sections. Distinct from `.operator-panel` (a single dense panel) - a
+   surface is the page shell hosting one or more panels/module-shells. Not
+   used by any current page - forward scaffolding. See
+   /public/DESIGN_SYSTEM.md (marketing repo) §17.
+
+   Usage:
+     <main class="operator-surface" data-version="1.0">
+       <section class="operator-surface-section reveal" data-reveal="up">
+         <h2>Queue</h2>
+         <div class="operator-panel">...</div>
+       </section>
+     </main>
+   ========================================================================= */
+
+.operator-surface {
+  display: grid;
+  gap: var(--rgbgold-space-6);
+}
+
+.operator-surface-section {
+  display: grid;
+  gap: var(--rgbgold-space-4);
+}
+
+.operator-surface-section > h2,
+.operator-surface-section > h3 {
+  margin: 0;
+}
+
+/* =========================================================================
+   NAV ECOSYSTEM  (cross-repo navigation hook - UI only, routing inert)
+   Dormant navigation component for future cross-repo entry points
+   (ttx-operator-shell <-> marketing site). NOT wired into any current
+   page's live nav - it exists as an available, styled component so a
+   future pass can drop it in without inventing new nav CSS. Links use
+   `href="#"` and `aria-disabled="true"` until real routing exists.
+   See /public/DESIGN_SYSTEM.md (marketing repo) §18.
+
+   Usage:
+     <nav class="nav-ecosystem" aria-label="Ecosystem">
+       <a href="#" aria-disabled="true">Modules</a>
+       <a href="#" aria-disabled="true">Agents</a>
+       <a href="#" aria-disabled="true">Marketplace</a>
+       <a href="#" aria-disabled="true">Operator Console</a>
+     </nav>
+   ========================================================================= */
+
+.nav-ecosystem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rgbgold-space-4);
+}
+
+.nav-ecosystem a {
+  color: inherit;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.nav-ecosystem a[aria-disabled="true"] {
+  color: rgba(255, 255, 255, 0.45);
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* =========================================================================
+   VERSIONED COMPONENT HOOKS  (cinematic-hook / a11y-hook)
+   -----------------------------------------------------------------------
+   Generic, zero-styling marker classes for future modules to identify
+   which of their elements host a versioned cinematic effect vs. which
+   participate in Accessibility Mode - see /public/DESIGN_SYSTEM.md
+   (marketing repo) §22 for the full `data-version` convention these pair
+   with.
+
+   `.cinematic-hook` marks an element as the deliberate host of a cinematic
+   effect (glow-pulse, hue-travel, hud-card, etc.) - sets `position:
+   relative` so ::before/::after-based effect classes behave predictably.
+
+   `.a11y-hook` marks an element as one whose accessibility behavior is
+   intentionally tracked/versioned. Zero styles by design.
+
+   Usage:
+     <h2 class="glow-pulse cinematic-hook" data-version="1.0">Headline</h2>
+     <div class="rgbgold-module-shell a11y-hook" data-version="1.0">...</div>
+   ========================================================================= */
+
+.cinematic-hook {
+  position: relative;
+}
+
+.a11y-hook {
+  /* Intentionally empty: pure semantic/tooling marker, never a styling
+     hook. Add accessibility overrides via .a11y-override-* instead. */
+}
+
+/* =========================================================================
+   EXPANSION-SAFE UTILITY
+   -----------------------------------------------------------------------
+   Drop-in safety net for any brand-new component that hasn't yet been
+   fully vetted against the design system's motion/HUD/token rules. Zero
+   pseudo-elements, zero animations, zero transitions, and high-contrast
+   defaults out of the box. See DESIGN_SYSTEM.md (marketing repo) §24.
+
+   Usage: add `.expansion-safe` to a new component while it's still being
+   designed/reviewed, then remove it once the component has its own
+   token-driven styling, motion classification, and a11y.css coverage.
+   ========================================================================= */
+
+.expansion-safe {
+  animation: none !important;
+  transition: none !important;
+  background: rgba(16, 20, 26, 0.93);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: none !important;
+}
+
+.expansion-safe::before,
+.expansion-safe::after {
+  content: none !important;
+  display: none !important;
+}

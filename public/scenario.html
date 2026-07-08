@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Scenario Engine</title>
+    <meta
+      name="description"
+      content="MSHOPS.NET operator Scenario Engine — start, pause, reset, and observe simulation scenarios from a single operator-grade console."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/scenario.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Scenario Engine</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="/mission">Mission</a>
+        <a href="/operator">Operator</a>
+        <a href="#scenario-control">Control</a>
+        <a href="#scenario-timeline">Timeline</a>
+        <a href="#scenario-events">Events</a>
+        <a href="#scenario-doctrine">Doctrine</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <header class="operator-surface" data-version="1.0">
+        <section class="operator-surface-section" data-scenario-hook>
+          <div
+            class="rgbgold-module-shell hud-frame reveal"
+            data-reveal="up"
+            data-module-hook
+            data-version="1.0"
+          >
+            <header class="rgbgold-module-shell-header">
+              <div class="hud-tag">Scenario // Ready</div>
+              <p class="section-label mono">[ SCENARIO_ENGINE :: TTX / MISSION / SIMULATION ]</p>
+              <h1>Scenario Engine console</h1>
+              <p class="hero-sub">
+                Start, pause, reset, and observe an operator scenario from a single console built on the RGB+Gold
+                Operator Design System - HUD framing, motion-safe reveals, and full Accessibility Mode coverage
+                included by default.
+              </p>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="scenario-shell-note mono">
+                This console is a UI-only integration layer. It simulates scenario lifecycle state client-side and
+                logs to the console - no backend, Worker, or Scenario Engine API calls are made from this page.
+              </p>
+            </div>
+          </div>
+        </section>
+      </header>
+
+      <section class="section-block" id="scenario-control">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SCENARIO_CONTROL ]</p>
+            <h2>Scenario Control Panel</h2>
+          </div>
+        </div>
+
+        <div
+          class="scenario-control-panel operator-panel hud-frame reveal"
+          data-reveal="up"
+          data-version="1.0"
+        >
+          <div class="scenario-control-panel__actions">
+            <button class="btn btn-primary" type="button" data-scenario-control="start">
+              Start Scenario
+            </button>
+            <button class="btn btn-secondary" type="button" data-scenario-control="pause">
+              Pause Scenario
+            </button>
+            <button class="btn btn-secondary" type="button" data-scenario-control="reset">
+              Reset Scenario
+            </button>
+          </div>
+          <p
+            class="scenario-control-panel__status a11y-override-badge mono"
+            data-scenario-status
+            aria-live="polite"
+          >
+            Idle — no scenario loaded.
+          </p>
+        </div>
+      </section>
+
+      <section class="section-block" id="scenario-timeline">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SCENARIO_TIMELINE ]</p>
+            <h2>Scenario Timeline</h2>
+          </div>
+        </div>
+
+        <div
+          class="scenario-timeline hud-frame reveal a11y-override-card"
+          data-reveal="up"
+          data-version="1.0"
+        >
+          <ol class="scenario-timeline__track" data-scenario-event-track aria-label="Scenario timeline">
+            <li class="scenario-timeline__node scenario-timeline__node--placeholder" data-scenario-timeline-empty>
+              <span class="hud-tag">Timeline // Standby</span>
+              <p class="mono">No scenario events recorded yet. Timeline nodes populate as the scenario runs.</p>
+            </li>
+          </ol>
+          <!-- Future timeline animation injection point - see DESIGN_SYSTEM.md §34. -->
+          <div class="cinematic-hook" data-cinematic hidden></div>
+        </div>
+      </section>
+
+      <section class="section-block" id="scenario-events">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SCENARIO_EVENTS ]</p>
+            <h2>Scenario Event Feed</h2>
+          </div>
+        </div>
+
+        <div class="scenario-event-feed a11y-override-card" data-scenario-event aria-live="polite" data-version="1.0">
+          <p class="scenario-event-feed__empty mono" data-scenario-event-empty>No events yet.</p>
+          <ul class="scenario-event-feed__list" data-scenario-event-list></ul>
+        </div>
+        <!-- Accessibility Mode registration hook - see a11y.css's generic override checklist. -->
+        <div class="a11y-hook" data-a11y-override hidden></div>
+      </section>
+
+      <section class="section-block" id="scenario-doctrine" data-doctrine-panel>
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ DOCTRINE_INTEGRATION ]</p>
+            <h2>Doctrine Panel</h2>
+          </div>
+        </div>
+
+        <div
+          class="scenario-doctrine-panel operator-panel hud-frame reveal a11y-override-card"
+          data-reveal="up"
+          data-version="1.0"
+        >
+          <p class="scenario-shell-note mono">
+            Reads approved doctrine through <code>/doctrine/broker</code> only. This page never calls
+            upstream sources, never calls <code>/doctrine/sync</code> or <code>/doctrine/approve-*</code>, and
+            never displays unapproved or quarantined doctrine content.
+          </p>
+
+          <form class="doctrine-broker-form" data-doctrine-broker-form>
+            <label class="doctrine-broker-form__field mono">
+              Agent ID
+              <input type="text" name="agentId" data-doctrine-input="agentId" placeholder="scenario-engine" autocomplete="off" />
+            </label>
+            <label class="doctrine-broker-form__field mono">
+              Version ID
+              <input type="text" name="versionId" data-doctrine-input="versionId" placeholder="doctrine version id" autocomplete="off" />
+            </label>
+            <label class="doctrine-broker-form__field mono">
+              Classification
+              <input type="text" name="classification" data-doctrine-input="classification" placeholder="PUBLIC" autocomplete="off" />
+            </label>
+            <button class="btn btn-primary" type="submit">Request via Broker</button>
+          </form>
+          <p
+            class="doctrine-broker-status a11y-override-badge mono"
+            data-doctrine-broker-status
+            aria-live="polite"
+          >
+            Idle — no broker request sent.
+          </p>
+
+          <div class="doctrine-version-viewer a11y-override-card" data-doctrine-version aria-live="polite">
+            <p class="section-label mono">[ DOCTRINE_VERSION ]</p>
+            <p class="doctrine-version-viewer__empty mono" data-doctrine-version-empty>
+              No approved version loaded yet.
+            </p>
+            <dl class="doctrine-version-viewer__meta" data-doctrine-version-meta hidden></dl>
+          </div>
+
+          <div class="doctrine-chunk-viewer a11y-override-card" data-doctrine-chunks>
+            <p class="section-label mono">[ DOCTRINE_CHUNKS ]</p>
+            <p class="doctrine-chunk-viewer__empty mono" data-doctrine-chunks-empty>
+              No approved chunks loaded yet.
+            </p>
+            <ul class="doctrine-chunk-viewer__list" data-doctrine-chunks-list></ul>
+          </div>
+
+          <div class="doctrine-diff-viewer expansion-safe" data-doctrine-diff>
+            <p class="section-label mono">[ DOCTRINE_DIFF ]</p>
+            <p class="mono">
+              Diffing an approved version against a quarantined version requires operator-token-authenticated
+              endpoints (<code>/doctrine/sync</code>, <code>/doctrine/approve-version</code>) that this
+              reference-only console does not hold credentials for and will never call. This panel
+              intentionally renders in its static <code>.expansion-safe</code> fallback state - see
+              DESIGN_SYSTEM.md §40.
+            </p>
+          </div>
+
+          <div class="doctrine-evidence-viewer a11y-override-card" data-doctrine-evidence aria-live="polite">
+            <p class="section-label mono">[ DOCTRINE_EVIDENCE ]</p>
+            <p class="mono doctrine-evidence-viewer__note">
+              Sync and approval evidence require an operator token this console does not hold - only this
+              browser session's own access/denied-access evidence (from the broker calls above) appears below.
+            </p>
+            <ul class="doctrine-evidence-viewer__list" data-doctrine-evidence-list></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <span>MSHOPS.NET Scenario Engine console</span>
+      <span>UI integration layer only - no backend or Worker calls originate from this page</span>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/doctrine-ui.js" defer></script>
+    <script src="/scripts/scenario.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,360 @@
+/**
+ * MISSION ENGINE - PAGE COMPOSITION
+ * -----------------------------------------------------------------------
+ * DRIFT-MARKER: layer=page file=public/styles/mission-engine.css version=1.0
+ *
+ * Page-specific composition for /mission-engine.html only. Follows the
+ * exact same pattern established by scenario.css: imports the app's base
+ * styles.css for shared layout primitives (.page-shell, .section-block,
+ * .topbar, etc.) and layers page-only rules on top, written entirely
+ * against the RGB+Gold `--rgbgold-*` token set.
+ *
+ * Defines the six Mission Engine components added by the Operator Mission
+ * Engine Integration Pass (see DESIGN_SYSTEM.md §43-§49):
+ *   - .mission-objective-panel  (§44)
+ *   - .mission-state-machine    (§45)
+ *   - .mission-action-console   (§46)
+ *   - .mission-timeline         (§47)
+ *   - .mission-evidence-viewer  (§48)
+ *
+ * Load order on mission-engine.html: rgbgold-tokens.css ->
+ * rgbgold-motion.css -> rgbgold-components.css -> rgbgold-hud.css ->
+ * rgbgold-hooks.css -> styles.css -> mission-engine.css -> a11y.css (last).
+ *
+ * None of the components below declare their own ::before/::after - they
+ * compose with `.hud-frame` (existing, ::before/::after) and
+ * `.operator-panel` (::before) from the shared system instead of
+ * introducing new pseudo-element usage. See the budget table in
+ * rgbgold-hud.css before adding any new decorator here.
+ */
+
+@import url("/styles.css");
+
+.mission-shell-note {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+/* =========================================================================
+   MISSION OBJECTIVE PANEL — §44
+   Composition: .mission-objective-panel + .operator-panel (surface/
+   padding) + .hud-frame (corner brackets) + .reveal (scroll-in motion) +
+   .a11y-override-card (Accessibility Mode coverage, no a11y.css edits
+   required). Every objective ships with a doctrine classification tag
+   (client-side constant, no broker call) and an operator-controlled
+   completion toggle.
+
+   Usage (the `data-mission-objectives` integration hook lives on the wrapping
+   <section>, per DESIGN_SYSTEM.md §44 - not on the panel div itself):
+     <section data-mission-objectives>
+       <div class="mission-objective-panel operator-panel hud-frame reveal a11y-override-card"
+            data-reveal="up" data-version="1.0">
+         <ul class="mission-objective-panel__list" data-mission-objective-list>
+         <li class="mission-objective-panel__item" data-mission-objective="id"
+             data-doctrine-classification="RESTRICTED">
+           <div class="mission-objective-panel__item-copy">
+             <p class="mission-objective-panel__item-title">Objective title</p>
+             <span class="mission-doctrine-tag">Doctrine // RESTRICTED</span>
+           </div>
+             <button class="btn btn-secondary" data-mission-objective-toggle aria-pressed="false">
+               Mark Complete
+             </button>
+           </li>
+         </ul>
+       </div>
+     </section>
+   ========================================================================= */
+
+.mission-objective-panel__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--rgbgold-space-3);
+}
+
+.mission-objective-panel__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rgbgold-space-4);
+  padding: var(--rgbgold-space-3) var(--rgbgold-space-4);
+  border-radius: var(--rgbgold-radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(16, 20, 26, 0.6);
+}
+
+.mission-objective-panel__item[data-complete="true"] {
+  border-color: rgba(142, 255, 117, 0.4);
+  background: rgba(142, 255, 117, 0.06);
+}
+
+.mission-objective-panel__item-copy {
+  display: grid;
+  gap: var(--rgbgold-space-1);
+}
+
+.mission-objective-panel__item-title {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.mission-objective-panel__item[data-complete="true"] .mission-objective-panel__item-title {
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+/* Independent, page-scoped twin of .scenario-doctrine-tag (scenario.css) -
+   intentionally duplicated rather than shared so mission-engine.css never
+   depends on scenario.css load order (see DESIGN_SYSTEM.md §49). Always
+   rendered with the .a11y-override-badge marker alongside this class (see
+   mission-engine.js's buildDoctrineTag()) - covered by a11y.css's generic
+   badge override, no bespoke body.a11y-mode rule needed here. */
+.mission-doctrine-tag {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.05rem 0.5rem;
+  border-radius: var(--rgbgold-radius-pill);
+  border: 1px solid rgba(245, 196, 81, 0.4);
+  background: rgba(245, 196, 81, 0.08);
+  color: var(--rgbgold-gold-soft);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* =========================================================================
+   MISSION STATE MACHINE — §45
+   Shows the current mission state and every state-defined allowed
+   transition as an operator-clickable button. `aria-live="polite"` on the
+   current-state readout so screen reader users hear every transition.
+   No animation of its own beyond the shared `.hud-frame`/`.reveal` - fully
+   reduced-motion safe by construction.
+
+   Usage:
+     <div class="mission-state-machine hud-frame reveal a11y-override-card"
+          data-reveal="up" data-version="1.0">
+       <div class="mission-state-machine__current" data-mission-state aria-live="polite">
+         <span class="hud-tag">State // Standby</span>
+         <p class="mono">...</p>
+       </div>
+       <div class="mission-state-machine__transitions" data-mission-transitions></div>
+     </div>
+   ========================================================================= */
+
+.mission-state-machine {
+  display: grid;
+  gap: var(--rgbgold-space-5);
+}
+
+.mission-state-machine__current {
+  display: grid;
+  gap: var(--rgbgold-space-2);
+}
+
+.mission-state-machine__current p {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.mission-state-machine__transitions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rgbgold-space-3);
+}
+
+/* =========================================================================
+   MISSION ACTION CONSOLE — §46
+   Operator action buttons on the left/top, a combined operator-action +
+   agent-response feed below. Every action is annotated with the objective
+   panel's doctrine constraint in force at the time it was logged (see
+   mission-engine.js `getActiveDoctrineConstraint()`).
+
+   Usage:
+     <div class="mission-action-console operator-panel hud-frame reveal"
+          data-reveal="up" data-mission-actions data-version="1.0">
+       <div class="mission-action-console__buttons">
+         <button class="btn btn-secondary" data-mission-action="log-note">Log Operator Note</button>
+       </div>
+       <div class="mission-action-console__feed a11y-override-card" data-mission-action-feed aria-live="polite">
+         <p data-mission-action-empty>No operator actions or agent responses logged yet.</p>
+         <ul class="mission-action-console__list" data-mission-action-list></ul>
+       </div>
+     </div>
+   ========================================================================= */
+
+.mission-action-console {
+  display: grid;
+  gap: var(--rgbgold-space-5);
+}
+
+.mission-action-console__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rgbgold-space-3);
+}
+
+.mission-action-console__feed {
+  max-height: 20rem;
+  overflow-y: auto;
+  padding: var(--rgbgold-space-5);
+  border-radius: var(--rgbgold-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(9, 12, 16, 0.92);
+  color: #eef2f8;
+}
+
+.mission-action-console__empty[hidden] {
+  display: none;
+}
+
+.mission-action-console__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--rgbgold-space-2);
+}
+
+.mission-action-console__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--rgbgold-space-3);
+  padding: var(--rgbgold-space-2) var(--rgbgold-space-3);
+  border-left: 2px solid var(--rgbgold-cyan);
+  background: rgba(60, 242, 255, 0.05);
+  font-size: 0.82rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.mission-action-console__item[data-source="agent"] {
+  border-left-color: var(--rgbgold-lime);
+  background: rgba(142, 255, 117, 0.05);
+}
+
+.mission-action-console__item time {
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+/* =========================================================================
+   MISSION TIMELINE — §47
+   `.reveal` for scroll-in motion, `.hud-frame` (applied directly to the
+   root) for tactical corner brackets - identical composition to
+   scenario.css's `.scenario-timeline`, no bespoke pseudo-elements. Fully
+   reduced-motion safe: `.reveal`'s own `prefers-reduced-motion` override
+   in rgbgold-motion.css disables the scroll-in transform/opacity
+   animation, and this component adds no animation of its own.
+
+   Usage:
+     <div class="mission-timeline hud-frame reveal" data-reveal="up" data-version="1.0">
+       <ol class="mission-timeline__track" data-mission-timeline-track>
+         <li class="mission-timeline__node">...</li>
+       </ol>
+       <div class="cinematic-hook" data-cinematic hidden></div>
+     </div>
+   ========================================================================= */
+
+.mission-timeline {
+  position: relative;
+  padding: var(--rgbgold-space-6);
+  border-radius: var(--rgbgold-radius-lg);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mission-timeline__track {
+  display: grid;
+  gap: var(--rgbgold-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mission-timeline__node {
+  display: grid;
+  gap: var(--rgbgold-space-2);
+  padding: var(--rgbgold-space-3) var(--rgbgold-space-4);
+  border-radius: var(--rgbgold-radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(16, 20, 26, 0.6);
+}
+
+.mission-timeline__node--placeholder {
+  opacity: 0.7;
+}
+
+.mission-timeline__node p {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+/* =========================================================================
+   MISSION EVIDENCE VIEWER — §48
+   The master audit log for the page: every state transition, operator
+   action, agent response, and doctrine reference lands here in
+   chronological order, each tagged with a `[data-kind]` badge. Scrollable,
+   high-contrast, `aria-live="polite"`. No animation of its own - reduced-
+   motion safe by construction, same as `.mission-action-console__feed`.
+
+   Usage:
+     <div class="mission-evidence-viewer a11y-override-card" data-mission-evidence aria-live="polite">
+       <p data-mission-evidence-empty>No mission evidence recorded yet.</p>
+       <ul class="mission-evidence-viewer__list" data-mission-evidence-list></ul>
+     </div>
+   ========================================================================= */
+
+.mission-evidence-viewer {
+  max-height: 24rem;
+  overflow-y: auto;
+  padding: var(--rgbgold-space-5);
+  border-radius: var(--rgbgold-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(9, 12, 16, 0.92);
+  color: #eef2f8;
+}
+
+.mission-evidence-viewer__empty[hidden] {
+  display: none;
+}
+
+.mission-evidence-viewer__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--rgbgold-space-2);
+}
+
+.mission-evidence-viewer__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--rgbgold-space-3);
+  padding: var(--rgbgold-space-2) var(--rgbgold-space-3);
+  border-left: 2px solid var(--rgbgold-gold-soft);
+  background: rgba(245, 196, 81, 0.05);
+  font-size: 0.8rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.mission-evidence-viewer__item time {
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.mission-evidence-viewer__kind {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--rgbgold-radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}

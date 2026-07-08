@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | AI Service Selector</title>
+    <meta
+      name="description"
+      content="Find the right MSHOPS AI service using the public service selector and route cleanly into the intake funnel."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>AI Service Selector</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#selector">Selector</a>
+        <a href="#catalog">Catalog</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell reveal" data-reveal="up">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <span class="hud-tag">Signal // Live</span>
+            <p class="section-label mono">[ PUBLIC_ROUTE :: /SERVICES ]</p>
+            <h1 class="glow-pulse">Find the right AI service for your team.</h1>
+            <p class="hero-sub">
+              Use the public questionnaire to match into the correct MSH OPS service path without exposing operator-only
+              surfaces. The result hands off directly into the existing <span class="mono">/enter</span> funnel with
+              preserved routing context.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#selector">[ START SELECTOR ]</a>
+              <a class="button secondary" href="#catalog">[ VIEW CATALOG ]</a>
+              <a class="button secondary" href="/apps/ai-agent-readiness-checker">[ CHECK AI AGENT READINESS ]</a>
+              <a class="button secondary" href="/apps/automation-roi-calculator">[ CALCULATE AUTOMATION ROI ]</a>
+              <a class="button secondary" href="/apps/rag-risk-analyzer">[ ANALYZE RAG RISK ]</a>
+              <a class="button secondary" href="/apps/prompt-injection-scanner">[ OPEN PROMPT INJECTION SCANNER ]</a>
+              <a class="button ghost" href="/enter">[ OPEN INTAKE ]</a>
+            </div>
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ AI_SECURITY_TOOLS ]</p>
+            <h2>Free AI security diagnostics</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid">
+          <article class="telemetry-card bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ AGENT_READINESS ]</p>
+              <h3>AI Agent Readiness Checker</h3>
+              <p class="system-copy">
+                Validate whether your AI agent idea is ready to build, what complexity it carries, and which controls should exist before deployment.
+              </p>
+              <div class="cta-row">
+                <a class="button primary" href="/apps/ai-agent-readiness-checker">[ CHECK READINESS ]</a>
+                <a class="button secondary" href="/enter?service=ai_agent_build&source=services-ai-agents">[ REQUEST BUILD REVIEW ]</a>
+              </div>
+            </div>
+          </article>
+          <article class="telemetry-card bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ AUTOMATION_ROI ]</p>
+              <h3>Automation ROI Calculator</h3>
+              <p class="system-copy">
+                Estimate time savings, cost savings, complexity, and the right automation path before starting an AI automation build.
+              </p>
+              <div class="cta-row">
+                <a class="button primary" href="/apps/automation-roi-calculator">[ CALCULATE ROI ]</a>
+                <a class="button secondary" href="/enter?service=ai_automation_build&source=services-ai-automation">[ REQUEST AUTOMATION REVIEW ]</a>
+              </div>
+            </div>
+          </article>
+          <article class="telemetry-card bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ PROMPT_INJECTION ]</p>
+              <h3>Prompt Injection Scanner</h3>
+              <p class="system-copy">
+                Score prompt-injection exposure, risky tool usage, data sensitivity, and governance gaps before routing
+                into a full review.
+              </p>
+              <div class="cta-row">
+                <a class="button primary" href="/apps/prompt-injection-scanner">[ RUN FREE SCAN ]</a>
+                <a class="button secondary" href="/enter?service=prompt_injection_review&source=services-ai-security">[ REQUEST REVIEW ]</a>
+              </div>
+            </div>
+          </article>
+          <article class="telemetry-card bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ RAG_RISK ]</p>
+              <h3>RAG Risk Analyzer</h3>
+              <p class="system-copy">
+                Assess retrieval exposure, access controls, source governance, hallucination risk, and prompt-injection risk in your RAG or knowledge assistant system.
+              </p>
+              <div class="cta-row">
+                <a class="button primary" href="/apps/rag-risk-analyzer">[ ANALYZE RAG RISK ]</a>
+                <a class="button secondary" href="/enter?service=rag_governance_review&source=services-rag">[ REQUEST RAG REVIEW ]</a>
+              </div>
+            </div>
+          </article>
+          <article class="telemetry-card bracket reveal" data-reveal="up">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ AI_SECURITY_AUDIT ]</p>
+              <h3>AI Security Risk Check</h3>
+              <p class="system-copy">
+                Run the broader AI security diagnostic when you want a quick risk posture check beyond prompt injection.
+              </p>
+              <div class="cta-row">
+                <a class="button primary" href="/apps/ai-security-audit">[ RUN RISK CHECK ]</a>
+                <a class="button secondary" href="/enter?service=ai_security_audit&source=services-ai-security">[ REQUEST AUDIT ]</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="selector">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SERVICE_SELECTOR ]</p>
+            <h2>Questionnaire and routing engine</h2>
+          </div>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket reveal" data-reveal="left">
+            <div class="bracket-inner">
+              <h3>Service Selector Questionnaire</h3>
+              <p class="system-copy">
+                Answer these questions and the selector will recommend the right path before routing you into the intake
+                funnel.
+              </p>
+              <div class="service-selector-steps mono" aria-hidden="true">
+                <span class="service-selector-step is-active">Step 1: Define goals</span>
+                <span class="service-selector-step">Step 2: Select usage</span>
+                <span class="service-selector-step">Step 3: Route to intake</span>
+              </div>
+              <form class="contact-form" id="service-selector-form">
+                <label>
+                  <span>Primary Goal</span>
+                  <select name="primary_goal" required>
+                    <option value="secure_ai_tools">Secure my AI tools and reduce risk</option>
+                    <option value="build_ai_agent">Build an AI agent</option>
+                    <option value="automate_workflow">Automate a workflow</option>
+                    <option value="improve_ai_visibility">Improve AI search visibility</option>
+                    <option value="build_private_local_ai">Build private or local AI</option>
+                    <option value="govern_copilot_enterprise_ai">Govern Copilot or enterprise AI</option>
+                    <option value="assess_multimodal_ai">Assess multimodal AI risks</option>
+                    <option value="not_sure">Not sure yet</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Business Type</span>
+                  <select name="business_type" required>
+                    <option value="solo_freelancer">Solo operator or freelancer</option>
+                    <option value="small_business">Small business</option>
+                    <option value="agency">Agency or consultancy</option>
+                    <option value="saas_company">SaaS or technology company</option>
+                    <option value="enterprise_team">Enterprise team</option>
+                    <option value="nonprofit">Nonprofit</option>
+                    <option value="regulated_business">Regulated business</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>Current AI Usage</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="current_ai_usage" value="chatgpt" /> ChatGPT</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="microsoft_copilot" /> Microsoft Copilot</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="gemini" /> Gemini</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="claude" /> Claude</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="customer_chatbot" /> Customer chatbot</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="internal_knowledge_assistant" /> Internal knowledge assistant</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="rag_system" /> RAG system</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="n8n_make_zapier" /> n8n, Make, or Zapier</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="local_models_ollama" /> Local models or Ollama</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="multimodal_ai" /> Image, audio, video, or document AI</label>
+                    <label><input type="checkbox" name="current_ai_usage" value="no_ai_yet" /> No AI yet</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>Risk Level</span>
+                  <select name="risk_level" required>
+                    <option value="handling_sensitive_data">Handling sensitive data</option>
+                    <option value="customer_facing_ai">Customer-facing AI</option>
+                    <option value="internal_only_ai">Internal tools only</option>
+                    <option value="regulated_compliance_heavy">Regulated or compliance-heavy environment</option>
+                    <option value="unknown">Unknown or not assessed yet</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Budget Range</span>
+                  <select name="budget_range" required>
+                    <option value="under_500">Under $500</option>
+                    <option value="500_2500">$500 - $2,500</option>
+                    <option value="2500_10000">$2,500 - $10,000</option>
+                    <option value="10000_plus">$10,000+</option>
+                    <option value="not_sure">Not sure yet</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Urgency</span>
+                  <select name="urgency" required>
+                    <option value="this_week">This week</option>
+                    <option value="this_month">This month</option>
+                    <option value="planning_phase">Planning phase</option>
+                    <option value="research_only">Research only</option>
+                  </select>
+                </label>
+
+                <div class="hero-actions">
+                  <button class="button primary" type="submit" id="service-selector-submit">[ FIND RECOMMENDED SERVICE ]</button>
+                  <button class="button ghost" type="reset">[ RESET ]</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="service-selector-status" role="status" aria-live="polite">
+                Selector ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket reveal" data-reveal="up">
+            <div class="bracket-inner" id="service-selector-result">
+              <p class="section-label mono">[ RECOMMENDED_PATH ]</p>
+              <h3>Recommended Path</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive a recommended service, a secondary path when useful, and a clean
+                intake handoff.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="catalog">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SERVICE_CATALOG ]</p>
+            <h2>Service Catalog Card Grid</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner">
+            <p class="section-label mono">[ AI_AUTOMATION ]</p>
+            <h3>Planning workflow automation?</h3>
+            <p class="system-copy">Run the automation ROI calculator before intake when you need to size savings, complexity, and the recommended delivery path.</p>
+            <div class="cta-row">
+              <a class="button primary" href="/apps/automation-roi-calculator">[ OPEN AUTOMATION ROI CALCULATOR ]</a>
+              <a class="button secondary" href="/apps/ai-agent-readiness-checker">[ OPEN READINESS CHECKER ]</a>
+            </div>
+          </div>
+        </article>
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner">
+            <p class="section-label mono">[ RAG_GOVERNANCE ]</p>
+            <h3>Running a knowledge assistant or RAG pipeline?</h3>
+            <p class="system-copy">Run the RAG risk analyzer before intake when you need retrieval, access-control, governance, and prompt-injection exposure scored.</p>
+            <div class="cta-row">
+              <a class="button primary" href="/apps/rag-risk-analyzer">[ OPEN RAG RISK ANALYZER ]</a>
+            </div>
+          </div>
+        </article>
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner">
+            <p class="section-label mono">[ AI_AGENT_BUILD ]</p>
+            <h3>Planning an AI agent?</h3>
+            <p class="system-copy">Run the readiness checker before intake when you need to validate workflow maturity, build complexity, and safety controls.</p>
+            <div class="cta-row">
+              <a class="button primary" href="/apps/ai-agent-readiness-checker">[ OPEN READINESS CHECKER ]</a>
+            </div>
+          </div>
+        </article>
+        <div class="marketplace-grid" id="service-catalog-grid"></div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET service selector</span>
+        <span>Public route with funnel-preserving intake handoff</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/enter">Intake</a>
+        <a href="mailto:matrixsechub@outlook.com?subject=MSHOPS%20Service%20Selector">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="/services.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>
