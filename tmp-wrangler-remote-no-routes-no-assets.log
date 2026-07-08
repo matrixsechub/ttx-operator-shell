@@ -2313,3 +2313,54 @@ Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
 [wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (31ms)
 [wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (114ms)
 [wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (31ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (294ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (74ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (341ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (33ms)
+⎔ Refreshing preview token...
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/subdomain/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: 578a50cb3a7440f68c2b19ba7de93a65.sogellagepul.workers.dev
+Access switch not cached for: 578a50cb3a7440f68c2b19ba7de93a65.sogellagepul.workers.dev
+Caching access switch for: 578a50cb3a7440f68c2b19ba7de93a65.sogellagepul.workers.dev
+-- START EXCHANGE API REQUEST: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END EXCHANGE API REQUEST
+-- START EXCHANGE API RESPONSE: OK 200
+HEADERS: {}
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END EXCHANGE API RESPONSE
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/subdomain
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Total Upload: 855.36 KiB / gzip: 151.31 KiB
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: mshops-public.sogellagepul.workers.dev
+Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
+✔ Preview token refreshed successfully
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 204 No Content (5ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (272ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (71ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (237ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (31ms)

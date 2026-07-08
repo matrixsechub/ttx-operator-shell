@@ -3,7 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MSHOPS Mission Control</title>
+    <title>MSH OPS | Mission Framework</title>
+    <meta
+      name="description"
+      content="The public MSH OPS Mission Framework — how objectives, checkpoints, timeline, and evidence come together across a guided engagement."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,259 +23,313 @@
     <link rel="stylesheet" href="/styles/rgbgold-components.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/mission.css" />
     <link rel="stylesheet" href="/styles/a11y.css" />
   </head>
   <body>
     <div class="fx-overlay" aria-hidden="true"></div>
-    <main class="mission-shell page-shell">
-      <section class="hero-panel bracket">
-        <div class="bracket-inner">
-          <p class="section-label mono">[ MISSION_CONTROL :: UCIP ]</p>
-          <h1>Unified Cloudflare intelligence mission board.</h1>
-          <p class="hero-sub">
-            Single advisory view synthesized from all federation layers — no per-layer route fan-out required.
-          </p>
-          <div class="cta-row">
-            <button class="button primary" type="button" id="mission-refresh">[ REFRESH ]</button>
-            <a class="button secondary" href="/os">[ OS ]</a>
-            <a class="button ghost" href="/operator">[ OPERATOR ]</a>
-            <a class="button ghost" href="/docs/cloudflare-federation">[ CF DOCS ]</a>
-            <a class="button ghost" href="/">[ LANDING ]</a>
-          </div>
-          <p class="form-status mono mission-status" id="mission-status">Loading UCIP signals...</p>
-          <div class="cinematic-hook" data-cinematic hidden></div>
-          <div class="motion-scan" data-motion-scan hidden></div>
-        </div>
-      </section>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSH OPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSH OPS</strong>
+          <span>Mission Framework</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/enter" aria-label="Get started with the MSH OPS gateway">Get Started</a>
+        <a href="/mission" aria-label="Read the public mission brief">Mission</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to contact and engagement options">Contact</a>
+      </nav>
+    </header>
 
-      <section class="section-block">
-        <div class="section-heading">
-          <p class="section-label mono">[ UCIP_STRIP ]</p>
-          <h2>Unified Cloudflare Intelligence Plane</h2>
-        </div>
-        <div class="mission-ucip-strip" id="mission-ucip-strip" aria-live="polite">
-          <article class="mission-ucip-segment green" data-ucip="green">
-            <p class="section-label mono">[ GREEN ]</p>
-            <h3>GREEN</h3>
-          </article>
-          <article class="mission-ucip-segment yellow" data-ucip="yellow">
-            <p class="section-label mono">[ YELLOW ]</p>
-            <h3>YELLOW</h3>
-          </article>
-          <article class="mission-ucip-segment orange" data-ucip="orange">
-            <p class="section-label mono">[ ORANGE ]</p>
-            <h3>ORANGE</h3>
-          </article>
-          <article class="mission-ucip-segment red" data-ucip="red">
-            <p class="section-label mono">[ RED ]</p>
-            <h3>RED</h3>
-          </article>
-        </div>
-        <p class="mission-advisory-note mono">Advisory-only :: does not block pipelines, releases, or operator actions.</p>
-        <p class="cf-panel-help mono mission-strip-help">
-          UCIP: GREEN = stable · YELLOW = caution/watch · ORANGE = hold/alert/prioritize · RED = degraded/fallback.
-        </p>
-        <ul class="mission-ucip-actions" id="mission-ucip-actions"></ul>
-      </section>
-
-      <section class="section-block">
-        <div class="section-heading">
-          <p class="section-label mono">[ UCIP_SUMMARY ]</p>
-          <h2>Synthesized federation snapshot</h2>
-        </div>
-        <div class="mission-signal-grid telemetry-grid" id="mission-ucip-grid"></div>
-      </section>
-
-      <section class="section-block">
-        <div class="section-heading">
-          <p class="section-label mono">[ UCIP_REASONS ]</p>
-          <h2>Unified advisories</h2>
-        </div>
-        <article class="telemetry-card bracket">
-          <div class="bracket-inner">
-            <ul class="mission-reasons" id="mission-ucip-reasons"></ul>
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Public // Mission</span>
+            <p class="section-label mono">[ MSH_OPS_MISSION_FRAMEWORK ]</p>
+            <h1 class="glow-pulse cinematic-hook">Mission Framework</h1>
+            <p class="hero-sub">
+              Public overview of how mission objectives, checkpoints, timeline, evidence, and governance fit together
+              across a guided MSH OPS engagement.
+            </p>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              This page explains how the framework fits together at a glance. The interactive console that drives a
+              live mission - objective tracking, state transitions, and the full evidence trail - lives on the
+              Mission Engine.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/mission-engine" aria-label="Open the Mission Engine console">
+                Open Mission Engine
+              </a>
+              <a class="button secondary" href="#mission-details" aria-label="Learn more about the mission framework">
+                Learn More
+              </a>
+            </div>
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
           </div>
         </article>
       </section>
 
-      <section class="section-block">
+      <section class="section-block" id="mission-details" aria-labelledby="mission-overview-heading">
         <div class="section-heading">
-          <p class="section-label mono">[ AMG_STRIP ]</p>
-          <h2>Autonomous Meta-Governance</h2>
+          <div>
+            <p class="section-label mono">[ MISSION_OVERVIEW ]</p>
+            <h2 id="mission-overview-heading">Mission Overview</h2>
+          </div>
         </div>
-        <div class="mission-amg-strip" id="mission-amg-strip" aria-live="polite">
-          <article class="mission-amg-segment govern_green" data-amg="govern_green">
-            <p class="section-label mono">[ GOVERN_GREEN ]</p>
-            <h3>STABLE</h3>
-          </article>
-          <article class="mission-amg-segment govern_yellow" data-amg="govern_yellow">
-            <p class="section-label mono">[ GOVERN_YELLOW ]</p>
-            <h3>CAUTION</h3>
-          </article>
-          <article class="mission-amg-segment govern_orange" data-amg="govern_orange">
-            <p class="section-label mono">[ GOVERN_ORANGE ]</p>
-            <h3>ALERT</h3>
-          </article>
-          <article class="mission-amg-segment govern_red" data-amg="govern_red">
-            <p class="section-label mono">[ GOVERN_RED ]</p>
-            <h3>FALLBACK</h3>
-          </article>
-        </div>
-        <p class="section-copy mono mission-strip-help">
-          AMG: GOVERN_GREEN = stable UCIP · GOVERN_YELLOW = caution · GOVERN_ORANGE = alert · GOVERN_RED = degraded/fallback.
-        </p>
-        <ul class="mission-amg-items" id="mission-amg-items"></ul>
+        <article
+          class="rgbgold-module-shell hud-frame reveal a11y-override-card"
+          data-reveal="up"
+          data-version="1.0"
+        >
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Overview // Framework</span>
+            <h3>One framework, every engagement</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              A mission is the structured container for an engagement - from initial briefing through delivery and
+              debrief. Every mission is built from the same four public building blocks: objectives, a timeline,
+              live actions, and an evidence trail, so progress is always visible and auditable without exposing
+              any internal tooling on this page.
+            </p>
+            <p class="system-copy">
+              The framework connects directly to the wider MSH OPS ecosystem: Mission Engine for live execution,
+              Scenario Engine for planning, Doctrine OS for approved guidance, the RGB+Gold interface system for visual
+              consistency, and the accessibility and governance layers that keep the experience stable as it evolves.
+            </p>
+          </div>
+        </article>
       </section>
 
-      <section class="section-block">
+      <section class="section-block" id="mission-objectives" aria-labelledby="mission-objectives-heading">
         <div class="section-heading">
-          <p class="section-label mono">[ CBA_STRIP ]</p>
-          <h2>Behavioral Autonomy</h2>
+          <div>
+            <p class="section-label mono">[ MISSION_OBJECTIVES ]</p>
+            <h2 id="mission-objectives-heading">Mission Objectives</h2>
+          </div>
         </div>
-        <div class="mission-cba-strip" id="mission-cba-strip" aria-live="polite">
-          <article class="mission-cba-segment behavior_green" data-cba="behavior_green">
-            <p class="section-label mono">[ BEHAVIOR_GREEN ]</p>
-            <h3>STABLE</h3>
-          </article>
-          <article class="mission-cba-segment behavior_yellow" data-cba="behavior_yellow">
-            <p class="section-label mono">[ BEHAVIOR_YELLOW ]</p>
-            <h3>DRIFT</h3>
-          </article>
-          <article class="mission-cba-segment behavior_orange" data-cba="behavior_orange">
-            <p class="section-label mono">[ BEHAVIOR_ORANGE ]</p>
-            <h3>ALERT</h3>
-          </article>
-          <article class="mission-cba-segment behavior_red" data-cba="behavior_red">
-            <p class="section-label mono">[ BEHAVIOR_RED ]</p>
-            <h3>FALLBACK</h3>
-          </article>
-        </div>
-        <p class="section-copy mono mission-strip-help">
-          CBA: BEHAVIOR_GREEN = aligned · BEHAVIOR_YELLOW = mild drift · BEHAVIOR_ORANGE = significant drift · BEHAVIOR_RED = degraded/severe.
-        </p>
-        <ul class="mission-cba-items" id="mission-cba-items"></ul>
+        <article
+          class="rgbgold-module-shell hud-frame reveal a11y-override-card"
+          data-reveal="up"
+          data-version="1.0"
+        >
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Objectives // Flow</span>
+            <h3>Objective-driven, checkpoint by checkpoint</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              Every mission is broken into a small set of concrete objectives. Each objective moves through the
+              same checkpoint progression - planned, in progress, and complete - so it's always clear what's left
+              before a mission can close out.
+            </p>
+            <p class="system-copy">
+              Objectives reference the relevant Doctrine OS guidance behind the scenes, so recommendations stay
+              consistent with approved practice. This page only ever shows the public-safe summary of that
+              guidance - never the underlying doctrine content itself.
+            </p>
+          </div>
+        </article>
       </section>
 
-      <section class="section-block">
+      <section class="section-block" id="mission-timeline" aria-labelledby="mission-timeline-heading">
         <div class="section-heading">
-          <p class="section-label mono">[ CAL_STRIP ]</p>
-          <h2>Cognitive Alignment</h2>
+          <div>
+            <p class="section-label mono">[ MISSION_TIMELINE ]</p>
+            <h2 id="mission-timeline-heading">Mission Timeline</h2>
+          </div>
         </div>
-        <div class="mission-cal-strip" id="mission-cal-strip" aria-live="polite">
-          <article class="mission-cal-segment align_green" data-cal="align_green">
-            <p class="section-label mono">[ ALIGN_GREEN ]</p>
-            <h3>ALIGNED</h3>
-          </article>
-          <article class="mission-cal-segment align_yellow" data-cal="align_yellow">
-            <p class="section-label mono">[ ALIGN_YELLOW ]</p>
-            <h3>PARTIAL</h3>
-          </article>
-          <article class="mission-cal-segment align_orange" data-cal="align_orange">
-            <p class="section-label mono">[ ALIGN_ORANGE ]</p>
-            <h3>MISALIGNED</h3>
-          </article>
-          <article class="mission-cal-segment align_red" data-cal="align_red">
-            <p class="section-label mono">[ ALIGN_RED ]</p>
-            <h3>FALLBACK</h3>
-          </article>
-        </div>
-        <p class="section-copy mono mission-strip-help">
-          CAL: ALIGN_GREEN = aligned · ALIGN_YELLOW = partial · ALIGN_ORANGE = significant misalignment · ALIGN_RED = degraded/severe.
-        </p>
-        <ul class="mission-cal-items" id="mission-cal-items"></ul>
+        <article class="mission-timeline-panel hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Timeline // Motion-Safe</span>
+            <h3>A running record, presented calmly</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              The mission timeline lays out every checkpoint in order inside a HUD-framed panel, using the same
+              scroll-in reveal used across the rest of the site. Motion is always subtle and fully respects
+              <code>prefers-reduced-motion</code> - anyone with that preference set sees the same information with
+              no animation at all.
+            </p>
+            <p class="system-copy">
+              The layout uses the same RGB+Gold structure and HUD framing rules as the rest of the ecosystem, so
+              checkpoint views remain visually consistent without adding extra motion or competing overlays.
+            </p>
+          </div>
+        </article>
       </section>
 
-      <section class="section-block">
+      <section class="section-block" id="mission-evidence" aria-labelledby="mission-evidence-heading">
         <div class="section-heading">
-          <p class="section-label mono">[ IHL_STRIP ]</p>
-          <h2>Intent Harmonization</h2>
+          <div>
+            <p class="section-label mono">[ MISSION_EVIDENCE ]</p>
+            <h2 id="mission-evidence-heading">Mission Evidence</h2>
+          </div>
         </div>
-        <div class="mission-ihl-strip" id="mission-ihl-strip" aria-live="polite">
-          <article class="mission-ihl-segment intent_green" data-ihl="intent_green">
-            <p class="section-label mono">[ INTENT_GREEN ]</p>
-            <h3>HARMONIZED</h3>
-          </article>
-          <article class="mission-ihl-segment intent_yellow" data-ihl="intent_yellow">
-            <p class="section-label mono">[ INTENT_YELLOW ]</p>
-            <h3>PARTIAL</h3>
-          </article>
-          <article class="mission-ihl-segment intent_orange" data-ihl="intent_orange">
-            <p class="section-label mono">[ INTENT_ORANGE ]</p>
-            <h3>CONFLICT</h3>
-          </article>
-          <article class="mission-ihl-segment intent_red" data-ihl="intent_red">
-            <p class="section-label mono">[ INTENT_RED ]</p>
-            <h3>FALLBACK</h3>
-          </article>
-        </div>
-        <p class="section-copy mono mission-strip-help">
-          IHL: INTENT_GREEN = harmonized · INTENT_YELLOW = partial · INTENT_ORANGE = significant conflict · INTENT_RED = degraded/severe.
-        </p>
-        <ul class="mission-ihl-items" id="mission-ihl-items"></ul>
+        <article
+          class="rgbgold-module-shell hud-frame reveal a11y-override-card"
+          data-reveal="up"
+          data-version="1.0"
+        >
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Evidence // Audit Trail</span>
+            <h3>An auditable trail of what happened</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              Every mission keeps a single, chronological evidence log: state changes, operator actions, and agent
+              responses all land in one place. That log is what makes a mission auditable after the fact - nothing
+              here is inferred or reconstructed after delivery.
+            </p>
+            <p class="system-copy">
+              The public summary above never includes engagement-specific evidence. To see a live evidence trail in
+              action, open the Mission Engine.
+            </p>
+          </div>
+        </article>
       </section>
 
-      <section class="section-block">
+      <section class="section-block" id="features" aria-labelledby="mission-features-heading">
         <div class="section-heading">
-          <p class="section-label mono">[ IARL_STRIP ]</p>
-          <h2>Intent-to-Action Resonance</h2>
+          <div>
+            <p class="section-label mono">[ FEATURES ]</p>
+            <h2 id="mission-features-heading">Built on the wider MSH OPS ecosystem</h2>
+          </div>
         </div>
-        <div class="mission-iarl-strip" id="mission-iarl-strip" aria-live="polite">
-          <article class="mission-iarl-segment resonance_green" data-iarl="resonance_green">
-            <p class="section-label mono">[ RESONANCE_GREEN ]</p>
-            <h3>RESONANT</h3>
+        <div class="telemetry-grid">
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Mission</span>
+              <h3>Mission Engine</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The Mission Engine is the live public console for objective progression, timeline review, and mission
+                evidence visibility when a guided engagement is underway.
+              </p>
+            </div>
           </article>
-          <article class="mission-iarl-segment resonance_yellow" data-iarl="resonance_yellow">
-            <p class="section-label mono">[ RESONANCE_YELLOW ]</p>
-            <h3>PARTIAL</h3>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Scenario</span>
+              <h3>Scenario Engine</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Missions are built on scenarios that have already been planned and rehearsed, so the objectives you
+                see here are grounded in a concrete, testable plan.
+              </p>
+            </div>
           </article>
-          <article class="mission-iarl-segment resonance_orange" data-iarl="resonance_orange">
-            <p class="section-label mono">[ RESONANCE_ORANGE ]</p>
-            <h3>MISMATCH</h3>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Doctrine</span>
+              <h3>Doctrine OS</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Objectives and checkpoints stay aligned with a single, version-controlled source of approved
+                guidance, so advice is consistent across every mission.
+              </p>
+            </div>
           </article>
-          <article class="mission-iarl-segment resonance_red" data-iarl="resonance_red">
-            <p class="section-label mono">[ RESONANCE_RED ]</p>
-            <h3>FALLBACK</h3>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Interface</span>
+              <h3>RGB+Gold Design System</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The public mission surface is built on the shared RGB+Gold token, motion, HUD, and component layers so
+                every mission page follows the same composition and visual governance rules.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Accessibility</span>
+              <h3>Accessibility Layer</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Accessibility overrides, focus-visible behavior, aria hooks, and reduced-motion handling stay active
+                across the mission surface so the framework remains readable and usable under different user needs.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Governance</span>
+              <h3>Autonomous Governance Layer</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The same accessibility, motion, and design standards you see on this page are checked continuously
+                in the background, so the framework stays consistent as it grows.
+              </p>
+            </div>
           </article>
         </div>
-        <p class="section-copy mono mission-strip-help">
-          IARL: RESONANCE_GREEN = strong resonance · RESONANCE_YELLOW = partial · RESONANCE_ORANGE = significant mismatch · RESONANCE_RED = degraded/severe.
-        </p>
-        <ul class="mission-iarl-items" id="mission-iarl-items"></ul>
       </section>
 
-      <section class="section-block">
-        <div class="section-heading">
-          <p class="section-label mono">[ ACL_STRIP ]</p>
-          <h2>Autonomous Coherence</h2>
-        </div>
-        <div class="mission-acl-strip" id="mission-acl-strip" aria-live="polite">
-          <article class="mission-acl-segment coherence_green" data-acl="coherence_green">
-            <p class="section-label mono">[ COHERENCE_GREEN ]</p>
-            <h3>COHERENT</h3>
-          </article>
-          <article class="mission-acl-segment coherence_yellow" data-acl="coherence_yellow">
-            <p class="section-label mono">[ COHERENCE_YELLOW ]</p>
-            <h3>PARTIAL</h3>
-          </article>
-          <article class="mission-acl-segment coherence_orange" data-acl="coherence_orange">
-            <p class="section-label mono">[ COHERENCE_ORANGE ]</p>
-            <h3>FRAGMENTED</h3>
-          </article>
-          <article class="mission-acl-segment coherence_red" data-acl="coherence_red">
-            <p class="section-label mono">[ COHERENCE_RED ]</p>
-            <h3>FALLBACK</h3>
-          </article>
-        </div>
-        <p class="section-copy mono mission-strip-help">
-          ACL: COHERENCE_GREEN = strong coherence · COHERENCE_YELLOW = partial · COHERENCE_ORANGE = significant fragmentation · COHERENCE_RED = degraded/severe.
-        </p>
-        <ul class="mission-acl-items" id="mission-acl-items"></ul>
+      <section class="section-block" id="contact" aria-labelledby="mission-contact-heading">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Contact // Engage</span>
+            <p class="section-label mono">[ PUBLIC_CONTACT ]</p>
+            <h2 id="mission-contact-heading">Ready to start a mission?</h2>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              Open the Mission Engine to see the framework in action, or start with the public gateway if you're
+              beginning a new engagement.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/mission-engine" aria-label="Open the Mission Engine console">
+                Open Mission Engine
+              </a>
+              <a class="button secondary" href="/enter" aria-label="Open the public gateway to begin engagement">
+                Open Gateway
+              </a>
+              <a
+                class="button ghost"
+                href="mailto:matrixsechub@outlook.com?subject=MSH%20OPS%20Mission%20Inquiry"
+                aria-label="Email the MSH OPS team about a mission"
+              >
+                Email Team
+              </a>
+            </div>
+            <p class="form-status mono" role="status" aria-live="polite">
+              Public mission framework and gateway routes are active.
+            </p>
+            <div class="a11y-hook" data-a11y-override hidden></div>
+          </div>
+        </article>
       </section>
     </main>
 
-    <script src="/cloudflare-federation-shared.js" defer></script>
-    <script src="/mission.js" defer></script>
+    <div class="footer-divider" aria-hidden="true"></div>
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSH OPS mission framework</span>
+        <span>Objectives, checkpoints, timeline, and evidence for every public engagement</span>
+      </div>
+      <nav class="nav-ecosystem" aria-label="Footer navigation">
+        <a href="/enter" aria-label="Open the public gateway">Get Started</a>
+        <a href="/mission" aria-label="Read the public mission brief">Mission</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
     <script src="/scripts/a11y.js" defer></script>
     <script src="/scripts/drift.js" defer></script>
     <script src="/scripts/a11y-scan.js" defer></script>
