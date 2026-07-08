@@ -1,0 +1,23 @@
+/**
+ * PUBLIC ENTRY PAGE COMPOSITION
+ * -----------------------------------------------------------------------
+ * DRIFT-MARKER: layer=page file=public/enter.css version=1.0
+ *
+ * Page-scoped composition for /enter only. This file keeps the required
+ * load order explicit on the entry page:
+ * rgbgold-tokens.css -> rgbgold-motion.css -> rgbgold-components.css ->
+ * rgbgold-hud.css -> rgbgold-hooks.css -> styles.css -> enter.css ->
+ * a11y.css.
+ *
+ * Only page-specific styling lives here. Shared design-system files remain
+ * untouched. `.footer-divider` mirrors the public page treatment used on
+ * other public surfaces without importing or editing shared CSS.
+ */
+
+.footer-divider {
+  width: min(1180px, calc(100% - 2rem));
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
+  opacity: 0.55;
+}

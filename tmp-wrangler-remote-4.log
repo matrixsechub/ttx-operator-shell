@@ -52192,3 +52192,510 @@ RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
 -- END CF API RESPONSE
 Checking if domain has Access enabled: mshops-public.sogellagepul.workers.dev
 Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
+🌀 C:\Users\wevrw\Dev\ttx-operator-shell\public\enter.html changed...
+⎔ Starting remote preview...
+LocalRuntimeController teardown beginning...
+LocalRuntimeController teardown complete
+⎔ Detected changes, restarted server.
+🌀 Building list of assets...
+Total Upload: 855.36 KiB / gzip: 151.31 KiB
+✨ Read 75 files from the assets directory C:\Users\wevrw\Dev\ttx-operator-shell\public
+/agent-readiness-operator.html
+/agent-readiness-operator.js
+/ai-agent-readiness-checker.html
+/ai-agent-readiness-checker.js
+/ai-security-audit.html
+/ai-security-audit.js
+/api-explorer.css
+/api-explorer.html
+/api-explorer.js
+/app.js
+/audit-lite-operator.html
+/audit-lite-operator.js
+/automation-roi-calculator.html
+/automation-roi-calculator.js
+/automation-roi-operator.html
+/automation-roi-operator.js
+/cloudflare-federation-shared.js
+/enter.html
+/enter.js
+/index.css
+/index.html
+/marketplace.css
+/marketplace.html
+/marketplace.js
+/mission-engine.html
+/mission.css
+/mission.html
+/mission.js
+/modules
+/operator-agents-intake.html
+/operator-agents-intake.js
+/operator-agents-security-intake.html
+/operator-agents-security-intake.js
+/operator.html
+/os.css
+/os.html
+/os.js
+/player.js
+/prompt-injection-scanner.html
+/prompt-injection-scanner.js
+/prompt-injection-scans-operator.html
+/prompt-injection-scans-operator.js
+/scenario.css
+/scenario.html
+/scripts
+/service-intake.html
+/service-intake.js
+/services.html
+/services.js
+/styles
+/styles.css
+/styles\a11y.css
+/styles\mission-engine.css
+/styles\rgbgold-components.css
+/styles\rgbgold-hooks.css
+/styles\rgbgold-hud.css
+/styles\rgbgold-motion.css
+/styles\rgbgold-tokens.css
+/scripts\a11y-scan.js
+/scripts\a11y.js
+/scripts\doctrine-ui.js
+/scripts\drift.js
+/scripts\ecosystem-health.js
+/scripts\hud-scan.js
+/scripts\mission-engine.js
+/scripts\motion-scan.js
+/scripts\rgbgold-motion.js
+/scripts\scenario.js
+/modules\ai-agent-threat-report.html
+/modules\module.css
+/modules\module.js
+/modules\msh-ops-doctrine.html
+/modules\multi-agent-cockpit.html
+/modules\n8n-automation-packs.html
+/modules\scenario-engine.html
+🌀 Starting asset upload...
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/assets-upload-session
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+🌀 Found 1 new or modified static asset to upload. Proceeding with upload...
++ /enter.html
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/assets/upload?base64=true
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: Created 201
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Uploaded 1 of 1 asset
+✨ /enter.html
+✨ Success! Uploaded 1 file (71 already uploaded) (2.53 sec)
+
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: Bad Request 400
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Preview token expired, fetching a new one
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/subdomain/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: 4b6b83a7e81c4898920c7543fdcfaf22.sogellagepul.workers.dev
+Access switch not cached for: 4b6b83a7e81c4898920c7543fdcfaf22.sogellagepul.workers.dev
+Caching access switch for: 4b6b83a7e81c4898920c7543fdcfaf22.sogellagepul.workers.dev
+-- START EXCHANGE API REQUEST: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END EXCHANGE API REQUEST
+-- START EXCHANGE API RESPONSE: OK 200
+HEADERS: {}
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END EXCHANGE API RESPONSE
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/subdomain
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+🌀 Building list of assets...
+Total Upload: 855.36 KiB / gzip: 151.31 KiB
+✨ Read 75 files from the assets directory C:\Users\wevrw\Dev\ttx-operator-shell\public
+/agent-readiness-operator.html
+/agent-readiness-operator.js
+/ai-agent-readiness-checker.html
+/ai-agent-readiness-checker.js
+/ai-security-audit.html
+/ai-security-audit.js
+/api-explorer.css
+/api-explorer.html
+/api-explorer.js
+/app.js
+/audit-lite-operator.html
+/audit-lite-operator.js
+/automation-roi-calculator.html
+/automation-roi-calculator.js
+/automation-roi-operator.html
+/automation-roi-operator.js
+/cloudflare-federation-shared.js
+/enter.html
+/enter.js
+/index.css
+/index.html
+/marketplace.css
+/marketplace.html
+/marketplace.js
+/mission-engine.html
+/mission.css
+/mission.html
+/mission.js
+/modules
+/operator-agents-intake.html
+/operator-agents-intake.js
+/operator-agents-security-intake.html
+/operator-agents-security-intake.js
+/operator.html
+/os.css
+/os.html
+/os.js
+/player.js
+/prompt-injection-scanner.html
+/prompt-injection-scanner.js
+/prompt-injection-scans-operator.html
+/prompt-injection-scans-operator.js
+/scenario.css
+/scenario.html
+/scripts
+/service-intake.html
+/service-intake.js
+/services.html
+/services.js
+/styles
+/styles.css
+/styles\a11y.css
+/styles\mission-engine.css
+/styles\rgbgold-components.css
+/styles\rgbgold-hooks.css
+/styles\rgbgold-hud.css
+/styles\rgbgold-motion.css
+/styles\rgbgold-tokens.css
+/scripts\a11y-scan.js
+/scripts\a11y.js
+/scripts\doctrine-ui.js
+/scripts\drift.js
+/scripts\ecosystem-health.js
+/scripts\hud-scan.js
+/scripts\mission-engine.js
+/scripts\motion-scan.js
+/scripts\rgbgold-motion.js
+/scripts\scenario.js
+/modules\ai-agent-threat-report.html
+/modules\module.css
+/modules\module.js
+/modules\msh-ops-doctrine.html
+/modules\multi-agent-cockpit.html
+/modules\n8n-automation-packs.html
+/modules\scenario-engine.html
+🌀 Starting asset upload...
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/assets-upload-session
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+No updated asset files to upload. Proceeding with deployment...
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: mshops-public.sogellagepul.workers.dev
+Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
+🌀 File C:\Users\wevrw\Dev\ttx-operator-shell\public\enter.css was added...
+⎔ Starting remote preview...
+LocalRuntimeController teardown beginning...
+LocalRuntimeController teardown complete
+⎔ Detected changes, restarted server.
+🌀 Building list of assets...
+Total Upload: 855.36 KiB / gzip: 151.31 KiB
+✨ Read 76 files from the assets directory C:\Users\wevrw\Dev\ttx-operator-shell\public
+/agent-readiness-operator.html
+/agent-readiness-operator.js
+/ai-agent-readiness-checker.html
+/ai-agent-readiness-checker.js
+/ai-security-audit.html
+/ai-security-audit.js
+/api-explorer.css
+/api-explorer.html
+/api-explorer.js
+/app.js
+/audit-lite-operator.html
+/audit-lite-operator.js
+/automation-roi-calculator.html
+/automation-roi-calculator.js
+/automation-roi-operator.html
+/automation-roi-operator.js
+/cloudflare-federation-shared.js
+/enter.css
+/enter.html
+/enter.js
+/index.css
+/index.html
+/marketplace.css
+/marketplace.html
+/marketplace.js
+/mission-engine.html
+/mission.css
+/mission.html
+/mission.js
+/modules
+/operator-agents-intake.html
+/operator-agents-intake.js
+/operator-agents-security-intake.html
+/operator-agents-security-intake.js
+/operator.html
+/os.css
+/os.html
+/os.js
+/player.js
+/prompt-injection-scanner.html
+/prompt-injection-scanner.js
+/prompt-injection-scans-operator.html
+/prompt-injection-scans-operator.js
+/scenario.css
+/scenario.html
+/scripts
+/service-intake.html
+/service-intake.js
+/services.html
+/services.js
+/styles
+/styles.css
+/styles\a11y.css
+/styles\mission-engine.css
+/styles\rgbgold-components.css
+/styles\rgbgold-hooks.css
+/styles\rgbgold-hud.css
+/styles\rgbgold-motion.css
+/styles\rgbgold-tokens.css
+/scripts\a11y-scan.js
+/scripts\a11y.js
+/scripts\doctrine-ui.js
+/scripts\drift.js
+/scripts\ecosystem-health.js
+/scripts\hud-scan.js
+/scripts\mission-engine.js
+/scripts\motion-scan.js
+/scripts\rgbgold-motion.js
+/scripts\scenario.js
+/modules\ai-agent-threat-report.html
+/modules\module.css
+/modules\module.js
+/modules\msh-ops-doctrine.html
+/modules\multi-agent-cockpit.html
+/modules\n8n-automation-packs.html
+/modules\scenario-engine.html
+🌀 Starting asset upload...
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/assets-upload-session
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+🌀 Found 1 new or modified static asset to upload. Proceeding with upload...
++ /enter.css
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/assets/upload?base64=true
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: Created 201
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Uploaded 1 of 1 asset
+✨ /enter.css
+✨ Success! Uploaded 1 file (72 already uploaded) (1.78 sec)
+
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: mshops-public.sogellagepul.workers.dev
+Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
+🌀 File C:\Users\wevrw\Dev\ttx-operator-shell\public\enter.html was removed...
+🌀 C:\Users\wevrw\Dev\ttx-operator-shell\public\enter.css changed...
+🌀 File C:\Users\wevrw\Dev\ttx-operator-shell\public\enter.html was added...
+⎔ Starting remote preview...
+LocalRuntimeController teardown beginning...
+LocalRuntimeController teardown complete
+⎔ Detected changes, restarted server.
+🌀 Building list of assets...
+Total Upload: 855.36 KiB / gzip: 151.31 KiB
+✨ Read 76 files from the assets directory C:\Users\wevrw\Dev\ttx-operator-shell\public
+/agent-readiness-operator.html
+/agent-readiness-operator.js
+/ai-agent-readiness-checker.html
+/ai-agent-readiness-checker.js
+/ai-security-audit.html
+/ai-security-audit.js
+/api-explorer.css
+/api-explorer.html
+/api-explorer.js
+/app.js
+/audit-lite-operator.html
+/audit-lite-operator.js
+/automation-roi-calculator.html
+/automation-roi-calculator.js
+/automation-roi-operator.html
+/automation-roi-operator.js
+/cloudflare-federation-shared.js
+/enter.css
+/enter.html
+/enter.js
+/index.css
+/index.html
+/marketplace.css
+/marketplace.html
+/marketplace.js
+/mission-engine.html
+/mission.css
+/mission.html
+/mission.js
+/modules
+/operator-agents-intake.html
+/operator-agents-intake.js
+/operator-agents-security-intake.html
+/operator-agents-security-intake.js
+/operator.html
+/os.css
+/os.html
+/os.js
+/player.js
+/prompt-injection-scanner.html
+/prompt-injection-scanner.js
+/prompt-injection-scans-operator.html
+/prompt-injection-scans-operator.js
+/scenario.css
+/scenario.html
+/scripts
+/service-intake.html
+/service-intake.js
+/services.html
+/services.js
+/styles
+/styles.css
+/styles\a11y.css
+/styles\mission-engine.css
+/styles\rgbgold-components.css
+/styles\rgbgold-hooks.css
+/styles\rgbgold-hud.css
+/styles\rgbgold-motion.css
+/styles\rgbgold-tokens.css
+/scripts\a11y-scan.js
+/scripts\a11y.js
+/scripts\doctrine-ui.js
+/scripts\drift.js
+/scripts\ecosystem-health.js
+/scripts\hud-scan.js
+/scripts\mission-engine.js
+/scripts\motion-scan.js
+/scripts\rgbgold-motion.js
+/scripts\scenario.js
+/modules\ai-agent-threat-report.html
+/modules\module.css
+/modules\module.js
+/modules\msh-ops-doctrine.html
+/modules\multi-agent-cockpit.html
+/modules\n8n-automation-packs.html
+/modules\scenario-engine.html
+🌀 Starting asset upload...
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/assets-upload-session
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+🌀 Found 2 new or modified static assets to upload. Proceeding with upload...
++ /enter.css
++ /enter.html
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/assets/upload?base64=true
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/assets/upload?base64=true
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: Accepted 202
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Uploaded 1 of 2 assets
+✨ /enter.css
+-- START CF API RESPONSE: Created 201
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Uploaded 2 of 2 assets
+✨ /enter.html
+✨ Success! Uploaded 2 files (71 already uploaded) (0.73 sec)
+
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: mshops-public.sogellagepul.workers.dev
+Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
