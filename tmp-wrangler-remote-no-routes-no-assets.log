@@ -2370,3 +2370,86 @@ Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
 [wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (32ms)
 [wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (258ms)
 [wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (29ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (195ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (29ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (108ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (48ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (366ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (31ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (73ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (208ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (32ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (315ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (94ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (165ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (33ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (316ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (90ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (136ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (32ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (211ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (33ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (136ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (109ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (250ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (32ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (257ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (70ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (405ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (86ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (148ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (309ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (35ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (306ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (29ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (229ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (69ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (407ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (53ms)
+⎔ Refreshing preview token...
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/subdomain/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: c798c726df9042cbb0d9fdc55a705f1c.sogellagepul.workers.dev
+Access switch not cached for: c798c726df9042cbb0d9fdc55a705f1c.sogellagepul.workers.dev
+Caching access switch for: c798c726df9042cbb0d9fdc55a705f1c.sogellagepul.workers.dev
+-- START EXCHANGE API REQUEST: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END EXCHANGE API REQUEST
+-- START EXCHANGE API RESPONSE: OK 200
+HEADERS: {}
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END EXCHANGE API RESPONSE
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/subdomain
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Total Upload: 855.36 KiB / gzip: 151.31 KiB
+-- START CF API REQUEST: POST https://api.cloudflare.com/client/v4/accounts/f02eebce2a5c46b33b0d204f3cd4950a/workers/scripts/mshops-public/edge-preview
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+BODY: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Checking if domain has Access enabled: mshops-public.sogellagepul.workers.dev
+Using cached Access switch for: mshops-public.sogellagepul.workers.dev false
+✔ Preview token refreshed successfully
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 204 No Content (1ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (501ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (71ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/pause 404 Not Found (374ms)
+[wrangler-ProxyWorker:info] GET /cdn-cgi/ProxyWorker/play 404 Not Found (28ms)

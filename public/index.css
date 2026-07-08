@@ -28,3 +28,15 @@
   background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
   opacity: 0.55;
 }
+
+.surface-link-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 960px) {
+  .surface-link-grid {
+    grid-template-columns: 1fr;
+  }
+}

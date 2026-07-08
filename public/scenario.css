@@ -1,441 +1,62 @@
 /**
- * SCENARIO ENGINE - PAGE COMPOSITION
+ * PUBLIC SCENARIO FRAMEWORK - PAGE COMPOSITION
  * -----------------------------------------------------------------------
- * DRIFT-MARKER: layer=page file=public/scenario.css version=1.0
+ * DRIFT-MARKER: layer=page file=public/scenario.css version=2.0
  *
- * Page-specific composition for /scenario.html only. Follows the same
- * pattern as mission.css/os.css: imports the app's base styles.css for
- * shared layout primitives (.page-shell, .section-block, .topbar, etc.)
- * and layers page-only rules on top. Unlike those legacy pages, this file
- * is written entirely against the RGB+Gold `--rgbgold-*` token set (this
- * is a brand-new page, so it has no legacy token debt to carry forward).
+ * Page-specific composition for the public Scenario Framework page
+ * (/scenario.html) only. Rebuilt during the Public Scenario Framework
+ * Rebuild pass (July 2026) to replace the interactive Scenario Engine
+ * operator console (control panel, doctrine broker panel/viewers, event
+ * feed) that previously lived at this public route. That console's
+ * concerns - live inject control, broker-verified doctrine access, and
+ * the full evidence trail - now belong on the Scenario Engine route
+ * (`/scenario-engine`), not on this public overview page. See the same
+ * rebuild already applied to `/mission.html` (`mission.css` v2.0) for the
+ * identical precedent on the Mission side of the ecosystem.
  *
- * Defines the reusable Scenario Engine components requested across the two
- * integration passes that built this page:
- *   - .scenario-control-panel  (see DESIGN_SYSTEM.md §33)
- *   - .scenario-timeline       (see DESIGN_SYSTEM.md §34)
- *   - .scenario-event-feed     (see DESIGN_SYSTEM.md §35)
- *   - .scenario-doctrine-panel, .doctrine-version-viewer,
- *     .doctrine-chunk-viewer, .doctrine-diff-viewer,
- *     .doctrine-evidence-viewer (Scenario Engine <-> Doctrine OS
- *     Integration Pass - see DESIGN_SYSTEM.md §37-42)
+ * Follows the same pattern as index.css/mission.css/mission-engine.css: a
+ * small, page-scoped stylesheet layered on top of the shared RGB+Gold
+ * system rather than editing any protected design-system file
+ * (rgbgold-tokens/motion/components/hud/hooks.css, styles.css, a11y.css).
  *
  * Load order on scenario.html: rgbgold-tokens.css -> rgbgold-motion.css ->
  * rgbgold-components.css -> rgbgold-hud.css -> rgbgold-hooks.css ->
  * styles.css -> scenario.css -> a11y.css (last).
  *
- * None of the components below declare their own ::before/::after - they
- * compose with `.hud-frame` (existing, ::before/::after) and
- * `.operator-panel`/`.hud-card` (::before) from the shared system instead
- * of introducing new pseudo-element usage. See the budget table in
- * rgbgold-hud.css before adding any new decorator here.
+ * Defines `.scenario-timeline-panel` (a thin visual variant of
+ * `.rgbgold-module-shell` used for the Scenario Timeline section - see
+ * DESIGN_SYSTEM.md's Scenario Engine sections for the interactive
+ * counterpart) and `.footer-divider`. `.footer-divider` is patterned
+ * directly on index.css's rule of the same name but kept as an
+ * independent, duplicate copy (scenario.html does not load index.css, so
+ * this page needs its own copy) - same pattern already used by
+ * mission.css duplicating this exact rule, and by
+ * `.mission-doctrine-tag` duplicating `.scenario-doctrine-tag` on the
+ * Mission Engine console before this rebuild. Introduces no new
+ * pseudo-elements of its own (see the budget table in rgbgold-hud.css)
+ * and no animation - reduced-motion and Accessibility Mode are unaffected
+ * by anything in this file.
  */
 
-@import url("/styles.css");
-
-.scenario-shell-note {
-  opacity: 0.7;
-  font-size: 0.85rem;
+.footer-divider {
+  width: min(1180px, calc(100% - 2rem));
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
+  opacity: 0.55;
 }
 
-/* =========================================================================
-   SCENARIO CONTROL PANEL
-   Composition: .scenario-control-panel + .operator-panel (surface/padding)
-   + .hud-frame (corner brackets) + .reveal (scroll-in motion). This is the
-   PRIMARY, cinematic variant used live on this page.
-
-   FALLBACK VARIANT: for a context that wants the panel with zero motion
-   and zero HUD chrome unconditionally (not just under Accessibility
-   Mode), swap `.hud-frame .reveal` for `.expansion-safe` instead of
-   stacking all four - `.expansion-safe` already forces static/no-motion
-   rendering, so combining it with `.reveal`/`.hud-frame` would be
-   contradictory (see DESIGN_SYSTEM.md §23 composition rules). This live
-   page uses the primary variant only; the fallback needs no separate
-   a11y.css work because `.operator-panel` is already registered there.
-
-   Usage:
-     <div class="scenario-control-panel operator-panel hud-frame reveal"
-          data-reveal="up" data-version="1.0">
-       <div class="scenario-control-panel__actions">
-         <button class="btn btn-primary" data-scenario-control="start">Start Scenario</button>
-         <button class="btn btn-secondary" data-scenario-control="pause">Pause Scenario</button>
-         <button class="btn btn-secondary" data-scenario-control="reset">Reset Scenario</button>
-       </div>
-       <p class="scenario-control-panel__status" data-scenario-status aria-live="polite">Idle</p>
-     </div>
-   ========================================================================= */
-
-.scenario-control-panel {
+.scenario-timeline-panel {
   display: grid;
-  gap: var(--rgbgold-space-5);
-}
-
-.scenario-control-panel__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--rgbgold-space-3);
-}
-
-.scenario-control-panel__status {
-  margin: 0;
-  padding: var(--rgbgold-space-3) var(--rgbgold-space-4);
-  border-radius: var(--rgbgold-radius-md);
-  border: 1px solid rgba(60, 242, 255, 0.28);
-  background: rgba(60, 242, 255, 0.06);
-  color: var(--rgbgold-cyan);
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
-  width: fit-content;
-}
-
-.scenario-control-panel__status[data-state="running"] {
-  border-color: rgba(142, 255, 117, 0.4);
-  background: rgba(142, 255, 117, 0.08);
-  color: var(--rgbgold-lime);
-}
-
-.scenario-control-panel__status[data-state="paused"] {
-  border-color: rgba(245, 196, 81, 0.4);
-  background: rgba(245, 196, 81, 0.08);
-  color: var(--rgbgold-gold-soft);
-}
-
-/* =========================================================================
-   SCENARIO TIMELINE
-   Tokens for spacing/radii/color, `.reveal` for scroll-in motion, and
-   `.hud-frame` (applied directly to the root) for tactical corner
-   brackets - no bespoke pseudo-elements introduced here. Individual
-   timeline nodes are plain list items so scenario.js can append/remove
-   them freely without touching this file.
-
-   Usage:
-     <div class="scenario-timeline hud-frame reveal" data-reveal="up" data-version="1.0">
-       <ol class="scenario-timeline__track" data-scenario-event-track>
-         <li class="scenario-timeline__node">...</li>
-       </ol>
-       <div class="cinematic-hook" data-cinematic hidden></div>
-     </div>
-   ========================================================================= */
-
-.scenario-timeline {
-  position: relative;
+  gap: var(--rgbgold-space-4);
   padding: var(--rgbgold-space-6);
   border-radius: var(--rgbgold-radius-lg);
   background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.scenario-timeline__track {
-  display: grid;
-  gap: var(--rgbgold-space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.scenario-timeline__node {
-  display: grid;
-  gap: var(--rgbgold-space-2);
-  padding: var(--rgbgold-space-3) var(--rgbgold-space-4);
-  border-radius: var(--rgbgold-radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(16, 20, 26, 0.6);
-}
-
-.scenario-timeline__node--placeholder {
-  opacity: 0.7;
-}
-
-.scenario-timeline__node p {
-  margin: 0;
-  font-size: 0.82rem;
-}
-
-/* =========================================================================
-   SCENARIO EVENT FEED
-   Scrollable, high-contrast, `aria-live="polite"` log. Reduced-motion
-   safe by construction - it has no animation of its own, so it needs no
-   `prefers-reduced-motion` override. `.a11y-override-card` (applied
-   directly in scenario.html) gives it automatic Accessibility Mode
-   coverage with no edits to a11y.css - see the registration checklist
-   there.
-
-   Usage:
-     <div class="scenario-event-feed a11y-override-card" data-scenario-event
-          aria-live="polite" data-version="1.0">
-       <p data-scenario-event-empty>No events yet.</p>
-       <ul class="scenario-event-feed__list" data-scenario-event-list></ul>
-     </div>
-   ========================================================================= */
-
-.scenario-event-feed {
-  max-height: 22rem;
-  overflow-y: auto;
-  padding: var(--rgbgold-space-5);
-  border-radius: var(--rgbgold-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(9, 12, 16, 0.92);
-  color: #eef2f8;
-}
-
-.scenario-event-feed__empty[hidden] {
-  display: none;
-}
-
-.scenario-event-feed__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: var(--rgbgold-space-2);
-}
-
-.scenario-event-feed__item {
-  display: flex;
-  gap: var(--rgbgold-space-3);
-  padding: var(--rgbgold-space-2) var(--rgbgold-space-3);
-  border-left: 2px solid var(--rgbgold-cyan);
-  background: rgba(60, 242, 255, 0.05);
-  font-size: 0.82rem;
-  font-family: var(--font-mono, monospace);
-}
-
-.scenario-event-feed__item time {
-  opacity: 0.6;
-  white-space: nowrap;
-}
-
-/* =========================================================================
-   DOCTRINE PANEL + VIEWERS
-   -----------------------------------------------------------------------
-   Scenario Engine <-> Doctrine OS integration surface (see DESIGN_SYSTEM.md
-   §37-42). Composition mirrors the Scenario Control Panel above:
-   `.scenario-doctrine-panel` + `.operator-panel` (surface/padding) +
-   `.hud-frame` (corner brackets) + `.reveal` (scroll-in motion) +
-   `.a11y-override-card` (Accessibility Mode coverage, no a11y.css edits
-   required). No new pseudo-elements are introduced by anything in this
-   section - see the budget table in rgbgold-hud.css.
-   ========================================================================= */
-
-.scenario-doctrine-panel {
-  display: grid;
-  gap: var(--rgbgold-space-5);
-}
-
-.scenario-doctrine-panel code {
+.scenario-timeline-panel code {
   font-family: var(--font-mono, monospace);
   background: rgba(255, 255, 255, 0.06);
   padding: 0.1em 0.4em;
   border-radius: 4px;
-}
-
-.doctrine-broker-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--rgbgold-space-3);
-}
-
-.doctrine-broker-form__field {
-  display: grid;
-  gap: var(--rgbgold-space-1);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-
-.doctrine-broker-form__field input {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.85rem;
-  padding: 0.55rem 0.7rem;
-  border-radius: var(--rgbgold-radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(9, 12, 16, 0.85);
-  color: #eef2f8;
-  min-width: 12rem;
-}
-
-.doctrine-broker-form__field input:focus-visible {
-  outline: 2px solid var(--rgbgold-cyan);
-  outline-offset: 1px;
-}
-
-/* Reuses the same status-readout treatment as .scenario-control-panel__status. */
-.doctrine-broker-status {
-  margin: 0;
-  padding: var(--rgbgold-space-3) var(--rgbgold-space-4);
-  border-radius: var(--rgbgold-radius-md);
-  border: 1px solid rgba(60, 242, 255, 0.28);
-  background: rgba(60, 242, 255, 0.06);
-  color: var(--rgbgold-cyan);
-  font-size: 0.82rem;
-  width: fit-content;
-}
-
-.doctrine-broker-status[data-state="granted"] {
-  border-color: rgba(142, 255, 117, 0.4);
-  background: rgba(142, 255, 117, 0.08);
-  color: var(--rgbgold-lime);
-}
-
-.doctrine-broker-status[data-state="denied"] {
-  border-color: rgba(255, 84, 112, 0.45);
-  background: rgba(255, 84, 112, 0.1);
-  color: var(--rgbgold-critical-soft);
-}
-
-/* -------------------------------------------------------------------------
-   Doctrine Version Viewer - §38. Latest approved version returned by a
-   successful broker call, plus its metadata (version id, classification,
-   access-grant timestamp). "Operator" is intentionally omitted when the
-   broker response doesn't include it - see doctrine-ui.js.
-   ------------------------------------------------------------------------- */
-
-.doctrine-version-viewer,
-.doctrine-chunk-viewer,
-.doctrine-evidence-viewer {
-  padding: var(--rgbgold-space-4) var(--rgbgold-space-5);
-  border-radius: var(--rgbgold-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(9, 12, 16, 0.72);
-}
-
-.doctrine-version-viewer__meta {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 0.4rem var(--rgbgold-space-4);
-  margin: var(--rgbgold-space-3) 0 0;
-  font-size: 0.82rem;
-}
-
-.doctrine-version-viewer__meta dt {
-  opacity: 0.6;
-  text-transform: uppercase;
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-}
-
-.doctrine-version-viewer__meta dd {
-  margin: 0;
-  font-family: var(--font-mono, monospace);
-  word-break: break-all;
-}
-
-.doctrine-version-viewer__meta[hidden],
-.doctrine-chunk-viewer__empty[hidden],
-.doctrine-version-viewer__empty[hidden] {
-  display: none;
-}
-
-/* -------------------------------------------------------------------------
-   Doctrine Chunk Viewer - §39. Scrollable, high-contrast, no animation
-   (reduced-motion safe by construction, same as .scenario-event-feed).
-   ------------------------------------------------------------------------- */
-
-.doctrine-chunk-viewer {
-  max-height: 18rem;
-  overflow-y: auto;
-}
-
-.doctrine-chunk-viewer__list {
-  margin: var(--rgbgold-space-3) 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: var(--rgbgold-space-2);
-}
-
-.doctrine-chunk-viewer__item {
-  padding: var(--rgbgold-space-2) var(--rgbgold-space-3);
-  border-left: 2px solid var(--rgbgold-gold-soft);
-  background: rgba(245, 196, 81, 0.05);
-  font-size: 0.8rem;
-  font-family: var(--font-mono, monospace);
-  word-break: break-word;
-}
-
-.doctrine-chunk-viewer__item-hash {
-  opacity: 0.65;
-  font-size: 0.72rem;
-  display: block;
-}
-
-/* -------------------------------------------------------------------------
-   Doctrine Diff Viewer - §40. Always rendered via `.expansion-safe`: there
-   is no read endpoint that returns a diff between an approved version and
-   a quarantined one without an operator token, so the honest, safe default
-   is the static "unavailable" fallback rather than a fabricated diff.
-   `.expansion-safe` already supplies static background/border/no-motion -
-   no additional rules needed here beyond spacing for its text content.
-   ------------------------------------------------------------------------- */
-
-.doctrine-diff-viewer {
-  padding: var(--rgbgold-space-4) var(--rgbgold-space-5);
-  border-radius: var(--rgbgold-radius-lg);
-  display: grid;
-  gap: var(--rgbgold-space-2);
-}
-
-/* -------------------------------------------------------------------------
-   Doctrine Evidence Viewer - §41. Shows this session's own access/denied-
-   access evidence only (sync/approval evidence requires an operator token
-   this console never holds - see the note rendered in scenario.html).
-   ------------------------------------------------------------------------- */
-
-.doctrine-evidence-viewer__note {
-  opacity: 0.7;
-  font-size: 0.78rem;
-}
-
-.doctrine-evidence-viewer__list {
-  margin: var(--rgbgold-space-2) 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: var(--rgbgold-space-2);
-}
-
-.doctrine-evidence-viewer__item {
-  display: flex;
-  gap: var(--rgbgold-space-3);
-  padding: var(--rgbgold-space-2) var(--rgbgold-space-3);
-  border-left: 2px solid var(--rgbgold-lime);
-  background: rgba(142, 255, 117, 0.05);
-  font-size: 0.8rem;
-  font-family: var(--font-mono, monospace);
-}
-
-.doctrine-evidence-viewer__item[data-state="DENIED"] {
-  border-left-color: var(--rgbgold-critical);
-  background: rgba(255, 84, 112, 0.06);
-}
-
-.doctrine-evidence-viewer__item time {
-  opacity: 0.6;
-  white-space: nowrap;
-}
-
-/* -------------------------------------------------------------------------
-   Scenario event doctrine tag (§42) - small inline chip appended by
-   scenario.js to event-feed/timeline entries once a doctrine classification
-   is known, via the shared `window.__mshopsScenarioDoctrine` state that
-   doctrine-ui.js publishes. No pseudo-elements; plain inline element.
-   ------------------------------------------------------------------------- */
-
-/* Always rendered with the .a11y-override-badge marker alongside this class
-   (see scenario.js's buildDoctrineTag()) - covered by a11y.css's generic
-   badge override, no bespoke body.a11y-mode rule needed here. */
-.scenario-doctrine-tag {
-  display: inline-flex;
-  align-items: center;
-  margin-left: var(--rgbgold-space-2);
-  padding: 0.05rem 0.5rem;
-  border-radius: var(--rgbgold-radius-pill);
-  border: 1px solid rgba(245, 196, 81, 0.4);
-  background: rgba(245, 196, 81, 0.08);
-  color: var(--rgbgold-gold-soft);
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }

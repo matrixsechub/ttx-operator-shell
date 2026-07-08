@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to MSH OPS</title>
+    <title>MSH OPS | Public Intake Funnel</title>
     <meta
       name="description"
-      content="Public entry point to the MSH OPS ecosystem for missions, scenarios, doctrine-guided planning, and governance-aware delivery."
+      content="Choose your intent, preview your best public route, and continue into the MSH OPS intake flow."
     />
     <link
       rel="icon"
@@ -34,47 +34,39 @@
         <span class="brand-mark">MSH</span>
         <span class="brand-copy">
           <strong>MSH OPS</strong>
-          <span>Public Entry</span>
+          <span>Public Intake</span>
         </span>
       </a>
       <nav class="nav-ecosystem mono" aria-label="Public navigation">
-        <a href="/enter" aria-label="Return to the MSH OPS entry page">Get Started</a>
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
         <a href="/mission" aria-label="Read the public mission framework">Mission</a>
-        <a href="#features" aria-label="Jump to ecosystem features">Features</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
         <a href="#contact" aria-label="Jump to public contact options">Contact</a>
       </nav>
     </header>
 
     <main class="page-shell">
       <section class="hero-shell">
-        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
           <header class="rgbgold-module-shell-header">
-            <span class="hud-tag a11y-override-badge">Public // Entry</span>
-            <p class="section-label mono">[ MSH_OPS_ENTRY_SURFACE ]</p>
-            <h1 class="glow-pulse cinematic-hook">Welcome to MSH OPS</h1>
+            <span class="hud-tag a11y-override-badge">Step 1 // Intent</span>
+            <p class="section-label mono">[ PUBLIC_INTAKE_FUNNEL ]</p>
+            <h1 class="glow-pulse cinematic-hook">Choose your starting path</h1>
             <p class="hero-sub">
-              Public entry point into missions, scenarios, doctrine-guided planning, and governance-aware execution
-              across the MSH OPS ecosystem.
+              This public-safe funnel helps you describe intent, preview the best route, and continue into the intake
+              surface without exposing internal tooling or private delivery details.
             </p>
           </header>
           <div class="rgbgold-module-shell-body">
             <p class="system-copy">
-              Start here to understand how the ecosystem fits together before moving into a mission flow or exploring
-              a scenario path. This page stays public-safe while still reflecting the same standards that guide the
-              wider MSH OPS system.
+              Start by selecting the kind of help you need. We will show a routing preview, explain the next public
+              page to visit, and prepare a guided handoff into <code>/intake</code>.
             </p>
-            <div class="chip-row mono" aria-label="Ecosystem entry highlights">
-              <span class="status-chip--success">mission-ready</span>
-              <span class="status-chip--warning">scenario-led</span>
-              <span class="status-chip--critical">governance-checked</span>
-            </div>
-            <div class="cta-row">
-              <a class="button primary" href="/mission" aria-label="Explore the public mission framework">
-                Explore Missions
-              </a>
-              <a class="button secondary" href="/scenario" aria-label="Explore public scenario workflows">
-                Explore Scenarios
-              </a>
+            <div class="chip-row mono" aria-label="Funnel traits">
+              <span class="status-chip--success">intent-led</span>
+              <span class="status-chip--warning">public-safe</span>
+              <span class="status-chip--critical">worker-backed intake</span>
             </div>
             <div class="cinematic-hook" data-cinematic hidden></div>
             <div class="motion-scan" data-motion-scan hidden></div>
@@ -82,130 +74,159 @@
         </article>
       </section>
 
-      <section class="section-block" id="ecosystem-overview" aria-labelledby="ecosystem-overview-heading">
-        <div class="section-heading">
-          <div>
-            <p class="section-label mono">[ ECOSYSTEM_OVERVIEW ]</p>
-            <h2 id="ecosystem-overview-heading">How the public ecosystem is organized</h2>
-          </div>
-        </div>
-        <div class="telemetry-grid">
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Ecosystem // Mission</span>
-              <h3>Mission Engine</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                Missions organize objectives, checkpoints, evidence, and outcomes into a public-safe framework that
-                explains how progress is tracked over time.
-              </p>
-            </div>
-          </article>
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Ecosystem // Scenario</span>
-              <h3>Scenario Engine</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                Scenarios turn abstract risk into concrete flows, giving teams a structured way to understand what a
-                mission is supposed to test or prove.
-              </p>
-            </div>
-          </article>
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Ecosystem // Doctrine</span>
-              <h3>Doctrine OS</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                Doctrine serves as the version-controlled guidance source behind missions and scenarios so public-facing
-                recommendations stay consistent with approved practice.
-              </p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="section-block" id="features" aria-labelledby="how-it-works-heading">
-        <div class="section-heading">
-          <div>
-            <p class="section-label mono">[ HOW_IT_WORKS ]</p>
-            <h2 id="how-it-works-heading">How the ecosystem works</h2>
-          </div>
-        </div>
-        <div class="telemetry-grid">
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Flow // Scenario</span>
-              <h3>Scenario flow</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                Public-safe scenario flow starts with a defined path, frames the risk or objective, and turns that into
-                a sequence that can later support a full mission.
-              </p>
-            </div>
-          </article>
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Flow // Mission</span>
-              <h3>Mission flow</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                Mission flow builds on those scenarios with checkpoints, timeline progression, and evidence visibility so
-                each engagement moves in a controlled, auditable way.
-              </p>
-            </div>
-          </article>
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Flow // Governance</span>
-              <h3>Guidance and continuous quality enforcement</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                Doctrine remains the source of truth for guidance, while the autonomous governance layer continuously
-                checks motion, accessibility, visual composition, and ecosystem integrity in the background.
-              </p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="section-block" id="contact" aria-labelledby="get-started-heading">
-        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+      <section class="section-block" aria-labelledby="intent-heading">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
           <header class="rgbgold-module-shell-header">
-            <span class="hud-tag a11y-override-badge">Start // Public</span>
-            <p class="section-label mono">[ GET_STARTED ]</p>
-            <h2 id="get-started-heading">Choose the public path that fits your next step</h2>
+            <span class="hud-tag a11y-override-badge">Step 2 // Route Preview</span>
+            <p class="section-label mono">[ INTENT_SELECTOR ]</p>
+            <h2 id="intent-heading">What brings you here?</h2>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <div class="intent-grid" role="group" aria-label="Select a public intake intent">
+              <button
+                class="button secondary intent-button is-active"
+                type="button"
+                data-intent-button
+                data-intent="orientation"
+                aria-pressed="true"
+              >
+                I need orientation
+              </button>
+              <button
+                class="button secondary intent-button"
+                type="button"
+                data-intent-button
+                data-intent="planning"
+                aria-pressed="false"
+              >
+                I am planning a project
+              </button>
+              <button
+                class="button secondary intent-button"
+                type="button"
+                data-intent-button
+                data-intent="assurance"
+                aria-pressed="false"
+              >
+                I need assurance review
+              </button>
+            </div>
+            <p class="form-status mono" id="enter-route-status" role="status" aria-live="polite">
+              Orientation selected. Previewing the best starting route now.
+            </p>
+            <div class="preview-grid" aria-live="polite">
+              <article class="preview-card is-active" data-intent-panel="orientation">
+                <span class="hud-tag a11y-override-badge">Route // Start Here</span>
+                <h3>Recommended first page: Start Here</h3>
+                <p class="system-copy">
+                  Use the beginner-friendly onboarding page to understand what MSH OPS is, what the ecosystem includes,
+                  and which path to choose next.
+                </p>
+                <p class="path-summary mono">Intent :: orientation | Route :: /start | Handoff :: /intake?intent=orientation</p>
+                <div class="cta-row">
+                  <a class="button secondary" href="/start">Open Start Here</a>
+                  <a class="button primary" data-intake-link href="/intake?intent=orientation&path=/start&source=enter">
+                    Continue to Intake
+                  </a>
+                </div>
+              </article>
+              <article class="preview-card" data-intent-panel="planning" hidden>
+                <span class="hud-tag a11y-override-badge">Route // Ecosystem</span>
+                <h3>Recommended first page: Ecosystem</h3>
+                <p class="system-copy">
+                  Review how Scenario Engine, Mission Engine, Doctrine OS, intake, governance, and ecosystem health
+                  connect before submitting your request.
+                </p>
+                <p class="path-summary mono">Intent :: planning | Route :: /ecosystem | Handoff :: /intake?intent=planning</p>
+                <div class="cta-row">
+                  <a class="button secondary" href="/ecosystem">Open Ecosystem</a>
+                  <a class="button primary" data-intake-link href="/intake?intent=planning&path=/ecosystem&source=enter">
+                    Continue to Intake
+                  </a>
+                </div>
+              </article>
+              <article class="preview-card" data-intent-panel="assurance" hidden>
+                <span class="hud-tag a11y-override-badge">Route // Mission</span>
+                <h3>Recommended first page: Mission</h3>
+                <p class="system-copy">
+                  If you already know you need guided delivery or assurance support, review the public mission framework
+                  and then continue into the intake flow.
+                </p>
+                <p class="path-summary mono">Intent :: assurance | Route :: /mission | Handoff :: /intake?intent=assurance</p>
+                <div class="cta-row">
+                  <a class="button secondary" href="/mission">Open Mission</a>
+                  <a class="button primary" data-intake-link href="/intake?intent=assurance&path=/mission&source=enter">
+                    Continue to Intake
+                  </a>
+                </div>
+              </article>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="features" aria-labelledby="funnel-details-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ FUNNEL_DETAILS ]</p>
+            <h2 id="funnel-details-heading">How the funnel works</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid">
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Step // Intent</span>
+              <h3>Pick a clear starting intent</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Each option stays public-safe and avoids private delivery terminology while still capturing enough
+                context to guide the next step.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Step // Preview</span>
+              <h3>See the route before you commit</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The preview shows the recommended public page, what it explains, and how that path hands off into the
+                intake form.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Step // Intake</span>
+              <h3>Continue into the worker-backed intake surface</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The final handoff moves into <code>/intake</code>, where the public form submits through the existing
+                engagement creation path.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="contact" aria-labelledby="enter-contact-heading">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Alternate // Contact</span>
+            <p class="section-label mono">[ PUBLIC_FALLBACK ]</p>
+            <h2 id="enter-contact-heading">Need a simpler path?</h2>
           </header>
           <div class="rgbgold-module-shell-body">
             <p class="system-copy">
-              Explore the mission framework if you need the structured engagement view, or start with scenarios if you
-              want to understand how risk, rehearsal, and planning connect before execution.
+              If you are not ready to choose an intake path yet, use the public contact page for a lighter first step.
             </p>
             <div class="cta-row">
-              <a class="button primary" href="/mission" aria-label="Open the public mission framework">
-                Explore Missions
-              </a>
-              <a class="button secondary" href="/scenario" aria-label="Open the public scenario overview">
-                Explore Scenarios
-              </a>
-              <a
-                class="button ghost"
-                href="mailto:matrixsechub@outlook.com?subject=MSH%20OPS%20Public%20Entry"
-                aria-label="Email the MSH OPS team from the public entry page"
-              >
-                Email Team
-              </a>
+              <a class="button primary" href="/contact">Open Contact</a>
+              <a class="button secondary" href="/status">View Status</a>
             </div>
-            <p class="form-status mono" role="status" aria-live="polite">
-              Mission and scenario entry routes are active.
-            </p>
             <div class="a11y-hook" data-a11y-override hidden></div>
           </div>
         </article>
@@ -215,12 +236,14 @@
     <div class="footer-divider" aria-hidden="true"></div>
     <footer class="footer mono">
       <div class="footer-copy">
-        <span>MSH OPS public entry surface</span>
-        <span>Mission flow, scenario flow, doctrine guidance, and governance-aware public navigation</span>
+        <span>MSH OPS public intake funnel</span>
+        <span>Intent selection, routing preview, and handoff into the guided intake surface</span>
       </div>
       <nav class="nav-ecosystem" aria-label="Footer navigation">
-        <a href="/enter" aria-label="Return to the public entry page">Get Started</a>
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
         <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
         <a href="#contact" aria-label="Jump to public contact options">Contact</a>
       </nav>
     </footer>
@@ -232,5 +255,6 @@
     <script src="/scripts/motion-scan.js" defer></script>
     <script src="/scripts/hud-scan.js" defer></script>
     <script src="/scripts/ecosystem-health.js" defer></script>
+    <script src="/scripts/enter-page.js" defer></script>
   </body>
 </html>

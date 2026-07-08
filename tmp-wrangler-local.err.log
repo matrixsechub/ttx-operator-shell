@@ -16,3 +16,11 @@
   
 
 
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mThe Workers runtime failed to start. There was likely a problem with the workerd binary or your configuration.[0m
+
+  Runtime stderr:
+  *** std::terminate() called with no exception
+  stack: 7ffa55101239 7ff65c2f63a5 7ffa551104ff 7ffa55103a90 7ffa5510f977 7ffa55102c77 7ffa55110310 7ffa734c482e 7ffa7337e432 7ffa5510fe75 7ffa551018f1 7ffa55101d16 7ffa55102d60 7ffa55110310 7ffa734c47ae 7ffa733821c6 7ffa733f6ea0 7ffa708a1b69 7ffa55105276 7ff65d98045f 7ff65c2f5f63 7ff65d985512 7ff65d98c416 7ff65d985a6b 7ff65d98c416 7ff65d982fbb 7ff65c2e1e77 7ff65f7b219e 7ffa72d4e956
+
+
+🪵  Logs were written to "C:\Users\wevrw\.wrangler-config\.wrangler\logs\wrangler-2026-07-08_06-08-22_966.log"

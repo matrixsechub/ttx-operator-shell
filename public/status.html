@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSH OPS | Public Status</title>
+    <meta
+      name="description"
+      content="Public status page for governance scanner results, accessibility and motion compliance, and the current uptime signal."
+    />
+    <script>
+      (function canonicalizeStatusRoute() {
+        if (window.location.pathname.endsWith(".html")) {
+          window.history.replaceState(null, "", window.location.pathname.slice(0, -5) + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/status.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSH OPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSH OPS</strong>
+          <span>Public Status</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.1">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Public // Status</span>
+            <p class="section-label mono">[ ECOSYSTEM_HEALTH ]</p>
+            <h1 class="glow-pulse cinematic-hook">Live public status</h1>
+            <p class="hero-sub">
+              This page turns governance scanner outputs, compliance state, and the current uptime signal into a
+              readable public snapshot.
+            </p>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              Scanner summaries are derived from the same governance chain loaded on this page. Uptime and intake
+              reachability are checked against the public status path already available in this repo.
+            </p>
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="features" aria-labelledby="status-grid-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ LIVE_SIGNALS ]</p>
+            <h2 id="status-grid-heading">Current public signals</h2>
+          </div>
+        </div>
+        <div class="status-grid">
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card status-panel" data-reveal="up" data-version="1.1">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Scanner // Summary</span>
+              <h3>Governance scanner results</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <ul class="status-list" id="status-scanners" aria-live="polite">
+                <li>Loading scanner results...</li>
+              </ul>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card status-panel" data-reveal="up" data-version="1.1">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Scanner // Motion + A11y</span>
+              <h3>Compliance state</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <ul class="status-list" id="status-compliance" aria-live="polite">
+                <li>Loading compliance summary...</li>
+              </ul>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card status-panel" data-reveal="up" data-version="1.1">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Public // Reachability</span>
+              <h3>Uptime and intake availability</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <ul class="status-list" id="status-reachability" aria-live="polite">
+                <li>Checking public signals...</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="contact" aria-labelledby="status-next-heading">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.1">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Next // Act</span>
+            <p class="section-label mono">[ NEXT_ACTION ]</p>
+            <h2 id="status-next-heading">Use this snapshot, then continue</h2>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <div class="cta-row">
+              <a class="button primary" href="/enter">Open Funnel</a>
+              <a class="button secondary" href="/mission">Read Mission</a>
+              <a class="button ghost" href="/contact">Contact Page</a>
+            </div>
+            <p class="form-status mono" id="status-updated-at" role="status" aria-live="polite">
+              Waiting for live status data.
+            </p>
+            <div class="a11y-hook" data-a11y-override hidden></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div class="footer-divider" aria-hidden="true"></div>
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSH OPS public status</span>
+        <span>Governance scanner state, compliance visibility, uptime, and intake reachability</span>
+      </div>
+      <nav class="nav-ecosystem" aria-label="Footer navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+    <script src="/scripts/status-page.js" defer></script>
+  </body>
+</html>

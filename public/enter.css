@@ -21,3 +21,48 @@
   background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
   opacity: 0.55;
 }
+
+.intent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.intent-button {
+  width: 100%;
+}
+
+.intent-button.is-active {
+  border-color: rgba(242, 193, 78, 0.4);
+  background: linear-gradient(145deg, rgba(242, 193, 78, 0.14), rgba(82, 184, 255, 0.08));
+  color: var(--gold);
+}
+
+.preview-grid {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.preview-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.95), rgba(9, 12, 16, 0.97));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+}
+
+.path-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 900px) {
+  .intent-grid {
+    grid-template-columns: 1fr;
+  }
+}
