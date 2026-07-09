@@ -89,6 +89,45 @@ function getModuleAccentClass(module) {
   return "accent-blue";
 }
 
+function renderMembershipBadges(module) {
+  const accessLevel = String(module?.metadata?.accessLevel || module?.access_level || "public").toLowerCase();
+  const isOperator = accessLevel === "operator" || accessLevel === "restricted";
+  const isIncluded = accessLevel === "public" || module?.base_price === 0;
+  const badges = [];
+
+  if (isIncluded) {
+    badges.push('<span class="membership-badge membership-badge--included">Included in Membership</span>');
+  }
+  if (isOperator) {
+    badges.push('<span class="membership-badge membership-badge--exclusive">Operator Exclusive</span>');
+  }
+  if (!badges.length) {
+    badges.push('<span class="membership-badge membership-badge--included">Included in Membership</span>');
+  }
+
+  return `<div class="membership-badge-row">${badges.join("")}</div>`;
+}
+
+function getMembershipValueStatement(module) {
+  const accessLevel = String(module?.metadata?.accessLevel || module?.access_level || "public").toLowerCase();
+  const name = module?.name || module?.title || "This module";
+
+  if (module?.slug === "public-register" || module?.service_slug === "public_register") {
+    return "Establish operator identity and receive cockpit readiness updates as systems activate.";
+  }
+  if (accessLevel === "operator" || accessLevel === "restricted") {
+    return `${name} delivers operator-exclusive controls, queue visibility, and security plane routing for members.`;
+  }
+  if (accessLevel === "public") {
+    return `${name} is included with membership — explore value before escalating into operator workflows.`;
+  }
+  return `${name} extends your membership with guided intake, governance signals, and ecosystem lifecycle visibility.`;
+}
+
+function renderMembershipValueStatement(module) {
+  return `<p class="module-value-statement">${escapeHtml(getMembershipValueStatement(module))}</p>`;
+}
+
 function animateGridRender(grid) {
   if (!grid) {
     return;
@@ -381,6 +420,10 @@ function renderInternalAgentModules(cards) {
               <span class="module-num">${String(index + 1).padStart(2, "0")}</span>
             </div>
             <p>${escapeHtml(card.description)}</p>
+            <div class="membership-badge-row">
+              <span class="membership-badge membership-badge--exclusive">Operator Exclusive</span>
+            </div>
+            <p class="module-value-statement">${escapeHtml(card.name)} routes multi-agent intake through the operator membership plane.</p>
             <div class="tag-row">
               <span>${escapeHtml(card.category)}</span>
               <span>operator-only</span>
@@ -450,6 +493,8 @@ function renderServiceModules(modules) {
                   <span class="module-num">${module.base_price === 0 ? "FREE" : escapeHtml(String(module.base_price || "custom"))}</span>
                 </div>
                 <p>${escapeHtml(module.description)}</p>
+                ${renderMembershipBadges(module)}
+                ${renderMembershipValueStatement(module)}
                 <div class="tag-row">
                   <span>${escapeHtml(module.category)}</span>
                   <span>${escapeHtml(module.revenue_type)}</span>
@@ -752,6 +797,8 @@ function renderModules(modules, view, federationMeta = {}, adaptiveMeta = {}, pr
                   <span class="module-num">${escapeHtml(module.metadata.num || "SYNC")}</span>
                 </div>
                 <p>${escapeHtml(module.description)}</p>
+                ${renderMembershipBadges(module)}
+                ${renderMembershipValueStatement(module)}
                 <div class="tag-row">
                   ${(module.tags || []).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
                   <span>${escapeHtml(module.agentSource)}</span>

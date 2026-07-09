@@ -55,7 +55,7 @@
 .marketplace-main {
   position: relative;
   z-index: 1;
-  padding: 36px 0 64px;
+  padding: 24px 0 64px;
 }
 
 .marketplace-main > * {

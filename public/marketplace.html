@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
     <link rel="stylesheet" href="/marketplace.css" />
+    <link rel="stylesheet" href="/styles/marketplace-membership.css" />
     <link rel="stylesheet" href="/styles/nav.css" />
     <link rel="stylesheet" href="/styles/a11y.css" />
   </head>
@@ -34,18 +35,24 @@
     </header>
 
     <main class="marketplace-main">
-      <section class="marketplace-hero bracket reveal" data-reveal="up">
+      <section class="marketplace-hero marketplace-membership-hero bracket reveal" data-reveal="up">
         <div class="bracket-inner">
-          <span class="hud-tag">Signal // Live</span>
-          <p class="section-label mono">[ MARKETPLACE_UI :: V3_5_OS ]</p>
-          <h1 class="glow-pulse">MSHOPS v3.5 marketplace surface.</h1>
-          <p class="lede">
-            Live module registry, governance posture, version state, certification, release, integration,
-            and federation synthesis for the public marketplace surface.
+          <span class="hud-tag">Operator // Membership</span>
+          <p class="section-label mono">[ MSHOPS_OPERATOR_MEMBERSHIP ]</p>
+          <h1 class="glow-pulse cinematic-hook">Become an Operator.</h1>
+          <p class="hero-lede">
+            Join the MSHOPS operator ecosystem — a membership-driven surface for threat intelligence,
+            multi-agent tooling, security plane insights, and cockpit access as systems come online.
           </p>
+          <div class="membership-tier-row" aria-label="Membership tiers">
+            <span class="membership-tier-chip">Observer</span>
+            <span class="membership-tier-chip">Builder</span>
+            <span class="membership-tier-chip">Operator</span>
+            <span class="membership-tier-chip">Partner</span>
+          </div>
           <div class="cta-row">
-            <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
-            <a class="button secondary" href="/enter">Open Intake Funnel</a>
+            <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register to Access Cockpit">Register to Access Cockpit</a>
+            <a class="button secondary" href="#membership-benefits">Explore Benefits</a>
           </div>
           <div class="cinematic-hook" data-cinematic hidden></div>
           <div class="motion-scan" data-motion-scan hidden></div>
@@ -55,7 +62,88 @@
             <a class="filter-chip" href="/marketplace?view=public" data-view="public">PUBLIC BRIEFS</a>
             <a class="filter-chip" href="/marketplace?view=restricted" data-view="restricted">RESTRICTED</a>
           </div>
-          <p class="section-copy mono">Icons and badges indicate module function, readiness, and advisory posture.</p>
+          <p class="section-copy mono">Membership unlocks module access, cockpit readiness updates, and operator identity signals.</p>
+        </div>
+      </section>
+
+      <section class="membership-benefits-shell reveal" data-reveal="up" id="membership-benefits">
+        <div class="section-heading">
+          <p class="section-label mono">[ MEMBERSHIP_BENEFITS ]</p>
+          <h2>What membership includes.</h2>
+          <p class="lede">Operator-grade capabilities delivered through the unified MSHOPS storefront.</p>
+        </div>
+        <div class="membership-benefits-grid" id="membership-benefits-grid">
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">📡</span>
+            <h3>Threat Intel Stream</h3>
+            <p>Live advisory signals, CVE context, and federation-ready threat posture across the module registry.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">🔄</span>
+            <h3>Ecosystem Lifecycle</h3>
+            <p>Track intake, validation, queue, and processed states as engagements move through the operator plane.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">🎛️</span>
+            <h3>Cockpit Access</h3>
+            <p>Preview the operator cockpit and receive readiness updates as cockpit systems activate.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">🤖</span>
+            <h3>Multi-Agent Tools</h3>
+            <p>Intake, security intake, and Aurelius-aligned agents routed through the security plane.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">🛡️</span>
+            <h3>Security Plane Insights</h3>
+            <p>Permission profiles, threat hooks, and lifecycle stages visible on every membership module.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">🪪</span>
+            <h3>Operator Identity</h3>
+            <p>Register once to establish operator identity and unlock ecosystem access pathways.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">🧭</span>
+            <h3>Governance Posture</h3>
+            <p>Certification, release, and integration badges synthesized into a single membership view.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">✅</span>
+            <h3>Module Certification</h3>
+            <p>See which modules are membership-included versus operator-exclusive before you engage.</p>
+          </article>
+          <article class="membership-benefit-card">
+            <span class="membership-benefit-icon" aria-hidden="true">☁️</span>
+            <h3>Federation Sync</h3>
+            <p>Cross-division Cloudflare federation signals keep your operator surface aligned with live registry state.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cockpit-preview-shell reveal" data-reveal="up" id="cockpit-preview">
+        <div class="section-heading">
+          <p class="section-label mono">[ COCKPIT_PREVIEW ]</p>
+          <h2>Operator cockpit preview.</h2>
+        </div>
+        <div class="cockpit-preview-panel">
+          <div class="cockpit-preview-visual" aria-hidden="true">
+            <div class="cockpit-preview-hud">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="cockpit-preview-lock">Preview locked</div>
+          </div>
+          <div class="cockpit-preview-copy">
+            <h3>Command-grade operator surface</h3>
+            <p>
+              The operator cockpit consolidates intake queues, agent orchestration, security plane telemetry,
+              and lifecycle controls into one membership-gated command surface.
+            </p>
+            <a class="register-cta-enterprise pulse mono" href="/register">Unlock Operator Cockpit</a>
+          </div>
         </div>
       </section>
 
@@ -189,7 +277,7 @@
     <footer class="marketplace-footer mono">
       <div class="footer-copy">
         <span>[ MSH OPS ]</span>
-        <span>[ PUBLIC MARKETPLACE :: LIVE REGISTRY ]</span>
+        <span>[ OPERATOR MEMBERSHIP :: LIVE REGISTRY ]</span>
       </div>
       <div
         class="audio-player"
