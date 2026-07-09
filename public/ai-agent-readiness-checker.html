@@ -20,9 +20,10 @@
     <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/readiness.css" />
     <link rel="stylesheet" href="/styles/a11y.css" />
   </head>
-  <body>
+  <body class="readiness-app">
     <div class="fx-overlay" aria-hidden="true"></div>
     <header class="topbar">
       <a class="brand" href="/">
@@ -40,9 +41,9 @@
       </nav>
     </header>
 
-    <main class="page-shell">
+    <main class="page-shell readiness-shell">
       <section class="hero-shell">
-        <article class="hero-panel bracket">
+        <article class="hero-panel bracket readiness-hero-panel">
           <div class="bracket-inner hero-copy">
             <p class="section-label mono">[ PUBLIC_APP :: AI_AGENT_READINESS_CHECKER_V1 ]</p>
             <h1>AI Agent Readiness Checker</h1>
@@ -64,14 +65,14 @@
             <h2>Answer the build-readiness questionnaire</h2>
           </div>
         </div>
-        <div class="services-layout">
-          <article class="contact-form-shell bracket">
+        <div class="services-layout readiness-layout">
+          <article class="contact-form-shell bracket readiness-form-shell">
             <div class="bracket-inner">
               <h3>Agent readiness questionnaire</h3>
               <p class="system-copy">
                 This is a deterministic advisory tool. It does not execute tools, connect systems, or trigger agent actions.
               </p>
-              <form class="contact-form" id="agent-readiness-form">
+              <form class="contact-form readiness-form" id="agent-readiness-form">
                 <label>
                   <span>1. Agent Goal</span>
                   <select name="agent_goal" required>
@@ -196,7 +197,7 @@
                   </select>
                 </label>
 
-                <div class="hero-actions">
+                <div class="hero-actions readiness-actions">
                   <button class="button primary" type="submit" id="agent-readiness-submit">Check Agent Readiness</button>
                   <button class="button ghost" type="reset">Reset</button>
                 </div>
@@ -207,7 +208,7 @@
             </div>
           </article>
 
-          <article class="telemetry-card bracket">
+          <article class="telemetry-card bracket readiness-result-card">
             <div class="bracket-inner" id="agent-readiness-result">
               <p class="section-label mono">[ RESULT_SCREEN ]</p>
               <h3>Agent readiness findings will appear here.</h3>
@@ -220,7 +221,7 @@
       </section>
 
       <section class="section-block">
-        <article class="telemetry-card bracket">
+        <article class="telemetry-card bracket readiness-cta-card">
           <div class="bracket-inner footer-architecture">
             <div class="section-heading">
               <div>

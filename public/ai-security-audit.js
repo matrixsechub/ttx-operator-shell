@@ -194,6 +194,12 @@ function renderResult(result) {
           <p class="stat-num">${escapeHtml(String(result.priority).toUpperCase())}</p>
         </div>
       </article>
+      <article class="stat-panel bracket">
+        <div class="bracket-inner">
+          <p class="stat-label mono">[ LIFECYCLE ]</p>
+          <p class="stat-num">${escapeHtml(String(result.lifecycle?.lifecycle_label || "Validated").toUpperCase())}</p>
+        </div>
+      </article>
     </div>
     <div class="telemetry-grid">
       ${(result.top_risks || [])

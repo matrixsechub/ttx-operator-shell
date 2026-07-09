@@ -148,10 +148,34 @@ const riskMetadata = {
   },
 };
 
+const AUDIT_LIFECYCLE_SEQUENCE = ["received", "validated", "queued", "processed"];
+const AUDIT_LIFECYCLE_LABELS = {
+  received: "Pending Intake",
+  validated: "Validated",
+  queued: "Queued",
+  processed: "Processed",
+};
+const AUDIT_QUEUE_WEIGHT = {
+  queued: 0,
+  validated: 1,
+  received: 2,
+  processed: 3,
+};
+
 const auditLiteSubmissions = [];
+const auditLiteHealth = {
+  audit_lite_received: 0,
+  audit_lite_validated: 0,
+  audit_lite_processed: 0,
+};
 
 function normalizeText(value) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeNullable(value) {
+  const normalized = normalizeText(value);
+  return normalized || null;
 }
 
 function normalizeArray(values) {
@@ -372,6 +396,23 @@ function computeAuditLiteResult(answers, auditId = generateAuditLiteId()) {
   };
 }
 
+function cloneTopRisks(topRisks = []) {
+  return topRisks.map((risk) => ({ ...risk }));
+}
+
+function buildLifecycleEntry(status, at, note = null) {
+  return {
+    status,
+    label: AUDIT_LIFECYCLE_LABELS[status] || status,
+    at: at || new Date().toISOString(),
+    note: note || null,
+  };
+}
+
+function ensureTimeline(submission = {}) {
+  return Array.isArray(submission.lifecycle_timeline) ? submission.lifecycle_timeline : [];
+}
+
 function upsertAuditLiteSubmission(submission) {
   const index = auditLiteSubmissions.findIndex((entry) => entry.audit_id === submission.audit_id);
   if (index >= 0) {
@@ -383,8 +424,98 @@ function upsertAuditLiteSubmission(submission) {
   return submission;
 }
 
-function recordAuditLiteSubmission(answers, result) {
+function ensureAuditLiteSubmission(details = {}) {
+  const auditId = normalizeText(details.audit_id || details.auditId);
+  if (!auditId) {
+    return null;
+  }
+
+  const existing = auditLiteSubmissions.find((entry) => entry.audit_id === auditId);
+  if (existing) {
+    return existing;
+  }
+
   return upsertAuditLiteSubmission({
+    audit_id: auditId,
+    created_at: details.created_at || new Date().toISOString(),
+    source_route: normalizeText(details.source_route || details.source) || "audit-lite",
+    company_type: normalizeText(details.company_type) || "",
+    ai_tools_used: normalizeArray(details.ai_tools_used),
+    data_used_with_ai: normalizeArray(details.data_used_with_ai),
+    ai_exposure: normalizeText(details.ai_exposure),
+    governance_controls: normalizeArray(details.governance_controls),
+    main_concern: normalizeText(details.main_concern),
+    risk_score: Number.isFinite(Number(details.risk_score)) ? Number(details.risk_score) : 0,
+    risk_tier: normalizeText(details.risk_tier) || "low",
+    priority: normalizeText(details.priority) || "low",
+    top_risks: cloneTopRisks(details.top_risks),
+    recommended_service: normalizeText(details.recommended_service) || "ai_security_audit",
+    next_route: normalizeText(details.next_route),
+    engagement_id: normalizeNullable(details.engagement_id || details.engagementId),
+    status: "audit-lite-complete",
+    lifecycle_status: "received",
+    lifecycle_label: AUDIT_LIFECYCLE_LABELS.received,
+    lifecycle_timeline: [],
+  });
+}
+
+function incrementHealthCounter(status) {
+  if (status === "received") {
+    auditLiteHealth.audit_lite_received += 1;
+  }
+  if (status === "validated") {
+    auditLiteHealth.audit_lite_validated += 1;
+  }
+  if (status === "processed") {
+    auditLiteHealth.audit_lite_processed += 1;
+  }
+}
+
+function advanceAuditLiteLifecycle(auditId, targetStatus, patch = {}) {
+  const normalizedId = normalizeText(auditId);
+  if (!normalizedId || !AUDIT_LIFECYCLE_SEQUENCE.includes(targetStatus)) {
+    return null;
+  }
+
+  const submission = ensureAuditLiteSubmission({ audit_id: normalizedId, ...patch });
+  if (!submission) {
+    return null;
+  }
+
+  const now = patch.updated_at || new Date().toISOString();
+  const timeline = ensureTimeline(submission);
+  const reached = new Set(timeline.map((entry) => entry.status));
+  const targetIndex = AUDIT_LIFECYCLE_SEQUENCE.indexOf(targetStatus);
+
+  for (let index = 0; index <= targetIndex; index += 1) {
+    const status = AUDIT_LIFECYCLE_SEQUENCE[index];
+    if (!reached.has(status)) {
+      timeline.push(buildLifecycleEntry(status, now, index === targetIndex ? patch.lifecycle_note : null));
+      reached.add(status);
+      incrementHealthCounter(status);
+    }
+  }
+
+  submission.lifecycle_timeline = timeline;
+  submission.lifecycle_status = targetStatus;
+  submission.lifecycle_label = AUDIT_LIFECYCLE_LABELS[targetStatus] || targetStatus;
+  submission.status = normalizeText(patch.status) || submission.status || "audit-lite-complete";
+  submission.engagement_id =
+    normalizeNullable(patch.engagement_id || patch.engagementId) || submission.engagement_id || null;
+  submission.risk_score = Number.isFinite(Number(patch.risk_score)) ? Number(patch.risk_score) : submission.risk_score;
+  submission.risk_tier = normalizeText(patch.risk_tier) || submission.risk_tier || "low";
+  submission.priority = normalizeText(patch.priority) || submission.priority || "low";
+  submission.recommended_service =
+    normalizeText(patch.recommended_service || patch.recommendedService) || submission.recommended_service || "ai_security_audit";
+  if (Array.isArray(patch.top_risks) && patch.top_risks.length) {
+    submission.top_risks = cloneTopRisks(patch.top_risks);
+  }
+
+  return upsertAuditLiteSubmission(submission);
+}
+
+function recordAuditLiteSubmission(answers, result) {
+  const submission = upsertAuditLiteSubmission({
     audit_id: result.audit_id,
     created_at: new Date().toISOString(),
     source_route: answers.source_route,
@@ -397,11 +528,23 @@ function recordAuditLiteSubmission(answers, result) {
     risk_score: result.risk_score,
     risk_tier: result.risk_tier,
     priority: result.priority,
-    top_risks: result.top_risks.map((risk) => ({ ...risk })),
+    top_risks: cloneTopRisks(result.top_risks),
     recommended_service: "ai_security_audit",
     next_route: result.next_route,
     engagement_id: null,
     status: "audit-lite-complete",
+    lifecycle_status: "received",
+    lifecycle_label: AUDIT_LIFECYCLE_LABELS.received,
+    lifecycle_timeline: [],
+  });
+
+  advanceAuditLiteLifecycle(result.audit_id, "received", {
+    created_at: submission.created_at,
+    lifecycle_note: "Audit lite submission captured.",
+  });
+  return advanceAuditLiteLifecycle(result.audit_id, "validated", {
+    created_at: submission.created_at,
+    lifecycle_note: "Audit lite payload validated and ready for intake.",
   });
 }
 
@@ -411,56 +554,113 @@ function attachEngagementToAuditLite(details = {}) {
     return null;
   }
 
-  const existing = auditLiteSubmissions.find((entry) => entry.audit_id === auditId);
-  const base =
-    existing ||
-    {
-      audit_id: auditId,
-      created_at: details.created_at || new Date().toISOString(),
-      source_route: details.source || "audit-lite",
-      company_type: normalizeText(details.company_type) || "",
-      ai_tools_used: [],
-      data_used_with_ai: [],
-      ai_exposure: "",
-      governance_controls: [],
-      main_concern: "",
-      risk_score: Number.isFinite(Number(details.risk_score)) ? Number(details.risk_score) : 0,
-      risk_tier: normalizeText(details.risk_tier) || "low",
-      priority: normalizeText(details.priority) || "low",
-      top_risks: Array.isArray(details.top_risks) ? details.top_risks : [],
-      recommended_service: "ai_security_audit",
-      next_route: "",
-      status: "audit-lite-complete",
-    };
+  const submission = ensureAuditLiteSubmission({
+    audit_id: auditId,
+    created_at: details.created_at || new Date().toISOString(),
+    source_route: details.source || "audit-lite",
+    company_type: normalizeText(details.company_type) || "",
+    risk_score: details.risk_score,
+    risk_tier: details.risk_tier,
+    priority: details.priority,
+    top_risks: Array.isArray(details.top_risks) ? details.top_risks : [],
+    recommended_service: details.recommended_service || details.recommendedService,
+    next_route: details.next_route,
+    engagement_id: details.engagement_id || details.engagementId,
+  });
 
-  base.engagement_id = normalizeText(details.engagement_id || details.engagementId) || base.engagement_id || null;
-  base.risk_score = Number.isFinite(Number(details.risk_score)) ? Number(details.risk_score) : base.risk_score || 0;
-  base.risk_tier = normalizeText(details.risk_tier) || base.risk_tier || "low";
-  base.priority = normalizeText(details.priority) || base.priority || "low";
-  base.status = normalizeText(details.status) || "intake-received";
-  base.recommended_service = normalizeText(details.recommended_service || details.recommendedService) || "ai_security_audit";
-  if (Array.isArray(details.top_risks) && details.top_risks.length) {
-    base.top_risks = details.top_risks;
+  if (!submission) {
+    return null;
   }
 
-  return upsertAuditLiteSubmission(base);
+  if (!ensureTimeline(submission).some((entry) => entry.status === "validated")) {
+    advanceAuditLiteLifecycle(auditId, "validated", {
+      created_at: submission.created_at,
+      lifecycle_note: "Audit lite context reconstructed for intake lifecycle.",
+    });
+  }
+
+  return advanceAuditLiteLifecycle(auditId, "queued", {
+    engagement_id: details.engagement_id || details.engagementId,
+    risk_score: details.risk_score,
+    risk_tier: details.risk_tier,
+    priority: details.priority,
+    recommended_service: details.recommended_service || details.recommendedService,
+    top_risks: details.top_risks,
+    created_at: details.created_at || submission.created_at,
+    status: normalizeText(details.status) || "intake-received",
+    lifecycle_note: "Engagement linked and routed into intake queue.",
+  });
 }
 
-function listAuditLiteQueue(engagements = []) {
+function markAuditLiteProcessed(auditId, note = "Operator view acknowledged the queued audit-lite record.") {
+  return advanceAuditLiteLifecycle(auditId, "processed", {
+    status: "processed",
+    lifecycle_note: note,
+  });
+}
+
+function getAuditLiteSubmission(auditId) {
+  const normalizedId = normalizeText(auditId);
+  if (!normalizedId) {
+    return null;
+  }
+  return auditLiteSubmissions.find((entry) => entry.audit_id === normalizedId) || null;
+}
+
+function buildLifecycleSnapshot(submission = {}, engagement = null) {
+  const lifecycleStatus = normalizeText(submission.lifecycle_status) || "received";
+  return {
+    audit_id: submission.audit_id,
+    selector_id: null,
+    engagement_id: submission.engagement_id || engagement?.id || null,
+    recommended_service: submission.recommended_service || "ai_security_audit",
+    risk_score: submission.risk_score ?? 0,
+    risk_tier: submission.risk_tier || "low",
+    top_risks: cloneTopRisks(submission.top_risks),
+    status: lifecycleStatus,
+    lifecycle_status: lifecycleStatus,
+    lifecycle_label: submission.lifecycle_label || AUDIT_LIFECYCLE_LABELS[lifecycleStatus] || lifecycleStatus,
+    lifecycle_timeline: ensureTimeline(submission).map((entry) => ({ ...entry })),
+    observer_mode: lifecycleStatus === "received" || lifecycleStatus === "validated",
+    operator_mode: lifecycleStatus === "processed",
+    next_route: submission.next_route || null,
+    created_at: submission.created_at || engagement?.createdAt || null,
+  };
+}
+
+function getAuditLiteLifecycle(auditId, engagements = []) {
+  const submission = getAuditLiteSubmission(auditId);
+  if (!submission) {
+    return null;
+  }
+  const engagement = engagements.find((entry) => entry.auditId === submission.audit_id) || null;
+  return buildLifecycleSnapshot(submission, engagement);
+}
+
+function listAuditLiteQueue(engagements = [], options = {}) {
+  const shouldMarkProcessed = Boolean(options.markProcessed);
   const queue = [];
 
   for (const submission of auditLiteSubmissions) {
-    const linkedEngagement = engagements.find((entry) => entry.auditId && entry.auditId === submission.audit_id);
+    const linkedEngagement = engagements.find((entry) => entry.auditId && entry.auditId === submission.audit_id) || null;
+    const activeSubmission =
+      shouldMarkProcessed && linkedEngagement && submission.lifecycle_status === "queued"
+        ? markAuditLiteProcessed(submission.audit_id)
+        : submission;
+
     queue.push({
-      audit_id: submission.audit_id,
-      engagement_id: submission.engagement_id || linkedEngagement?.id || null,
-      risk_score: submission.risk_score,
-      risk_tier: submission.risk_tier,
-      priority: submission.priority,
-      top_risk_category: submission.top_risks?.[0]?.category || null,
-      recommended_service: submission.recommended_service,
-      status: linkedEngagement?.status || submission.status,
-      created_at: linkedEngagement?.createdAt || submission.created_at,
+      audit_id: activeSubmission.audit_id,
+      engagement_id: activeSubmission.engagement_id || linkedEngagement?.id || null,
+      risk_score: activeSubmission.risk_score,
+      risk_tier: activeSubmission.risk_tier,
+      priority: activeSubmission.priority,
+      top_risk_category: activeSubmission.top_risks?.[0]?.category || null,
+      recommended_service: activeSubmission.recommended_service,
+      status: linkedEngagement?.status || activeSubmission.status,
+      lifecycle_status: activeSubmission.lifecycle_status || "received",
+      lifecycle_label: activeSubmission.lifecycle_label || AUDIT_LIFECYCLE_LABELS.received,
+      lifecycle_timeline: ensureTimeline(activeSubmission).map((entry) => ({ ...entry })),
+      created_at: linkedEngagement?.createdAt || activeSubmission.created_at,
     });
   }
 
@@ -468,31 +668,115 @@ function listAuditLiteQueue(engagements = []) {
     if (!engagement.auditId) {
       continue;
     }
-    if (queue.some((entry) => entry.engagement_id === engagement.id)) {
+    if (queue.some((entry) => entry.audit_id === engagement.auditId)) {
       continue;
     }
-    queue.push({
+    const submission = attachEngagementToAuditLite({
       audit_id: engagement.auditId,
       engagement_id: engagement.id,
       risk_score: engagement.riskScore || 0,
       risk_tier: engagement.riskTier || "low",
       priority: engagement.priority || "low",
-      top_risk_category: engagement.topRiskCategory || null,
       recommended_service: engagement.recommendedService || "ai_security_audit",
       status: engagement.status || "intake-received",
+      created_at: engagement.createdAt || new Date().toISOString(),
+    });
+
+    queue.push({
+      audit_id: engagement.auditId,
+      engagement_id: engagement.id,
+      risk_score: submission?.risk_score ?? engagement.riskScore ?? 0,
+      risk_tier: submission?.risk_tier || engagement.riskTier || "low",
+      priority: submission?.priority || engagement.priority || "low",
+      top_risk_category: submission?.top_risks?.[0]?.category || engagement.topRiskCategory || null,
+      recommended_service: submission?.recommended_service || engagement.recommendedService || "ai_security_audit",
+      status: engagement.status || "intake-received",
+      lifecycle_status: submission?.lifecycle_status || "queued",
+      lifecycle_label: submission?.lifecycle_label || AUDIT_LIFECYCLE_LABELS.queued,
+      lifecycle_timeline: ensureTimeline(submission).map((entry) => ({ ...entry })),
       created_at: engagement.createdAt || null,
     });
   }
 
-  return queue.sort((left, right) => String(right.created_at || "").localeCompare(String(left.created_at || "")));
+  return queue.sort((left, right) => {
+    const leftRank = AUDIT_QUEUE_WEIGHT[left.lifecycle_status] ?? 99;
+    const rightRank = AUDIT_QUEUE_WEIGHT[right.lifecycle_status] ?? 99;
+    if (leftRank !== rightRank) {
+      return leftRank - rightRank;
+    }
+    if ((right.risk_score || 0) !== (left.risk_score || 0)) {
+      return (right.risk_score || 0) - (left.risk_score || 0);
+    }
+    return String(right.created_at || "").localeCompare(String(left.created_at || ""));
+  });
+}
+
+function buildRiskTierDistribution(rows = []) {
+  return rows.reduce(
+    (distribution, row) => {
+      const tier = normalizeText(row.risk_tier) || "low";
+      distribution[tier] = (distribution[tier] || 0) + 1;
+      return distribution;
+    },
+    { low: 0, medium: 0, high: 0, critical: 0 },
+  );
+}
+
+function buildLifecycleDistribution(rows = []) {
+  return rows.reduce(
+    (distribution, row) => {
+      const status = normalizeText(row.lifecycle_status) || "received";
+      distribution[status] = (distribution[status] || 0) + 1;
+      return distribution;
+    },
+    { received: 0, validated: 0, queued: 0, processed: 0 },
+  );
+}
+
+function getAuditLiteHealthRecord() {
+  return { ...auditLiteHealth };
+}
+
+function getAuditLiteOperatorSnapshot(engagements = [], options = {}) {
+  const rows = listAuditLiteQueue(engagements, options);
+  return {
+    rows,
+    summary: {
+      total: rows.length,
+      last_10_submissions: rows.slice(0, 10),
+      risk_tier_distribution: buildRiskTierDistribution(rows),
+      lifecycle_distribution: buildLifecycleDistribution(rows),
+      health: getAuditLiteHealthRecord(),
+    },
+  };
+}
+
+function getAuditLiteMarketplaceSummary(engagements = []) {
+  const rows = listAuditLiteQueue(engagements);
+  const latest = rows[0] || null;
+  return {
+    total_submissions: rows.length,
+    latest_lifecycle_status: latest?.lifecycle_status || "received",
+    latest_lifecycle_label: latest?.lifecycle_label || AUDIT_LIFECYCLE_LABELS.received,
+    observer_mode: Boolean(latest && latest.lifecycle_status !== "processed"),
+    operator_mode: Boolean(latest && latest.lifecycle_status === "processed"),
+    risk_tier_distribution: buildRiskTierDistribution(rows),
+  };
 }
 
 export default {
+  AUDIT_LIFECYCLE_LABELS,
   auditLiteMarketplaceModule,
   auditLiteSubmissions,
   normalizeAuditLiteAnswers,
   computeAuditLiteResult,
   recordAuditLiteSubmission,
   attachEngagementToAuditLite,
+  markAuditLiteProcessed,
+  getAuditLiteSubmission,
+  getAuditLiteLifecycle,
   listAuditLiteQueue,
+  getAuditLiteHealthRecord,
+  getAuditLiteOperatorSnapshot,
+  getAuditLiteMarketplaceSummary,
 };

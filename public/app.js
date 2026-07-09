@@ -187,6 +187,49 @@ function renderFederationStrip(version) {
     .join("");
 }
 
+function renderAuditLitePanel(snapshot = {}) {
+  const target = document.getElementById("audit-lite-operator-panel-grid");
+  if (!target) {
+    return;
+  }
+
+  const summary = snapshot.summary || {};
+  const lastRows = Array.isArray(summary.last_10_submissions) ? summary.last_10_submissions.slice(0, 10) : [];
+  const risk = summary.risk_tier_distribution || {};
+  const lifecycle = summary.lifecycle_distribution || {};
+
+  target.innerHTML = [
+    buildCard(
+      "AUDIT_LITE",
+      `${summary.total || 0} submissions`,
+      "Audit-lite routes are lifecycle-backed before the operator queue touches them.",
+      [
+        `Pending intake :: ${lifecycle.received || 0}`,
+        `Validated :: ${lifecycle.validated || 0}`,
+        `Queued :: ${lifecycle.queued || 0}`,
+        `Processed :: ${lifecycle.processed || 0}`,
+      ],
+    ),
+    buildCard(
+      "RISK_TIERS",
+      `Critical ${risk.critical || 0}`,
+      "Risk-tier distribution for the last visible audit-lite submissions.",
+      [
+        `Low :: ${risk.low || 0}`,
+        `Medium :: ${risk.medium || 0}`,
+        `High :: ${risk.high || 0}`,
+        `Critical :: ${risk.critical || 0}`,
+      ],
+    ),
+    buildCard(
+      "LAST_10",
+      lastRows[0]?.audit_id || "No submissions",
+      "Most recent audit-lite submissions routed through IntakeAgentV2 lifecycle.",
+      lastRows.slice(0, 5).map((row) => `${row.audit_id} :: ${row.lifecycle_label} :: ${row.risk_tier}`),
+    ),
+  ].join("");
+}
+
 function updateHero(model) {
   const version = model.version;
   const heartbeat = model.heartbeat;
@@ -212,6 +255,7 @@ async function loadDashboard() {
     certificationResult,
     heartbeatResult,
     identityResult,
+    auditLiteResult,
   ] = await Promise.allSettled([
     fetchJson("/api/os/version"),
     fetchJson("/api/os/governance"),
@@ -220,6 +264,7 @@ async function loadDashboard() {
     fetchJson("/api/os/certification"),
     fetchJson("/api/os/heartbeat"),
     fetchJson("/api/identity"),
+    fetchJson("/api/operator/audit-lite"),
   ]);
 
   const identity = identityResult.status === "fulfilled" ? identityResult.value : {};
@@ -248,11 +293,13 @@ async function loadDashboard() {
         kvHealth: null,
         divisionUptimeStartedAt: null,
       };
+  const auditLite = auditLiteResult.status === "fulfilled" ? auditLiteResult.value : { rows: [], summary: {} };
 
-  const model = { version, governance, releases, integrations, certification, heartbeat, identity };
+  const model = { version, governance, releases, integrations, certification, heartbeat, identity, auditLite };
   updateHero(model);
   renderSystemCards(model);
   renderFederationStrip(version);
+  renderAuditLitePanel(auditLite);
 }
 
 async function boot() {
