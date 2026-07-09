@@ -7,6 +7,7 @@ import promptInjectionScanner from "./data/promptInjectionScanner.js";
 import agentReadinessChecker from "./data/agentReadinessChecker.js";
 import automationRoiCalculator from "./data/automationRoiCalculator.js";
 import ragRiskAnalyzer from "./data/ragRiskAnalyzer.js";
+import localAiReadinessChecker from "./data/localAiReadinessChecker.js";
 import intakeAgent from "./agents/intakeAgent.js";
 import securityIntakeAgent from "./agents/securityIntakeAgent.js";
 import cloudflareSecurityAudit from "./data/cloudflareSecurityAudit.js";
@@ -252,6 +253,14 @@ const {
   listRagRiskQueue,
 } = ragRiskAnalyzer;
 const {
+  localAiReadinessMarketplaceModule,
+  normalizeLocalAiReadinessAnswers,
+  computeLocalAiReadinessResult,
+  recordLocalAiReadinessSubmission,
+  attachEngagementToLocalAiReadiness,
+  listLocalAiReadinessQueue,
+} = localAiReadinessChecker;
+const {
   isOperatorSurfaceRequest,
   startSecurityAudit,
   applySecurityAuditWebhook,
@@ -337,6 +346,10 @@ export default {
         return serveStatic(request, env, "/rag-risk-analyzer.html");
       }
 
+      if (url.pathname === "/apps/local-ai-readiness-checker" || url.pathname === "/apps/local-ai-readiness-checker/") {
+        return serveStatic(request, env, "/local-ai-readiness-checker.html");
+      }
+
       if (url.pathname === "/operator" || url.pathname === "/operator/") {
         return serveStatic(request, env, "/operator.html");
       }
@@ -369,6 +382,10 @@ export default {
         return serveStatic(request, env, "/rag-risk-operator.html");
       }
 
+      if (url.pathname === "/operator/local-ai-readiness" || url.pathname === "/operator/local-ai-readiness/") {
+        return serveStatic(request, env, "/local-ai-readiness-operator.html");
+      }
+
       if (url.pathname === "/operator/agents/intake" || url.pathname === "/operator/agents/intake/") {
         return serveStatic(request, env, "/operator-agents-intake.html");
       }
@@ -383,6 +400,10 @@ export default {
 
       if (url.pathname === "/register" || url.pathname === "/register/") {
         return serveStatic(request, env, "/register.html");
+      }
+
+      if (url.pathname === "/onboarding" || url.pathname === "/onboarding/") {
+        return serveStatic(request, env, "/onboarding.html");
       }
 
       if (url.pathname === "/marketplace" || url.pathname === "/marketplace/") {
@@ -595,6 +616,10 @@ function resolveStaticPath(requestPath) {
     return "/rag-risk-analyzer.html";
   }
 
+  if (normalizedRequestPath === "/apps/local-ai-readiness-checker" || normalizedRequestPath === "/apps/local-ai-readiness-checker/") {
+    return "/local-ai-readiness-checker.html";
+  }
+
   if (normalizedRequestPath === "/operator" || normalizedRequestPath === "/operator/") {
     return "/operator.html";
   }
@@ -627,6 +652,10 @@ function resolveStaticPath(requestPath) {
     return "/rag-risk-operator.html";
   }
 
+  if (normalizedRequestPath === "/operator/local-ai-readiness" || normalizedRequestPath === "/operator/local-ai-readiness/") {
+    return "/local-ai-readiness-operator.html";
+  }
+
   if (normalizedRequestPath === "/operator/agents/intake" || normalizedRequestPath === "/operator/agents/intake/") {
     return "/operator-agents-intake.html";
   }
@@ -641,6 +670,10 @@ function resolveStaticPath(requestPath) {
 
   if (normalizedRequestPath === "/register" || normalizedRequestPath === "/register/") {
     return "/register.html";
+  }
+
+  if (normalizedRequestPath === "/onboarding" || normalizedRequestPath === "/onboarding/") {
+    return "/onboarding.html";
   }
 
   if (normalizedRequestPath === "/marketplace" || normalizedRequestPath === "/marketplace/") {
@@ -843,6 +876,15 @@ function normalizeEngagementPayload(payload) {
     buildComplexity: normalizeNullable(payload.build_complexity || payload.buildComplexity),
     automationComplexity: normalizeNullable(payload.automation_complexity || payload.automationComplexity),
     safetyLevel: normalizeNullable(payload.safety_level || payload.safetyLevel),
+    localAiCheckId: normalizeNullable(payload.local_ai_check_id || payload.localAiCheckId),
+    localAiReadinessScore: Number.isFinite(Number(payload.local_ai_readiness_score))
+      ? Number(payload.local_ai_readiness_score)
+      : null,
+    privacyNeedLevel: normalizeNullable(payload.privacy_need_level || payload.privacyNeedLevel),
+    hardwareReadiness: normalizeNullable(payload.hardware_readiness || payload.hardwareReadiness),
+    dataSensitivityLevel: normalizeNullable(payload.data_sensitivity_level || payload.dataSensitivityLevel),
+    deploymentComplexity: normalizeNullable(payload.deployment_complexity || payload.deploymentComplexity),
+    governanceGapLevel: normalizeNullable(payload.governance_gap_level || payload.governanceGapLevel),
   };
 }
 
@@ -3625,6 +3667,18 @@ async function handleApi(request, env, url) {
     }
   }
 
+  if (method === "POST" && pathname === "/api/local-ai-readiness-check") {
+    try {
+      const payload = await readBody(request);
+      const answers = normalizeLocalAiReadinessAnswers(payload);
+      const result = computeLocalAiReadinessResult(answers);
+      recordLocalAiReadinessSubmission(answers, result);
+      return json(result, 200, { "Cache-Control": "no-store" });
+    } catch (error) {
+      return json({ error: error.message || "local-ai-readiness-check-failed" }, 400);
+    }
+  }
+
   if (method === "POST" && pathname === "/api/os/route") {
     try {
       const body = await readBody(request);
@@ -5289,6 +5343,13 @@ async function handleApi(request, env, url) {
         buildComplexity: engagementPayload.buildComplexity,
         automationComplexity: engagementPayload.automationComplexity,
         safetyLevel: engagementPayload.safetyLevel,
+        localAiCheckId: engagementPayload.localAiCheckId,
+        localAiReadinessScore: engagementPayload.localAiReadinessScore,
+        privacyNeedLevel: engagementPayload.privacyNeedLevel,
+        hardwareReadiness: engagementPayload.hardwareReadiness,
+        dataSensitivityLevel: engagementPayload.dataSensitivityLevel,
+        deploymentComplexity: engagementPayload.deploymentComplexity,
+        governanceGapLevel: engagementPayload.governanceGapLevel,
         topRiskCategory: null,
         status: "intake-received",
         createdAt: new Date().toISOString(),
@@ -5370,6 +5431,23 @@ async function handleApi(request, env, url) {
         retrieval_exposure_level: engagement.retrievalExposureLevel,
         access_control_level: engagement.accessControlLevel,
         governance_maturity: engagement.governanceMaturity,
+        priority: engagement.priority,
+        recommended_service: engagement.recommendedService || engagement.moduleInterest,
+        secondary_service: engagement.secondaryService,
+        status: engagement.status,
+        created_at: engagement.createdAt,
+        source: engagement.source,
+      });
+      attachEngagementToLocalAiReadiness({
+        local_ai_check_id: engagement.localAiCheckId,
+        engagement_id: engagement.id,
+        local_ai_readiness_score: engagement.localAiReadinessScore,
+        readiness_tier: engagement.readinessTier,
+        privacy_need_level: engagement.privacyNeedLevel,
+        hardware_readiness: engagement.hardwareReadiness,
+        data_sensitivity_level: engagement.dataSensitivityLevel,
+        deployment_complexity: engagement.deploymentComplexity,
+        governance_gap_level: engagement.governanceGapLevel,
         priority: engagement.priority,
         recommended_service: engagement.recommendedService || engagement.moduleInterest,
         secondary_service: engagement.secondaryService,
@@ -5570,6 +5648,12 @@ async function handleApi(request, env, url) {
     });
   }
 
+  if (method === "GET" && pathname === "/api/operator/local-ai-readiness") {
+    return json({
+      rows: listLocalAiReadinessQueue(engagements),
+    });
+  }
+
   if (method === "GET" && pathname === "/api/marketplace/service-modules") {
     return json({
       modules: [
@@ -5582,6 +5666,7 @@ async function handleApi(request, env, url) {
         agentReadinessMarketplaceModule,
         automationRoiMarketplaceModule,
         ragRiskMarketplaceModule,
+        localAiReadinessMarketplaceModule,
         buildPublicRegisterMarketplacePayload(),
       ],
     });

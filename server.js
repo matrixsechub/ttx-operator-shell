@@ -76,6 +76,14 @@ const {
   listRagRiskQueue
 } = require("./data/ragRiskAnalyzer");
 const {
+  localAiReadinessMarketplaceModule,
+  normalizeLocalAiReadinessAnswers,
+  computeLocalAiReadinessResult,
+  recordLocalAiReadinessSubmission,
+  attachEngagementToLocalAiReadiness,
+  listLocalAiReadinessQueue
+} = require("./data/localAiReadinessChecker");
+const {
   publicRegisterMarketplaceModule,
   normalizePublicRegisterAnswers,
   computePublicRegisterResult,
@@ -204,6 +212,10 @@ function resolveStaticPath(requestPath) {
     return "/rag-risk-analyzer.html";
   }
 
+  if (requestPath === "/apps/local-ai-readiness-checker" || requestPath === "/apps/local-ai-readiness-checker/") {
+    return "/local-ai-readiness-checker.html";
+  }
+
   if (requestPath === "/marketplace" || requestPath === "/marketplace/") {
     return "/marketplace.html";
   }
@@ -244,6 +256,10 @@ function resolveStaticPath(requestPath) {
     return "/rag-risk-operator.html";
   }
 
+  if (requestPath === "/operator/local-ai-readiness" || requestPath === "/operator/local-ai-readiness/") {
+    return "/local-ai-readiness-operator.html";
+  }
+
   if (requestPath === "/operator/agents/intake" || requestPath === "/operator/agents/intake/") {
     return "/operator-agents-intake.html";
   }
@@ -258,6 +274,10 @@ function resolveStaticPath(requestPath) {
 
   if (requestPath === "/register" || requestPath === "/register/") {
     return "/register.html";
+  }
+
+  if (requestPath === "/onboarding" || requestPath === "/onboarding/") {
+    return "/onboarding.html";
   }
 
   if (requestPath === "/api-explorer" || requestPath === "/api-explorer/") {
@@ -444,7 +464,16 @@ function normalizeEngagementPayload(payload) {
     governanceMaturity: normalizeNullable(payload.governance_maturity || payload.governanceMaturity),
     buildComplexity: normalizeNullable(payload.build_complexity || payload.buildComplexity),
     automationComplexity: normalizeNullable(payload.automation_complexity || payload.automationComplexity),
-    safetyLevel: normalizeNullable(payload.safety_level || payload.safetyLevel)
+    safetyLevel: normalizeNullable(payload.safety_level || payload.safetyLevel),
+    localAiCheckId: normalizeNullable(payload.local_ai_check_id || payload.localAiCheckId),
+    localAiReadinessScore: Number.isFinite(Number(payload.local_ai_readiness_score))
+      ? Number(payload.local_ai_readiness_score)
+      : null,
+    privacyNeedLevel: normalizeNullable(payload.privacy_need_level || payload.privacyNeedLevel),
+    hardwareReadiness: normalizeNullable(payload.hardware_readiness || payload.hardwareReadiness),
+    dataSensitivityLevel: normalizeNullable(payload.data_sensitivity_level || payload.dataSensitivityLevel),
+    deploymentComplexity: normalizeNullable(payload.deployment_complexity || payload.deploymentComplexity),
+    governanceGapLevel: normalizeNullable(payload.governance_gap_level || payload.governanceGapLevel)
   };
 }
 
@@ -650,6 +679,19 @@ async function handleApi(request, response, url) {
     return;
   }
 
+  if (method === "POST" && pathname === "/api/local-ai-readiness-check") {
+    try {
+      const payload = await readBody(request);
+      const answers = normalizeLocalAiReadinessAnswers(payload);
+      const result = computeLocalAiReadinessResult(answers);
+      recordLocalAiReadinessSubmission(answers, result);
+      sendJson(response, 200, result, { "Cache-Control": "no-store" });
+    } catch (error) {
+      sendJson(response, 400, { error: error.message || "local-ai-readiness-check-failed" });
+    }
+    return;
+  }
+
   if (method === "GET" && pathname === "/api/modules") {
     sendJson(response, 200, { modules: modules.map(serializeModuleSummary) });
     return;
@@ -761,6 +803,13 @@ async function handleApi(request, response, url) {
         buildComplexity: engagementPayload.buildComplexity,
         automationComplexity: engagementPayload.automationComplexity,
         safetyLevel: engagementPayload.safetyLevel,
+        localAiCheckId: engagementPayload.localAiCheckId,
+        localAiReadinessScore: engagementPayload.localAiReadinessScore,
+        privacyNeedLevel: engagementPayload.privacyNeedLevel,
+        hardwareReadiness: engagementPayload.hardwareReadiness,
+        dataSensitivityLevel: engagementPayload.dataSensitivityLevel,
+        deploymentComplexity: engagementPayload.deploymentComplexity,
+        governanceGapLevel: engagementPayload.governanceGapLevel,
         topRiskCategory: null,
         status: "intake-received",
         createdAt: new Date().toISOString()
@@ -844,6 +893,23 @@ async function handleApi(request, response, url) {
         retrieval_exposure_level: engagement.retrievalExposureLevel,
         access_control_level: engagement.accessControlLevel,
         governance_maturity: engagement.governanceMaturity,
+        priority: engagement.priority,
+        recommended_service: engagement.recommendedService || engagement.moduleInterest,
+        secondary_service: engagement.secondaryService,
+        status: engagement.status,
+        created_at: engagement.createdAt,
+        source: engagement.source
+      });
+      attachEngagementToLocalAiReadiness({
+        local_ai_check_id: engagement.localAiCheckId,
+        engagement_id: engagement.id,
+        local_ai_readiness_score: engagement.localAiReadinessScore,
+        readiness_tier: engagement.readinessTier,
+        privacy_need_level: engagement.privacyNeedLevel,
+        hardware_readiness: engagement.hardwareReadiness,
+        data_sensitivity_level: engagement.dataSensitivityLevel,
+        deployment_complexity: engagement.deploymentComplexity,
+        governance_gap_level: engagement.governanceGapLevel,
         priority: engagement.priority,
         recommended_service: engagement.recommendedService || engagement.moduleInterest,
         secondary_service: engagement.secondaryService,
@@ -1061,6 +1127,13 @@ async function handleApi(request, response, url) {
     return;
   }
 
+  if (method === "GET" && pathname === "/api/operator/local-ai-readiness") {
+    sendJson(response, 200, {
+      rows: listLocalAiReadinessQueue(engagements)
+    });
+    return;
+  }
+
   if (method === "GET" && pathname === "/api/marketplace/service-modules") {
     sendJson(response, 200, {
       modules: [
@@ -1073,6 +1146,7 @@ async function handleApi(request, response, url) {
         agentReadinessMarketplaceModule,
         automationRoiMarketplaceModule,
         ragRiskMarketplaceModule,
+        localAiReadinessMarketplaceModule,
         buildPublicRegisterMarketplacePayload()
       ]
     });

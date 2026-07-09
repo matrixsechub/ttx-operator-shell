@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS | Operator Onboarding</title>
+    <meta
+      name="description"
+      content="Guided operator onboarding for new MSHOPS members — identity, ecosystem, cockpit preview, and membership activation."
+    />
+    <script>
+      (function canonicalizeOnboardingRoute() {
+        if (window.location.pathname.endsWith(".html")) {
+          window.history.replaceState(null, "", window.location.pathname.slice(0, -5) + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/nav.css" />
+    <link rel="stylesheet" href="/styles/onboarding.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSHOPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS</strong>
+          <span>Operator Onboarding</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/marketplace">Marketplace</a>
+        <a class="register-cta-enterprise pulse mono" href="/register">Register</a>
+        <a href="/ecosystem">Ecosystem</a>
+        <a href="/status">Status</a>
+      </nav>
+    </header>
+
+    <main class="onboarding-shell page-shell">
+      <section class="onboarding-hero rgbgold-module-shell hud-frame reveal" data-reveal="up">
+        <span class="hud-tag">Activation // Guided</span>
+        <p class="section-label mono">[ OPERATOR_ONBOARDING ]</p>
+        <h1 class="glow-pulse cinematic-hook">Welcome, Operator.</h1>
+        <p class="hero-mission">
+          You have entered the MSHOPS operator mission — align with the multi-agent ecosystem,
+          understand cockpit capabilities, and prepare for command-surface access as systems activate.
+        </p>
+        <p class="section-copy mono" id="onboarding-register-ref" hidden></p>
+      </section>
+
+      <div class="onboarding-progress" id="onboarding-progress" aria-label="Onboarding progress"></div>
+
+      <div class="onboarding-stage-viewport" id="onboarding-stage-viewport">
+        <article class="onboarding-stage is-active" data-step="0" aria-labelledby="onboarding-step-1-title">
+          <span class="onboarding-hud-overlay">Step 01 // Identity</span>
+          <p class="section-label mono">[ OPERATOR_IDENTITY ]</p>
+          <h2 id="onboarding-step-1-title">Your operator identity</h2>
+          <p>
+            Registration establishes your operator profile inside the MSHOPS membership plane.
+            Your role, access tier, and intake signals route through the security plane for validation.
+          </p>
+          <p class="section-copy mono">IDENTITY :: registered member :: intake-validated pathway</p>
+        </article>
+
+        <article class="onboarding-stage" data-step="1" aria-labelledby="onboarding-step-2-title">
+          <span class="onboarding-hud-overlay">Step 02 // Ecosystem</span>
+          <p class="section-label mono">[ MULTI_AGENT_ECOSYSTEM ]</p>
+          <h2 id="onboarding-step-2-title">Multi-agent ecosystem</h2>
+          <p>
+            MSHOPS orchestrates intake, security intake, Aurelius analysis, and governance agents
+            through a unified registry. Each agent operates within permission profiles and lifecycle stages.
+          </p>
+          <p class="section-copy mono">AGENTS :: intake_agent_v2 :: security_intake :: aurelius</p>
+        </article>
+
+        <article class="onboarding-stage" data-step="2" aria-labelledby="onboarding-step-3-title">
+          <span class="onboarding-hud-overlay">Step 03 // Cockpit</span>
+          <p class="section-label mono">[ COCKPIT_CAPABILITIES ]</p>
+          <h2 id="onboarding-step-3-title">Cockpit capabilities</h2>
+          <p>
+            The operator cockpit consolidates queues, telemetry, agent orchestration, and security plane
+            insights into one command surface.
+          </p>
+          <div class="onboarding-cockpit-preview" aria-hidden="true"></div>
+        </article>
+
+        <article class="onboarding-stage" data-step="3" aria-labelledby="onboarding-step-4-title">
+          <span class="onboarding-hud-overlay">Step 04 // Membership</span>
+          <p class="section-label mono">[ MEMBERSHIP_BENEFITS ]</p>
+          <h2 id="onboarding-step-4-title">Membership benefits</h2>
+          <p>Your membership unlocks the same benefits surfaced on the marketplace operator theme:</p>
+          <ul class="onboarding-benefit-list">
+            <li>Threat intel stream and federation sync</li>
+            <li>Ecosystem lifecycle visibility from intake to processed</li>
+            <li>Security plane insights and module certification badges</li>
+            <li>Operator-exclusive multi-agent tooling</li>
+          </ul>
+        </article>
+
+        <article class="onboarding-stage" data-step="4" aria-labelledby="onboarding-step-5-title">
+          <span class="onboarding-hud-overlay">Step 05 // Prepare</span>
+          <p class="section-label mono">[ COCKPIT_PREP ]</p>
+          <h2 id="onboarding-step-5-title">Prepare for cockpit access</h2>
+          <p>
+            You are aligned for operator activation. When the cockpit comes online, your registration
+            ensures you receive readiness updates automatically.
+          </p>
+          <div class="onboarding-coming-online" id="onboarding-coming-online" role="status" hidden>
+            ⚠️ Cockpit Coming Online — you will be notified when command-surface access activates.
+          </div>
+          <div class="cta-row" style="margin-top: 1rem">
+            <a class="register-cta-enterprise pulse mono onboarding-final-cta" id="onboarding-cockpit-cta" href="/operator">
+              Enter Operator Cockpit
+            </a>
+            <a class="button secondary" href="/marketplace">Explore Marketplace</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="onboarding-controls">
+        <button class="button ghost" type="button" id="onboarding-prev" disabled>Previous</button>
+        <p class="section-copy mono" id="onboarding-step-label">Step 1 of 5</p>
+        <button class="button primary" type="button" id="onboarding-next">Continue</button>
+      </div>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS operator onboarding</span>
+        <span>Registration → activation → cockpit readiness</span>
+      </div>
+    </footer>
+
+    <script src="/scripts/onboarding.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+  </body>
+</html>

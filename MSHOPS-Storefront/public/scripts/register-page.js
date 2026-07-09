@@ -63,40 +63,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       const result = await response.json();
-      status.textContent = "Access Pending — Operator Review Required";
-      status.dataset.state = "success";
 
-      if (confirmation instanceof HTMLElement) {
-        confirmation.hidden = false;
+      const onboardingParams = new URLSearchParams();
+      if (result.register_id) {
+        onboardingParams.set("register_id", result.register_id);
       }
-
-      if (confirmationCopy instanceof HTMLElement) {
-        confirmationCopy.textContent = "Access Pending — Operator Review Required";
+      if (result.role) {
+        onboardingParams.set("role", result.role);
       }
-
-      if (cockpitNote instanceof HTMLElement) {
-        cockpitNote.hidden = false;
-        cockpitNote.textContent =
-          "You will receive cockpit readiness updates as systems activate.";
-      }
-
-      if (result.next_route && confirmation instanceof HTMLElement) {
-        const ctaRow = confirmation.querySelector(".cta-row");
-        if (ctaRow && !ctaRow.querySelector("[data-register-next-route]")) {
-          const nextLink = document.createElement("a");
-          nextLink.className = "register-cta-enterprise pulse mono";
-          nextLink.href = result.next_route;
-          nextLink.setAttribute("data-register-next-route", "true");
-          nextLink.textContent = "Continue to Intake Funnel";
-          ctaRow.prepend(nextLink);
-        }
-      }
-
-      if (demoNote instanceof HTMLElement) {
-        demoNote.hidden = result.mode !== "demo";
-      }
-
-      form.reset();
+      window.location.assign(`/onboarding?${onboardingParams.toString()}`);
+      return;
     } catch (error) {
       console.error("MSH OPS registration submission failed", error);
       status.textContent = "The registration path is unavailable right now. Please try again shortly.";
