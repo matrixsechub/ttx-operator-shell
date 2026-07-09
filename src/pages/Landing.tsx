@@ -5,7 +5,7 @@ export function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="public-surface public-landing min-h-dvh overflow-hidden bg-op-bg text-op-text">
+    <div className="public-surface public-landing min-h-dvh overflow-x-hidden bg-op-bg text-op-text">
       <div className="public-noise-grid" aria-hidden="true" />
       <div className="public-scanline-overlay" aria-hidden="true" />
       <div className="public-orbital-glow public-orbital-glow--left" aria-hidden="true" />
@@ -80,7 +80,7 @@ export function Landing() {
           </aside>
         </section>
 
-        <SecurityNewsReel className="surface-reveal" />
+        <SecurityNewsReel className="surface-reveal public-landing-reel" />
 
         <section className="public-section-grid surface-reveal">
           <article className="public-panel public-panel--console">

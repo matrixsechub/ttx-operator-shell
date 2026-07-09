@@ -616,7 +616,7 @@ button {
 }
 
 .public-landing-hero {
-  min-height: calc(100dvh - 5.5rem);
+  min-height: min(calc(100dvh - 10rem), 680px);
   align-items: center;
 }
 
@@ -624,6 +624,10 @@ button {
   display: grid;
   gap: 1.2rem;
   align-content: center;
+}
+
+.public-landing-reel {
+  margin-block: 1.5rem 2rem;
 }
 
 .public-footer {
