@@ -30,6 +30,15 @@ const INTERNAL_AGENT_MODULES = [
     route: "/operator/agents/security-intake",
     active: true,
   },
+  {
+    slug: "traffic_acquisition_agent",
+    name: "Traffic Acquisition Agent",
+    category: "growth_agents",
+    description:
+      "Autonomous inbound engine that grows the operator ecosystem.",
+    route: "/apps/traffic-acquisition",
+    active: true,
+  },
 ];
 
 function renderCfBadge(label, extraClass = "") {
@@ -56,6 +65,8 @@ function formatDate(value) {
 const MODULE_ICON_MAP = {
   intake_agent: "🛰️",
   ai_security_intake_agent: "🛡️",
+  traffic_acquisition_agent: "📈",
+  traffic: "📈",
   agent: "🤖",
   security: "🔐",
   governance: "🧭",
@@ -109,11 +120,24 @@ function renderMembershipBadges(module) {
 }
 
 function getMembershipValueStatement(module) {
+  if (module?.membership_value_statement) {
+    return module.membership_value_statement;
+  }
+
   const accessLevel = String(module?.metadata?.accessLevel || module?.access_level || "public").toLowerCase();
   const name = module?.name || module?.title || "This module";
 
   if (module?.slug === "public-register" || module?.service_slug === "public_register") {
     return "Establish operator identity and receive cockpit readiness updates as systems activate.";
+  }
+  if (
+    module?.slug === "traffic-acquisition-agent" ||
+    module?.service_slug === "traffic_acquisition_agent"
+  ) {
+    return (
+      module?.membership_value_statement ||
+      "Autonomous inbound engine that grows the operator ecosystem."
+    );
   }
   if (accessLevel === "operator" || accessLevel === "restricted") {
     return `${name} delivers operator-exclusive controls, queue visibility, and security plane routing for members.`;
@@ -473,9 +497,20 @@ function renderServiceModules(modules) {
                 : "Observer Mode :: lifecycle is still moving through intake."
               : "";
             const isPublicRegister = module.slug === "public-register" || module.service_slug === "public_register";
+            const isTrafficAcquisition =
+              module.slug === "traffic-acquisition-agent" ||
+              module.service_slug === "traffic_acquisition_agent";
             const securityBadges = isPublicRegister ? renderRegisterSecurityBadges(module) : "";
-            const publicCtaLabel = isPublicRegister ? "Register for Access" : "[ VIEW PUBLIC ROUTE ]";
-            const operatorCtaLabel = isPublicRegister ? "[ OPERATOR QUEUE ]" : "[ OPEN OPERATOR ROUTE ]";
+            const publicCtaLabel = isPublicRegister
+              ? "Register for Access"
+              : isTrafficAcquisition
+                ? "[ LAUNCH GROWTH APP ]"
+                : "[ VIEW PUBLIC ROUTE ]";
+            const operatorCtaLabel = isPublicRegister
+              ? "[ OPERATOR QUEUE ]"
+              : isTrafficAcquisition
+                ? "[ COCKPIT PREVIEW ]"
+                : "[ OPEN OPERATOR ROUTE ]";
             const publicCtaClass = isPublicRegister
               ? "register-cta-enterprise pulse mono"
               : "button primary";

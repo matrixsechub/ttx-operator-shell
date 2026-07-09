@@ -8,6 +8,7 @@ import agentReadinessChecker from "./data/agentReadinessChecker.js";
 import automationRoiCalculator from "./data/automationRoiCalculator.js";
 import ragRiskAnalyzer from "./data/ragRiskAnalyzer.js";
 import localAiReadinessChecker from "./data/localAiReadinessChecker.js";
+import trafficAcquisition from "./data/trafficAcquisition.js";
 import intakeAgent from "./agents/intakeAgent.js";
 import securityIntakeAgent from "./agents/securityIntakeAgent.js";
 import cloudflareSecurityAudit from "./data/cloudflareSecurityAudit.js";
@@ -261,6 +262,14 @@ const {
   listLocalAiReadinessQueue,
 } = localAiReadinessChecker;
 const {
+  trafficAcquisitionMarketplaceModule,
+  normalizeTrafficCampaignInput,
+  computeTrafficAcquisitionResult,
+  recordTrafficCampaign,
+  listTrafficAcquisitionQueue,
+  buildTrafficAcquisitionOperatorSummary,
+} = trafficAcquisition;
+const {
   isOperatorSurfaceRequest,
   startSecurityAudit,
   applySecurityAuditWebhook,
@@ -350,6 +359,10 @@ export default {
         return serveStatic(request, env, "/local-ai-readiness-checker.html");
       }
 
+      if (url.pathname === "/apps/traffic-acquisition" || url.pathname === "/apps/traffic-acquisition/") {
+        return serveStatic(request, env, "/traffic-acquisition.html");
+      }
+
       if (url.pathname === "/operator" || url.pathname === "/operator/") {
         return serveStatic(request, env, "/operator.html");
       }
@@ -384,6 +397,10 @@ export default {
 
       if (url.pathname === "/operator/local-ai-readiness" || url.pathname === "/operator/local-ai-readiness/") {
         return serveStatic(request, env, "/local-ai-readiness-operator.html");
+      }
+
+      if (url.pathname === "/operator/traffic-acquisition" || url.pathname === "/operator/traffic-acquisition/") {
+        return serveStatic(request, env, "/traffic-acquisition-operator.html");
       }
 
       if (url.pathname === "/operator/agents/intake" || url.pathname === "/operator/agents/intake/") {
@@ -620,6 +637,10 @@ function resolveStaticPath(requestPath) {
     return "/local-ai-readiness-checker.html";
   }
 
+  if (normalizedRequestPath === "/apps/traffic-acquisition" || normalizedRequestPath === "/apps/traffic-acquisition/") {
+    return "/traffic-acquisition.html";
+  }
+
   if (normalizedRequestPath === "/operator" || normalizedRequestPath === "/operator/") {
     return "/operator.html";
   }
@@ -654,6 +675,10 @@ function resolveStaticPath(requestPath) {
 
   if (normalizedRequestPath === "/operator/local-ai-readiness" || normalizedRequestPath === "/operator/local-ai-readiness/") {
     return "/local-ai-readiness-operator.html";
+  }
+
+  if (normalizedRequestPath === "/operator/traffic-acquisition" || normalizedRequestPath === "/operator/traffic-acquisition/") {
+    return "/traffic-acquisition-operator.html";
   }
 
   if (normalizedRequestPath === "/operator/agents/intake" || normalizedRequestPath === "/operator/agents/intake/") {
@@ -3679,6 +3704,18 @@ async function handleApi(request, env, url) {
     }
   }
 
+  if (method === "POST" && pathname === "/api/traffic-acquisition/run") {
+    try {
+      const payload = await readBody(request);
+      const input = normalizeTrafficCampaignInput(payload);
+      const result = computeTrafficAcquisitionResult(input);
+      recordTrafficCampaign(input, result);
+      return json(result, 200, { "Cache-Control": "no-store" });
+    } catch (error) {
+      return json({ error: error.message || "traffic-acquisition-run-failed" }, 400);
+    }
+  }
+
   if (method === "POST" && pathname === "/api/os/route") {
     try {
       const body = await readBody(request);
@@ -5654,6 +5691,17 @@ async function handleApi(request, env, url) {
     });
   }
 
+  if (method === "GET" && pathname === "/api/operator/traffic-acquisition") {
+    return json({
+      summary: buildTrafficAcquisitionOperatorSummary(),
+      rows: listTrafficAcquisitionQueue(),
+      security_plane: {
+        module: trafficAcquisitionMarketplaceModule,
+        agent_config_key: "traffic",
+      },
+    });
+  }
+
   if (method === "GET" && pathname === "/api/marketplace/service-modules") {
     return json({
       modules: [
@@ -5667,6 +5715,7 @@ async function handleApi(request, env, url) {
         automationRoiMarketplaceModule,
         ragRiskMarketplaceModule,
         localAiReadinessMarketplaceModule,
+        trafficAcquisitionMarketplaceModule,
         buildPublicRegisterMarketplacePayload(),
       ],
     });

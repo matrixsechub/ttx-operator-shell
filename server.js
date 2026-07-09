@@ -84,6 +84,14 @@ const {
   listLocalAiReadinessQueue
 } = require("./data/localAiReadinessChecker");
 const {
+  trafficAcquisitionMarketplaceModule,
+  normalizeTrafficCampaignInput,
+  computeTrafficAcquisitionResult,
+  recordTrafficCampaign,
+  listTrafficAcquisitionQueue,
+  buildTrafficAcquisitionOperatorSummary
+} = require("./data/trafficAcquisition");
+const {
   publicRegisterMarketplaceModule,
   normalizePublicRegisterAnswers,
   computePublicRegisterResult,
@@ -216,6 +224,10 @@ function resolveStaticPath(requestPath) {
     return "/local-ai-readiness-checker.html";
   }
 
+  if (requestPath === "/apps/traffic-acquisition" || requestPath === "/apps/traffic-acquisition/") {
+    return "/traffic-acquisition.html";
+  }
+
   if (requestPath === "/marketplace" || requestPath === "/marketplace/") {
     return "/marketplace.html";
   }
@@ -258,6 +270,10 @@ function resolveStaticPath(requestPath) {
 
   if (requestPath === "/operator/local-ai-readiness" || requestPath === "/operator/local-ai-readiness/") {
     return "/local-ai-readiness-operator.html";
+  }
+
+  if (requestPath === "/operator/traffic-acquisition" || requestPath === "/operator/traffic-acquisition/") {
+    return "/traffic-acquisition-operator.html";
   }
 
   if (requestPath === "/operator/agents/intake" || requestPath === "/operator/agents/intake/") {
@@ -688,6 +704,19 @@ async function handleApi(request, response, url) {
       sendJson(response, 200, result, { "Cache-Control": "no-store" });
     } catch (error) {
       sendJson(response, 400, { error: error.message || "local-ai-readiness-check-failed" });
+    }
+    return;
+  }
+
+  if (method === "POST" && pathname === "/api/traffic-acquisition/run") {
+    try {
+      const payload = await readBody(request);
+      const input = normalizeTrafficCampaignInput(payload);
+      const result = computeTrafficAcquisitionResult(input);
+      recordTrafficCampaign(input, result);
+      sendJson(response, 200, result, { "Cache-Control": "no-store" });
+    } catch (error) {
+      sendJson(response, 400, { error: error.message || "traffic-acquisition-run-failed" });
     }
     return;
   }
@@ -1134,6 +1163,18 @@ async function handleApi(request, response, url) {
     return;
   }
 
+  if (method === "GET" && pathname === "/api/operator/traffic-acquisition") {
+    sendJson(response, 200, {
+      summary: buildTrafficAcquisitionOperatorSummary(),
+      rows: listTrafficAcquisitionQueue(),
+      security_plane: {
+        module: trafficAcquisitionMarketplaceModule,
+        agent_config_key: "traffic"
+      }
+    });
+    return;
+  }
+
   if (method === "GET" && pathname === "/api/marketplace/service-modules") {
     sendJson(response, 200, {
       modules: [
@@ -1147,6 +1188,7 @@ async function handleApi(request, response, url) {
         automationRoiMarketplaceModule,
         ragRiskMarketplaceModule,
         localAiReadinessMarketplaceModule,
+        trafficAcquisitionMarketplaceModule,
         buildPublicRegisterMarketplacePayload()
       ]
     });

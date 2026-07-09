@@ -9,6 +9,10 @@ const MEMORY_NAMESPACE_MAP = {
     read_agents: ["AureliusAgent", "intake_agent_v2", "ComplianceGovernanceAgent"],
     write_agents: ["AureliusAgent"],
   },
+  "session:marketing": {
+    read_agents: ["TrafficAcquisitionAgent"],
+    write_agents: ["TrafficAcquisitionAgent"],
+  },
   "session:investigation": {
     read_agents: ["SecurityAnalystAgent", "AureliusAgent", "ComplianceGovernanceAgent"],
     write_agents: ["SecurityAnalystAgent"],
@@ -96,6 +100,16 @@ const AGENT_REGISTRY = {
     permitted_tools: ["siem_read", "rag_retrieval", "cve_lookup", "report_write", "safe_telemetry_log"],
     readable_namespaces: ["session:analysis", "session:investigation"],
     writable_namespaces: ["session:analysis"],
+    tm_escalation: false,
+  },
+  traffic: {
+    enabled: true,
+    name: "TrafficAcquisitionAgent",
+    trust_level: "MEDIUM",
+    lifecycle_stage: "03:ANALYSIS_READY",
+    permitted_tools: ["content_generate", "seo_analyze", "telemetry_write", "distribution_push"],
+    readable_namespaces: ["session:marketing"],
+    writable_namespaces: ["session:marketing"],
     tm_escalation: false,
   },
 };
