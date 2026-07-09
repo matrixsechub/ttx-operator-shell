@@ -13,7 +13,7 @@
     "smoke:worker:dry-run": "npx wrangler deploy --dry-run --config wrangler.jsonc",
     "build:public": "node scripts/build-unified-public.mjs",
     "pages:build": "npm run build:public",
-    "pages:deploy": "npm run build:public && npx wrangler pages deploy public --project-name mshops-public"
+    "pages:deploy": "npm run build:public & npx wrangler pages deploy public --project-name mshops-public"
   },
   "repository": {
     "type": "git",
