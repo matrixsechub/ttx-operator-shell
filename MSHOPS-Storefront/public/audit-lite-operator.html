@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Audit Lite Queue</title>
+    <meta
+      name="description"
+      content="Private operator queue for AI Security Audit Lite submissions and full-audit handoff."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/operator">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Audit Lite Queue</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/operator">Operator</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/api-explorer">API Explorer</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PRIVATE_ROUTE :: /OPERATOR/AUDIT-LITE ]</p>
+            <h1>AI Security Audit Lite Queue</h1>
+            <p class="hero-sub">
+              Review free diagnostic submissions, risk tiers, and audit-to-intake handoff state without exposing any
+              operator route publicly.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/operator">[ RETURN TO OPERATOR ]</a>
+              <a class="button secondary" href="/marketplace">[ OPEN MARKETPLACE ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ AUDIT_LITE_QUEUE ]</p>
+            <h2>Diagnostic audit submissions</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid" id="audit-lite-summary-grid"></div>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <div class="service-intake-toolbar">
+              <label class="marketplace-search-label">
+                <span>Risk Tier Filter</span>
+                <select id="audit-lite-filter">
+                  <option value="">all tiers</option>
+                  <option value="low">low</option>
+                  <option value="medium">medium</option>
+                  <option value="high">high</option>
+                  <option value="critical">critical</option>
+                </select>
+              </label>
+              <button class="button secondary" type="button" id="audit-lite-refresh">[ REFRESH QUEUE ]</button>
+            </div>
+            <p class="form-status mono" id="audit-lite-queue-status" role="status" aria-live="polite">
+              Loading audit-lite queue.
+            </p>
+            <div class="service-intake-table-wrap">
+              <table class="service-intake-table">
+                <thead>
+                  <tr>
+                    <th>audit_id</th>
+                    <th>engagement_id</th>
+                    <th>risk_score</th>
+                    <th>risk_tier</th>
+                    <th>lifecycle</th>
+                    <th>priority</th>
+                    <th>top_risk_category</th>
+                    <th>recommended_service</th>
+                    <th>queue_status</th>
+                    <th>timeline</th>
+                    <th>created_at</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-lite-rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+      <section class="operator-surface-hook" data-operator-surface hidden>
+        <div class="operator-panel-hook"></div>
+      </section>
+      <div class="ds-enforce" data-ds-enforce hidden></div>
+      <div class="hud-scan" data-hud-scan hidden></div>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET private audit queue</span>
+        <span>Diagnostic scoring and full-audit intake visibility</span>
+      </div>
+      <nav class="nav">
+        <a href="/operator">Operator</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/services">Public Services</a>
+      </nav>
+    </footer>
+
+    <script src="/audit-lite-operator.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

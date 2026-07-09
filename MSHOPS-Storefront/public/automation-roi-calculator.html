@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Automation ROI Calculator</title>
+    <meta
+      name="description"
+      content="Estimate how much time and money your business could save by automating repetitive workflows."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Automation ROI Calculator</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#automation-roi-form">Calculator</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: AUTOMATION_ROI_CALCULATOR_V1 ]</p>
+            <h1>Automation ROI Calculator</h1>
+            <p class="hero-sub">
+              Estimate how much time and money your business could save by automating repetitive workflows.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#automation-roi-form">[ CALCULATE AUTOMATION ROI ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="automation-roi-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ WORKFLOW_ROI_FORM ]</p>
+            <h2>Answer the workflow ROI questionnaire</h2>
+          </div>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>Automation ROI questionnaire</h3>
+              <p class="system-copy">
+                This is a deterministic advisory tool. It estimates savings, complexity, and the recommended automation path without executing workflows.
+              </p>
+              <form class="contact-form" id="automation-roi-form-element">
+                <label>
+                  <span>1. Workflow Type</span>
+                  <select name="workflow_type" required>
+                    <option value="lead_capture_followup">Lead capture and follow-up</option>
+                    <option value="customer_support">Customer support</option>
+                    <option value="reporting_dashboard">Reporting or dashboard work</option>
+                    <option value="document_processing">Document processing</option>
+                    <option value="data_entry">Data entry</option>
+                    <option value="crm_updates">CRM updates</option>
+                    <option value="invoice_or_billing">Invoice or billing</option>
+                    <option value="appointment_scheduling">Appointment scheduling</option>
+                    <option value="email_triage">Email triage</option>
+                    <option value="social_content_ops">Social content operations</option>
+                    <option value="sales_prospecting">Sales prospecting</option>
+                    <option value="security_or_compliance_process">Security or compliance process</option>
+                    <option value="internal_operations">Internal operations</option>
+                    <option value="custom_workflow">Custom workflow</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>2. Current Process</span>
+                  <select name="current_process" required>
+                    <option value="fully_manual">Fully manual</option>
+                    <option value="spreadsheets_and_email">Spreadsheets and email</option>
+                    <option value="partially_automated">Partially automated</option>
+                    <option value="scattered_tools">Scattered tools</option>
+                    <option value="legacy_system">Legacy system</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>3. Weekly Volume</span>
+                  <select name="weekly_volume" required>
+                    <option value="under_25">Under 25</option>
+                    <option value="25_100">25 to 100</option>
+                    <option value="100_500">100 to 500</option>
+                    <option value="500_2000">500 to 2,000</option>
+                    <option value="2000_plus">2,000 plus</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>4. Time Per Item</span>
+                  <select name="time_per_item_minutes" required>
+                    <option value="under_5">Under 5 minutes</option>
+                    <option value="5_15">5 to 15 minutes</option>
+                    <option value="15_30">15 to 30 minutes</option>
+                    <option value="30_60">30 to 60 minutes</option>
+                    <option value="60_plus">60 plus minutes</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>5. Team Hourly Cost</span>
+                  <select name="team_hourly_cost" required>
+                    <option value="under_25">Under $25</option>
+                    <option value="25_50">$25 to $50</option>
+                    <option value="50_100">$50 to $100</option>
+                    <option value="100_200">$100 to $200</option>
+                    <option value="200_plus">$200 plus</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>6. Error Rate</span>
+                  <select name="error_rate" required>
+                    <option value="low_under_2_percent">Low, under 2%</option>
+                    <option value="moderate_2_5_percent">Moderate, 2% to 5%</option>
+                    <option value="high_5_10_percent">High, 5% to 10%</option>
+                    <option value="severe_over_10_percent">Severe, over 10%</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>7. Tools Involved</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="tools_involved" value="email" /> Email</label>
+                    <label><input type="checkbox" name="tools_involved" value="calendar" /> Calendar</label>
+                    <label><input type="checkbox" name="tools_involved" value="crm" /> CRM</label>
+                    <label><input type="checkbox" name="tools_involved" value="spreadsheet" /> Spreadsheet</label>
+                    <label><input type="checkbox" name="tools_involved" value="database" /> Database</label>
+                    <label><input type="checkbox" name="tools_involved" value="file_storage" /> File storage</label>
+                    <label><input type="checkbox" name="tools_involved" value="slack_or_teams" /> Slack or Teams</label>
+                    <label><input type="checkbox" name="tools_involved" value="project_management" /> Project management</label>
+                    <label><input type="checkbox" name="tools_involved" value="payments_or_invoicing" /> Payments or invoicing</label>
+                    <label><input type="checkbox" name="tools_involved" value="forms" /> Forms</label>
+                    <label><input type="checkbox" name="tools_involved" value="website" /> Website</label>
+                    <label><input type="checkbox" name="tools_involved" value="ai_chatbot" /> AI chatbot</label>
+                    <label><input type="checkbox" name="tools_involved" value="n8n_make_zapier" /> n8n, Make, or Zapier</label>
+                    <label><input type="checkbox" name="tools_involved" value="custom_api" /> Custom API</label>
+                    <label><input type="checkbox" name="tools_involved" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>8. AI Needed</span>
+                  <select name="ai_needed" required>
+                    <option value="no_rules_based_is_enough">No, rules-based is enough</option>
+                    <option value="maybe">Maybe</option>
+                    <option value="yes_text_or_email_generation">Yes, text or email generation</option>
+                    <option value="yes_document_understanding">Yes, document understanding</option>
+                    <option value="yes_decision_support">Yes, decision support</option>
+                    <option value="yes_agentic_workflow">Yes, agentic workflow</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>9. Risk Sensitivity</span>
+                  <select name="risk_sensitivity" required>
+                    <option value="low_internal_only">Low, internal only</option>
+                    <option value="medium_business_data">Medium, business data</option>
+                    <option value="high_customer_data">High, customer data</option>
+                    <option value="regulated_or_financial_data">Regulated or financial data</option>
+                    <option value="credentials_or_admin_actions">Credentials or admin actions</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>10. Timeline</span>
+                  <select name="timeline" required>
+                    <option value="this_week">This week</option>
+                    <option value="this_month">This month</option>
+                    <option value="this_quarter">This quarter</option>
+                    <option value="exploring">Exploring</option>
+                  </select>
+                </label>
+
+                <div class="hero-actions">
+                  <button class="button primary" type="submit" id="automation-roi-submit">Calculate Automation ROI</button>
+                  <button class="button ghost" type="reset">Reset</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="automation-roi-status" role="status" aria-live="polite">
+                Calculator ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner" id="automation-roi-result">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Automation ROI findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive savings estimates, ROI tiering, implementation requirements, and a direct intake route.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner footer-architecture">
+            <div class="section-heading">
+              <div>
+                <p class="section-label mono">[ CTA_SECTION ]</p>
+                <h2>Request Automation Build Review</h2>
+              </div>
+            </div>
+            <p class="system-copy">
+              Use the automation build review intake when you want operator guidance on workflow design, controls, and the safest automation delivery path.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/enter?service=ai_automation_build&source=automation-roi-calculator">[ REQUEST AUTOMATION BUILD REVIEW ]</a>
+              <a class="button secondary" href="/apps/ai-agent-readiness-checker">[ CHECK AI AGENT READINESS ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET automation ROI calculator</span>
+        <span>Deterministic advisory scoring with funnel handoff to operator review</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/automation-roi-calculator.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,113 @@
+@import url("/styles.css");
+
+.ucip-mode-green h3 {
+  color: var(--status-success);
+}
+
+.ucip-mode-yellow h3 {
+  color: var(--status-warning);
+}
+
+.ucip-mode-orange h3 {
+  color: var(--status-high);
+}
+
+.ucip-mode-red h3 {
+  color: var(--status-critical);
+}
+
+.amg-mode-govern-green h3 {
+  color: var(--status-success);
+}
+
+.amg-mode-govern-yellow h3 {
+  color: var(--status-warning);
+}
+
+.amg-mode-govern-orange h3 {
+  color: var(--status-high);
+}
+
+.amg-mode-govern-red h3 {
+  color: var(--status-critical);
+}
+
+.cba-mode-behavior-green h3 {
+  color: var(--status-success);
+}
+
+.cba-mode-behavior-yellow h3 {
+  color: var(--status-warning);
+}
+
+.cba-mode-behavior-orange h3 {
+  color: var(--status-high);
+}
+
+.cba-mode-behavior-red h3 {
+  color: var(--status-critical);
+}
+
+.cal-mode-align-green h3 {
+  color: var(--status-success);
+}
+
+.cal-mode-align-yellow h3 {
+  color: var(--status-warning);
+}
+
+.cal-mode-align-orange h3 {
+  color: var(--status-high);
+}
+
+.cal-mode-align-red h3 {
+  color: var(--status-critical);
+}
+
+.ihl-mode-intent-green h3 {
+  color: var(--status-success);
+}
+
+.ihl-mode-intent-yellow h3 {
+  color: var(--status-warning);
+}
+
+.ihl-mode-intent-orange h3 {
+  color: var(--status-high);
+}
+
+.ihl-mode-intent-red h3 {
+  color: var(--status-critical);
+}
+
+.iarl-mode-resonance-green h3 {
+  color: var(--status-success);
+}
+
+.iarl-mode-resonance-yellow h3 {
+  color: var(--status-warning);
+}
+
+.iarl-mode-resonance-orange h3 {
+  color: var(--status-high);
+}
+
+.iarl-mode-resonance-red h3 {
+  color: var(--status-critical);
+}
+
+.acl-mode-coherence-green h3 {
+  color: var(--status-success);
+}
+
+.acl-mode-coherence-yellow h3 {
+  color: var(--status-warning);
+}
+
+.acl-mode-coherence-orange h3 {
+  color: var(--status-high);
+}
+
+.acl-mode-coherence-red h3 {
+  color: var(--status-critical);
+}

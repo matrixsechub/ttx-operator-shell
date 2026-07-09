@@ -1,0 +1,24 @@
+@import url("/styles.css");
+
+body {
+  min-height: 100vh;
+}
+
+.page-shell {
+  width: min(1120px, calc(100% - 2rem));
+}
+
+#api-tester-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+}
+
+#api-tester-form input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(82, 184, 255, 0.1);
+}

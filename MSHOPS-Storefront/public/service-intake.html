@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Service Intake Queue</title>
+    <meta
+      name="description"
+      content="Private operator queue for service-selector matches and intake records routed from the public services funnel."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/operator">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Service Intake Queue</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/operator">Operator</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/api-explorer">API Explorer</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell reveal" data-reveal="up">
+        <article class="hero-panel bracket hud-frame">
+          <div class="bracket-inner hero-copy">
+            <div class="hud-ticker" aria-hidden="true">TACTICAL_FEED :: LIVE</div>
+            <p class="section-label mono">[ PRIVATE_ROUTE :: /OPERATOR/SERVICE-INTAKE ]</p>
+            <h1 class="glow-pulse">Service Intake Queue</h1>
+            <p class="hero-sub">
+              This queue tracks selector matches that route from the public <span class="mono">/services</span> surface through <span class="mono">/enter</span> and
+              into operator-managed intake. It stays on the private side of the system and does not require new
+              bindings or Cloudflare topology changes.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/operator">[ RETURN TO OPERATOR ]</a>
+              <a class="button secondary" href="/marketplace">[ OPEN MARKETPLACE ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ QUEUE_VIEW ]</p>
+            <h2>Selector and engagement handoff records</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner">
+            <div class="service-intake-toolbar">
+              <label class="marketplace-search-label">
+                <span>Service Filter</span>
+                <select id="service-intake-filter">
+                  <option value="">all services</option>
+                </select>
+              </label>
+              <button class="button secondary" type="button" id="service-intake-refresh">[ REFRESH QUEUE ]</button>
+            </div>
+            <p class="form-status mono" id="service-intake-status" role="status" aria-live="polite">
+              Loading service intake queue.
+            </p>
+            <div class="service-intake-table-wrap">
+              <table class="service-intake-table">
+                <thead>
+                  <tr>
+                    <th>selector_id</th>
+                    <th>engagement_id</th>
+                    <th>recommended_service</th>
+                    <th>secondary_service</th>
+                    <th>urgency_score</th>
+                    <th>revenue_potential</th>
+                    <th>priority</th>
+                    <th>status</th>
+                    <th>security_audit</th>
+                    <th>audit_summary</th>
+                    <th>actions</th>
+                    <th>created_at</th>
+                  </tr>
+                </thead>
+                <tbody id="service-intake-rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+      <section class="operator-surface-hook" data-operator-surface hidden>
+        <div class="operator-panel-hook"></div>
+      </section>
+      <div class="ds-enforce" data-ds-enforce hidden></div>
+      <div class="hud-scan" data-hud-scan hidden></div>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET operator intake queue</span>
+        <span>Selector-to-engagement routing visibility</span>
+      </div>
+      <nav class="nav">
+        <a href="/operator">Operator</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/services">Public Services</a>
+      </nav>
+    </footer>
+
+    <script src="/service-intake.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

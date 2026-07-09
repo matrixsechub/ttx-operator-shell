@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSH OPS | Brand Identity</title>
+    <meta
+      name="description"
+      content="Public explanation of the MSH OPS RGB+Gold identity, HUD system, motion philosophy, and accessibility guarantees."
+    />
+    <script>
+      (function canonicalizeBrandRoute() {
+        if (window.location.pathname.endsWith(".html")) {
+          window.history.replaceState(null, "", window.location.pathname.slice(0, -5) + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/brand.css" />
+    <link rel="stylesheet" href="/styles/nav.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSH OPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSH OPS</strong>
+          <span>Brand Identity</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Public // Brand</span>
+            <p class="section-label mono">[ RGB_GOLD_IDENTITY ]</p>
+            <h1 class="glow-pulse cinematic-hook">Why RGB+Gold looks the way it does</h1>
+            <p class="hero-sub">
+              The visual system balances clarity, signal, and atmosphere while keeping readability and motion safety in
+              front of decoration.
+            </p>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="features" aria-labelledby="brand-pillars-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ BRAND_PILLARS ]</p>
+            <h2 id="brand-pillars-heading">Identity, HUD, motion, and accessibility</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid">
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Brand // Color</span>
+              <h3>RGB+Gold</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Blue, cyan, and gold establish contrast between structure, signal, and emphasis without losing calm
+                readability on dark surfaces.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Brand // HUD</span>
+              <h3>HUD framing</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                HUD corners and tags provide orientation, context, and page rhythm without overwhelming the content
+                itself.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Brand // Motion</span>
+              <h3>Motion philosophy</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Motion supports orientation and hierarchy. It is subtle by default and disabled cleanly for visitors
+                who prefer reduced motion.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Brand // Accessibility</span>
+              <h3>Accessibility guarantees</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Focus visibility, live regions, contrast tokens, accessibility overrides, and scanner coverage are part
+                of the brand contract, not afterthoughts.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="contact" aria-labelledby="brand-next-heading">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Next // Explore</span>
+            <p class="section-label mono">[ CONTINUE ]</p>
+            <h2 id="brand-next-heading">See the brand in motion across the ecosystem</h2>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <div class="cta-row">
+              <a class="button primary" href="/ecosystem">Ecosystem</a>
+              <a class="button secondary" href="/status">Status</a>
+              <a class="button ghost" href="/about">About</a>
+            </div>
+            <div class="a11y-hook" data-a11y-override hidden></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div class="footer-divider" aria-hidden="true"></div>
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSH OPS brand identity</span>
+        <span>RGB+Gold, HUD framing, motion safety, and accessibility as one system</span>
+      </div>
+      <nav class="nav-ecosystem" aria-label="Footer navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>
