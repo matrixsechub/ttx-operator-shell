@@ -397,6 +397,20 @@ function renderInternalAgentModules(cards) {
     .join("");
 }
 
+function renderRegisterSecurityBadges(module) {
+  const security = module.security_plane || {};
+  const lifecycle = module.lifecycle_summary || {};
+  const moduleMeta = security.module || module;
+  return `
+    <div class="tag-row register-security-badges">
+      <span title="Security lifecycle stage for intake routing">SECURITY :: ${escapeHtml(moduleMeta.security_stage || lifecycle.security_stage || "intake")}</span>
+      <span title="Permission profile enforced by AgentPermissionValidator">PERMISSION :: ${escapeHtml(moduleMeta.permission_profile || lifecycle.permission_profile || "public_intake")}</span>
+      <span title="Linked IntakeAgentV2 configuration key">AGENT :: ${escapeHtml(moduleMeta.agent_config_key || lifecycle.agent_config_key || "intake_agent_v2")}</span>
+      <span title="Threat modeling requirement for this module">THREAT_MODEL :: ${moduleMeta.requires_threat_modeling || lifecycle.requires_threat_modeling ? "required" : "not required"}</span>
+    </div>
+  `;
+}
+
 function renderServiceModules(modules) {
   const grid = document.getElementById("service-module-grid");
   if (!grid) {
@@ -407,13 +421,25 @@ function renderServiceModules(modules) {
   const serviceCards = (modules || []).length
     ? modules
         .map(
-          (module) => `
+          (module) => {
+            const lifecycle = module.lifecycle_summary || null;
+            const lifecycleLabel = lifecycle?.latest_lifecycle_label || "Pending Intake";
+            const lifecycleBanner = lifecycle
+              ? lifecycle.operator_mode
+                ? "Operator Mode teaser :: processed lifecycle available."
+                : "Observer Mode :: lifecycle is still moving through intake."
+              : "";
+            const isPublicRegister = module.slug === "public-register" || module.service_slug === "public_register";
+            const securityBadges = isPublicRegister ? renderRegisterSecurityBadges(module) : "";
+            const publicCtaLabel = isPublicRegister ? "[ REQUEST ACCESS ]" : "[ VIEW PUBLIC ROUTE ]";
+            const operatorCtaLabel = isPublicRegister ? "[ OPERATOR QUEUE ]" : "[ OPEN OPERATOR ROUTE ]";
+            return `
             <article class="module-card bracket">
               <div class="bracket-inner">
                 <div class="module-head">
                   <div>
-                    <p class="section-label mono">[ SERVICE_MODULE ]</p>
-                    <h3 class="module-identity"><span class="module-icon ${getModuleAccentClass(module)}" aria-hidden="true">${getModuleIcon(module)}</span>${escapeHtml(module.name)}</h3>
+                    <p class="section-label mono">[ ${isPublicRegister ? "ACCESS_INTAKE_MODULE" : "SERVICE_MODULE"} ]</p>
+                    <h3 class="module-identity"><span class="module-icon ${getModuleAccentClass(module)}" aria-hidden="true">${getModuleIcon(module)}</span>${escapeHtml(module.name || module.title)}</h3>
                   </div>
                   <span class="module-num">${module.base_price === 0 ? "FREE" : escapeHtml(String(module.base_price || "custom"))}</span>
                 </div>
@@ -422,16 +448,20 @@ function renderServiceModules(modules) {
                   <span>${escapeHtml(module.category)}</span>
                   <span>${escapeHtml(module.revenue_type)}</span>
                   <span>${escapeHtml(module.status)}</span>
+                  ${lifecycle ? `<span title="Latest IntakeAgentV2 lifecycle label">${escapeHtml(lifecycleLabel)}</span>` : ""}
                 </div>
+                ${securityBadges}
+                ${lifecycleBanner ? `<p class="section-copy mono">LIFECYCLE :: ${escapeHtml(lifecycleBanner)}</p>` : ""}
                 <p class="section-copy mono">INPUTS :: ${escapeHtml((module.required_inputs || []).join(" | "))}</p>
                 <p class="section-copy mono">OUTPUTS :: ${escapeHtml((module.delivery_outputs || []).join(" | "))}</p>
                 <div class="button-row">
-                  <a class="button primary" href="${escapeHtml(module.operator_route)}">[ OPEN OPERATOR ROUTE ]</a>
-                  <a class="button secondary" href="${escapeHtml(module.public_service_route)}">[ VIEW PUBLIC ROUTE ]</a>
+                  <a class="button primary" href="${escapeHtml(module.public_service_route)}" title="Open the public registration intake surface">${publicCtaLabel}</a>
+                  <a class="button secondary" href="${escapeHtml(module.operator_route)}" title="Operator-only queue preview for registration intake">${operatorCtaLabel}</a>
                 </div>
               </div>
             </article>
-          `,
+          `;
+          },
         )
         .join("")
     : "";

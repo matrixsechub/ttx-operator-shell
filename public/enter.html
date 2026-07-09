@@ -3,14 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MSH OPS | Public Intake Funnel</title>
+    <title>MSHOPS.NET | Guided Intake</title>
     <meta
       name="description"
-      content="Choose your intent, preview your best public route, and continue into the MSH OPS intake flow."
-    />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+      content="Public intake funnel for MSHOPS.NET with preserved routing context, lifecycle-aware audit handoff, and operator-safe lead capture."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,224 +26,185 @@
   <body>
     <div class="fx-overlay" aria-hidden="true"></div>
     <header class="topbar">
-      <a class="brand" href="/" aria-label="MSH OPS public homepage">
+      <a class="brand" href="/">
         <span class="brand-mark">MSH</span>
         <span class="brand-copy">
-          <strong>MSH OPS</strong>
-          <span>Public Intake</span>
+          <strong>MSHOPS.NET</strong>
+          <span>Guided Intake</span>
         </span>
       </a>
-      <nav class="nav-ecosystem mono" aria-label="Public navigation">
-        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
-        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
-        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
-        <a href="#features" aria-label="Jump to public features">Features</a>
-        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="#lead-form-shell">Intake Form</a>
       </nav>
     </header>
 
     <main class="page-shell">
-      <section class="hero-shell">
-        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
-          <header class="rgbgold-module-shell-header">
-            <span class="hud-tag a11y-override-badge">Step 1 // Intent</span>
-            <p class="section-label mono">[ PUBLIC_INTAKE_FUNNEL ]</p>
-            <h1 class="glow-pulse cinematic-hook">Choose your starting path</h1>
+      <section class="hero-shell reveal" data-reveal="up">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_FUNNEL :: /ENTER ]</p>
+            <p class="section-label mono" id="enter-context-badge">Service context pending.</p>
+            <h1 id="enter-context-heading">Start your guided intake</h1>
             <p class="hero-sub">
-              This public-safe funnel helps you describe intent, preview the best route, and continue into the intake
-              surface without exposing internal tooling or private delivery details.
-            </p>
-          </header>
-          <div class="rgbgold-module-shell-body">
-            <p class="system-copy">
-              Start by selecting the kind of help you need. We will show a routing preview, explain the next public
-              page to visit, and prepare a guided handoff into <code>/intake</code>.
-            </p>
-            <div class="chip-row mono" aria-label="Funnel traits">
-              <span class="status-chip--success">intent-led</span>
-              <span class="status-chip--warning">public-safe</span>
-              <span class="status-chip--critical">worker-backed intake</span>
-            </div>
-            <div class="cinematic-hook" data-cinematic hidden></div>
-            <div class="motion-scan" data-motion-scan hidden></div>
-          </div>
-        </article>
-      </section>
-
-      <section class="section-block" aria-labelledby="intent-heading">
-        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
-          <header class="rgbgold-module-shell-header">
-            <span class="hud-tag a11y-override-badge">Step 2 // Route Preview</span>
-            <p class="section-label mono">[ INTENT_SELECTOR ]</p>
-            <h2 id="intent-heading">What brings you here?</h2>
-          </header>
-          <div class="rgbgold-module-shell-body">
-            <div class="intent-grid" role="group" aria-label="Select a public intake intent">
-              <button
-                class="button secondary intent-button is-active"
-                type="button"
-                data-intent-button
-                data-intent="orientation"
-                aria-pressed="true"
-              >
-                I need orientation
-              </button>
-              <button
-                class="button secondary intent-button"
-                type="button"
-                data-intent-button
-                data-intent="planning"
-                aria-pressed="false"
-              >
-                I am planning a project
-              </button>
-              <button
-                class="button secondary intent-button"
-                type="button"
-                data-intent-button
-                data-intent="assurance"
-                aria-pressed="false"
-              >
-                I need assurance review
-              </button>
-            </div>
-            <p class="form-status mono" id="enter-route-status" role="status" aria-live="polite">
-              Orientation selected. Previewing the best starting route now.
-            </p>
-            <div class="preview-grid" aria-live="polite">
-              <article class="preview-card is-active" data-intent-panel="orientation">
-                <span class="hud-tag a11y-override-badge">Route // Start Here</span>
-                <h3>Recommended first page: Start Here</h3>
-                <p class="system-copy">
-                  Use the beginner-friendly onboarding page to understand what MSH OPS is, what the ecosystem includes,
-                  and which path to choose next.
-                </p>
-                <p class="path-summary mono">Intent :: orientation | Route :: /start | Handoff :: /intake?intent=orientation</p>
-                <div class="cta-row">
-                  <a class="button secondary" href="/start">Open Start Here</a>
-                  <a class="button primary" data-intake-link href="/intake?intent=orientation&path=/start&source=enter">
-                    Continue to Intake
-                  </a>
-                </div>
-              </article>
-              <article class="preview-card" data-intent-panel="planning" hidden>
-                <span class="hud-tag a11y-override-badge">Route // Ecosystem</span>
-                <h3>Recommended first page: Ecosystem</h3>
-                <p class="system-copy">
-                  Review how Scenario Engine, Mission Engine, Doctrine OS, intake, governance, and ecosystem health
-                  connect before submitting your request.
-                </p>
-                <p class="path-summary mono">Intent :: planning | Route :: /ecosystem | Handoff :: /intake?intent=planning</p>
-                <div class="cta-row">
-                  <a class="button secondary" href="/ecosystem">Open Ecosystem</a>
-                  <a class="button primary" data-intake-link href="/intake?intent=planning&path=/ecosystem&source=enter">
-                    Continue to Intake
-                  </a>
-                </div>
-              </article>
-              <article class="preview-card" data-intent-panel="assurance" hidden>
-                <span class="hud-tag a11y-override-badge">Route // Mission</span>
-                <h3>Recommended first page: Mission</h3>
-                <p class="system-copy">
-                  If you already know you need guided delivery or assurance support, review the public mission framework
-                  and then continue into the intake flow.
-                </p>
-                <p class="path-summary mono">Intent :: assurance | Route :: /mission | Handoff :: /intake?intent=assurance</p>
-                <div class="cta-row">
-                  <a class="button secondary" href="/mission">Open Mission</a>
-                  <a class="button primary" data-intake-link href="/intake?intent=assurance&path=/mission&source=enter">
-                    Continue to Intake
-                  </a>
-                </div>
-              </article>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <section class="section-block" id="features" aria-labelledby="funnel-details-heading">
-        <div class="section-heading">
-          <div>
-            <p class="section-label mono">[ FUNNEL_DETAILS ]</p>
-            <h2 id="funnel-details-heading">How the funnel works</h2>
-          </div>
-        </div>
-        <div class="telemetry-grid">
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Step // Intent</span>
-              <h3>Pick a clear starting intent</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                Each option stays public-safe and avoids private delivery terminology while still capturing enough
-                context to guide the next step.
-              </p>
-            </div>
-          </article>
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Step // Preview</span>
-              <h3>See the route before you commit</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                The preview shows the recommended public page, what it explains, and how that path hands off into the
-                intake form.
-              </p>
-            </div>
-          </article>
-          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
-            <header class="rgbgold-module-shell-header">
-              <span class="hud-tag a11y-override-badge">Step // Intake</span>
-              <h3>Continue into the worker-backed intake surface</h3>
-            </header>
-            <div class="rgbgold-module-shell-body">
-              <p class="system-copy">
-                The final handoff moves into <code>/intake</code>, where the public form submits through the existing
-                engagement creation path.
-              </p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="section-block" id="contact" aria-labelledby="enter-contact-heading">
-        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="2.0">
-          <header class="rgbgold-module-shell-header">
-            <span class="hud-tag a11y-override-badge">Alternate // Contact</span>
-            <p class="section-label mono">[ PUBLIC_FALLBACK ]</p>
-            <h2 id="enter-contact-heading">Need a simpler path?</h2>
-          </header>
-          <div class="rgbgold-module-shell-body">
-            <p class="system-copy">
-              If you are not ready to choose an intake path yet, use the public contact page for a lighter first step.
+              This public-safe funnel preserves your selected route, captures operator context, and keeps private
+              operator surfaces isolated behind the existing engagement flow.
             </p>
             <div class="cta-row">
-              <a class="button primary" href="/contact">Open Contact</a>
-              <a class="button secondary" href="/status">View Status</a>
+              <a class="button primary" href="#lead-form-shell" data-scroll-target="lead-form-shell">[ START INTAKE ]</a>
+              <a class="button secondary" href="#calendly-shell" data-scroll-target="calendly-shell">[ BOOK CALENDLY ]</a>
+              <a class="button ghost" href="/services">[ RETURN TO SERVICES ]</a>
             </div>
-            <div class="a11y-hook" data-a11y-override hidden></div>
           </div>
         </article>
+      </section>
+
+      <section class="section-block" id="enter-security-panel" hidden>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <p class="section-label mono">[ SECURITY_PLANE ]</p>
+            <h2 id="enter-security-heading">Security-stage intake</h2>
+            <p class="form-status mono" id="enter-security-stage" role="status" aria-live="polite">Security stage pending.</p>
+            <p class="system-copy mono" id="enter-permission-profile">Permission profile pending.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="enter-lifecycle-panel">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ INTAKE_LIFECYCLE ]</p>
+            <h2 id="enter-lifecycle-heading">Intake lifecycle status</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <p class="form-status mono" id="enter-lifecycle-status" role="status" aria-live="polite">
+              Lifecycle context loads when audit-lite routing metadata is present.
+            </p>
+            <div class="telemetry-list" id="enter-lifecycle-timeline">
+              <span>No lifecycle events loaded.</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="services-layout">
+          <article class="contact-form-shell bracket reveal" data-reveal="left" id="lead-form-shell">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ LEAD_CAPTURE ]</p>
+              <h2>Transmit operator context</h2>
+              <p class="system-copy">
+                Send enough context to preserve routing, diagnostic scores, and your preferred intake path without
+                exposing private operator links on this page.
+              </p>
+              <form class="contact-form" id="enter-lead-form">
+                <label>
+                  <span>Operator Handle</span>
+                  <input name="operator_handle" type="text" required />
+                </label>
+                <label>
+                  <span>Contact Email</span>
+                  <input name="contact_email" type="email" required />
+                </label>
+                <label>
+                  <span>Organization</span>
+                  <input name="organization" type="text" />
+                </label>
+                <label>
+                  <span>Module Interest</span>
+                  <input id="module-interest" name="module_interest" type="text" />
+                </label>
+                <label>
+                  <span>Urgency</span>
+                  <select name="urgency">
+                    <option value="">Select urgency</option>
+                    <option value="this_week">This week</option>
+                    <option value="this_month">This month</option>
+                    <option value="planning_phase">Planning phase</option>
+                    <option value="research_only">Research only</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Mission Brief</span>
+                  <textarea id="transmission" name="transmission" rows="7" required></textarea>
+                </label>
+
+                <input id="hidden-service" name="service" type="hidden" />
+                <input id="hidden-priority" name="priority" type="hidden" />
+                <input id="hidden-source" name="source" type="hidden" />
+                <input id="hidden-selector-id" name="selector_id" type="hidden" />
+                <input id="hidden-audit-id" name="audit_id" type="hidden" />
+                <input id="hidden-register-id" name="register_id" type="hidden" />
+                <input id="hidden-scan-id" name="scan_id" type="hidden" />
+                <input id="hidden-agent-check-id" name="agent_check_id" type="hidden" />
+                <input id="hidden-automation-roi-id" name="automation_roi_id" type="hidden" />
+                <input id="hidden-rag-risk-id" name="rag_risk_id" type="hidden" />
+                <input id="hidden-risk-score" name="risk_score" type="hidden" />
+                <input id="hidden-injection-score" name="injection_score" type="hidden" />
+                <input id="hidden-risk-tier" name="risk_tier" type="hidden" />
+                <input id="hidden-readiness-score" name="readiness_score" type="hidden" />
+                <input id="hidden-readiness-tier" name="readiness_tier" type="hidden" />
+                <input id="hidden-roi-score" name="roi_score" type="hidden" />
+                <input id="hidden-roi-tier" name="roi_tier" type="hidden" />
+                <input id="hidden-rag-risk-score" name="rag_risk_score" type="hidden" />
+                <input id="hidden-rag-risk-tier" name="rag_risk_tier" type="hidden" />
+                <input id="hidden-estimated-monthly-savings" name="estimated_monthly_savings" type="hidden" />
+                <input id="hidden-estimated-annual-savings" name="estimated_annual_savings" type="hidden" />
+                <input id="hidden-hours-saved-per-month" name="hours_saved_per_month" type="hidden" />
+                <input id="hidden-retrieval-exposure-level" name="retrieval_exposure_level" type="hidden" />
+                <input id="hidden-access-control-level" name="access_control_level" type="hidden" />
+                <input id="hidden-governance-maturity" name="governance_maturity" type="hidden" />
+                <input id="hidden-build-complexity" name="build_complexity" type="hidden" />
+                <input id="hidden-automation-complexity" name="automation_complexity" type="hidden" />
+                <input id="hidden-safety-level" name="safety_level" type="hidden" />
+
+                <div class="cta-row">
+                  <button class="button primary" id="enter-submit" type="submit">[ CAPTURE LEAD ]</button>
+                  <a class="button secondary" href="/services">[ REVIEW SERVICES ]</a>
+                </div>
+              </form>
+              <p class="form-status mono" id="enter-form-status" role="status" aria-live="polite">
+                Intake form ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket reveal" data-reveal="up" id="calendly-shell">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ CALENDLY ]</p>
+              <h2>Optional calendar handoff</h2>
+              <p class="system-copy">
+                If you want a faster intake handoff, use the embedded booking widget. The lead form still preserves the
+                structured route and audit metadata.
+              </p>
+              <div
+                class="calendly-inline-widget"
+                data-url="https://calendly.com/matrixsechub/30min"
+                style="min-width: 320px; height: 700px"
+              ></div>
+            </div>
+          </article>
+        </div>
       </section>
     </main>
 
-    <div class="footer-divider" aria-hidden="true"></div>
     <footer class="footer mono">
       <div class="footer-copy">
-        <span>MSH OPS public intake funnel</span>
-        <span>Intent selection, routing preview, and handoff into the guided intake surface</span>
+        <span>MSHOPS.NET intake funnel</span>
+        <span>Public capture, lifecycle-aware routing, and operator-safe escalation</span>
       </div>
-      <nav class="nav-ecosystem" aria-label="Footer navigation">
-        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
-        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
-        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
-        <a href="#features" aria-label="Jump to public features">Features</a>
-        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="mailto:matrixsechub@outlook.com?subject=MSHOPS%20Intake">Contact</a>
       </nav>
     </footer>
 
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <script src="/enter.js" defer></script>
     <script src="/scripts/rgbgold-motion.js" defer></script>
     <script src="/scripts/a11y.js" defer></script>
     <script src="/scripts/drift.js" defer></script>
@@ -255,6 +212,5 @@
     <script src="/scripts/motion-scan.js" defer></script>
     <script src="/scripts/hud-scan.js" defer></script>
     <script src="/scripts/ecosystem-health.js" defer></script>
-    <script src="/scripts/enter-page.js" defer></script>
   </body>
 </html>

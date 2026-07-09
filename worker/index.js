@@ -11,6 +11,8 @@ import intakeAgent from "./agents/intakeAgent.js";
 import securityIntakeAgent from "./agents/securityIntakeAgent.js";
 import cloudflareSecurityAudit from "./data/cloudflareSecurityAudit.js";
 import handleDoctrineRequest from "./doctrine/index.js";
+import { INTAKE_DEMO_MODE_MESSAGE, isIntakeDemoMode } from "./data/intakeDemoMode.js";
+import publicRegister from "./data/publicRegister.js";
 import {
   collectAutonomousSignalInputs,
   buildAutonomousGovernanceSignals,
@@ -200,8 +202,22 @@ const {
   computeAuditLiteResult,
   recordAuditLiteSubmission,
   attachEngagementToAuditLite,
-  listAuditLiteQueue,
+  getAuditLiteLifecycle,
+  getAuditLiteOperatorSnapshot,
+  getAuditLiteMarketplaceSummary,
 } = auditLite;
+const {
+  publicRegisterMarketplaceModule,
+  normalizePublicRegisterAnswers,
+  computePublicRegisterResult,
+  recordPublicRegisterSubmission,
+  getPublicRegisterLifecycle,
+  getPublicRegisterSecurityPlane,
+  getPublicRegisterQueuePreview,
+  getPublicRegisterOperatorSnapshot,
+  getPublicRegisterMarketplaceSummary,
+  buildPublicRegisterMarketplacePayload,
+} = publicRegister;
 const {
   promptInjectionMarketplaceModule,
   normalizePromptInjectionAnswers,
@@ -332,6 +348,10 @@ export default {
         return serveStatic(request, env, "/audit-lite-operator.html");
       }
 
+      if (url.pathname === "/operator/register-intake" || url.pathname === "/operator/register-intake/") {
+        return serveStatic(request, env, "/operator/register-intake.html");
+      }
+
       if (url.pathname === "/operator/prompt-injection-scans" || url.pathname === "/operator/prompt-injection-scans/") {
         return serveStatic(request, env, "/prompt-injection-scans-operator.html");
       }
@@ -358,6 +378,10 @@ export default {
 
       if (url.pathname === "/enter" || url.pathname === "/enter/") {
         return serveStatic(request, env, "/enter.html");
+      }
+
+      if (url.pathname === "/register" || url.pathname === "/register/") {
+        return serveStatic(request, env, "/register.html");
       }
 
       if (url.pathname === "/marketplace" || url.pathname === "/marketplace/") {
@@ -582,6 +606,10 @@ function resolveStaticPath(requestPath) {
     return "/audit-lite-operator.html";
   }
 
+  if (normalizedRequestPath === "/operator/register-intake" || normalizedRequestPath === "/operator/register-intake/") {
+    return "/operator/register-intake.html";
+  }
+
   if (normalizedRequestPath === "/operator/prompt-injection-scans" || normalizedRequestPath === "/operator/prompt-injection-scans/") {
     return "/prompt-injection-scans-operator.html";
   }
@@ -608,6 +636,10 @@ function resolveStaticPath(requestPath) {
 
   if (normalizedRequestPath === "/enter" || normalizedRequestPath === "/enter/") {
     return "/enter.html";
+  }
+
+  if (normalizedRequestPath === "/register" || normalizedRequestPath === "/register/") {
+    return "/register.html";
   }
 
   if (normalizedRequestPath === "/marketplace" || normalizedRequestPath === "/marketplace/") {
@@ -3514,10 +3546,34 @@ async function handleApi(request, env, url) {
       const answers = normalizeAuditLiteAnswers(payload);
       const result = computeAuditLiteResult(answers);
       recordAuditLiteSubmission(answers, result);
-      return json(result, 200, { "Cache-Control": "no-store" });
+      const lifecycle = getAuditLiteLifecycle(result.audit_id, engagements);
+      return json(
+        {
+          ...result,
+          lifecycle,
+          hq_health: getAuditLiteOperatorSnapshot(engagements).summary.health,
+          route_table: intakeAgent.intakeRoutingTable?.audit_lite || null,
+        },
+        200,
+        { "Cache-Control": "no-store" },
+      );
     } catch (error) {
       return json({ error: error.message || "audit-lite-failed" }, 400);
     }
+  }
+
+  if (method === "GET" && pathname === "/api/audit-lite/lifecycle") {
+    const auditId = normalizeText(url.searchParams.get("audit_id"));
+    if (!auditId) {
+      return json({ error: "audit_id is required" }, 400);
+    }
+
+    const lifecycle = getAuditLiteLifecycle(auditId, engagements);
+    if (!lifecycle) {
+      return json({ error: "Audit lifecycle not found" }, 404);
+    }
+
+    return json(lifecycle, 200, { "Cache-Control": "no-store" });
   }
 
   if (method === "POST" && pathname === "/api/prompt-injection-scan") {
@@ -4818,6 +4874,91 @@ async function handleApi(request, env, url) {
     }
   }
 
+  if (method === "GET" && pathname === "/api/public/demo-mode") {
+    const enabled = isIntakeDemoMode(env);
+    return json(
+      {
+        enabled,
+        message: INTAKE_DEMO_MODE_MESSAGE,
+      },
+      200,
+      { "Cache-Control": "no-store" }
+    );
+  }
+
+  if (method === "POST" && pathname === "/api/register") {
+    try {
+      const payload = await readBody(request);
+      const demoMode = isIntakeDemoMode(env);
+      const answers = normalizePublicRegisterAnswers(payload);
+      const result = computePublicRegisterResult(answers);
+      let lifecycle = null;
+
+      if (!demoMode) {
+        recordPublicRegisterSubmission(answers, result);
+        lifecycle = getPublicRegisterLifecycle(result.register_id);
+      } else {
+        lifecycle = {
+          register_id: result.register_id,
+          lifecycle_status: "received",
+          lifecycle_label: "Pending Intake",
+          lifecycle_timeline: [
+            {
+              status: "received",
+              label: "Pending Intake",
+              at: new Date().toISOString(),
+              note: "Demo mode capture only — no data stored.",
+            },
+          ],
+          observer_mode: true,
+          operator_mode: false,
+          permission_profile: result.permission_profile,
+          security_stage: result.security_stage,
+          agent_config_key: result.agent_config_key,
+        };
+      }
+
+      return json(
+        {
+          status: "pending",
+          mode: demoMode ? "demo" : "public",
+          received_at: new Date().toISOString(),
+          ...result,
+          lifecycle,
+          security_plane: getPublicRegisterSecurityPlane(),
+          queue_preview: demoMode ? { queue_length: 0, lifecycle_stage: "received" } : getPublicRegisterQueuePreview(),
+          route_table: intakeAgent.intakeRoutingTable?.public_register || null,
+        },
+        200,
+        { "Cache-Control": "no-store" },
+      );
+    } catch (error) {
+      return json({ error: error.message || "register-failed" }, 400);
+    }
+  }
+
+  if (method === "GET" && pathname === "/api/register-lifecycle") {
+    const registerId = normalizeText(url.searchParams.get("register_id"));
+    if (!registerId) {
+      return json({ error: "register_id is required" }, 400);
+    }
+
+    const lifecycle = getPublicRegisterLifecycle(registerId);
+    if (!lifecycle) {
+      return json({ error: "Register lifecycle not found" }, 404);
+    }
+
+    return json(lifecycle, 200, { "Cache-Control": "no-store" });
+  }
+
+  if (method === "GET" && pathname === "/api/register-security") {
+    return json(getPublicRegisterSecurityPlane(), 200, { "Cache-Control": "no-store" });
+  }
+
+  if (method === "GET" && pathname === "/api/register-queue") {
+    return json(getPublicRegisterQueuePreview(), 200, { "Cache-Control": "no-store" });
+  }
+
   if (method === "GET" && pathname === "/api/identity") {
     try {
       const identity = getIdentityDescriptor();
@@ -5180,6 +5321,7 @@ async function handleApi(request, env, url) {
         risk_tier: engagement.riskTier,
         priority: engagement.priority,
         recommended_service: engagement.recommendedService || engagement.moduleInterest,
+        top_risks: Array.isArray(payload.top_risks) ? payload.top_risks : [],
         status: engagement.status,
         created_at: engagement.createdAt,
         source: engagement.source,
@@ -5392,9 +5534,23 @@ async function handleApi(request, env, url) {
   }
 
   if (method === "GET" && pathname === "/api/operator/audit-lite") {
-    return json({
-      rows: listAuditLiteQueue(engagements),
-    });
+    return json(
+      getAuditLiteOperatorSnapshot(engagements, {
+        markProcessed: isOperatorSurfaceRequest(request),
+      }),
+      200,
+      { "Cache-Control": "no-store" },
+    );
+  }
+
+  if (method === "GET" && pathname === "/api/operator/register-intake") {
+    return json(
+      getPublicRegisterOperatorSnapshot({
+        markProcessed: isOperatorSurfaceRequest(request),
+      }),
+      200,
+      { "Cache-Control": "no-store" },
+    );
   }
 
   if (method === "GET" && pathname === "/api/operator/prompt-injection-scans") {
@@ -5425,11 +5581,15 @@ async function handleApi(request, env, url) {
     return json({
       modules: [
         ...serviceMarketplaceModules,
-        auditLiteMarketplaceModule,
+        {
+          ...auditLiteMarketplaceModule,
+          lifecycle_summary: getAuditLiteMarketplaceSummary(engagements),
+        },
         promptInjectionMarketplaceModule,
         agentReadinessMarketplaceModule,
         automationRoiMarketplaceModule,
         ragRiskMarketplaceModule,
+        buildPublicRegisterMarketplacePayload(),
       ],
     });
   }

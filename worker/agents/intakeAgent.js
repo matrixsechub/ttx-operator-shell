@@ -2,6 +2,27 @@ import serviceSelector from "../data/serviceSelector.js";
 
 const { getServiceBySlug } = serviceSelector;
 
+const intakeRoutingTable = {
+  service_selector: {
+    submit: "POST /api/service-selector",
+    funnel: "GET /enter?source=service-selector",
+    operator: "GET /operator/service-intake",
+  },
+  audit_lite: {
+    submit: "POST /api/audit-lite",
+    funnel: "GET /enter?source=audit-lite",
+    operator: "GET /operator/audit-lite",
+  },
+  public_register: {
+    submit: "POST /api/register",
+    funnel: "GET /enter?source=public-register",
+    operator: "GET /operator/register-intake",
+    lifecycle: "GET /api/register-lifecycle",
+    security: "GET /api/register-security",
+    queue: "GET /api/register-queue",
+  },
+};
+
 const serviceMap = {
   secure_ai_tools: { primary: "ai_security_audit", secondary: "copilot_governance" },
   build_ai_agent: { primary: "ai_agent_build", secondary: "ai_automation_systems" },
@@ -303,6 +324,7 @@ function process(selector, engagement = {}) {
 }
 
 export default {
+  intakeRoutingTable,
   normalizeSelector,
   score,
   summarize,

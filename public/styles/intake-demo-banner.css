@@ -1,0 +1,45 @@
+.intake-demo-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid rgba(77, 252, 240, 0.35);
+  background:
+    linear-gradient(90deg, rgba(60, 242, 255, 0.12), rgba(245, 196, 81, 0.16), rgba(211, 75, 255, 0.12)),
+    rgba(5, 6, 8, 0.94);
+  color: var(--gold, #f2c14e);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 18px rgba(77, 252, 240, 0.12);
+}
+
+.intake-demo-banner::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--neon-cyan, #4dfcf0);
+  box-shadow: 0 0 10px var(--neon-cyan, #4dfcf0);
+}
+
+body.demo-mode-active {
+  padding-top: 2.35rem;
+}
+
+body.demo-mode-active .topbar {
+  top: 2.35rem;
+}
+
+.register-demo-note {
+  margin-top: 0.75rem;
+  color: var(--neon-cyan, #4dfcf0);
+  font-size: 0.9rem;
+}

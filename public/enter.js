@@ -34,6 +34,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const hiddenBuildComplexity = document.getElementById("hidden-build-complexity");
   const hiddenAutomationComplexity = document.getElementById("hidden-automation-complexity");
   const hiddenSafetyLevel = document.getElementById("hidden-safety-level");
+  const lifecyclePanel = document.getElementById("enter-lifecycle-panel");
+  const lifecycleHeading = document.getElementById("enter-lifecycle-heading");
+  const lifecycleStatus = document.getElementById("enter-lifecycle-status");
+  const lifecycleTimeline = document.getElementById("enter-lifecycle-timeline");
+  const securityPanel = document.getElementById("enter-security-panel");
+  const securityHeading = document.getElementById("enter-security-heading");
+  const securityStage = document.getElementById("enter-security-stage");
+  const permissionProfile = document.getElementById("enter-permission-profile");
+  const hiddenRegisterId = document.getElementById("hidden-register-id");
   const params = new URLSearchParams(window.location.search);
 
   const selectedService = params.get("service") || "";
@@ -41,6 +50,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const selectedSource = params.get("source") || "enter-funnel";
   const selectedSelectorId = params.get("selector_id") || "";
   const selectedAuditId = params.get("audit_id") || "";
+  const selectedRegisterId = params.get("register_id") || "";
+  const selectedRole = params.get("role") || "";
   const selectedScanId = params.get("scan_id") || "";
   const selectedAgentCheckId = params.get("agent_check_id") || "";
   const selectedAutomationRoiId = params.get("automation_roi_id") || "";
@@ -82,6 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (hiddenAuditId instanceof HTMLInputElement) {
     hiddenAuditId.value = selectedAuditId;
+  }
+
+  if (hiddenRegisterId instanceof HTMLInputElement) {
+    hiddenRegisterId.value = selectedRegisterId;
   }
 
   if (hiddenScanId instanceof HTMLInputElement) {
@@ -171,7 +186,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (contextHeading instanceof HTMLElement && selectedSource === "audit-lite") {
-    contextHeading.textContent = "Start your full AI Security Audit intake";
+    contextHeading.textContent = "AI Security Audit - Access Pending";
+  } else if (contextHeading instanceof HTMLElement && selectedSource === "public-register") {
+    contextHeading.textContent = "Registration Intake Pending";
   } else if (contextHeading instanceof HTMLElement && selectedSource === "prompt-injection-scanner") {
     contextHeading.textContent = "Start your full Prompt Injection Review intake";
   } else if (contextHeading instanceof HTMLElement && selectedSource === "agent-readiness-checker") {
@@ -197,6 +214,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (selectedAuditId) {
       segments.push(`audit ${selectedAuditId}`);
+    }
+    if (selectedRegisterId) {
+      segments.push(`register ${selectedRegisterId}`);
+    }
+    if (selectedRole) {
+      segments.push(`role ${selectedRole}`);
     }
     if (selectedScanId) {
       segments.push(`scan ${selectedScanId}`);
@@ -246,6 +269,148 @@ document.addEventListener("DOMContentLoaded", () => {
     contextBadge.textContent = segments.join(" :: ");
   }
 
+  async function loadAuditLifecycle() {
+    if (!(lifecyclePanel instanceof HTMLElement)) {
+      return;
+    }
+
+    if (selectedSource !== "audit-lite" || !selectedAuditId) {
+      if (selectedSource !== "public-register") {
+        lifecyclePanel.hidden = true;
+      }
+      return;
+    }
+
+    lifecyclePanel.hidden = false;
+    if (lifecycleHeading instanceof HTMLElement) {
+      lifecycleHeading.textContent = "Audit-lite lifecycle status";
+    }
+    if (lifecycleStatus instanceof HTMLElement) {
+      lifecycleStatus.textContent = "Loading audit-lite lifecycle...";
+      lifecycleStatus.dataset.state = "";
+    }
+
+    try {
+      const response = await fetch(`/api/audit-lite/lifecycle?audit_id=${encodeURIComponent(selectedAuditId)}`, {
+        headers: { "Cache-Control": "no-store" },
+      });
+      if (!response.ok) {
+        throw new Error(`Lifecycle request failed with status ${response.status}`);
+      }
+
+      const lifecycle = await response.json();
+      if (contextBadge instanceof HTMLElement) {
+        const base = contextBadge.textContent ? `${contextBadge.textContent} :: ` : "";
+        contextBadge.textContent = `${base}${lifecycle.lifecycle_label}`;
+      }
+      if (lifecycleStatus instanceof HTMLElement) {
+        lifecycleStatus.textContent = lifecycle.operator_mode
+          ? "Operator Mode available. Intake lifecycle has already been processed."
+          : "Observer Mode active. Audit intake remains in the public-to-operator handoff path.";
+        lifecycleStatus.dataset.state = lifecycle.operator_mode ? "success" : "warning";
+      }
+      if (lifecycleTimeline instanceof HTMLElement) {
+        lifecycleTimeline.innerHTML = (Array.isArray(lifecycle.lifecycle_timeline) ? lifecycle.lifecycle_timeline : [])
+          .map(
+            (entry) =>
+              `<span>${entry.label || entry.status} :: ${new Date(entry.at).toLocaleString()}${entry.note ? ` :: ${entry.note}` : ""}</span>`,
+          )
+          .join("");
+      }
+    } catch (error) {
+      console.error("MSHOPS audit-lite lifecycle load failed", error);
+      if (lifecycleStatus instanceof HTMLElement) {
+        lifecycleStatus.textContent = "Audit-lite lifecycle is unavailable right now.";
+        lifecycleStatus.dataset.state = "error";
+      }
+      if (lifecycleTimeline instanceof HTMLElement) {
+        lifecycleTimeline.innerHTML = "<span>No lifecycle events available.</span>";
+      }
+    }
+  }
+
+  async function loadRegisterLifecycle() {
+    if (selectedSource !== "public-register") {
+      if (securityPanel instanceof HTMLElement) {
+        securityPanel.hidden = true;
+      }
+      return;
+    }
+
+    if (securityPanel instanceof HTMLElement) {
+      securityPanel.hidden = false;
+    }
+    if (securityHeading instanceof HTMLElement) {
+      securityHeading.textContent = "Registration Intake Pending";
+    }
+
+    try {
+      const securityResponse = await fetch("/api/register-security", {
+        headers: { "Cache-Control": "no-store" },
+      });
+      if (securityResponse.ok) {
+        const securityPlane = await securityResponse.json();
+        if (securityStage instanceof HTMLElement) {
+          securityStage.textContent = `Security stage :: ${securityPlane.module?.security_stage || "intake"}`;
+          securityStage.dataset.state = "warning";
+        }
+        if (permissionProfile instanceof HTMLElement) {
+          permissionProfile.textContent = `Permission profile :: ${securityPlane.module?.permission_profile || "public_intake"} :: agent ${securityPlane.module?.agent_config_key || "intake_agent_v2"}`;
+        }
+      }
+    } catch (error) {
+      console.error("MSHOPS register security-plane load failed", error);
+    }
+
+    if (!(lifecyclePanel instanceof HTMLElement) || !selectedRegisterId) {
+      return;
+    }
+
+    lifecyclePanel.hidden = false;
+    if (lifecycleHeading instanceof HTMLElement) {
+      lifecycleHeading.textContent = "Registration lifecycle status";
+    }
+    if (lifecycleStatus instanceof HTMLElement) {
+      lifecycleStatus.textContent = "Loading registration lifecycle...";
+      lifecycleStatus.dataset.state = "";
+    }
+
+    try {
+      const response = await fetch(`/api/register-lifecycle?register_id=${encodeURIComponent(selectedRegisterId)}`, {
+        headers: { "Cache-Control": "no-store" },
+      });
+      if (!response.ok) {
+        throw new Error(`Lifecycle request failed with status ${response.status}`);
+      }
+
+      const lifecycle = await response.json();
+      if (contextBadge instanceof HTMLElement) {
+        const base = contextBadge.textContent ? `${contextBadge.textContent} :: ` : "";
+        contextBadge.textContent = `${base}${lifecycle.lifecycle_label}`;
+      }
+      if (lifecycleStatus instanceof HTMLElement) {
+        lifecycleStatus.textContent = lifecycle.operator_mode
+          ? "Operator Mode available. Registration lifecycle has been processed."
+          : "Registration Intake Pending — operator review required.";
+        lifecycleStatus.dataset.state = lifecycle.operator_mode ? "success" : "warning";
+      }
+      if (lifecycleTimeline instanceof HTMLElement) {
+        lifecycleTimeline.innerHTML = (Array.isArray(lifecycle.lifecycle_timeline) ? lifecycle.lifecycle_timeline : [])
+          .map((entry) => `<span>${entry.label || entry.status}</span>`)
+          .join("") || "<span>No lifecycle events available.</span>";
+      }
+    } catch (error) {
+      console.error("MSHOPS register lifecycle load failed", error);
+      if (lifecycleStatus instanceof HTMLElement) {
+        lifecycleStatus.textContent = "Registration lifecycle is unavailable right now.";
+        lifecycleStatus.dataset.state = "error";
+      }
+      if (lifecycleTimeline instanceof HTMLElement) {
+        lifecycleTimeline.innerHTML = "<span>No lifecycle events available.</span>";
+      }
+    }
+  }
+
   if (transmissionField instanceof HTMLTextAreaElement && selectedService && !transmissionField.value) {
     transmissionField.placeholder = `Mission context for ${selectedService.replace(
       /_/g,
@@ -271,6 +436,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) {
+    loadAuditLifecycle();
+    loadRegisterLifecycle();
     return;
   }
 
@@ -290,6 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
       source: String(formData.get("source") || "").trim() || "enter-funnel",
       selector_id: String(formData.get("selector_id") || "").trim(),
       audit_id: String(formData.get("audit_id") || "").trim(),
+      register_id: String(formData.get("register_id") || "").trim(),
       scan_id: String(formData.get("scan_id") || "").trim(),
       agent_check_id: String(formData.get("agent_check_id") || "").trim(),
       automation_roi_id: String(formData.get("automation_roi_id") || "").trim(),
@@ -347,12 +515,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const result = await response.json();
       status.textContent = `Lead captured. Intake ${result.engagement_id || result.id} is now ${result.status}.`;
       status.dataset.state = "success";
+      if (selectedSource === "audit-lite") {
+        loadAuditLifecycle();
+      }
+      if (selectedSource === "public-register") {
+        loadRegisterLifecycle();
+      }
       form.reset();
       if (hiddenService instanceof HTMLInputElement) hiddenService.value = selectedService;
       if (hiddenPriority instanceof HTMLInputElement) hiddenPriority.value = selectedPriority;
       if (hiddenSource instanceof HTMLInputElement) hiddenSource.value = selectedSource;
       if (hiddenSelectorId instanceof HTMLInputElement) hiddenSelectorId.value = selectedSelectorId;
       if (hiddenAuditId instanceof HTMLInputElement) hiddenAuditId.value = selectedAuditId;
+      if (hiddenRegisterId instanceof HTMLInputElement) hiddenRegisterId.value = selectedRegisterId;
       if (hiddenScanId instanceof HTMLInputElement) hiddenScanId.value = selectedScanId;
       if (hiddenAgentCheckId instanceof HTMLInputElement) hiddenAgentCheckId.value = selectedAgentCheckId;
       if (hiddenAutomationRoiId instanceof HTMLInputElement) hiddenAutomationRoiId.value = selectedAutomationRoiId;
@@ -389,4 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  loadAuditLifecycle();
+  loadRegisterLifecycle();
 });

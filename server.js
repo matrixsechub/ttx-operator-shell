@@ -39,7 +39,9 @@ const {
   computeAuditLiteResult,
   recordAuditLiteSubmission,
   attachEngagementToAuditLite,
-  listAuditLiteQueue
+  getAuditLiteLifecycle,
+  getAuditLiteOperatorSnapshot,
+  getAuditLiteMarketplaceSummary
 } = require("./data/auditLite");
 const {
   promptInjectionMarketplaceModule,
@@ -73,6 +75,19 @@ const {
   attachEngagementToRagRisk,
   listRagRiskQueue
 } = require("./data/ragRiskAnalyzer");
+const {
+  publicRegisterMarketplaceModule,
+  normalizePublicRegisterAnswers,
+  computePublicRegisterResult,
+  recordPublicRegisterSubmission,
+  getPublicRegisterLifecycle,
+  getPublicRegisterSecurityPlane,
+  getPublicRegisterQueuePreview,
+  getPublicRegisterOperatorSnapshot,
+  getPublicRegisterMarketplaceSummary,
+  buildPublicRegisterMarketplacePayload
+} = require("./data/publicRegister");
+const { isIntakeDemoMode, INTAKE_DEMO_MODE_MESSAGE } = require("./data/intakeDemoMode");
 const {
   isOperatorSurfaceRequest,
   startSecurityAudit,
@@ -209,6 +224,10 @@ function resolveStaticPath(requestPath) {
     return "/audit-lite-operator.html";
   }
 
+  if (requestPath === "/operator/register-intake" || requestPath === "/operator/register-intake/") {
+    return "/operator/register-intake.html";
+  }
+
   if (requestPath === "/operator/prompt-injection-scans" || requestPath === "/operator/prompt-injection-scans/") {
     return "/prompt-injection-scans-operator.html";
   }
@@ -235,6 +254,10 @@ function resolveStaticPath(requestPath) {
 
   if (requestPath === "/enter" || requestPath === "/enter/") {
     return "/enter.html";
+  }
+
+  if (requestPath === "/register" || requestPath === "/register/") {
+    return "/register.html";
   }
 
   if (requestPath === "/api-explorer" || requestPath === "/api-explorer/") {
@@ -454,11 +477,133 @@ async function handleApi(request, response, url) {
       const payload = await readBody(request);
       const answers = normalizeAuditLiteAnswers(payload);
       const result = computeAuditLiteResult(answers);
-      recordAuditLiteSubmission(answers, result);
-      sendJson(response, 200, result, { "Cache-Control": "no-store" });
+      const submission = recordAuditLiteSubmission(answers, result);
+      const lifecycle = getAuditLiteLifecycle(result.audit_id, engagements);
+      sendJson(
+        response,
+        200,
+        {
+          ...result,
+          lifecycle,
+          hq_health: getAuditLiteOperatorSnapshot(engagements).summary.health,
+          route_table: intakeAgent.intakeRoutingTable?.audit_lite || null,
+        },
+        { "Cache-Control": "no-store" },
+      );
     } catch (error) {
       sendJson(response, 400, { error: error.message || "audit-lite-failed" });
     }
+    return;
+  }
+
+  if (method === "GET" && pathname === "/api/audit-lite/lifecycle") {
+    const auditId = normalizeText(url.searchParams.get("audit_id"));
+    if (!auditId) {
+      sendJson(response, 400, { error: "audit_id is required" });
+      return;
+    }
+
+    const lifecycle = getAuditLiteLifecycle(auditId, engagements);
+    if (!lifecycle) {
+      sendJson(response, 404, { error: "Audit lifecycle not found" });
+      return;
+    }
+
+    sendJson(response, 200, lifecycle, { "Cache-Control": "no-store" });
+    return;
+  }
+
+  if (method === "POST" && pathname === "/api/register") {
+    try {
+      const payload = await readBody(request);
+      const demoMode = isIntakeDemoMode({});
+      const answers = normalizePublicRegisterAnswers(payload);
+      const result = computePublicRegisterResult(answers);
+      let lifecycle = null;
+
+      if (!demoMode) {
+        recordPublicRegisterSubmission(answers, result);
+        lifecycle = getPublicRegisterLifecycle(result.register_id);
+      } else {
+        lifecycle = {
+          register_id: result.register_id,
+          lifecycle_status: "received",
+          lifecycle_label: "Pending Intake",
+          lifecycle_timeline: [
+            {
+              status: "received",
+              label: "Pending Intake",
+              at: new Date().toISOString(),
+              note: INTAKE_DEMO_MODE_MESSAGE,
+            },
+          ],
+          observer_mode: true,
+          operator_mode: false,
+          permission_profile: result.permission_profile,
+          security_stage: result.security_stage,
+          agent_config_key: result.agent_config_key,
+        };
+      }
+
+      sendJson(
+        response,
+        200,
+        {
+          status: "pending",
+          mode: demoMode ? "demo" : "public",
+          received_at: new Date().toISOString(),
+          ...result,
+          lifecycle,
+          security_plane: getPublicRegisterSecurityPlane(),
+          queue_preview: demoMode ? { queue_length: 0, lifecycle_stage: "received" } : getPublicRegisterQueuePreview(),
+          route_table: intakeAgent.intakeRoutingTable?.public_register || null,
+        },
+        { "Cache-Control": "no-store" },
+      );
+    } catch (error) {
+      sendJson(response, 400, { error: error.message || "register-failed" });
+    }
+    return;
+  }
+
+  if (method === "GET" && pathname === "/api/register-lifecycle") {
+    const registerId = normalizeText(url.searchParams.get("register_id"));
+    if (!registerId) {
+      sendJson(response, 400, { error: "register_id is required" });
+      return;
+    }
+
+    const lifecycle = getPublicRegisterLifecycle(registerId);
+    if (!lifecycle) {
+      sendJson(response, 404, { error: "Register lifecycle not found" });
+      return;
+    }
+
+    sendJson(response, 200, lifecycle, { "Cache-Control": "no-store" });
+    return;
+  }
+
+  if (method === "GET" && pathname === "/api/register-security") {
+    sendJson(response, 200, getPublicRegisterSecurityPlane(), { "Cache-Control": "no-store" });
+    return;
+  }
+
+  if (method === "GET" && pathname === "/api/register-queue") {
+    sendJson(response, 200, getPublicRegisterQueuePreview(), { "Cache-Control": "no-store" });
+    return;
+  }
+
+  if (method === "GET" && pathname === "/api/public/demo-mode") {
+    const enabled = isIntakeDemoMode({});
+    sendJson(
+      response,
+      200,
+      {
+        enabled,
+        message: INTAKE_DEMO_MODE_MESSAGE,
+      },
+      { "Cache-Control": "no-store" },
+    );
     return;
   }
 
@@ -650,6 +795,7 @@ async function handleApi(request, response, url) {
         risk_tier: engagement.riskTier,
         priority: engagement.priority,
         recommended_service: engagement.recommendedService || engagement.moduleInterest,
+        top_risks: Array.isArray(payload.top_risks) ? payload.top_risks : [],
         status: engagement.status,
         created_at: engagement.createdAt,
         source: engagement.source
@@ -881,9 +1027,18 @@ async function handleApi(request, response, url) {
   }
 
   if (method === "GET" && pathname === "/api/operator/audit-lite") {
-    sendJson(response, 200, {
-      rows: listAuditLiteQueue(engagements)
+    const snapshot = getAuditLiteOperatorSnapshot(engagements, {
+      markProcessed: isOperatorSurfaceRequest(request),
     });
+    sendJson(response, 200, snapshot, { "Cache-Control": "no-store" });
+    return;
+  }
+
+  if (method === "GET" && pathname === "/api/operator/register-intake") {
+    const snapshot = getPublicRegisterOperatorSnapshot({
+      markProcessed: isOperatorSurfaceRequest(request),
+    });
+    sendJson(response, 200, snapshot, { "Cache-Control": "no-store" });
     return;
   }
 
@@ -919,11 +1074,15 @@ async function handleApi(request, response, url) {
     sendJson(response, 200, {
       modules: [
         ...serviceMarketplaceModules,
-        auditLiteMarketplaceModule,
+        {
+          ...auditLiteMarketplaceModule,
+          lifecycle_summary: getAuditLiteMarketplaceSummary(engagements),
+        },
         promptInjectionMarketplaceModule,
         agentReadinessMarketplaceModule,
         automationRoiMarketplaceModule,
-        ragRiskMarketplaceModule
+        ragRiskMarketplaceModule,
+        buildPublicRegisterMarketplacePayload()
       ]
     });
     return;
