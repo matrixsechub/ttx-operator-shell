@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | AI Security Intake Agent</title>
+    <meta
+      name="description"
+      content="Private operator security intake agent analyzing AI usage, risk, and exposure for intake records."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/operator">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>AI Security Intake Agent</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/operator">Operator</a>
+        <a href="/operator/service-intake">Service Intake</a>
+        <a href="/marketplace">Marketplace</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell reveal" data-reveal="up">
+        <article class="hero-panel bracket hud-frame">
+          <div class="bracket-inner hero-copy">
+            <div class="hud-ticker" aria-hidden="true">SECURITY_SCAN :: ARMED</div>
+            <p class="section-label mono">[ PRIVATE_ROUTE :: /OPERATOR/AGENTS/SECURITY-INTAKE ]</p>
+            <h1 class="glow-pulse">AI Security Intake Agent</h1>
+            <p class="hero-sub">
+              Operator-grade security brain that evaluates selector submissions and funnel engagements to produce
+              security-focused intake records. This surface is not linked from public pages.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/operator">[ RETURN TO OPERATOR ]</a>
+              <a class="button secondary" href="/operator/service-intake">[ SERVICE INTAKE QUEUE ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SECURITY_QUEUE ]</p>
+            <h2>Security intake records</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner">
+            <div class="service-intake-toolbar">
+              <label class="marketplace-search-label">
+                <span>Exposure Filter</span>
+                <select id="security-intake-filter">
+                  <option value="">all exposure levels</option>
+                  <option value="critical">critical</option>
+                  <option value="high">high</option>
+                  <option value="medium">medium</option>
+                  <option value="low">low</option>
+                </select>
+              </label>
+              <button class="button secondary" type="button" id="security-intake-refresh">[ REFRESH QUEUE ]</button>
+            </div>
+            <p class="form-status mono" id="security-intake-status" role="status" aria-live="polite">
+              Loading security intake queue.
+            </p>
+            <div class="service-intake-table-wrap">
+              <table class="service-intake-table">
+                <thead>
+                  <tr>
+                    <th>selector_id</th>
+                    <th>engagement_id</th>
+                    <th>security_risk_score</th>
+                    <th>security_exposure_level</th>
+                    <th>recommended_security_service</th>
+                    <th>status</th>
+                    <th>created_at</th>
+                  </tr>
+                </thead>
+                <tbody id="security-intake-rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SECURITY_SUMMARY ]</p>
+            <h2>Selected record summary</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner">
+            <div class="service-intake-toolbar">
+              <button class="button primary" type="button" id="security-intake-ready" disabled>[ MARK READY FOR REVIEW ]</button>
+              <button class="button secondary" type="button" id="security-intake-closed" disabled>[ MARK CLOSED ]</button>
+              <button class="button secondary" type="button" id="security-intake-view-selector" disabled>[ VIEW RAW SELECTOR ]</button>
+              <button class="button secondary" type="button" id="security-intake-view-engagement" disabled>[ VIEW ENGAGEMENT DETAILS ]</button>
+            </div>
+            <p class="section-copy mono" id="security-intake-selection">Select a queue row to view security output.</p>
+            <details class="detail-panel detail-panel-collapsible" open>
+              <summary class="section-label mono">security_summary</summary>
+              <p id="security-intake-summary">—</p>
+            </details>
+            <details class="detail-panel detail-panel-collapsible" id="security-intake-detail-panel" open hidden>
+              <summary class="section-label mono" id="security-intake-detail-label">detail</summary>
+              <pre class="mono" id="security-intake-detail-json"></pre>
+            </details>
+          </div>
+        </article>
+      </section>
+      <section class="operator-surface-hook" data-operator-surface hidden>
+        <div class="operator-panel-hook"></div>
+      </section>
+      <div class="ds-enforce" data-ds-enforce hidden></div>
+      <div class="hud-scan" data-hud-scan hidden></div>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET security intake agent</span>
+        <span>AI risk and exposure analyzer</span>
+      </div>
+      <nav class="nav">
+        <a href="/operator">Operator</a>
+        <a href="/operator/service-intake">Service Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/operator-agents-security-intake.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

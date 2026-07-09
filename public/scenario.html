@@ -1,0 +1,342 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSH OPS | Scenario Framework</title>
+    <meta
+      name="description"
+      content="The public MSH OPS Scenario Framework - how inject-driven flows, timeline-based structure, doctrine references, and evidence come together across a guided scenario."
+    />
+    <script>
+      (function canonicalizeScenarioRoute() {
+        if (window.location.pathname.endsWith(".html")) {
+          window.history.replaceState(null, "", window.location.pathname.slice(0, -5) + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/scenario.css" />
+    <link rel="stylesheet" href="/styles/nav.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSH OPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSH OPS</strong>
+          <span>Scenario Framework</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Public // Scenario</span>
+            <p class="section-label mono">[ MSH_OPS_SCENARIO_FRAMEWORK ]</p>
+            <h1 class="glow-pulse cinematic-hook">Scenario Framework</h1>
+            <p class="hero-sub">
+              A structured way to plan, sequence, and rehearse scenario-based work - built on inject-driven flows and
+              a governed doctrine reference layer, without exposing any internal operator tooling on this page.
+            </p>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              This page explains how the framework fits together at a glance. The interactive console that drives a
+              live scenario - inject sequencing, timeline progression, and the full evidence trail - lives on the
+              Scenario Engine.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/scenario-engine" aria-label="Open the Scenario Engine console">
+                Open Scenario Engine
+              </a>
+              <a class="button secondary" href="#scenario-details" aria-label="Learn more about the scenario framework">
+                Learn More
+              </a>
+            </div>
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="scenario-details" aria-labelledby="scenario-overview-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SCENARIO_OVERVIEW ]</p>
+            <h2 id="scenario-overview-heading">Scenario Overview</h2>
+          </div>
+        </div>
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Overview // Framework</span>
+            <h3>One framework, every scenario</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              A scenario is the structured container for planning and rehearsing a change before it reaches
+              production. Every scenario is built from the same public building blocks: an inject-driven flow, a
+              timeline, and an evidence trail, so a plan is always concrete and reviewable without exposing any
+              internal tooling on this page.
+            </p>
+            <p class="system-copy">
+              The framework connects directly to the wider MSH OPS ecosystem: Scenario Engine for live execution,
+              Mission Engine for guided delivery, Doctrine OS for approved guidance, the RGB+Gold interface system
+              for visual consistency, and the accessibility and governance layers that keep the experience stable as
+              it evolves.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="scenario-flow" aria-labelledby="scenario-flow-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SCENARIO_FLOW ]</p>
+            <h2 id="scenario-flow-heading">Scenario Flow</h2>
+          </div>
+        </div>
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Flow // Injects</span>
+            <h3>Inject-driven, one step at a time</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              A scenario progresses through a sequence of injects - discrete, well-defined events that move the
+              plan forward one step at a time. Each inject has a clear trigger and a clear outcome, so a scenario
+              stays predictable even as it grows more complex.
+            </p>
+            <p class="system-copy">
+              Injects are organized along the same timeline-based structure used across the rest of the ecosystem,
+              so a scenario's shape is always easy to follow at a glance - what has happened, what is happening now,
+              and what comes next.
+            </p>
+            <p class="system-copy">
+              Injects reference the relevant Doctrine OS guidance behind the scenes, so every step stays consistent
+              with approved practice. This page only ever shows the public-safe summary of that guidance - never the
+              underlying doctrine content itself.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="scenario-timeline" aria-labelledby="scenario-timeline-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SCENARIO_TIMELINE ]</p>
+            <h2 id="scenario-timeline-heading">Scenario Timeline</h2>
+          </div>
+        </div>
+        <article class="scenario-timeline-panel hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Timeline // Motion-Safe</span>
+            <h3>A running record, presented calmly</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              The scenario timeline lays out every inject in order inside a HUD-framed panel, using the same
+              scroll-in reveal used across the rest of the site. Motion is always subtle and fully respects
+              <code>prefers-reduced-motion</code> - anyone with that preference set sees the same information with
+              no animation at all.
+            </p>
+            <p class="system-copy">
+              The layout uses the same RGB+Gold structure and HUD framing rules as the rest of the ecosystem, so
+              timeline views remain visually consistent without adding extra motion or competing overlays.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="scenario-evidence" aria-labelledby="scenario-evidence-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SCENARIO_EVIDENCE ]</p>
+            <h2 id="scenario-evidence-heading">Scenario Evidence</h2>
+          </div>
+        </div>
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Evidence // Audit Trail</span>
+            <h3>An auditable trail of what happened</h3>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              Every scenario keeps a single, chronological evidence log: inject transitions, operator actions, and
+              agent responses all land in one place. That log is what makes a scenario auditable after the fact -
+              nothing here is inferred or reconstructed after the fact.
+            </p>
+            <p class="system-copy">
+              The public summary above never includes engagement-specific evidence. To see a live evidence trail in
+              action, open the Scenario Engine.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="features" aria-labelledby="scenario-features-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ FEATURES ]</p>
+            <h2 id="scenario-features-heading">Built on the wider MSH OPS ecosystem</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid">
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Scenario</span>
+              <h3>Scenario Engine</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The Scenario Engine is the live public console for inject sequencing, timeline progression, and
+                scenario evidence visibility when a plan is underway.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Mission</span>
+              <h3>Mission Engine</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Rehearsed scenarios feed directly into missions, carrying an engagement from kickoff through
+                delivery as a clear sequence of objectives and checkpoints.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Doctrine</span>
+              <h3>Doctrine OS</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Every inject stays aligned with a single, version-controlled source of approved guidance, so
+                recommendations are consistent across every scenario.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Interface</span>
+              <h3>RGB+Gold Design System</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The public scenario surface is built on the shared RGB+Gold token, motion, HUD, and component layers
+                so every scenario page follows the same composition and visual governance rules.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Accessibility</span>
+              <h3>Accessibility Layer</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                Accessibility overrides, focus-visible behavior, aria hooks, and reduced-motion handling stay active
+                across the scenario surface so the framework remains readable and usable under different user needs.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">System // Governance</span>
+              <h3>Autonomous Governance Layer</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The same accessibility, motion, and design standards you see on this page are checked continuously
+                in the background, so the framework stays consistent as it grows.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="contact" aria-labelledby="scenario-contact-heading">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Contact // Engage</span>
+            <p class="section-label mono">[ PUBLIC_CONTACT ]</p>
+            <h2 id="scenario-contact-heading">Ready to plan a scenario?</h2>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              Open the Scenario Engine to see the framework in action, or start with the public gateway if you're
+              beginning a new engagement.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/scenario-engine" aria-label="Open the Scenario Engine console">
+                Open Scenario Engine
+              </a>
+              <a class="button secondary" href="/enter" aria-label="Open the public gateway to begin engagement">
+                Open Gateway
+              </a>
+              <a class="button ghost" href="/contact" aria-label="Open the public contact page">Contact Page</a>
+            </div>
+            <p class="form-status mono" role="status" aria-live="polite">
+              Public scenario framework and gateway routes are active.
+            </p>
+            <div class="a11y-hook" data-a11y-override hidden></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div class="footer-divider" aria-hidden="true"></div>
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSH OPS scenario framework</span>
+        <span>Injects, timeline, and evidence for every public scenario</span>
+      </div>
+      <nav class="nav-ecosystem" aria-label="Footer navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>
+

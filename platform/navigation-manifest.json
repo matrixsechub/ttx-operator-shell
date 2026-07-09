@@ -1,0 +1,114 @@
+[
+  {
+    "label": "Home",
+    "href": "/",
+    "surface": "public",
+    "authRequired": false,
+    "group": "core"
+  },
+  {
+    "label": "Marketplace",
+    "href": "/marketplace",
+    "surface": "both",
+    "authRequired": false,
+    "group": "catalog"
+  },
+  {
+    "label": "Marketplace Module",
+    "href": "/marketplace/modules/:moduleId",
+    "surface": "public",
+    "authRequired": false,
+    "group": "catalog"
+  },
+  {
+    "label": "OS",
+    "href": "/os",
+    "surface": "public",
+    "authRequired": false,
+    "group": "platform"
+  },
+  {
+    "label": "Mission Control",
+    "href": "/mission",
+    "surface": "public",
+    "authRequired": false,
+    "group": "platform"
+  },
+  {
+    "label": "Cloudflare Federation Docs",
+    "href": "/docs/cloudflare-federation",
+    "surface": "public",
+    "authRequired": false,
+    "group": "platform"
+  },
+  {
+    "label": "Dashboard",
+    "href": "/ops/dashboard",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "operations"
+  },
+  {
+    "label": "Marketplace",
+    "href": "/ops/marketplace",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "catalog"
+  },
+  {
+    "label": "Marketplace Category",
+    "href": "/ops/marketplace/:category",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "catalog"
+  },
+  {
+    "label": "Marketplace Module",
+    "href": "/ops/marketplace/modules/:moduleId",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "catalog"
+  },
+  {
+    "label": "TTX",
+    "href": "/ops/ttx",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "operations"
+  },
+  {
+    "label": "Systems",
+    "href": "/ops/systems",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "platform"
+  },
+  {
+    "label": "Divisions",
+    "href": "/ops/divisions",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "platform"
+  },
+  {
+    "label": "Future",
+    "href": "/ops/future",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "platform"
+  },
+  {
+    "label": "Status",
+    "href": "/ops/status",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "operations"
+  },
+  {
+    "label": "About",
+    "href": "/ops/about",
+    "surface": "operator",
+    "authRequired": true,
+    "group": "platform"
+  }
+]

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | AI Agent Readiness Checker</title>
+    <meta
+      name="description"
+      content="Find out if your AI agent idea is ready to build, what it will require, and what risks need controls before deployment."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/readiness.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body class="readiness-app">
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>AI Agent Readiness Checker</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#readiness-form">Checker</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main class="page-shell readiness-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket readiness-hero-panel">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: AI_AGENT_READINESS_CHECKER_V1 ]</p>
+            <h1>AI Agent Readiness Checker</h1>
+            <p class="hero-sub">
+              Find out if your AI agent idea is ready to build, what it will require, and what risks need controls before deployment.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#readiness-form">[ CHECK AGENT READINESS ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="readiness-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ AGENT_IDEA_FORM ]</p>
+            <h2>Answer the build-readiness questionnaire</h2>
+          </div>
+        </div>
+        <div class="services-layout readiness-layout">
+          <article class="contact-form-shell bracket readiness-form-shell">
+            <div class="bracket-inner">
+              <h3>Agent readiness questionnaire</h3>
+              <p class="system-copy">
+                This is a deterministic advisory tool. It does not execute tools, connect systems, or trigger agent actions.
+              </p>
+              <form class="contact-form readiness-form" id="agent-readiness-form">
+                <label>
+                  <span>1. Agent Goal</span>
+                  <select name="agent_goal" required>
+                    <option value="customer_support_agent">Customer support agent</option>
+                    <option value="sales_or_lead_agent">Sales or lead agent</option>
+                    <option value="research_agent">Research agent</option>
+                    <option value="operations_agent">Operations agent</option>
+                    <option value="inbox_triage_agent">Inbox triage agent</option>
+                    <option value="meeting_prep_agent">Meeting prep agent</option>
+                    <option value="crm_agent">CRM agent</option>
+                    <option value="reporting_agent">Reporting agent</option>
+                    <option value="content_agent">Content agent</option>
+                    <option value="security_or_compliance_agent">Security or compliance agent</option>
+                    <option value="custom_agent">Custom agent</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>2. Agent Autonomy Level</span>
+                  <select name="agent_autonomy_level" required>
+                    <option value="answers_only">Answers only</option>
+                    <option value="drafts_recommendations">Drafts recommendations</option>
+                    <option value="takes_low_risk_actions">Takes low-risk actions</option>
+                    <option value="takes_external_actions">Takes external actions</option>
+                    <option value="fully_autonomous">Fully autonomous</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>3. Tool Connections</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="tool_connections" value="no_tools" /> No tools</label>
+                    <label><input type="checkbox" name="tool_connections" value="email" /> Email</label>
+                    <label><input type="checkbox" name="tool_connections" value="calendar" /> Calendar</label>
+                    <label><input type="checkbox" name="tool_connections" value="crm" /> CRM</label>
+                    <label><input type="checkbox" name="tool_connections" value="database" /> Database</label>
+                    <label><input type="checkbox" name="tool_connections" value="file_storage" /> File storage</label>
+                    <label><input type="checkbox" name="tool_connections" value="project_management" /> Project management</label>
+                    <label><input type="checkbox" name="tool_connections" value="slack_or_teams" /> Slack or Teams</label>
+                    <label><input type="checkbox" name="tool_connections" value="payments" /> Payments</label>
+                    <label><input type="checkbox" name="tool_connections" value="web_search" /> Web search</label>
+                    <label><input type="checkbox" name="tool_connections" value="browser_or_scraper" /> Browser or scraper</label>
+                    <label><input type="checkbox" name="tool_connections" value="code_execution" /> Code execution</label>
+                    <label><input type="checkbox" name="tool_connections" value="workflow_automation" /> Workflow automation</label>
+                    <label><input type="checkbox" name="tool_connections" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>4. Data Access</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="data_access" value="public_content" /> Public content</label>
+                    <label><input type="checkbox" name="data_access" value="internal_docs" /> Internal docs</label>
+                    <label><input type="checkbox" name="data_access" value="customer_data" /> Customer data</label>
+                    <label><input type="checkbox" name="data_access" value="sales_data" /> Sales data</label>
+                    <label><input type="checkbox" name="data_access" value="financial_data" /> Financial data</label>
+                    <label><input type="checkbox" name="data_access" value="health_data" /> Health data</label>
+                    <label><input type="checkbox" name="data_access" value="legal_data" /> Legal data</label>
+                    <label><input type="checkbox" name="data_access" value="credentials_or_secrets" /> Credentials or secrets</label>
+                    <label><input type="checkbox" name="data_access" value="regulated_data" /> Regulated data</label>
+                    <label><input type="checkbox" name="data_access" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>5. Human Review</span>
+                  <select name="human_review" required>
+                    <option value="every_action">Every action</option>
+                    <option value="sensitive_actions_only">Sensitive actions only</option>
+                    <option value="periodic_review">Periodic review</option>
+                    <option value="no_review">No review</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>6. Deployment Context</span>
+                  <select name="deployment_context" required>
+                    <option value="internal_only">Internal only</option>
+                    <option value="customer_facing">Customer facing</option>
+                    <option value="public_website">Public website</option>
+                    <option value="employee_copilot">Employee copilot</option>
+                    <option value="connected_to_business_tools">Connected to business tools</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>7. Workflow Clarity</span>
+                  <select name="workflow_clarity" required>
+                    <option value="clearly_documented">Clearly documented</option>
+                    <option value="partially_documented">Partially documented</option>
+                    <option value="tribal_knowledge">Tribal knowledge</option>
+                    <option value="not_documented">Not documented</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>8. Success Metric</span>
+                  <select name="success_metric" required>
+                    <option value="time_saved">Time saved</option>
+                    <option value="revenue_generated">Revenue generated</option>
+                    <option value="response_quality">Response quality</option>
+                    <option value="error_reduction">Error reduction</option>
+                    <option value="faster_research">Faster research</option>
+                    <option value="better_follow_up">Better follow-up</option>
+                    <option value="compliance_or_risk_reduction">Compliance or risk reduction</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>9. Timeline</span>
+                  <select name="timeline" required>
+                    <option value="this_week">This week</option>
+                    <option value="this_month">This month</option>
+                    <option value="this_quarter">This quarter</option>
+                    <option value="exploring">Exploring</option>
+                  </select>
+                </label>
+
+                <div class="hero-actions readiness-actions">
+                  <button class="button primary" type="submit" id="agent-readiness-submit">Check Agent Readiness</button>
+                  <button class="button ghost" type="reset">Reset</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="agent-readiness-status" role="status" aria-live="polite">
+                Checker ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket readiness-result-card">
+            <div class="bracket-inner" id="agent-readiness-result">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Agent readiness findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive readiness scoring, build complexity, safety controls, and a direct intake route.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <article class="telemetry-card bracket readiness-cta-card">
+          <div class="bracket-inner footer-architecture">
+            <div class="section-heading">
+              <div>
+                <p class="section-label mono">[ CTA_SECTION ]</p>
+                <h2>Request AI Agent Build Review</h2>
+              </div>
+            </div>
+            <p class="system-copy">
+              Use the build review intake when you want operator guidance on architecture, control design, and the safest delivery path for your AI agent idea.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/enter?service=ai_agent_build&source=agent-readiness-checker">[ REQUEST AI AGENT BUILD REVIEW ]</a>
+              <a class="button secondary" href="/apps/automation-roi-calculator">[ CALCULATE AUTOMATION ROI ]</a>
+              <a class="button secondary" href="/apps/rag-risk-analyzer">[ ANALYZE RAG RISK ]</a>
+              <a class="button secondary" href="/apps/ai-security-audit">[ OPEN AI SECURITY RISK CHECK ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET AI agent readiness checker</span>
+        <span>Deterministic advisory scoring with funnel handoff to operator review</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/ai-agent-readiness-checker.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

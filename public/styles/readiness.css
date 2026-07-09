@@ -1,0 +1,399 @@
+.readiness-app {
+  font-family: var(--font-sans);
+}
+
+.readiness-shell {
+  gap: 24px;
+}
+
+.readiness-app .hero-shell {
+  padding: 24px 0 32px;
+}
+
+.readiness-app .section-block {
+  padding: 24px 0;
+}
+
+.readiness-app .hero-sub,
+.readiness-app .system-copy,
+.readiness-app .contact-form,
+.readiness-app .contact-form input,
+.readiness-app .contact-form select,
+.readiness-app .contact-form textarea,
+.readiness-app .telemetry-list,
+.readiness-app .form-status,
+.readiness-app .button {
+  line-height: 1.42;
+}
+
+.readiness-app .hero-panel,
+.readiness-app .contact-form-shell,
+.readiness-app .telemetry-card {
+  border-radius: 8px;
+}
+
+.readiness-app .bracket-inner {
+  padding: 20px;
+}
+
+.readiness-app .hero-copy h1 {
+  font-size: 1.74rem;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.readiness-app .section-heading h2,
+.readiness-app .readiness-result-shell h3,
+.readiness-app .readiness-form-shell h3,
+.readiness-app .readiness-cta-card h2 {
+  font-size: 1.24rem;
+  line-height: 1.28;
+}
+
+.readiness-app .hero-sub,
+.readiness-app .system-copy,
+.readiness-app .contact-form input,
+.readiness-app .contact-form select,
+.readiness-app .contact-form textarea {
+  font-size: 1rem;
+}
+
+.readiness-app .section-label,
+.readiness-app .contact-form label span,
+.readiness-app .form-status,
+.readiness-app .telemetry-list {
+  font-size: 0.72rem;
+}
+
+.readiness-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.readiness-form {
+  gap: 20px;
+}
+
+.readiness-app .contact-form label {
+  gap: 8px;
+}
+
+.readiness-app .contact-form input,
+.readiness-app .contact-form select,
+.readiness-app .contact-form textarea {
+  min-height: 52px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border-color: rgba(242, 193, 78, 0.12);
+  background: linear-gradient(180deg, rgba(13, 13, 13, 0.94), rgba(18, 18, 18, 0.96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.readiness-app .contact-form input:focus,
+.readiness-app .contact-form select:focus,
+.readiness-app .contact-form textarea:focus {
+  border-color: rgba(242, 193, 78, 0.55);
+  box-shadow:
+    0 0 0 3px rgba(242, 193, 78, 0.12),
+    0 0 24px rgba(242, 193, 78, 0.08);
+}
+
+.readiness-app .services-fieldset {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid rgba(242, 193, 78, 0.12);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(11, 11, 11, 0.84), rgba(17, 17, 17, 0.92));
+}
+
+.readiness-app .services-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.readiness-app .services-checkbox-grid label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
+.readiness-actions {
+  gap: 16px;
+}
+
+.readiness-result-shell {
+  display: grid;
+  gap: 20px;
+}
+
+.readiness-score-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.readiness-score-indicator {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  min-height: 220px;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(242, 193, 78, 0.18);
+  background:
+    radial-gradient(circle at top right, rgba(242, 193, 78, 0.16), transparent 36%),
+    linear-gradient(180deg, rgba(11, 11, 11, 0.98), rgba(18, 18, 18, 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(242, 193, 78, 0.06),
+    0 0 0 1px rgba(242, 193, 78, 0.04),
+    0 0 34px rgba(242, 193, 78, 0.12);
+}
+
+.readiness-score-indicator::after {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 193, 78, 0.14);
+  box-shadow:
+    0 0 0 1px rgba(242, 193, 78, 0.05),
+    0 0 24px rgba(242, 193, 78, 0.08);
+  pointer-events: none;
+}
+
+.readiness-score-num {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 4.2rem;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  color: var(--gold);
+}
+
+.readiness-score-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 26ch;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.readiness-status-panel,
+.readiness-requirements,
+.readiness-next-route,
+.readiness-timeline-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(11, 11, 11, 0.96), rgba(19, 19, 19, 0.98));
+}
+
+.readiness-status-grid,
+.readiness-meta-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.readiness-status-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.readiness-chip,
+.readiness-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 193, 78, 0.16);
+  background: rgba(242, 193, 78, 0.08);
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.readiness-badge--healthy {
+  border-color: rgba(82, 184, 255, 0.24);
+  background: rgba(82, 184, 255, 0.09);
+  color: var(--blue);
+  box-shadow: 0 0 16px rgba(82, 184, 255, 0.12);
+}
+
+.readiness-badge--warning {
+  border-color: rgba(242, 193, 78, 0.26);
+  background: rgba(242, 193, 78, 0.1);
+  color: var(--gold);
+  box-shadow: 0 0 16px rgba(242, 193, 78, 0.1);
+}
+
+.readiness-badge--critical {
+  border-color: rgba(255, 95, 95, 0.28);
+  background: rgba(255, 95, 95, 0.12);
+  color: #ff8b8b;
+  box-shadow: 0 0 16px rgba(255, 95, 95, 0.14);
+}
+
+.readiness-meta-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.readiness-meta-card {
+  display: grid;
+  gap: 8px;
+  min-height: 116px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(14, 14, 14, 0.96), rgba(20, 20, 20, 0.96));
+}
+
+.readiness-meta-card .readiness-meta-value {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  line-height: 1.2;
+}
+
+.readiness-lists {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.readiness-list {
+  display: grid;
+  gap: 12px;
+}
+
+.readiness-list-item {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.readiness-list-item p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.42;
+}
+
+.readiness-list-item strong {
+  color: var(--text);
+  font-size: 1.04rem;
+}
+
+.readiness-list-item .readiness-list-kicker {
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.readiness-timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.readiness-timeline-item {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.readiness-timeline-dot {
+  width: 12px;
+  height: 12px;
+  margin-top: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.readiness-timeline-item.is-active .readiness-timeline-dot,
+.readiness-timeline-item.is-complete .readiness-timeline-dot {
+  background: var(--gold);
+  box-shadow: 0 0 18px rgba(242, 193, 78, 0.28);
+}
+
+.readiness-timeline-item.is-active .readiness-timeline-label {
+  color: var(--text);
+}
+
+.readiness-timeline-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.readiness-timeline-copy {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.readiness-empty {
+  display: grid;
+  gap: 16px;
+}
+
+.readiness-app .readiness-result-card,
+.readiness-app .readiness-form-shell,
+.readiness-app .readiness-cta-card {
+  background:
+    linear-gradient(180deg, rgba(11, 11, 11, 0.98), rgba(18, 18, 18, 0.98)),
+    radial-gradient(circle at top right, rgba(242, 193, 78, 0.08), transparent 40%);
+}
+
+@media (max-width: 980px) {
+  .readiness-layout,
+  .readiness-score-block,
+  .readiness-lists,
+  .readiness-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .readiness-app .bracket-inner {
+    padding: 16px;
+  }
+
+  .readiness-app .hero-copy h1 {
+    font-size: 1.6rem;
+  }
+
+  .readiness-app .services-checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .readiness-score-num {
+    font-size: 3.4rem;
+  }
+}

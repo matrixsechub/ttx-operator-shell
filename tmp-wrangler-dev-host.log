@@ -1,0 +1,110 @@
+🪵  Writing logs to "C:\Users\wevrw\.wrangler-config\.wrangler\logs\wrangler-2026-07-08_06-14-22_510.log"
+.env file not found at "C:\Users\wevrw\Dev\ttx-operator-shell\.env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+.env file not found at "C:\Users\wevrw\Dev\ttx-operator-shell\.env.local". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+
+ ⛅️ wrangler 4.108.0
+────────────────────
+Support for remote bindings in `wrangler dev` is now available as a replacement for `wrangler dev --remote`. Try it out now by running `wrangler dev` with the `remote` option enabled on your resources and let us know how it goes!
+This gives you access to remote resources in development while retaining all the usual benefits of local dev: fast iteration speed, breakpoint debugging, and more.
+
+Refer to https://developers.cloudflare.com/workers/development-testing/#remote-bindings for more information.
+setting config
+Updating config... undefined undefined
+Metrics dispatcher: Posting data {"deviceId":"d9d8a427-1b79-43e3-8abc-212ee96807e6","event":"wrangler command started","timestamp":1783491262696,"properties":{"amplitude_session_id":1783491262678,"amplitude_event_id":0,"wranglerVersion":"4.108.0","wranglerMajorVersion":4,"wranglerMinorVersion":108,"wranglerPatchVersion":0,"osPlatform":"Windows","osVersion":"Windows 11 Pro","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"none","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"agent":"codex","argsUsed":["config","logLevel","port","remote"],"argsCombination":"config, logLevel, port, remote","sanitizedCommand":"dev","sanitizedArgs":{"remote":true,"logLevel":"debug"},"currentAgentSkillsInstalled":"automatic"}}
+local dev variables file not found at ".dev.vars". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+.env file not found at "C:\Users\wevrw\Dev\ttx-operator-shell\.env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+.env file not found at "C:\Users\wevrw\Dev\ttx-operator-shell\.env.local". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+Your Worker has access to the following bindings:
+Binding                                                                   Resource                  
+env.PAYLOADS (c6eb10a085374a0da8203510a8b30aa5)                           KV Namespace              
+env.ESCALATIONS (70012e225fec4741b7091b0e8f8f419b)                        KV Namespace              
+env.MODULES (15fc5fd7617c4e2085225b308ab43130)                            KV Namespace              
+env.ROUTING_LOGS (e45ef3052c9b45288c7056f3ad1595f0)                       KV Namespace              
+env.SEARCH_LOGS (2ef786e641524157bb9a4157ff2a6be9)                        KV Namespace              
+env.EVENTS (4a2da288c6f9444ab3feede4af71e0b2)                             KV Namespace              
+env.AUTONOMY_LOGS (2601529dd22b4e2d84ec897d31e8b56c)                      KV Namespace              
+env.ECOSYSTEM (9e2fc7ab16d04a0faaa89d627fca7ae9)                          KV Namespace              
+env.NOTIFICATIONS (64bf9a5e24ce4878af5da462dce0850b)                      KV Namespace              
+env.AUDIT (a14e4598a46e4f04a386778b5c400e60)                              KV Namespace              
+env.SCENARIOS (a34a9eb075c14bcba1634b4d0cb24945)                          KV Namespace              
+env.HEARTBEAT (295df0b9d7a446af95a4240232f046b7)                          KV Namespace              
+env.OS_ROUTING (8bca0b466fb54806a0ab006c9d8cb1af)                         KV Namespace              
+env.DIVISION_MEMORY (73b30206aac84a6abffa7cb8a8e4086d)                    KV Namespace              
+env.OPERATOR_INTENTS (561c5b4faf8f40f18899df823a28467d)                   KV Namespace              
+env.PIPELINES (c02d5f390f794eccab7fecca7afa867c)                          KV Namespace              
+env.SANDBOX_LOGS (3d4bd8f69b7646af82ba17c7013de7d5)                       KV Namespace              
+env.OS_CONFIG (c85c78cbd69d48b09e8f1d5d5b7aaffa)                          KV Namespace              
+env.PUBLIC_SCENARIOS (d48825f87ed54e669f5cd239062d35c5)                   KV Namespace              
+env.TELEMETRY (278bc6b453544756a86a5a271c56ac11)                          KV Namespace              
+env.GOVERNANCE (8c78343515204e89b3bf07a226e5ad99)                         KV Namespace              
+env.RELEASES (2f75901f1cac45ed9d508576676f3ddd)                           KV Namespace              
+env.INTEGRATIONS (a7e3cc1786034c2583fa2e88279cc42d)                       KV Namespace              
+env.CERTIFICATION (7cf4d79fe8f0430ca03d38512d5585ad)                      KV Namespace              
+env.ASSETS                                                                Assets                    
+env.UPSTREAM_ENGINE_URL ("https://msh-ops-os-harness.sogellagep...")      Environment Variable      
+
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/zones
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/zones
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+-- START CF API REQUEST: GET https://api.cloudflare.com/client/v4/zones
+QUERY STRING: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+INIT: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API REQUEST
+-- START CF API RESPONSE: OK 200
+HEADERS: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+RESPONSE: omitted; set WRANGLER_LOG_SANITIZE=false to include sanitized data
+-- END CF API RESPONSE
+Error updating config Error: Could not find zone for `mshops-public.sogellagepul.workers.dev`. Make sure the domain is set up to be proxied by Cloudflare.
+For more details, refer to https://developers.cloudflare.com/workers/configuration/routing/routes/#set-up-a-route
+    at getZoneIdFromHost (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:147238:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async getZoneIdForPreview (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210288:14)
+    at async resolveDevConfig (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210439:5)
+    at async resolveConfig (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210650:10)
+    at async #updateConfig (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210885:68)
+    at async setupDevEnv (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:368335:3)
+    at async startDev (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:368283:7)
+    at async Object.handler (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:185042:29)
+    at async C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:233583:26
+DevEnv teardown beginning...
+ConfigController teardown beginning...
+BundlerController teardown beginning...
+LocalRuntimeController teardown beginning...
+RemoteRuntimeController teardown beginning...
+RemoteRuntimeController teardown complete
+ProxyController teardown beginning...
+ConfigController teardown complete
+BundlerController teardown complete
+LocalRuntimeController teardown complete
+ProxyController teardown complete
+DevEnv teardown complete
+
+Error: Could not find zone for `mshops-public.sogellagepul.workers.dev`. Make sure the domain is set up to be proxied by Cloudflare.
+For more details, refer to https://developers.cloudflare.com/workers/configuration/routing/routes/#set-up-a-route
+    at getZoneIdFromHost (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:147238:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async getZoneIdForPreview (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210288:14)
+    at async resolveDevConfig (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210439:5)
+    at async resolveConfig (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210650:10)
+    at async #updateConfig (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:210885:68)
+    at async setupDevEnv (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:368335:3)
+    at async startDev (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:368283:7)
+    at async Object.handler (C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:185042:29)
+    at async C:\Users\wevrw\AppData\Local\npm-cache\_npx\32026684e21afda6\node_modules\wrangler\wrangler-dist\cli.js:233583:26
+Metrics dispatcher: Posting data {"deviceId":"d9d8a427-1b79-43e3-8abc-212ee96807e6","event":"wrangler command errored","timestamp":1783491263398,"properties":{"amplitude_session_id":1783491262678,"amplitude_event_id":1,"wranglerVersion":"4.108.0","wranglerMajorVersion":4,"wranglerMinorVersion":108,"wranglerPatchVersion":0,"osPlatform":"Windows","osVersion":"Windows 11 Pro","nodeVersion":24,"packageManager":"npm","isFirstUsage":false,"configFileType":"none","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"agent":"codex","argsUsed":["config","logLevel","port","remote"],"argsCombination":"config, logLevel, port, remote","sanitizedCommand":"dev","sanitizedArgs":{"remote":true,"logLevel":"debug"},"durationMs":688,"errorType":"UserError","errorMessage":"zones route zone not found","currentAgentSkillsInstalled":"automatic"}}

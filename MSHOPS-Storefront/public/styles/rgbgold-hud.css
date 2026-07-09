@@ -1,0 +1,115 @@
+/**
+ * RGB+GOLD OPERATOR DESIGN SYSTEM — HUD TAG
+ * -----------------------------------------------------------------------
+ * Adds `.hud-tag`, the monospace "Signal // Live" style status pill from
+ * the shared marketing design system. This app already has an equivalent
+ * `.hud-ticker` component and a corner-bracket `.hud-frame` component (see
+ * /public/styles.css) - both are left untouched. `.hud-tag` is a distinct
+ * name with no collision, provided so new UI can opt into the exact
+ * shared-system status-pill styling when desired.
+ *
+ * Depends on: rgbgold-tokens.css.
+ *
+ * DRIFT-MARKER: layer=hud file=public/styles/rgbgold-hud.css version=1.0
+ *
+ * PSEUDO-ELEMENT BUDGET - READ BEFORE COMBINING CLASSES
+ * Every element has exactly one ::before and one ::after slot. Combines
+ * BOTH this app's pre-existing pseudo-element usage AND the additive
+ * rgbgold-* system so future modules never collide with either:
+ *
+ * | Class              | File                       | Slot     | Intended host node |
+ * |--------------------|----------------------------|----------|---------------------|
+ * | .bracket           | styles.css (existing)      | ::before, ::after | panel-level element (existing corner brackets) |
+ * | .hud-frame         | styles.css (existing)      | ::before, ::after | panel-level element (existing corner brackets, different impl than .bracket) |
+ * | .fx-overlay        | styles.css (existing)      | ::before, ::after | one full-bleed decorative host per page (tron-sweep + matrix-fall) |
+ * | .hud-card          | rgbgold-components.css     | ::before | card-level element (self-contained animated border) |
+ * | .module-card       | rgbgold-components.css     | ::before | card-level element (self-contained; see rgbgold-components.css) |
+ * | .operator-panel    | rgbgold-components.css     | ::before | panel-level element (self-contained) |
+ * | .hue-travel        | rgbgold-motion.css         | ::before | element NOT already using .bracket/.hud-frame/.hud-card (see warning in rgbgold-motion.css) |
+ * | .glow-pulse        | rgbgold-motion.css         | ::after  | text/headline element only, never a card/panel node |
+ * | .hud-tag           | this file                  | ::before | status pill only (small inline element, not a card/panel) |
+ *
+ * FUTURE HUD ELEMENTS - HOW TO AVOID COLLISIONS:
+ *   1. Check the table above for what's already using ::before/::after on
+ *      the node type you're targeting before adding a new class.
+ *   2. Never put .hue-travel or a new ::before-based class on a node that
+ *      already has .bracket, .hud-frame, or .hud-card - wrap in an extra
+ *      `<div>` instead.
+ *   3. Self-contained "bundle" components (.hud-card, .module-card,
+ *      .operator-panel) already own their ::before, so keep that pattern
+ *      for new bundle components rather than composing loose classes.
+ *   4. Add the new class + slot + host node to the table above in the same
+ *      change that introduces it.
+ *
+ * ECOSYSTEM SCAFFOLDING NOTE: `.rgbgold-module-shell`, `.marketplace-entry`,
+ * and `.operator-surface`/`.operator-surface-section` (rgbgold-components.
+ * css) all use ZERO pseudo-elements by design, precisely so they never
+ * compete for ::before/::after budget with `.hud-frame`/`.hud-card`/
+ * `.hue-travel` - add `.hud-frame` or `.hud-card` directly to a
+ * `.rgbgold-module-shell` (or wrap child `.operator-panel`/`.module-card`
+ * elements in it) with no budget conflict. `.nav-ecosystem` is also
+ * pseudo-element-free. (Named `.rgbgold-module-shell`, not `.module-shell`,
+ * to avoid colliding with the pre-existing `.module-shell` layout wrapper
+ * in /public/modules/module.css - see rgbgold-components.css for the full
+ * rationale.)
+ */
+
+.hud-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rgbgold-gold-soft);
+  border: 1px solid rgba(245, 196, 81, 0.4);
+  background: rgba(245, 196, 81, 0.08);
+  border-radius: var(--rgbgold-radius-pill);
+  padding: 0.28rem 0.65rem;
+  width: fit-content;
+}
+
+.hud-tag::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--rgbgold-gold);
+  box-shadow: 0 0 8px rgba(245, 196, 81, 0.9);
+  animation: rgbgoldBlinkDot var(--rgbgold-duration-blink) var(--rgbgold-ease-standard) infinite;
+}
+
+@keyframes rgbgoldBlinkDot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-tag::before {
+    animation: none !important;
+  }
+}
+
+/* =========================================================================
+   HUD-SCAN HOOK
+   Inert placeholder marker for the HUD compliance scanner
+   (/public/scripts/hud-scan.js, see DESIGN_SYSTEM.md §30). Not a visual
+   component - `<div data-hud-scan hidden>` on operator pages just gives the
+   scanner a stable, known DOM location per page (currently console-only,
+   always hidden).
+   ========================================================================= */
+
+.hud-scan[hidden],
+.hud-scan:empty {
+  display: none;
+}
+
+.hud-scan {
+  display: block;
+}

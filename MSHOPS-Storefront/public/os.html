@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS Operating System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/os.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <main class="page-shell">
+      <section class="hero-panel bracket">
+        <div class="bracket-inner">
+          <p class="section-label mono">[ MSHOPS_OS_V3_5 ]</p>
+          <h1>Division operating system surface.</h1>
+          <p class="hero-sub">Inspect global routing, memory, config, pipelines, sandboxes, public scenarios, and OS heartbeat from one runtime view.</p>
+          <div class="cta-row">
+            <a class="button secondary" href="/">[ LANDING ]</a>
+            <a class="button ghost" href="/operator">[ OPERATOR ]</a>
+            <a class="button ghost" href="/marketplace?view=all">[ MARKETPLACE ]</a>
+            <a class="button ghost" href="/mission">[ MISSION ]</a>
+          </div>
+          <div class="cinematic-hook" data-cinematic hidden></div>
+          <div class="motion-scan" data-motion-scan hidden></div>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ OS_HEALTH ]</p>
+          <h2>OS heartbeat</h2>
+        </div>
+        <div class="telemetry-grid" id="os-heartbeat-grid"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ OS_DATA_PLANES ]</p>
+          <h2>Routing, memory, intents, pipelines, sandboxes, config, scenarios.</h2>
+        </div>
+        <div class="public-api-grid" id="os-surface-grid"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_OBSERVABILITY ]</p>
+          <h2>Cloudflare MCP observability</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-grid"></div>
+        <div class="telemetry-grid" id="os-cloudflare-actions-grid"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_DOCS ]</p>
+          <h2>Cloudflare documentation search</h2>
+        </div>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <form class="agent-form" id="os-cloudflare-docs-form">
+              <label><span class="mono">[ QUERY ]</span><input id="os-cloudflare-docs-query" type="text" placeholder="workers observability" required /></label>
+              <div class="cta-row"><button class="button primary" type="submit">[ SEARCH ]</button></div>
+            </form>
+            <div id="os-cloudflare-docs-results" class="telemetry-list"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_AUTONOMOUS ]</p>
+          <h2>Autonomous federation health</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-autonomous-grid"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_CROSS_DIVISION ]</p>
+          <h2>Cross-division federation sync</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-cross-division-grid"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_ORCHESTRATION ]</p>
+          <h2>Multi-agent orchestration</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-orchestration-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-orchestration-plan"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_EXECUTION ]</p>
+          <h2>Autonomous execution</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-execution-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-execution-plan"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_ADAPTIVE ]</p>
+          <h2>Adaptive runtime</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-adaptive-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-adaptive-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_PREDICTIVE ]</p>
+          <h2>Predictive modeling</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-predictive-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-predictive-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_STRATEGIC ]</p>
+          <h2>Strategic planning</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-strategic-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-strategic-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_UCIP ]</p>
+          <h2>Unified Cloudflare Intelligence Plane</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-ucip-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-ucip-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_AMG ]</p>
+          <h2>Autonomous Meta-Governance</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-amg-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-amg-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_CBA ]</p>
+          <h2>Behavioral Autonomy</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-cba-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-cba-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_CAL ]</p>
+          <h2>Cognitive Alignment Layer</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-cal-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-cal-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_IHL ]</p>
+          <h2>Intent Harmonization Layer</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-ihl-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-ihl-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_IARL ]</p>
+          <h2>Intent-to-Action Resonance Layer</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-iarl-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-iarl-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_ACL ]</p>
+          <h2>Autonomous Coherence Layer</h2>
+        </div>
+        <div class="telemetry-grid" id="os-cloudflare-acl-grid"></div>
+        <ul class="telemetry-list" id="os-cloudflare-acl-reasons"></ul>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ CLOUDFLARE_FEDERATION ]</p>
+          <h2>Cloudflare federation readiness</h2>
+        </div>
+        <div class="public-api-grid" id="os-federation-grid"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <p class="section-label mono">[ OS_V3_5_EXTENSIONS ]</p>
+          <h2>Governance, releases, integrations, certification, safety, versioning.</h2>
+        </div>
+        <div class="public-api-grid" id="os-extension-grid"></div>
+      </section>
+    </main>
+
+    <script src="/cloudflare-federation-shared.js" defer></script>
+    <script src="/os.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

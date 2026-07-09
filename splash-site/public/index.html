@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS | Public Operator Surface</title>
+    <meta
+      name="description"
+      content="MSHOPS public splash surface routing into the unified storefront for registration, marketplace access, and ecosystem onboarding."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/nav.css" />
+    <link rel="stylesheet" href="/styles/splash.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSHOPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS</strong>
+          <span>Public Surface</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/marketplace" aria-label="Open the MSHOPS marketplace">Marketplace</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/ecosystem" aria-label="Open the public ecosystem overview">Ecosystem</a>
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a href="/status" aria-label="View public status">Status</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell" data-splash-hero>
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Splash // Unified</span>
+            <p class="section-label mono">[ MSHOPS_PUBLIC_SPLASH ]</p>
+            <h1 class="glow-pulse cinematic-hook">Operator surface coming online.</h1>
+            <p class="hero-sub splash-hero-copy">
+              One public entry point into the MSHOPS storefront. Register for cockpit readiness updates,
+              explore the marketplace, and continue into the guided ecosystem surfaces.
+            </p>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <div class="cta-row">
+              <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+              <a class="button primary" href="/marketplace" aria-label="Open the MSHOPS marketplace">Open Marketplace</a>
+              <a class="button secondary" href="/ecosystem" aria-label="Explore the ecosystem overview">Explore Ecosystem</a>
+            </div>
+            <div class="splash-signal-grid" aria-label="Unified public surface signals">
+              <div class="splash-signal-card">
+                <strong>Register</strong>
+                <span>Routes directly into the storefront registration surface at <code>/register</code>.</span>
+              </div>
+              <div class="splash-signal-card">
+                <strong>Marketplace</strong>
+                <span>Single authoritative marketplace surface for modules, governance, and public services.</span>
+              </div>
+              <div class="splash-signal-card">
+                <strong>Cockpit updates</strong>
+                <span>Registration keeps you aligned as operator cockpit systems activate.</span>
+              </div>
+            </div>
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div class="footer-divider" aria-hidden="true"></div>
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS unified public surface</span>
+        <span class="splash-footer-note">Splash landing routes into the storefront for registration and marketplace access.</span>
+      </div>
+      <nav class="nav-ecosystem" aria-label="Footer navigation">
+        <a href="/marketplace" aria-label="Open the MSHOPS marketplace">Marketplace</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/ecosystem" aria-label="Open the public ecosystem overview">Ecosystem</a>
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a href="/status" aria-label="View public status">Status</a>
+      </nav>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/splash.js" defer></script>
+  </body>
+</html>

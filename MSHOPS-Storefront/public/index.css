@@ -1,0 +1,42 @@
+/**
+ * PUBLIC INDEX - PAGE COMPOSITION
+ * -----------------------------------------------------------------------
+ * DRIFT-MARKER: layer=page file=public/index.css version=1.0
+ *
+ * Page-specific composition for the public homepage (/index.html) only.
+ * Follows the same pattern as scenario.css/mission-engine.css: a small,
+ * page-scoped stylesheet layered on top of the shared RGB+Gold system
+ * rather than editing any protected design-system file
+ * (rgbgold-tokens/motion/components/hud/hooks.css, styles.css, a11y.css).
+ *
+ * Load order on index.html: rgbgold-tokens.css -> rgbgold-motion.css ->
+ * rgbgold-components.css -> rgbgold-hud.css -> rgbgold-hooks.css ->
+ * styles.css -> index.css -> a11y.css (last).
+ *
+ * Defines `.footer-divider`, a gold/blue gradient rule used ONLY on this
+ * page's footer - not currently part of the shared component library, so
+ * it lives here rather than in rgbgold-components.css/components.css.
+ * Introduces no new pseudo-elements (see the budget table in
+ * rgbgold-hud.css) and no animation (reduced-motion/Accessibility Mode are
+ * unaffected by this file).
+ */
+
+.footer-divider {
+  width: min(1180px, calc(100% - 2rem));
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
+  opacity: 0.55;
+}
+
+.surface-link-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 960px) {
+  .surface-link-grid {
+    grid-template-columns: 1fr;
+  }
+}

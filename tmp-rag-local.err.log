@@ -1,0 +1,15 @@
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mScheduled Workers are not automatically triggered during local development.[0m
+
+  To manually trigger a scheduled event, run:
+    curl "http://127.0.0.1:8787/cdn-cgi/handler/scheduled"
+  For more details, see [4mhttps://developers.cloudflare.com/workers/configuration/cron-triggers/#test-cron-triggers-locally[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mThe Workers runtime failed to start. There was likely a problem with the workerd binary or your configuration.[0m
+
+  Runtime stderr:
+  *** std::terminate() called with no exception
+  stack: 7ffb23e21239 7ff6d82d63a5 7ffb23e304ff 7ffb23e23a90 7ffb23e2f977 7ffb23e22c77 7ffb23e30310 7ffb4250482e 7ffb423be432 7ffb23e2fe75 7ffb23e218f1 7ffb23e21d16 7ffb23e22d60 7ffb23e30310 7ffb425047ae 7ffb423c21c6 7ffb42436ea0 7ffb3fb01b69 7ffb23e25276 7ff6d995733f 7ff6d82d5f63 7ff6d995c3f2 7ff6d99632f6 7ff6d995c94b 7ff6d99632f6 7ff6d9959e9b 7ff6d82c1e77 7ff6db77999e 7ffb41d8e956
+
+
+🪵  Logs were written to "C:\Users\wevrw\.wrangler-config\.wrangler\logs\wrangler-2026-07-09_08-49-18_446.log"

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Register Intake Queue</title>
+    <meta
+      name="description"
+      content="Private operator queue for public registration intake routed through IntakeAgentV2."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/operator">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Register Intake Queue</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/operator">Operator</a>
+        <a href="/marketplace">Marketplace</a>
+        <a href="/api-explorer">API Explorer</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PRIVATE_ROUTE :: /OPERATOR/REGISTER-INTAKE ]</p>
+            <h1>Access Request Intake Queue</h1>
+            <p class="hero-sub">
+              Read-only operator visibility into public registration intake, lifecycle routing, and security-plane
+              metadata. No operator actions are enabled on this surface yet.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/operator">[ RETURN TO OPERATOR ]</a>
+              <a class="button secondary" href="/register">[ VIEW PUBLIC REGISTER ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ REGISTER_INTAKE_QUEUE ]</p>
+            <h2>Public registration submissions</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid" id="register-intake-summary-grid"></div>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <p class="section-label mono">[ SECURITY_PLANE ]</p>
+            <div class="telemetry-list" id="register-intake-security-plane">
+              <span>Loading security-plane metadata...</span>
+            </div>
+          </div>
+        </article>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <div class="service-intake-toolbar">
+              <p class="section-copy mono">READ_ONLY :: operator actions disabled</p>
+            </div>
+            <div class="table-shell">
+              <table class="data-table mono">
+                <thead>
+                  <tr>
+                    <th>Register ID</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Lifecycle</th>
+                    <th>Priority</th>
+                    <th>Timeline</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="register-intake-rows">
+                  <tr>
+                    <td colspan="7">Loading queue...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="form-status mono" id="register-intake-queue-status" role="status" aria-live="polite">
+              Queue idle.
+            </p>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="/operator/register-intake.js" defer></script>
+  </body>
+</html>

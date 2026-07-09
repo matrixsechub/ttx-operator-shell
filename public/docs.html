@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSH OPS | Public Documentation</title>
+    <meta
+      name="description"
+      content="Public-safe documentation hub for understanding the MSH OPS ecosystem, onboarding paths, governance standards, and intake flow."
+    />
+    <script>
+      (function canonicalizeDocsRoute() {
+        if (window.location.pathname.endsWith(".html")) {
+          window.history.replaceState(null, "", window.location.pathname.slice(0, -5) + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/docs.css" />
+    <link rel="stylesheet" href="/styles/nav.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSH OPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSH OPS</strong>
+          <span>Public Docs</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Public // Documentation</span>
+            <p class="section-label mono">[ DOCS_HUB ]</p>
+            <h1 class="glow-pulse cinematic-hook">Public documentation hub</h1>
+            <p class="hero-sub">
+              A public-safe guide to the ecosystem, its visible components, and the paths new visitors can take without
+              needing access to private systems.
+            </p>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <p class="system-copy">
+              These explanations focus on user-facing behavior, intent, and structure. They do not expose private
+              coordination mechanics, internal credentials, or restricted delivery details.
+            </p>
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="features" aria-labelledby="docs-sections-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ DOC_SECTIONS ]</p>
+            <h2 id="docs-sections-heading">What the public docs cover</h2>
+          </div>
+        </div>
+        <div class="telemetry-grid">
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Docs // Orientation</span>
+              <h3>What MSH OPS is</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The start guide and about pages explain the ecosystem, who it is for, and how the public surfaces help
+                people navigate it without insider knowledge.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Docs // Flow</span>
+              <h3>How to begin</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The intake funnel and contact flow document the public entry experience, what information is useful to
+                share, and how the handoff into guided support happens.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Docs // Frameworks</span>
+              <h3>Mission and scenario concepts</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The mission and scenario pages explain two distinct public concepts: planning and rehearsal on one side,
+                structured execution and completion on the other.
+              </p>
+            </div>
+          </article>
+          <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+            <header class="rgbgold-module-shell-header">
+              <span class="hud-tag a11y-override-badge">Docs // Governance</span>
+              <h3>Motion, accessibility, and health</h3>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="system-copy">
+                The brand and status pages document how RGB+Gold, reduced motion, accessibility hooks, and compliance
+                scanners shape the public experience.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="contact" aria-labelledby="docs-next-heading">
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Next // Read or Submit</span>
+            <p class="section-label mono">[ CONTINUE ]</p>
+            <h2 id="docs-next-heading">Pick your next public step</h2>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <div class="cta-row">
+              <a class="button primary" href="/start">Start Here</a>
+              <a class="button secondary" href="/enter">Open Funnel</a>
+              <a class="button ghost" href="/contact">Contact Page</a>
+            </div>
+            <div class="a11y-hook" data-a11y-override hidden></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div class="footer-divider" aria-hidden="true"></div>
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSH OPS public documentation</span>
+        <span>Orientation, ecosystem structure, governance standards, and public intake guidance</span>
+      </div>
+      <nav class="nav-ecosystem" aria-label="Footer navigation">
+        <a href="/enter" aria-label="Open the public intake funnel">Enter</a>
+        <a class="register-cta-enterprise pulse mono" href="/register" aria-label="Register for Access">Register for Access</a>
+        <a href="/mission" aria-label="Read the public mission framework">Mission</a>
+        <a href="/scenario" aria-label="Read the public scenario framework">Scenario</a>
+        <a href="#features" aria-label="Jump to public features">Features</a>
+        <a href="#contact" aria-label="Jump to public contact options">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

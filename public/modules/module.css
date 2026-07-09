@@ -1,0 +1,27 @@
+@import url("/marketplace.css");
+
+.module-shell {
+  width: min(1080px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 16px 0 48px;
+}
+
+.module-detail {
+  margin-top: 8px;
+}
+
+.module-section {
+  margin-top: 24px;
+}
+
+.detail-panel h2 {
+  margin-bottom: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.55rem;
+  letter-spacing: -0.03em;
+}
+
+.module-detail .section-label {
+  margin-bottom: 6px;
+}

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Mission Engine</title>
+    <meta
+      name="description"
+      content="MSHOPS.NET operator Mission Engine — multi-step missions, doctrine-linked objectives, operator actions, agent responses, and mission-state transitions from a single operator-grade console."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/mission-engine.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Mission Engine</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="/mission">Mission</a>
+        <a href="/operator">Operator</a>
+        <a href="/scenario.html">Scenario</a>
+        <a href="#mission-objectives">Objectives</a>
+        <a href="#mission-state">State</a>
+        <a href="#mission-actions">Actions</a>
+        <a href="#mission-timeline">Timeline</a>
+        <a href="#mission-evidence">Evidence</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <header class="operator-surface" data-version="1.0">
+        <section class="operator-surface-section" data-mission-hook>
+          <div
+            class="rgbgold-module-shell hud-frame reveal"
+            data-reveal="up"
+            data-module-hook
+            data-version="1.0"
+          >
+            <header class="rgbgold-module-shell-header">
+              <div class="hud-tag">Mission Engine // Standby</div>
+              <p class="section-label mono">[ MISSION_ENGINE :: OBJECTIVES / STATE / ACTIONS / EVIDENCE ]</p>
+              <h1>Mission Engine console</h1>
+              <p class="hero-sub">
+                Hosts multi-step missions on top of the Scenario Engine and Doctrine OS integrations - doctrine-
+                linked objectives, an explicit mission state machine, an operator action + agent response
+                console, and a full evidence trail, all built on the RGB+Gold Operator Design System.
+              </p>
+            </header>
+            <div class="rgbgold-module-shell-body">
+              <p class="mission-shell-note mono">
+                This console is a UI-only integration layer. It simulates mission lifecycle state client-side and
+                logs to the console - no backend, Worker, or Mission Engine API calls are made from this page.
+                Doctrine classifications shown here are client-side reference tags only; see
+                <a href="/scenario.html#scenario-doctrine">the Scenario Engine's Doctrine Panel</a> for real,
+                broker-verified doctrine access.
+              </p>
+            </div>
+          </div>
+        </section>
+      </header>
+
+      <section class="section-block" id="mission-objectives" data-mission-objectives>
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ MISSION_OBJECTIVES ]</p>
+            <h2>Mission Objective Panel</h2>
+          </div>
+        </div>
+
+        <div
+          class="mission-objective-panel operator-panel hud-frame reveal a11y-override-card"
+          data-reveal="up"
+          data-version="1.0"
+        >
+          <ul class="mission-objective-panel__list" data-mission-objective-list>
+            <li
+              class="mission-objective-panel__item"
+              data-mission-objective="secure-perimeter"
+              data-doctrine-classification="PUBLIC"
+              data-complete="false"
+            >
+              <div class="mission-objective-panel__item-copy">
+                <p class="mission-objective-panel__item-title">Secure the operator perimeter</p>
+                <span class="mission-doctrine-tag a11y-override-badge">Doctrine // PUBLIC</span>
+              </div>
+              <button class="btn btn-secondary" type="button" data-mission-objective-toggle aria-pressed="false">
+                Mark Complete
+              </button>
+            </li>
+            <li
+              class="mission-objective-panel__item"
+              data-mission-objective="verify-doctrine"
+              data-doctrine-classification="RESTRICTED"
+              data-complete="false"
+            >
+              <div class="mission-objective-panel__item-copy">
+                <p class="mission-objective-panel__item-title">Verify doctrine classification via broker</p>
+                <span class="mission-doctrine-tag a11y-override-badge">Doctrine // RESTRICTED</span>
+              </div>
+              <button class="btn btn-secondary" type="button" data-mission-objective-toggle aria-pressed="false">
+                Mark Complete
+              </button>
+            </li>
+            <li
+              class="mission-objective-panel__item"
+              data-mission-objective="debrief"
+              data-doctrine-classification="PUBLIC"
+              data-complete="false"
+            >
+              <div class="mission-objective-panel__item-copy">
+                <p class="mission-objective-panel__item-title">File mission debrief</p>
+                <span class="mission-doctrine-tag a11y-override-badge">Doctrine // PUBLIC</span>
+              </div>
+              <button class="btn btn-secondary" type="button" data-mission-objective-toggle aria-pressed="false">
+                Mark Complete
+              </button>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section-block" id="mission-state">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ MISSION_STATE ]</p>
+            <h2>Mission State Machine</h2>
+          </div>
+        </div>
+
+        <div class="mission-state-machine hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <div class="mission-state-machine__current" data-mission-state aria-live="polite">
+            <span class="hud-tag">State // Standby</span>
+            <p class="mono">Mission has not been briefed yet.</p>
+          </div>
+          <div class="mission-state-machine__transitions" data-mission-transitions></div>
+        </div>
+      </section>
+
+      <section class="section-block" id="mission-actions">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ MISSION_ACTIONS ]</p>
+            <h2>Mission Action Console</h2>
+          </div>
+        </div>
+
+        <div
+          class="mission-action-console operator-panel hud-frame reveal"
+          data-reveal="up"
+          data-mission-actions
+          data-version="1.0"
+        >
+          <div class="mission-action-console__buttons">
+            <button class="btn btn-secondary" type="button" data-mission-action="log-note">
+              Log Operator Note
+            </button>
+            <button class="btn btn-secondary" type="button" data-mission-action="request-agent-response">
+              Request Agent Response
+            </button>
+            <button class="btn btn-secondary" type="button" data-mission-action="flag-doctrine">
+              Flag Doctrine Constraint
+            </button>
+          </div>
+          <div
+            class="mission-action-console__feed a11y-override-card"
+            data-mission-action-feed
+            aria-live="polite"
+          >
+            <p class="mission-action-console__empty mono" data-mission-action-empty>
+              No operator actions or agent responses logged yet.
+            </p>
+            <ul class="mission-action-console__list" data-mission-action-list></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block" id="mission-timeline">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ MISSION_TIMELINE ]</p>
+            <h2>Mission Timeline</h2>
+          </div>
+        </div>
+
+        <div class="mission-timeline hud-frame reveal" data-reveal="up" data-version="1.0">
+          <ol class="mission-timeline__track" data-mission-timeline-track aria-label="Mission timeline">
+            <li class="mission-timeline__node mission-timeline__node--placeholder" data-mission-timeline-empty>
+              <span class="hud-tag">Timeline // Standby</span>
+              <p class="mono">No mission events recorded yet. Timeline nodes populate as the mission runs.</p>
+            </li>
+          </ol>
+          <!-- Future timeline animation injection point - see DESIGN_SYSTEM.md §47. -->
+          <div class="cinematic-hook" data-cinematic hidden></div>
+        </div>
+      </section>
+
+      <section class="section-block" id="mission-evidence">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ MISSION_EVIDENCE ]</p>
+            <h2>Mission Evidence Viewer</h2>
+          </div>
+        </div>
+
+        <div class="mission-evidence-viewer a11y-override-card" data-mission-evidence aria-live="polite">
+          <p class="mission-evidence-viewer__empty mono" data-mission-evidence-empty>
+            No mission evidence recorded yet.
+          </p>
+          <ul class="mission-evidence-viewer__list" data-mission-evidence-list></ul>
+        </div>
+        <!-- Accessibility Mode registration hook - see a11y.css's generic override checklist. -->
+        <div class="a11y-hook" data-a11y-override hidden></div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <span>MSHOPS.NET Mission Engine console</span>
+      <span>UI integration layer only - no backend or Worker calls originate from this page</span>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/mission-engine.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>

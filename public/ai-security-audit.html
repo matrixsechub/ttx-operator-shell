@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | AI Security Audit Lite</title>
+    <meta
+      name="description"
+      content="Run a free AI Security Risk Check to score AI exposure, review top risks, and route into a full audit intake."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>AI Security Audit Lite</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#questionnaire">Risk Check</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: AI_SECURITY_AUDIT_LITE ]</p>
+            <h1>Free AI Security Risk Check</h1>
+            <p class="hero-sub">
+              Find out where your AI tools may be exposing your business to data leakage, prompt injection, automation
+              risk, or governance gaps.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#questionnaire">[ START FREE RISK CHECK ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+              <a class="button secondary" href="/apps/prompt-injection-scanner">[ ALSO CHECK PROMPT INJECTION RISK ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="questionnaire">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ QUESTIONNAIRE ]</p>
+            <h2>Short AI security questionnaire</h2>
+          </div>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>Diagnostic intake</h3>
+              <p class="system-copy">
+                This free diagnostic scores exposure and returns limited findings. It does not create user accounts,
+                exports, paid reports, or full generated assessments.
+              </p>
+              <form class="contact-form" id="audit-lite-form">
+                <label>
+                  <span>Company Type</span>
+                  <select name="company_type" required>
+                    <option value="solo_operator">Solo operator</option>
+                    <option value="small_business">Small business</option>
+                    <option value="agency">Agency</option>
+                    <option value="saas_company">SaaS company</option>
+                    <option value="enterprise_team">Enterprise team</option>
+                    <option value="regulated_business">Regulated business</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>AI Tools Used</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="ai_tools_used" value="chatgpt" /> ChatGPT</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="microsoft_copilot" /> Microsoft Copilot</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="gemini" /> Gemini</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="claude" /> Claude</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="customer_chatbot" /> Customer chatbot</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="internal_ai_assistant" /> Internal AI assistant</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="rag_knowledge_base" /> RAG knowledge base</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="ai_agent" /> AI agent</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="n8n_make_zapier" /> n8n, Make, or Zapier</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="local_llm_ollama" /> Local LLM or Ollama</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="multimodal_ai" /> Multimodal AI</label>
+                    <label><input type="checkbox" name="ai_tools_used" value="none_yet" /> None yet</label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>Data Used With AI</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="data_used_with_ai" value="public_content" /> Public content</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="internal_docs" /> Internal docs</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="customer_data" /> Customer data</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="financial_data" /> Financial data</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="health_data" /> Health data</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="legal_data" /> Legal data</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="credentials_or_secrets" /> Credentials or secrets</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="regulated_data" /> Regulated data</label>
+                    <label><input type="checkbox" name="data_used_with_ai" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>AI Exposure</span>
+                  <select name="ai_exposure" required>
+                    <option value="internal_only">Internal only</option>
+                    <option value="customer_facing">Customer facing</option>
+                    <option value="public_website">Public website</option>
+                    <option value="connected_to_business_tools">Connected to business tools</option>
+                    <option value="autonomous_actions">Autonomous actions</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>Governance Controls</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="governance_controls" value="written_ai_policy" /> Written AI policy</label>
+                    <label><input type="checkbox" name="governance_controls" value="approved_tool_list" /> Approved tool list</label>
+                    <label><input type="checkbox" name="governance_controls" value="access_controls" /> Access controls</label>
+                    <label><input type="checkbox" name="governance_controls" value="logging_monitoring" /> Logging and monitoring</label>
+                    <label><input type="checkbox" name="governance_controls" value="human_review" /> Human review</label>
+                    <label><input type="checkbox" name="governance_controls" value="vendor_review" /> Vendor review</label>
+                    <label><input type="checkbox" name="governance_controls" value="prompt_security_testing" /> Prompt security testing</label>
+                    <label><input type="checkbox" name="governance_controls" value="none" /> None</label>
+                    <label><input type="checkbox" name="governance_controls" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>Main Concern</span>
+                  <select name="main_concern" required>
+                    <option value="data_leakage">Data leakage</option>
+                    <option value="prompt_injection">Prompt injection</option>
+                    <option value="employee_misuse">Employee misuse</option>
+                    <option value="compliance">Compliance</option>
+                    <option value="agent_actions">Agent actions</option>
+                    <option value="automation_failure">Automation failure</option>
+                    <option value="hallucinations">Hallucinations</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <div class="hero-actions">
+                  <button class="button primary" type="submit" id="audit-lite-submit">Run Free Risk Check</button>
+                  <button class="button ghost" type="reset">Reset</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="audit-lite-status" role="status" aria-live="polite">
+                Risk check ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner" id="audit-lite-result">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Free AI Security Risk Check</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive a risk score, tier, top 3 risks, and the recommended next step.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner footer-architecture">
+            <div class="section-heading">
+              <div>
+                <p class="section-label mono">[ CTA_SECTION ]</p>
+                <h2>Request Full AI Security Audit</h2>
+              </div>
+            </div>
+            <p class="system-copy">
+              The free diagnostic is a lightweight lead-generation check. For a full review of controls, routing,
+              governance, and live AI risk posture, route into the full AI Security Audit intake.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/enter?service=ai_security_audit&source=audit-lite">[ REQUEST FULL AI SECURITY AUDIT ]</a>
+              <a class="button secondary" href="/apps/ai-agent-readiness-checker">[ PLANNING AN AI AGENT? CHECK READINESS ]</a>
+              <a class="button secondary" href="/apps/rag-risk-analyzer">[ USING RAG OR KNOWLEDGE ASSISTANTS? ANALYZE RAG RISK ]</a>
+              <a class="button secondary" href="/apps/prompt-injection-scanner">[ ALSO CHECK PROMPT INJECTION RISK ]</a>
+              <a class="button secondary" href="/services">[ RETURN TO SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET free diagnostic app</span>
+        <span>Risk check, limited findings, and funnel handoff to full audit intake</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/ai-security-audit.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>
