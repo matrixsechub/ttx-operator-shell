@@ -11,7 +11,7 @@ import intakeAgent from "./agents/intakeAgent.js";
 import securityIntakeAgent from "./agents/securityIntakeAgent.js";
 import cloudflareSecurityAudit from "./data/cloudflareSecurityAudit.js";
 import handleDoctrineRequest from "./doctrine/index.js";
-import { INTAKE_DEMO_MODE_MESSAGE, isIntakeDemoMode } from "./data/intakeDemoMode.js";
+import { getPublicDemoModePayload, INTAKE_DEMO_MODE_MESSAGE, isIntakeDemoMode } from "./data/intakeDemoMode.js";
 import publicRegister from "./data/publicRegister.js";
 import {
   collectAutonomousSignalInputs,
@@ -4875,15 +4875,7 @@ async function handleApi(request, env, url) {
   }
 
   if (method === "GET" && pathname === "/api/public/demo-mode") {
-    const enabled = isIntakeDemoMode(env);
-    return json(
-      {
-        enabled,
-        message: INTAKE_DEMO_MODE_MESSAGE,
-      },
-      200,
-      { "Cache-Control": "no-store" }
-    );
+    return json(getPublicDemoModePayload(env), 200, { "Cache-Control": "no-store" });
   }
 
   if (method === "POST" && pathname === "/api/register") {

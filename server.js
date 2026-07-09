@@ -87,7 +87,7 @@ const {
   getPublicRegisterMarketplaceSummary,
   buildPublicRegisterMarketplacePayload
 } = require("./data/publicRegister");
-const { isIntakeDemoMode, INTAKE_DEMO_MODE_MESSAGE } = require("./data/intakeDemoMode");
+const { isIntakeDemoMode, INTAKE_DEMO_MODE_MESSAGE, getPublicDemoModePayload } = require("./data/intakeDemoMode");
 const {
   isOperatorSurfaceRequest,
   startSecurityAudit,
@@ -594,16 +594,7 @@ async function handleApi(request, response, url) {
   }
 
   if (method === "GET" && pathname === "/api/public/demo-mode") {
-    const enabled = isIntakeDemoMode({});
-    sendJson(
-      response,
-      200,
-      {
-        enabled,
-        message: INTAKE_DEMO_MODE_MESSAGE,
-      },
-      { "Cache-Control": "no-store" },
-    );
+    sendJson(response, 200, getPublicDemoModePayload({}), { "Cache-Control": "no-store" });
     return;
   }
 

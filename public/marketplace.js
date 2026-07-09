@@ -431,8 +431,14 @@ function renderServiceModules(modules) {
               : "";
             const isPublicRegister = module.slug === "public-register" || module.service_slug === "public_register";
             const securityBadges = isPublicRegister ? renderRegisterSecurityBadges(module) : "";
-            const publicCtaLabel = isPublicRegister ? "[ REQUEST ACCESS ]" : "[ VIEW PUBLIC ROUTE ]";
+            const publicCtaLabel = isPublicRegister ? "Register for Access" : "[ VIEW PUBLIC ROUTE ]";
             const operatorCtaLabel = isPublicRegister ? "[ OPERATOR QUEUE ]" : "[ OPEN OPERATOR ROUTE ]";
+            const publicCtaClass = isPublicRegister
+              ? "register-cta-enterprise pulse mono"
+              : "button primary";
+            const publicCtaTitle = isPublicRegister
+              ? "Register to receive cockpit activation updates."
+              : "Open the public registration intake surface";
             return `
             <article class="module-card bracket">
               <div class="bracket-inner">
@@ -455,7 +461,7 @@ function renderServiceModules(modules) {
                 <p class="section-copy mono">INPUTS :: ${escapeHtml((module.required_inputs || []).join(" | "))}</p>
                 <p class="section-copy mono">OUTPUTS :: ${escapeHtml((module.delivery_outputs || []).join(" | "))}</p>
                 <div class="button-row">
-                  <a class="button primary" href="${escapeHtml(module.public_service_route)}" title="Open the public registration intake surface">${publicCtaLabel}</a>
+                  <a class="${publicCtaClass}" href="${escapeHtml(module.public_service_route)}" title="${escapeHtml(publicCtaTitle)}">${publicCtaLabel}</a>
                   <a class="button secondary" href="${escapeHtml(module.operator_route)}" title="Operator-only queue preview for registration intake">${operatorCtaLabel}</a>
                 </div>
               </div>

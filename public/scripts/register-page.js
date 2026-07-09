@@ -1,10 +1,41 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("register-form");
   const status = document.getElementById("register-form-status");
   const submitButton = document.getElementById("register-submit");
   const confirmation = document.getElementById("register-confirmation");
   const confirmationCopy = document.getElementById("register-confirmation-copy");
   const demoNote = document.getElementById("register-demo-note");
+  const cockpitNote = document.getElementById("register-cockpit-update-note");
+  const underConstructionBanner = document.getElementById("register-under-construction");
+  const underConstructionCopy = document.getElementById("register-under-construction-copy");
+
+  async function loadCockpitStatus() {
+    try {
+      const response = await fetch("/api/public/demo-mode", {
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) {
+        return null;
+      }
+      return response.json();
+    } catch (error) {
+      console.warn("MSH OPS cockpit status unavailable", error);
+      return null;
+    }
+  }
+
+  const demoModePayload = await loadCockpitStatus();
+  if (demoModePayload?.cockpit_status === "under_construction") {
+    if (underConstructionBanner instanceof HTMLElement) {
+      underConstructionBanner.hidden = false;
+    }
+    if (underConstructionCopy instanceof HTMLElement) {
+      underConstructionCopy.textContent =
+        demoModePayload.cockpit_message ||
+        "Operator Cockpit Under Construction — Your registration will receive updates as systems come online.";
+    }
+    document.body.classList.add("register-under-construction-active");
+  }
 
   if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) {
     return;
@@ -43,11 +74,17 @@ document.addEventListener("DOMContentLoaded", () => {
         confirmationCopy.textContent = "Access Pending — Operator Review Required";
       }
 
+      if (cockpitNote instanceof HTMLElement) {
+        cockpitNote.hidden = false;
+        cockpitNote.textContent =
+          "You will receive cockpit readiness updates as systems activate.";
+      }
+
       if (result.next_route && confirmation instanceof HTMLElement) {
         const ctaRow = confirmation.querySelector(".cta-row");
         if (ctaRow && !ctaRow.querySelector("[data-register-next-route]")) {
           const nextLink = document.createElement("a");
-          nextLink.className = "button primary";
+          nextLink.className = "register-cta-enterprise pulse mono";
           nextLink.href = result.next_route;
           nextLink.setAttribute("data-register-next-route", "true");
           nextLink.textContent = "Continue to Intake Funnel";
