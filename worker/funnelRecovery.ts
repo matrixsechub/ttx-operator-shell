@@ -1,6 +1,7 @@
 import type { BackboneEnv } from "./backboneEnv";
 import type { WorkerEnv } from "./env";
 import type { AiGatewayEnv } from "./aiGateway";
+import { recordUsageEvent, isValidSessionId } from "./usage";
 import { injectSecurityHeaders } from "./edge/headers";
 import {
   handleFulfillmentAgentApi,
@@ -378,6 +379,7 @@ const ENGAGEMENT_KEYS = [
   "rag_plan_id",
   "deployment_plan_id",
   "beacon_order_id",
+  "sessionId",
 ] as const;
 
 class ApiError extends Error {
@@ -787,6 +789,14 @@ async function registerQueuePreview(kv: KVNamespace) {
   };
 }
 
+export function redirectWelcomeToRoot(request: Request, pathname: string): Response | null {
+  if (normalizePath(pathname) !== "/welcome") return null;
+  if (request.method === "GET" || request.method === "HEAD") {
+    return Response.redirect(new URL("/", request.url).toString(), 302);
+  }
+  return jsonResponse({ error: "Method not allowed" }, 405, { Allow: "GET, HEAD" });
+}
+
 export function isRecoveredPublicRoute(pathname: string): boolean {
   return resolveRecoveredHtml(pathname) !== null;
 }
@@ -819,6 +829,35 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
 
   try {
     if (method === "POST" && pathname === "/api/growth/track") {
+      if (env.TTX_STATE) {
+        try {
+          const payload = await readJsonBody(request, ["event", "sessionId", "trafficSource", "campaignId"], 4096);
+          const event = typeof payload.event === "string" ? payload.event : "";
+          const sessionId = payload.sessionId;
+          if (isValidSessionId(sessionId) && event) {
+            const allowed = [
+              "visit",
+              "entry_click",
+              "marketplace_click",
+              "service_view",
+              "intake_started",
+              "intake_completed",
+              "checkout_started",
+              "purchase_completed",
+            ];
+            if (allowed.includes(event)) {
+              await recordUsageEvent(env as WorkerEnv, {
+                event: event as Parameters<typeof recordUsageEvent>[1]["event"],
+                sessionId,
+                trafficSource: typeof payload.trafficSource === "string" ? payload.trafficSource : undefined,
+                campaignId: typeof payload.campaignId === "string" ? payload.campaignId : undefined,
+              });
+            }
+          }
+        } catch {
+          // backward-compatible no-op on malformed payloads
+        }
+      }
       return new Response(null, { status: 202 });
     }
 
@@ -1079,6 +1118,14 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
       processRagArchitectureEngagement(payload, record);
       processLocalAiDeploymentEngagement(payload, record);
       processNorthstarBeaconEngagement(payload, record);
+
+      if (env.TTX_STATE && isValidSessionId(payload.sessionId)) {
+        void recordUsageEvent(env as WorkerEnv, {
+          event: "intake_started",
+          sessionId: payload.sessionId as string,
+          trafficSource: typeof payload.source === "string" ? payload.source : undefined,
+        }).catch(() => {});
+      }
 
       return jsonResponse(
         {

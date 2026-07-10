@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { before, describe, it } from "node:test";
-import { handleRecoveredFunnelApi, isRecoveredPublicRoute } from "../worker/funnelRecovery.ts";
+import { handleRecoveredFunnelApi, isRecoveredPublicRoute, redirectWelcomeToRoot } from "../worker/funnelRecovery.ts";
 import { ensureAgentGovernance } from "../msh-ops/agent/initAgentGovernance.ts";
 import { ensureBeaconLoaded } from "../msh-ops/beacon/loadBeacon.ts";
 
@@ -44,7 +44,16 @@ describe("funnel route map", () => {
     assert.equal(isRecoveredPublicRoute("/apps/northstar-beacon"), true);
     assert.equal(isRecoveredPublicRoute("/operator/northstar-beacon-orders"), true);
     assert.equal(isRecoveredPublicRoute("/apps/cloudflare-security-audit-lite"), true);
+    assert.equal(isRecoveredPublicRoute("/welcome"), false);
     assert.equal(isRecoveredPublicRoute("/not-real"), false);
+  });
+
+  it("redirects /welcome to canonical root", () => {
+    const request = new Request("https://example.test/welcome");
+    const response = redirectWelcomeToRoot(request, "/welcome");
+    assert.ok(response);
+    assert.equal(response?.status, 302);
+    assert.equal(response?.headers.get("location"), "https://example.test/");
   });
 });
 

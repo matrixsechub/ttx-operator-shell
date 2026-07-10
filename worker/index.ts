@@ -63,10 +63,12 @@ import { handleIntentCaptureRoute } from "./intentCaptureRoute";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
+import { handleActivationRoute } from "./activation/activationRoutes";
+import { handleTrafficInteractionRoute } from "./activation/interactionRoute";
 import { handleLiveTtxRoute } from "./liveTtxRoute";
 import { handleWildcardRoute } from "./wildcardAdvancement";
 import { handleAuditLiteRoute } from "./auditLite";
-import { handleRecoveredFunnelApi, isRecoveredPublicRoute, serveRecoveredPublicRoute } from "./funnelRecovery";
+import { handleRecoveredFunnelApi, isRecoveredPublicRoute, redirectWelcomeToRoot, serveRecoveredPublicRoute } from "./funnelRecovery";
 import { handleAiGatewayRoute } from "./aiGatewayRoutes";
 import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
 import { handlePrismUiuxRoute } from "./prismUiuxRoutes";
@@ -406,6 +408,13 @@ export default {
         return prismUiuxResponse;
       }
 
+      const activationResponse = await handleActivationRoute(request, url.pathname, env as WorkerEnv);
+
+      if (activationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, activationResponse.status);
+        return activationResponse;
+      }
+
 
 
       if (url.pathname.startsWith("/api/ttx/live")) {
@@ -550,6 +559,13 @@ export default {
         return trafficActivationResponse;
       }
 
+      const trafficInteractionResponse = await handleTrafficInteractionRoute(request, url.pathname, env as WorkerEnv);
+
+      if (trafficInteractionResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, trafficInteractionResponse.status);
+        return trafficInteractionResponse;
+      }
+
       const kernelResponse = await handleKernelRoute(request, url.pathname, env as WorkerEnv & BackboneEnv);
 
       if (kernelResponse) {
@@ -579,6 +595,11 @@ export default {
       if (recoveredPublic) {
         return recoveredPublic;
       }
+    }
+
+    const welcomeRedirect = redirectWelcomeToRoot(request, pathname);
+    if (welcomeRedirect) {
+      return welcomeRedirect;
     }
 
     if (mode === "public") {
