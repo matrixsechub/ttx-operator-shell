@@ -17,6 +17,21 @@ export function RequireAuth() {
   }
 
   if (!isAuthenticated) {
+    // #region agent log
+    fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
+      body: JSON.stringify({
+        sessionId: "14ea90",
+        runId: "fix-auth-redirect",
+        hypothesisId: "H-require-auth",
+        location: "src/lib/RequireAuth.tsx",
+        message: "client redirect to login",
+        data: { pathname: location.pathname },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

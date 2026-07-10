@@ -11,7 +11,7 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"]
+    "run_worker_first": true
   },
   "vars": {
     "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
@@ -25,28 +25,40 @@
     // APP_VERSION is a manual mirror of package.json's "version" field —
     // bump both together, no build-step sync exists for this.
     "DEPLOY_ENV": "production",
-    "APP_VERSION": "0.1.0"
+    "APP_VERSION": "0.1.0",
+    "BUILD_COMMIT_SHA": "unknown",
+    "BUILD_TIMESTAMP": "",
+    "SYSTEM_MODE": "PRODUCTION",
+    "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev"
   },
-  // Revoked-refresh-token denylist (Phase 16). Real Cloudflare KV namespace,
-  // created via `wrangler kv namespace create AUTH_REVOCATION`. Shared
-  // across local dev / production / staging rather than provisioning three
-  // separate namespaces — a deliberate simplification for a single-developer
-  // storefront, not an oversight.
+  // Revoked-refresh-token denylist (Phase 16). Production namespace —
+  // staging uses dedicated namespaces in env.staging (see docs/RELEASE.md).
   "kv_namespaces": [
     { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },
-    // Webhook Trigger event storage (Phase 20). Real KV namespace, created
-    // via `wrangler kv namespace create WEBHOOK_EVENTS`. Same shared-across-
-    // environments simplification as AUTH_REVOCATION.
     { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" },
-    // Security signal storage (Phase 23) — failed logins, invalid tokens,
-    // malformed/duplicate/spiking webhook events. Same shared-across-
-    // environments simplification as the other two namespaces.
     { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" },
-    // TTX scenario engine state (Phase 24) — a single hardcoded scenario's
-    // current phase index, not to be confused with the separate
-    // src/operator/ttx/ "TTX SaaS" scaffold (scenarios/roles/scoring),
-    // which still proxies to an Engine that doesn't exist yet.
     { "binding": "TTX_STATE", "id": "b86a60440f2a4b3db5f949eebf420e56" }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "GOVERNANCE", "class_name": "GovernanceDO" },
+      { "name": "SESSION", "class_name": "SessionDO" },
+      { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
+      { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1-operator-backbone",
+      "new_sqlite_classes": ["GovernanceDO", "SessionDO", "MarketplaceDO"]
+    },
+    {
+      "tag": "v36-live-ttx-sessions",
+      "new_sqlite_classes": ["LiveTtxSession"]
+    }
+  ],
+  "services": [
+    { "binding": "HARNESS", "service": "msh-ops-os-harness" }
   ],
   "env": {
     "staging": {
@@ -56,13 +68,43 @@
         "OPERATOR_ROLE": "operator",
         "OPERATOR_ACCESS_LEVEL": "internal",
         "DEPLOY_ENV": "staging",
-        "APP_VERSION": "0.1.0"
+        "APP_VERSION": "0.1.0",
+        "BUILD_COMMIT_SHA": "unknown",
+        "BUILD_TIMESTAMP": "",
+        "SYSTEM_MODE": "OPERATOR_BETA",
+        "ORIGIN_URL": "https://ttx-operator-shell-staging.sogellagepul.workers.dev"
       },
       "kv_namespaces": [
-        { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },
-        { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" },
-        { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" },
-        { "binding": "TTX_STATE", "id": "b86a60440f2a4b3db5f949eebf420e56" }
+        // Replace each id with the output of the corresponding create command (run once before first staging deploy):
+        //   wrangler kv namespace create AUTH_REVOCATION --env staging
+        //   wrangler kv namespace create WEBHOOK_EVENTS --env staging
+        //   wrangler kv namespace create SECURITY_EVENTS --env staging
+        //   wrangler kv namespace create TTX_STATE --env staging
+        { "binding": "AUTH_REVOCATION", "id": "a0000000000000000000000000000001", "preview_id": "a0000000000000000000000000000001" },
+        { "binding": "WEBHOOK_EVENTS", "id": "a0000000000000000000000000000002", "preview_id": "a0000000000000000000000000000002" },
+        { "binding": "SECURITY_EVENTS", "id": "a0000000000000000000000000000003", "preview_id": "a0000000000000000000000000000003" },
+        { "binding": "TTX_STATE", "id": "a0000000000000000000000000000004", "preview_id": "a0000000000000000000000000000004" }
+      ],
+      "durable_objects": {
+        "bindings": [
+          { "name": "GOVERNANCE", "class_name": "GovernanceDO" },
+          { "name": "SESSION", "class_name": "SessionDO" },
+          { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
+          { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" }
+        ]
+      },
+      "migrations": [
+        {
+          "tag": "v1-operator-backbone",
+          "new_sqlite_classes": ["GovernanceDO", "SessionDO", "MarketplaceDO"]
+        },
+        {
+          "tag": "v36-live-ttx-sessions",
+          "new_sqlite_classes": ["LiveTtxSession"]
+        }
+      ],
+      "services": [
+        { "binding": "HARNESS", "service": "msh-ops-os-harness" }
       ]
     }
   }

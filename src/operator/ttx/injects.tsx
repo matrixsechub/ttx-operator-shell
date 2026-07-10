@@ -1,8 +1,7 @@
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { InfoCard } from "../../components/InfoCard";
 import { StatusPill } from "../../components/StatusPill";
-import { useApiResource } from "../../lib/useApiResource";
-import { ttxService } from "./service";
+import { localScenarioToInjects } from "./scenarioBridge";
 import { useScenarioContext } from "./ScenarioContext";
 
 const SEVERITY_TONE = {
@@ -11,37 +10,26 @@ const SEVERITY_TONE = {
   critical: "danger",
 } as const;
 
-// Inject management for the active scenario, selected via ScenarioContext
-// (set in Builder once a scenario is saved).
 export function TTXInjects() {
-  const { selectedScenarioId } = useScenarioContext();
-  const { result, loading, refresh } = useApiResource(() => ttxService.listInjects(selectedScenarioId ?? ""));
+  const { selectedScenarioId, localById } = useScenarioContext();
 
-  useEffect(() => {
-    if (selectedScenarioId) refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedScenarioId]);
-
-  const injects = result?.ok ? result.data.injects : [];
+  const injects = useMemo(() => {
+    if (!selectedScenarioId) return [];
+    const local = localById[selectedScenarioId];
+    return local ? localScenarioToInjects(local) : [];
+  }, [localById, selectedScenarioId]);
 
   return (
     <InfoCard label="Inject Management">
       <div className="mb-3 flex items-center justify-between">
         <p className="text-xs text-op-text-dim">Timed events that fire during a live session.</p>
-        <button
-          type="button"
-          onClick={() => refresh()}
-          className="text-[10px] uppercase tracking-widest text-op-accent hover:underline"
-        >
-          {loading ? "syncing…" : "refresh"}
-        </button>
       </div>
 
       {!selectedScenarioId ? (
         <p className="text-xs italic text-op-text-dim">Select a scenario above to view its injects.</p>
-      ) : !result || !result.ok || injects.length === 0 ? (
+      ) : injects.length === 0 ? (
         <p className="text-xs italic text-op-text-dim">
-          {!result || result.ok ? "No injects yet for this scenario." : `Engine unreachable — ${result.error}`}
+          Built-in scenarios expose injects during live sessions. Author a scenario in Builder to preview node injects here.
         </p>
       ) : (
         <ul className="flex flex-col gap-2">

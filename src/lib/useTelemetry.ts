@@ -29,7 +29,7 @@ const POLL_INTERVAL_MS = 30_000;
 export function useTelemetry() {
   const workerHealth = useApiResource(api.engineHealth, { pollIntervalMs: POLL_INTERVAL_MS });
   const engineVersion = useApiResource(api.engineVersion, { pollIntervalMs: POLL_INTERVAL_MS });
-  const externalStatus = useApiResource(api.getSystemStatus, { pollIntervalMs: POLL_INTERVAL_MS });
+  const systemState = useApiResource(api.getSystemState, { pollIntervalMs: POLL_INTERVAL_MS });
   const catalog = useApiResource(api.getCatalog, { pollIntervalMs: POLL_INTERVAL_MS });
   const webhookEvents = useApiResource(() => webhookTriggerService.getEvents(), { pollIntervalMs: POLL_INTERVAL_MS });
   // Phase 23 — one more useApiResource call feeding security event count/
@@ -61,7 +61,7 @@ export function useTelemetry() {
   return {
     workerHealth,
     engineVersion,
-    externalStatus,
+    systemState,
     catalog,
     webhookEvents,
     securityEvents,

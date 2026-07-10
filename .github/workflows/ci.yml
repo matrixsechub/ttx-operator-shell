@@ -5,8 +5,11 @@ on:
   pull_request:
 
 jobs:
-  typecheck-and-build:
+  typecheck-test-build:
     runs-on: ubuntu-latest
+    env:
+      GIT_COMMIT_SHA: ${{ github.sha }}
+      BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
     steps:
       - uses: actions/checkout@v4
 
@@ -18,5 +21,7 @@ jobs:
       - run: npm ci
 
       - run: npm run typecheck
+
+      - run: npm test
 
       - run: npm run build

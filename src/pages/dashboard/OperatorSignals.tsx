@@ -2,19 +2,18 @@ import { StatusPill } from "../../components/StatusPill";
 import { api } from "../../lib/apiClient";
 import { useApiResource } from "../../lib/useApiResource";
 
-// Surfaces SystemStatus.errors (already returned by the existing
-// getSystemStatus call) as a compact operator-facing signal feed. No new
-// data source — same polling pattern as Status.tsx.
 export function OperatorSignals() {
-  const { result, loading } = useApiResource(api.getSystemStatus, { pollIntervalMs: 15_000 });
-  const signals = result?.ok ? (result.data.errors ?? []) : [];
+  const { result, loading } = useApiResource(api.getSystemState, { pollIntervalMs: 15_000 });
+  const state = result?.ok ? result.data.state : null;
+  const errorCount = state?.telemetry?.errorCount ?? 0;
+  const govEvents = (state?.telemetry?.governanceEventCount as number | undefined) ?? 0;
 
   return (
     <div id="operator-signals" className="op-panel rounded-sm p-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Operator Signals</h2>
-        <StatusPill tone={!result || !result.ok ? "neutral" : signals.length === 0 ? "ok" : "warn"}>
-          {loading ? "syncing" : !result || !result.ok ? "unknown" : signals.length === 0 ? "clear" : `${signals.length}`}
+        <StatusPill tone={!result || !result.ok ? "neutral" : errorCount === 0 ? "ok" : "warn"}>
+          {loading ? "syncing" : !result || !result.ok ? "unknown" : errorCount === 0 ? "clear" : `${errorCount}`}
         </StatusPill>
       </div>
 
@@ -22,15 +21,12 @@ export function OperatorSignals() {
         <p className="mt-3 text-xs italic text-op-text-dim">
           Signal feed unavailable{result && !result.ok ? ` — ${result.error}` : ""}.
         </p>
-      ) : signals.length === 0 ? (
-        <p className="mt-3 text-xs italic text-op-text-dim">No active signals.</p>
       ) : (
-        <ul className="mt-3 flex flex-col gap-1.5">
-          {signals.map((signal, index) => (
-            <li key={index} className="text-xs text-op-text-dim">
-              &bull; {signal}
-            </li>
-          ))}
+        <ul className="mt-3 flex flex-col gap-1.5 text-xs text-op-text-dim">
+          <li>Telemetry errors: {errorCount}</li>
+          <li>Governance events: {govEvents}</li>
+          <li>Ghost: {state?.ghost?.connected ? "connected" : "fallback"}</li>
+          <li>Mode: {state?.systemMode ?? "—"}</li>
         </ul>
       )}
     </div>

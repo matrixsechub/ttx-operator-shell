@@ -1,5 +1,6 @@
 import { useParams, Navigate } from "react-router-dom";
 import { OperatorShell } from "../../components/OperatorShell";
+import { SystemHUD } from "../../components/SystemHUD";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { RelatedLinksRail } from "../../components/RelatedLinksRail";
 import { getSystemRelatedLinks, getSystemMarketplaceCategory } from "../../lib/ecosystem";
@@ -16,7 +17,7 @@ export function SystemDetail() {
   }
 
   return (
-    <OperatorShell>
+    <OperatorShell hud={<SystemHUD compact />}>
       <div className="flex flex-col gap-6">
         <Breadcrumbs
           trail={[

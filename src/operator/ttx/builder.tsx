@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { InfoCard } from "../../components/InfoCard";
-import { ttxService } from "./service";
+import { ttxLocalScenarioService } from "../../lib/ttxLocalScenarioService";
+import { createEmptyLocalDraft } from "./scenarioBridge";
 import { useScenarioContext } from "./ScenarioContext";
 
-// Scenario Builder UI. Save calls ttxService.createScenario for real — the
-// engine doesn't expose /api/ttx/scenarios yet, so this will surface a real
-// (graceful) error via ApiResult until that route exists. That's expected,
-// same as the rest of this module.
+// Scenario Builder UI — persists operator-authored scenarios via the Worker
+// local-scenario API (worker/localScenarioRoutes.ts).
 export function TTXBuilder() {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
@@ -23,7 +22,9 @@ export function TTXBuilder() {
     setSaveError(null);
     setSaveSuccess(false);
 
-    const result = await ttxService.createScenario({ title, summary, division: division || undefined });
+    const result = await ttxLocalScenarioService.create(
+      createEmptyLocalDraft(title, summary, division || undefined),
+    );
 
     if (result.ok) {
       selectScenario(result.data.scenario.id);

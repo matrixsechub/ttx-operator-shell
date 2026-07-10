@@ -5,12 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run cf-typegen && tsc -b && vite build",
+    "build": "node scripts/build.mjs",
     "preview": "vite preview",
-    "typecheck": "npm run cf-typegen && tsc -b --noEmit",
-    "worker:dev": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "typecheck": "node scripts/typecheck.mjs",
+    "worker:dev": "node scripts/build.mjs && wrangler dev",
+    "deploy": "node scripts/build.mjs && wrangler deploy",
+    "deploy:staging": "node scripts/deploy-staging.mjs",
+    "verify:staging-config": "node scripts/verify-staging-config.mjs",
+    "deploy:mshops-public": "node scripts/deploy-mshops-public.mjs",
+    "deploy:mshops-operator": "node scripts/deploy-mshops-operator.mjs",
+    "verify:step5": "node scripts/verify-step5-gate.mjs",
+    "cf-typegen": "wrangler types",
+    "test": "node --import tsx --test tests/apiAuth.test.ts tests/buildManifest.test.ts tests/stagingConfig.test.ts tests/statusRoute.test.ts tests/ttxSession.test.ts"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -25,6 +31,7 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.23.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.0",
     "wrangler": "^4.0.0"

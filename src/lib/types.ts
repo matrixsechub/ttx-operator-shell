@@ -69,4 +69,81 @@ export interface EngineHealth {
 
 export interface EngineVersion {
   version: string;
+  commitSha?: string;
+  buildTimestamp?: string;
+  deployEnv?: string;
+}
+
+export interface BuildInfo {
+  version: string;
+  commitSha: string;
+  buildTimestamp: string;
+  deployEnv: string;
+  workerName: string;
+}
+
+export interface SystemStateResponse {
+  ok: true;
+  state: {
+    assembledAt: string;
+    systemMode: string;
+    governanceSource: string;
+    governance: {
+      northstar: { statement: string; version: number; updatedAt: string };
+      strategicAxis: { id: string; name: string; weight: number; status: string }[];
+      mandateRegistry: { id: string; title: string; status: string; owner: string }[];
+      eventLog: { id: string; type: string; actor: string; ts: string }[];
+    };
+    policy: {
+      marketplaceValidationRequired: boolean;
+      wildcardFeaturesEnabled: boolean;
+      northstarVersion: number;
+      mode: string;
+    };
+    policyBaseline?: {
+      marketplaceValidationRequired: boolean;
+      wildcardFeaturesEnabled: boolean;
+      northstarVersion: number;
+      mode: string;
+    };
+    policyAdjustments?: string[];
+    signalStates?: string[];
+    proposals?: {
+      id: string;
+      type: string;
+      reason: string;
+      priority: string;
+      advisory?: boolean;
+    }[];
+    governanceIntegrity?: {
+      locked: boolean;
+      proposalsAdvisory: boolean;
+      approvalsRequireOperator: boolean;
+      eventsLoggedPermanently: boolean;
+    };
+    telemetry: {
+      environment?: string;
+      governanceEventCount?: number;
+      errorCount?: number;
+      requestCount?: number;
+      latencyP50Ms?: number;
+      latencyP95Ms?: number;
+      sessionEvents?: number;
+      [key: string]: unknown;
+    };
+    ghost: {
+      connected?: boolean;
+      derived?: boolean;
+      authMethod?: string | null;
+      depth?: {
+        volatility?: number;
+        spectralDensity?: number;
+        oversoulDepth?: number;
+        agentActivationCount?: number;
+      };
+    };
+    session: Record<string, unknown>;
+    marketplace: Record<string, unknown>;
+    health?: { overall: "STABLE" | "DEGRADED" | "CRITICAL" };
+  };
 }

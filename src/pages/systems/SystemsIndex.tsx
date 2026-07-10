@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { OperatorShell } from "../../components/OperatorShell";
+import { SystemHUD } from "../../components/SystemHUD";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { OPERATOR_SYSTEMS } from "../../operator/registry";
 
 export function SystemsIndex() {
   return (
-    <OperatorShell>
+    <OperatorShell hud={<SystemHUD compact />}>
       <div className="flex flex-col gap-6">
         <Breadcrumbs trail={[{ label: "Cockpit", to: "/dashboard" }, { label: "Systems" }]} />
 

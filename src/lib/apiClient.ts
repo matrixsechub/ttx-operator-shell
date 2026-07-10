@@ -1,4 +1,4 @@
-import type { CatalogResponse, EngineHealth, EngineVersion, LoginPayload, LoginResponse, Operator, SystemStatus } from "./types";
+import type { BuildInfo, CatalogResponse, EngineHealth, EngineVersion, LoginPayload, LoginResponse, Operator, SystemStateResponse, SystemStatus } from "./types";
 import { getToken, getStoredIdentity } from "./authToken";
 
 export interface ApiSuccess<T> {
@@ -94,6 +94,7 @@ export async function request<T>(path: string, init?: RequestInit, timeoutMs = D
 export const api = {
   getCatalog: () => request<CatalogResponse>("/api/marketplace/catalog"),
   getSystemStatus: () => request<SystemStatus>("/api/system/status"),
+  getSystemState: () => request<SystemStateResponse>("/api/system/state"),
   login: (payload: LoginPayload) =>
     request<LoginResponse>("/api/auth/login", {
       method: "POST",
@@ -118,4 +119,5 @@ export const api = {
   // them entirely; nothing here depends on being logged in.
   engineHealth: () => request<EngineHealth>("/api/engine/health"),
   engineVersion: () => request<EngineVersion>("/api/engine/version"),
+  buildInfo: () => request<BuildInfo>("/api/build-info"),
 };

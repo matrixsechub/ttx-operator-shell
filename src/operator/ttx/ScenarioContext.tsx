@@ -1,15 +1,12 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import { useApiResource } from "../../lib/useApiResource";
-import { ttxService } from "./service";
+import type { TtxLocalScenario } from "../../lib/ttxTypes";
+import { loadMergedScenarios, type MergedScenarioResult } from "./scenarioBridge";
 import type { TTXScenario } from "./types";
 
-// Tracks which TTX scenario the operator is currently working with, shared
-// across the /ttx/* tabs (Builder, Injects, Timeline, Score) via Outlet
-// siblings. Replaces the hardcoded "draft" scenario id that each tab used to
-// reference independently. No persistence beyond this session — selection
-// resets on reload, same as the rest of this UI-only scaffold.
 interface ScenarioContextValue {
   scenarios: TTXScenario[];
+  localById: Record<string, TtxLocalScenario>;
   loading: boolean;
   error: string | null;
   selectedScenarioId: string | null;
@@ -20,16 +17,21 @@ interface ScenarioContextValue {
 const ScenarioContext = createContext<ScenarioContextValue | null>(null);
 
 export function ScenarioProvider({ children }: { children: ReactNode }) {
-  const { result, loading, refresh } = useApiResource(ttxService.listScenarios);
+  const { result, loading, refresh } = useApiResource<MergedScenarioResult>(loadMergedScenarios);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
 
   const scenarios = result?.ok ? result.data.scenarios : [];
+  const localById = useMemo(
+    () => (result?.ok ? result.data.localById : {}),
+    [result],
+  );
   const error = result && !result.ok ? result.error : null;
 
   return (
     <ScenarioContext.Provider
       value={{
         scenarios,
+        localById,
         loading,
         error,
         selectedScenarioId,

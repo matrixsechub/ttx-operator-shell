@@ -1,10 +1,8 @@
 import { request, type ApiResult } from "../../lib/apiClient";
 import type { TTXInject, TTXOperatorRole, TTXScenario, TTXScenarioStatus, TTXScoreEntry, TTXScoringRubric } from "./types";
 
-// API client stubs for the TTX SaaS module. These call /api/ttx/* through the
-// existing Worker proxy (worker/index.ts) the same way the rest of the
-// storefront does — no separate backend wiring needed once the engine exposes
-// these routes. Until then, calls will fail gracefully via ApiResult.
+// Legacy engine-proxy client for the TTX SaaS scaffold. Prefer
+// ttxSessionService / ttxLocalScenarioService / scenarioBridge.ts for Worker-backed flows.
 
 export const ttxService = {
   listScenarios: (): Promise<ApiResult<{ scenarios: TTXScenario[] }>> => request("/api/ttx/scenarios"),

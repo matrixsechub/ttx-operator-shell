@@ -12,7 +12,7 @@ export function TelemetryPanel() {
   const {
     workerHealth,
     engineVersion,
-    externalStatus,
+    systemState,
     catalog,
     webhookEvents,
     securityEvents,
@@ -79,18 +79,19 @@ export function TelemetryPanel() {
           </div>
         </InfoCard>
 
-        <InfoCard label="External Engine">
-          {!externalStatus.result ? (
+        <InfoCard label="Kernel State">
+          {!systemState.result ? (
             <span className="text-xs italic text-op-text-dim">checking…</span>
-          ) : !externalStatus.result.ok ? (
-            <span className="text-xs italic text-op-text-dim">unreachable — {externalStatus.result.error}</span>
+          ) : !systemState.result.ok ? (
+            <span className="text-xs italic text-op-text-dim">unreachable — {systemState.result.error}</span>
           ) : (
             <div className="flex items-center justify-between">
               <span className="text-xs text-op-text">
-                {externalStatus.result.data.harness?.detail ?? "No detail reported"}
+                {systemState.result.data.state.systemMode} · ghost{" "}
+                {systemState.result.data.state.ghost?.connected ? "up" : "down"}
               </span>
-              <StatusPill tone={externalStatus.result.data.harness?.state === "online" ? "ok" : "warn"}>
-                {externalStatus.result.data.harness?.state ?? "unknown"}
+              <StatusPill tone={systemState.result.data.state.ghost?.connected ? "ok" : "warn"}>
+                {systemState.result.data.state.ghost?.connected ? "connected" : "fallback"}
               </StatusPill>
             </div>
           )}

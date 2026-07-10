@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { InfoCard } from "./InfoCard";
+import { LiveTtxPanel } from "./LiveTtxPanel";
 import { AnalyticsCard } from "./AnalyticsCard";
 import { TTXScorePanel } from "./TTXScorePanel";
 import { useApiResource } from "../lib/useApiResource";
@@ -23,6 +24,7 @@ const POLL_INTERVAL_MS = 30_000;
 // multi-session browser, matching the single-operator convention used
 // everywhere else in this repo.
 export function TTXPanel() {
+  const [showLive, setShowLive] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(() => getCurrentSessionId());
   const [selectedScenarioId, setSelectedScenarioId] = useState("");
   const [busy, setBusy] = useState(false);
@@ -127,6 +129,8 @@ export function TTXPanel() {
     setBusy(false);
   }
 
+  if (showLive) return <LiveTtxPanel onClose={() => setShowLive(false)} />;
+
   return (
     <div id="ttx-panel" className="op-panel rounded-sm p-4">
       <div className="flex items-center justify-between">
@@ -189,14 +193,23 @@ export function TTXPanel() {
 
       <div className="mt-3 flex flex-wrap gap-2">
         {!sessionId ? (
-          <button
-            type="button"
-            disabled={busy || !selectedScenarioId}
-            onClick={handleStart}
-            className="rounded-sm border border-op-border-bright px-3 py-1.5 text-[11px] uppercase tracking-widest text-op-text-dim transition-colors hover:border-op-accent/50 hover:text-op-accent disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Start Scenario
-          </button>
+          <>
+            <button
+              type="button"
+              disabled={busy || !selectedScenarioId}
+              onClick={handleStart}
+              className="rounded-sm border border-op-border-bright px-3 py-1.5 text-[11px] uppercase tracking-widest text-op-text-dim transition-colors hover:border-op-accent/50 hover:text-op-accent disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Start Scenario
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowLive(true)}
+              className="rounded-sm border border-op-accent/40 px-3 py-1.5 text-[11px] uppercase tracking-widest text-op-accent transition-colors hover:bg-op-accent/10"
+            >
+              Start Live Session
+            </button>
+          </>
         ) : state && !state.done && state.choices.length > 1 ? (
           state.choices.map((choice) => (
             <button

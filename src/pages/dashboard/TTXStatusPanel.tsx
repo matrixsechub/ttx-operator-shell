@@ -1,14 +1,12 @@
 import { Link } from "react-router-dom";
 import { useApiResource } from "../../lib/useApiResource";
-import { ttxService } from "../../operator/ttx/service";
+import { loadMergedScenarios, type MergedScenarioResult } from "../../operator/ttx/scenarioBridge";
 import type { TTXScenarioStatus } from "../../operator/ttx/types";
 
 const STATUS_ORDER: TTXScenarioStatus[] = ["draft", "published", "archived"];
 
-// Aggregates TTX scenario counts by status for a cockpit-level glance —
-// reuses the same ttxService.listScenarios call the TTX shell already makes.
 export function TTXStatusPanel() {
-  const { result, loading } = useApiResource(ttxService.listScenarios);
+  const { result, loading } = useApiResource<MergedScenarioResult>(loadMergedScenarios);
   const scenarios = result?.ok ? result.data.scenarios : [];
 
   const counts = STATUS_ORDER.reduce<Record<TTXScenarioStatus, number>>(
@@ -30,7 +28,7 @@ export function TTXStatusPanel() {
 
       {!result || !result.ok ? (
         <p className="mt-3 text-xs italic text-op-text-dim">
-          {loading ? "syncing…" : `Engine unreachable${result && !result.ok ? ` — ${result.error}` : ""}.`}
+          {loading ? "syncing…" : `Worker unreachable${result && !result.ok ? ` — ${result.error}` : ""}.`}
         </p>
       ) : scenarios.length === 0 ? (
         <p className="mt-3 text-xs italic text-op-text-dim">No scenarios saved yet.</p>

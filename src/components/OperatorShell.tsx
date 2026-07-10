@@ -14,7 +14,15 @@ export const NAV_ITEMS = [
   { to: "/future", label: "Future", glyph: "08" },
 ];
 
-export function OperatorShell({ children, telemetry }: { children: ReactNode; telemetry?: ReactNode }) {
+export function OperatorShell({
+  children,
+  telemetry,
+  hud,
+}: {
+  children: ReactNode;
+  telemetry?: ReactNode;
+  hud?: ReactNode;
+}) {
   const { operator, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -49,6 +57,8 @@ export function OperatorShell({ children, telemetry }: { children: ReactNode; te
           </button>
         </div>
       </header>
+
+      {hud ? <div className="shrink-0 border-b border-op-border px-4 py-2 sm:px-6">{hud}</div> : null}
 
       <CommandPalette />
 

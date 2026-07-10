@@ -16,6 +16,9 @@
 // request because of prior failures.
 
 import { recordSecurityEvent, type SecurityEnv } from "./security";
+import { createOperatorSession, getOperatorSession } from "./sessionBridge";
+import { recordSessionEvent, type TelemetryEnv } from "./telemetry";
+import type { BackboneEnv } from "./backboneEnv";
 
 // Note: PBKDF2 iteration count lives in the stored hash string itself
 // (pbkdf2$<iterations>$...), set by scripts/hash-password.mjs — verification
@@ -196,15 +199,23 @@ function operatorFromEnv(env: AuthEnv): OperatorProfile {
 // (unlike the rest of this repo's unauthenticated GET/POST data routes)
 // genuinely warrants requiring a valid session first.
 export async function hasValidAccessToken(request: Request, env: AuthEnv & SecurityEnv): Promise<boolean> {
-  if (!env.AUTH_SIGNING_KEY) return false;
+  const operator = await getAccessTokenOperator(request, env);
+  return operator !== null;
+}
+
+export async function getAccessTokenOperator(
+  request: Request,
+  env: AuthEnv,
+): Promise<OperatorProfile | null> {
+  if (!env.AUTH_SIGNING_KEY) return null;
   const token = bearerToken(request);
-  if (!token) return false;
+  if (!token) return null;
   const payload = await verifyToken(token, env.AUTH_SIGNING_KEY);
-  if (payload?.type === "access") return true;
-  // Only a present-but-invalid token counts as a signal — a missing token
-  // is just an anonymous request, not an anomaly.
-  await recordSecurityEvent(env.SECURITY_EVENTS, "invalid_token", {});
-  return false;
+  if (!payload || payload.type !== "access") return null;
+  const { exp, type, ...operator } = payload;
+  void exp;
+  void type;
+  return operator;
 }
 
 // Returns null for /api/auth/* paths this module doesn't own so the caller
@@ -213,16 +224,20 @@ export async function hasValidAccessToken(request: Request, env: AuthEnv & Secur
 export async function handleAuthRoute(
   request: Request,
   pathname: string,
-  env: AuthEnv & SecurityEnv,
+  env: AuthEnv & SecurityEnv & TelemetryEnv & Partial<Pick<BackboneEnv, "SESSION">>,
 ): Promise<Response | null> {
   if (pathname === "/api/auth/login") return handleLogin(request, env);
   if (pathname === "/api/auth/me") return handleMe(request, env);
+  if (pathname === "/api/auth/session") return handleSession(request, env);
   if (pathname === "/api/auth/logout") return handleLogout(request, env);
   if (pathname === "/api/auth/refresh") return handleRefresh(request, env);
   return null;
 }
 
-async function handleLogin(request: Request, env: AuthEnv & SecurityEnv): Promise<Response> {
+async function handleLogin(
+  request: Request,
+  env: AuthEnv & SecurityEnv & TelemetryEnv & Partial<Pick<BackboneEnv, "SESSION">>,
+): Promise<Response> {
   if (request.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
   }
@@ -253,7 +268,42 @@ async function handleLogin(request: Request, env: AuthEnv & SecurityEnv): Promis
   const operator = operatorFromEnv(env);
   const token = await signAccessToken(operator, env.AUTH_SIGNING_KEY);
   const { token: refreshToken } = await signRefreshToken(operator, env.AUTH_SIGNING_KEY);
-  return Response.json({ token, refreshToken, operator });
+
+  let sessionId: string | null = null;
+  if (env.SESSION) {
+    const created = await createOperatorSession(env as unknown as BackboneEnv, operator);
+    sessionId = created?.sessionId ?? null;
+    if (sessionId) {
+      await recordSessionEvent(env, "session_create");
+      await recordSessionEvent(env, "login_success");
+    }
+  }
+
+  return Response.json({ token, refreshToken, operator, sessionId });
+}
+
+async function handleSession(
+  request: Request,
+  env: AuthEnv & Partial<Pick<BackboneEnv, "SESSION">>,
+): Promise<Response> {
+  if (request.method !== "GET") {
+    return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "GET" } });
+  }
+
+  const meResponse = await handleMe(request, env);
+  if (meResponse.status !== 200) return meResponse;
+  const meBody = (await meResponse.json()) as { operator?: { id: string; handle: string } };
+
+  if (!env.SESSION || !meBody.operator?.id) {
+    return Response.json({ operator: meBody.operator ?? null, session: null, tokenValid: meResponse.status === 200 });
+  }
+
+  const session = await getOperatorSession(env as BackboneEnv, meBody.operator.id);
+  return Response.json({
+    operator: meBody.operator,
+    session,
+    tokenValid: true,
+  });
 }
 
 async function handleMe(request: Request, env: AuthEnv): Promise<Response> {

@@ -1,21 +1,17 @@
-import { useEffect } from "react";
+import { useMemo } from "react";
 import { InfoCard } from "../../components/InfoCard";
-import { useApiResource } from "../../lib/useApiResource";
-import { ttxService } from "./service";
+import { localScenarioToInjects } from "./scenarioBridge";
 import { useScenarioContext } from "./ScenarioContext";
 
-// Playback timeline — lays out injects along a horizontal track scaled by
-// triggerAtMinutes, for the scenario selected via ScenarioContext.
 export function TTXTimeline() {
-  const { selectedScenarioId } = useScenarioContext();
-  const { result, refresh } = useApiResource(() => ttxService.listInjects(selectedScenarioId ?? ""));
+  const { selectedScenarioId, localById } = useScenarioContext();
 
-  useEffect(() => {
-    if (selectedScenarioId) refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedScenarioId]);
+  const injects = useMemo(() => {
+    if (!selectedScenarioId) return [];
+    const local = localById[selectedScenarioId];
+    return local ? localScenarioToInjects(local) : [];
+  }, [localById, selectedScenarioId]);
 
-  const injects = result?.ok ? result.data.injects : [];
   const maxMinute = Math.max(60, ...injects.map((inject) => inject.triggerAtMinutes));
 
   return (
@@ -36,7 +32,7 @@ export function TTXTimeline() {
             ))}
             {injects.length === 0 && (
               <p className="absolute inset-0 flex items-center justify-center text-[11px] italic text-op-text-dim">
-                No injects scheduled yet.
+                Built-in scenarios render injects during live sessions.
               </p>
             )}
           </div>
