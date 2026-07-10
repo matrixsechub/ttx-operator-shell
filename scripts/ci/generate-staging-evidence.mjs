@@ -18,6 +18,8 @@ function main() {
   const aiGatewayReport = readJson(join(process.cwd(), "artifacts", "ai-gateway-smoke-report.json"));
   const fulfillmentScopeReport = readJson(join(process.cwd(), "artifacts", "ai-fulfillment-scope-report.json"));
   const storefrontAssemblyReport = readJson(join(process.cwd(), "artifacts", "storefront-assembly-report.json"));
+  const phase1GovernanceProof = readJson(join(process.cwd(), "artifacts", "staging-governance-proof.json"));
+  const phase2bGovernanceProof = readJson(join(process.cwd(), "artifacts", "staging-phase-2b-governance-proof.json"));
   const buildManifest = readJson(join(process.cwd(), "dist", ".build-manifest.json"));
 
   const validation = {
@@ -46,6 +48,18 @@ function main() {
         : storefrontAssemblyReport?.ok === true || storefrontAssemblyReport?.status === "pass"
           ? "PASS"
           : process.env.VALIDATION_STOREFRONT_ASSEMBLY ?? "NOT_RUN",
+    phase_1_governance_proof:
+      phase1GovernanceProof?.status === "PASS"
+        ? "PASS"
+        : phase1GovernanceProof?.status === "FAIL"
+          ? "FAIL"
+          : process.env.VALIDATION_PHASE_1_GOVERNANCE_PROOF ?? "NOT_RUN",
+    phase_2b_governance_proof:
+      phase2bGovernanceProof?.status === "PASS"
+        ? "PASS"
+        : phase2bGovernanceProof?.status === "FAIL"
+          ? "FAIL"
+          : process.env.VALIDATION_PHASE_2B_GOVERNANCE_PROOF ?? "NOT_RUN",
   };
 
   const releaseMetadata = {
@@ -63,6 +77,18 @@ function main() {
     wrangler_version: process.env.WRANGLER_VERSION ?? "unknown",
     deployed_at: process.env.DEPLOYED_AT ?? new Date().toISOString(),
     build_hash: buildManifest ? createHash("sha256").update(JSON.stringify(buildManifest)).digest("hex") : null,
+    operator_shell_commit_sha: process.env.COMMIT_SHA ?? phase2bGovernanceProof?.commitSha ?? null,
+    deployment_id: phase2bGovernanceProof?.deploymentId ?? null,
+    beacon_hash: phase2bGovernanceProof?.beaconHash ?? null,
+    codex_hash: phase2bGovernanceProof?.codexHash ?? null,
+    proposal_id: phase2bGovernanceProof?.proposalId ?? null,
+    approval_id: phase2bGovernanceProof?.approvalId ?? null,
+    receipt_id: phase2bGovernanceProof?.receiptId ?? null,
+    execution_id: phase2bGovernanceProof?.executionId ?? null,
+    audit_bundle_id: phase2bGovernanceProof?.auditBundleId ?? null,
+    proof_sha256: existsSync(join(process.cwd(), "artifacts", "staging-phase-2b-governance-proof.sha256"))
+      ? readFileSync(join(process.cwd(), "artifacts", "staging-phase-2b-governance-proof.sha256"), "utf8").trim()
+      : null,
     validation,
   };
 
@@ -79,6 +105,16 @@ function main() {
           status: storefrontAssemblyReport.status,
           assetCount: storefrontAssemblyReport.assetCount,
           placeholderDetected: storefrontAssemblyReport.placeholderDetected,
+        }
+      : null,
+    phase_1_governance_proof_summary: phase1GovernanceProof
+      ? { status: phase1GovernanceProof.status, passed: phase1GovernanceProof.summary?.passed ?? null }
+      : null,
+    phase_2b_governance_proof_summary: phase2bGovernanceProof
+      ? {
+          status: phase2bGovernanceProof.status,
+          mutationCount: phase2bGovernanceProof.mutationCount,
+          rollback: phase2bGovernanceProof.rollback?.result ?? null,
         }
       : null,
   };
@@ -112,6 +148,20 @@ function main() {
     );
   }
 
+  if (phase1GovernanceProof) {
+    writeFileSync(
+      join(artifactsDir, "staging-governance-proof.json"),
+      JSON.stringify(phase1GovernanceProof, null, 2),
+    );
+  }
+
+  if (phase2bGovernanceProof) {
+    writeFileSync(
+      join(artifactsDir, "staging-phase-2b-governance-proof.json"),
+      JSON.stringify(phase2bGovernanceProof, null, 2),
+    );
+  }
+
   const checksumTargets = [
     "release-metadata.json",
     "validation-summary.json",
@@ -120,6 +170,8 @@ function main() {
     "ai-fulfillment-scope-report.json",
     "build-manifest.json",
     "storefront-assembly-report.json",
+    "staging-governance-proof.json",
+    "staging-phase-2b-governance-proof.json",
   ];
   const checksumLines = [];
   for (const name of checksumTargets) {

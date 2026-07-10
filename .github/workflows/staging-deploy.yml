@@ -220,8 +220,43 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
-  evidence:
+  staging-phase-2b-governance-proof:
     needs: [authorize, deploy-staging, staging-smoke, staging-ai-gateway]
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - uses: ./.github/actions/setup-node-npm
+        with:
+          node-version: "24"
+
+      - name: Run Phase 2B governance lifecycle proof
+        env:
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+          EXPECTED_BEACON_HASH: ${{ vars.EXPECTED_BEACON_HASH }}
+          EXPECTED_CODEX_HASH: ${{ vars.EXPECTED_CODEX_HASH }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          OPERATOR_BEARER_TOKEN: ${{ secrets.OPERATOR_BEARER_TOKEN }}
+        run: node scripts/ci/staging-phase-2b-governance-proof.mjs
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-phase-2b-governance-proof
+          path: |
+            artifacts/staging-phase-2b-governance-proof.json
+            artifacts/staging-phase-2b-governance-proof.sha256
+          retention-days: 14
+          if-no-files-found: error
+
+  evidence:
+    needs: [authorize, deploy-staging, staging-smoke, staging-ai-gateway, staging-phase-2b-governance-proof]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -239,6 +274,11 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: staging-ai-gateway-report
+          path: artifacts
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: staging-phase-2b-governance-proof
           path: artifacts
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
