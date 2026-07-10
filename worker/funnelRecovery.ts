@@ -141,7 +141,6 @@ const AGGREGATE_LIMIT: RateLimitRule = { max: 10, windowMs: 60_000 };
 const fieldRateLimitBuckets = new Map<string, { count: number; windowStart: number }>();
 
 const RECOVERED_ROUTE_MAP: Record<string, string> = {
-  "/": "/root-funnel.html",
   "/about": "/about.html",
   "/apps/ai-agent-readiness-checker": "/ai-agent-readiness-checker.html",
   "/apps/ai-security-audit": "/ai-security-audit.html",

@@ -1,0 +1,284 @@
+# Manual staging deployment only — requires operator confirmation and GitHub Environment secrets.
+# Does not deploy production. PR code never runs on self-hosted runners.
+
+name: Staging Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: Type DEPLOY_STAGING to authorize deployment
+        required: true
+        type: string
+      target_ref:
+        description: Git ref to deploy (branch, tag, or SHA)
+        required: true
+        default: main
+        type: string
+      reason:
+        description: Optional deployment reason for audit logs
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+      requested_ref: ${{ steps.resolve.outputs.requested_ref }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate deployment authorization
+        id: resolve
+        env:
+          CONFIRM_DEPLOY: ${{ inputs.confirm_deploy }}
+          TARGET_REF: ${{ inputs.target_ref }}
+        run: node scripts/ci/resolve-deploy-ref.mjs
+
+  preflight:
+    needs: authorize
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - run: node scripts/ci/workflow-permissions-lint.mjs
+
+      - run: node scripts/ci/audit-action-pins.mjs
+
+      - run: node scripts/ci/verify-staging-config.mjs
+
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
+  build-test:
+    needs: [authorize, preflight]
+    uses: ./.github/workflows/_reusable-build-test.yml
+    with:
+      ref: ${{ needs.authorize.outputs.commit_sha }}
+      git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
+    permissions:
+      contents: read
+      actions: write
+
+  staging-dry-run:
+    needs: [authorize, preflight]
+    uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    with:
+      ref: ${{ needs.authorize.outputs.commit_sha }}
+      git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
+    permissions:
+      contents: read
+      actions: write
+
+  deploy-staging:
+    needs: [authorize, build-test, staging-dry-run]
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+    env:
+      GIT_COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+      BUILD_TIMESTAMP: ${{ github.run_started_at }}
+      MSHOPS_ROOT: ${{ github.workspace }}/MSHOPS
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - name: Checkout MSHOPS storefront source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: ${{ vars.MSHOPS_REPOSITORY || 'matrixsechub/MSHOPS' }}
+          path: MSHOPS
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ./.github/actions/setup-node-npm
+        with:
+          node-version: "24"
+
+      - run: node scripts/ci/verify-staging-config.mjs
+
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
+      - run: npm run typecheck
+
+      - run: npm test
+
+      - run: npm run build
+
+      - name: Wrangler staging dry run (pre-deploy gate)
+        run: npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging-predeploy
+
+      - name: Deploy to staging Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx wrangler deploy --env staging \
+            --var BUILD_COMMIT_SHA:${GIT_COMMIT_SHA} \
+            --var BUILD_TIMESTAMP:${BUILD_TIMESTAMP}
+
+      - name: Capture deployment metadata
+        env:
+          DEPLOY_REASON: ${{ inputs.reason }}
+        run: |
+          mkdir -p artifacts
+          node --input-type=module -e "
+            import { writeFileSync } from 'node:fs';
+            writeFileSync('artifacts/staging-deploy-metadata.json', JSON.stringify({
+              commit_sha: process.env.GIT_COMMIT_SHA,
+              requested_ref: '${{ needs.authorize.outputs.requested_ref }}',
+              worker_name: 'ttx-operator-shell-staging',
+              deployed_at: new Date().toISOString(),
+              workflow_run_id: '${{ github.run_id }}',
+              actor: '${{ github.actor }}',
+              reason: process.env.DEPLOY_REASON ?? ''
+            }, null, 2));
+          "
+          npx wrangler --version | head -n 1 > artifacts/wrangler-version.txt
+          node --version > artifacts/node-version.txt
+          npm --version > artifacts/npm-version.txt
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-deploy-metadata
+          path: |
+            artifacts/staging-deploy-metadata.json
+            artifacts/wrangler-version.txt
+            artifacts/node-version.txt
+            artifacts/npm-version.txt
+            artifacts/storefront-assembly-report.json
+            dist/.build-manifest.json
+          retention-days: 14
+          if-no-files-found: error
+
+  staging-smoke:
+    needs: [authorize, deploy-staging]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - name: Run staging smoke tests
+        env:
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+        run: node scripts/ci/staging-smoke.mjs "$STAGING_BASE_URL" "$COMMIT_SHA"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-smoke-report
+          path: artifacts/staging-smoke-report.json
+          retention-days: 14
+          if-no-files-found: error
+
+  staging-ai-gateway:
+    needs: [authorize, deploy-staging]
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
+      - name: Run AI Gateway staging smoke
+        env:
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+          OPERATOR_BEARER_TOKEN: ${{ secrets.OPERATOR_BEARER_TOKEN }}
+          REQUIRE_OPERATOR_TOKEN: "1"
+        run: node scripts/ci/verify-ai-gateway.mjs "$STAGING_BASE_URL" "$COMMIT_SHA"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-ai-gateway-report
+          path: |
+            artifacts/ai-gateway-smoke-report.json
+            artifacts/ai-fulfillment-scope-report.json
+          retention-days: 14
+          if-no-files-found: error
+
+  evidence:
+    needs: [authorize, deploy-staging, staging-smoke, staging-ai-gateway]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: staging-smoke-report
+          path: artifacts
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: staging-ai-gateway-report
+          path: artifacts
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: staging-deploy-metadata
+          path: staging-deploy-metadata
+
+      - name: Prepare evidence inputs
+        run: |
+          mkdir -p dist artifacts
+          if [ -f staging-deploy-metadata/dist/.build-manifest.json ]; then
+            cp staging-deploy-metadata/dist/.build-manifest.json dist/.build-manifest.json
+          fi
+          if [ -f staging-deploy-metadata/artifacts/storefront-assembly-report.json ]; then
+            cp staging-deploy-metadata/artifacts/storefront-assembly-report.json artifacts/storefront-assembly-report.json
+          fi
+
+      - id: versions
+        run: |
+          echo "npm=$(cat staging-deploy-metadata/artifacts/npm-version.txt 2>/dev/null || echo unknown)" >> "$GITHUB_OUTPUT"
+          echo "wrangler=$(cat staging-deploy-metadata/artifacts/wrangler-version.txt 2>/dev/null || echo unknown)" >> "$GITHUB_OUTPUT"
+          echo "node=$(cat staging-deploy-metadata/artifacts/node-version.txt 2>/dev/null || echo unknown)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate staging release evidence
+        env:
+          COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+          REQUESTED_REF: ${{ needs.authorize.outputs.requested_ref }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          DEPLOYED_AT: ${{ github.run_started_at }}
+          NODE_VERSION: ${{ steps.versions.outputs.node }}
+          NPM_VERSION: ${{ steps.versions.outputs.npm }}
+          WRANGLER_VERSION: ${{ steps.versions.outputs.wrangler }}
+        run: node scripts/ci/generate-staging-evidence.mjs
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-release-evidence
+          path: artifacts/staging-release-evidence/
+          retention-days: 14
+          if-no-files-found: error

@@ -20,6 +20,7 @@
   "include": [
     "worker",
     "msh-ops/beacon",
+    "msh-ops/beacon/releases",
     "msh-ops/agent",
     "msh-ops/governance/checkAutonomy.ts",
     "msh-ops/mcp",

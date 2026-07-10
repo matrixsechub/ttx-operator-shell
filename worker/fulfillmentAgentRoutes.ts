@@ -45,6 +45,11 @@ import {
 } from "./northstarBeaconRoutes";
 import { getAgentGovernanceContextFor } from "../msh-ops/agent/initAgentGovernance";
 import { checkAutonomy } from "../msh-ops/governance/checkAutonomy";
+import { evaluateLegacyOperatorApproval } from "./governance/legacyApproval";
+import { extractGovernanceFields, runGovernedRoute } from "./governance/mutationGate";
+import { getProposal } from "./governance/proposalStore";
+import { isGovernedMutationEnvironment, resolveRuntimeEnvironment } from "./governance/runtimeEnv";
+import type { GovernedExecutionEnv } from "./governance/governedMutation";
 import type { AiGatewayEnv } from "./aiGateway";
 import { aiFulfillmentEnabled } from "./aiGateway";
 import { maybeEnrichWithAi } from "./aiFulfillmentEnrichment";
@@ -120,9 +125,25 @@ async function handleGenerateWithGovernance(options: {
   record: () => void;
   successStatus: string;
   enrichmentPrompt?: string;
-  env?: WorkerEnv & BackboneEnv & AiGatewayEnv;
+  env?: WorkerEnv & BackboneEnv & AiGatewayEnv & GovernedExecutionEnv;
+  actionType?: string;
+  actionClass?: import("./governance/types").ActionClass;
 }): Promise<Response> {
   const governance = getAgentGovernanceContextFor(options.agentId);
+
+  if (options.env && isGovernedMutationEnvironment(options.env)) {
+    if (options.operatorApproval) {
+      const legacy = await evaluateLegacyOperatorApproval(options.env, options.payload, {
+        actionClass: options.actionClass ?? "C3",
+        systemTarget: options.agentId,
+        actorId: "operator",
+        correlationId: crypto.randomUUID(),
+      });
+      if (!legacy.allowed) {
+        return autonomyErrorResponse(legacy.code ?? "LEGACY_BYPASS_FORBIDDEN", legacy.reason, 403);
+      }
+    }
+  }
 
   const generateDecision = checkAutonomy(
     {
@@ -157,6 +178,45 @@ async function handleGenerateWithGovernance(options: {
       kernelCtx.policy,
       kernelCtx.signalStates,
     );
+  }
+
+  if (options.env && isGovernedMutationEnvironment(options.env)) {
+    const fields = extractGovernanceFields(options.payload);
+    if (!fields) {
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Signed approval receipt required (proposalId, approvalId, idempotencyKey)",
+          code: "RECEIPT_REQUIRED",
+        },
+        403,
+      );
+    }
+    const proposal = await getProposal(options.env, fields.proposalId);
+    if (!proposal) {
+      return autonomyErrorResponse("PROPOSAL_NOT_FOUND", "Proposal not found", 404);
+    }
+      const governed = await runGovernedRoute(options.env as GovernedExecutionEnv, {
+      actionType: options.actionType ?? `fulfillment.${options.agentId}.record`,
+      actionClass: options.actionClass ?? proposal.action_class,
+      environment: resolveRuntimeEnvironment(options.env),
+      proposalId: fields.proposalId,
+      approvalId: fields.approvalId,
+      idempotencyKey: fields.idempotencyKey,
+      input: options.payload,
+      rollbackReference: proposal.rollback_plan,
+      execute: async () => {
+        options.record();
+        return result;
+      },
+    });
+    if (!governed.ok) {
+      return jsonResponse(
+        { ok: false, error: governed.error, code: governed.code, executionReceipt: governed.executionReceipt },
+        403,
+      );
+    }
+    return jsonResponse({ ...result, status: options.successStatus, executionReceipt: governed.executionReceipt });
   }
 
   const recordDecision = checkAutonomy(
@@ -330,7 +390,7 @@ export async function handleFulfillmentAgentApi(
     });
   }
 
-  const northstarResponse = await handleNorthstarBeaconApi(request, pathname, method);
+  const northstarResponse = await handleNorthstarBeaconApi(request, pathname, method, env);
   if (northstarResponse) {
     return northstarResponse;
   }

@@ -7,15 +7,30 @@ import {
   type AdaptiveUiMode,
 } from "./usageModeMetrics";
 import { recordTrafficSourceSession, sanitizeTrafficSource } from "./trafficSources";
+import { runActivationHooks } from "./activation/activationHooks";
 
 const VISITS_KEY = "usage:v2:visits";
 const ENTRY_CLICKS_KEY = "usage:v2:entryClicks";
 const MARKETPLACE_CLICKS_KEY = "usage:v2:marketplaceClicks";
+const SERVICE_VIEWS_KEY = "usage:v2:serviceViews";
+const INTAKE_STARTED_KEY = "usage:v2:intakeStarted";
+const INTAKE_COMPLETED_KEY = "usage:v2:intakeCompleted";
+const CHECKOUT_STARTED_KEY = "usage:v2:checkoutStarted";
+const PURCHASE_COMPLETED_KEY = "usage:v2:purchaseCompleted";
 
 const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60;
 const COUNTER_TTL_SECONDS = 365 * 24 * 60 * 60;
 
-export type UsageEvent = "visit" | "entry_click" | "marketplace_click" | "ui_mode_view";
+export type UsageEvent =
+  | "visit"
+  | "entry_click"
+  | "marketplace_click"
+  | "ui_mode_view"
+  | "service_view"
+  | "intake_started"
+  | "intake_completed"
+  | "checkout_started"
+  | "purchase_completed";
 
 export type SignalIntegrityStatus = "VALID" | "INVALID_RATIOS";
 
@@ -33,6 +48,9 @@ export interface UsageEventInput {
   sessionId: string;
   uiMode?: AdaptiveUiMode;
   trafficSource?: string;
+  campaignId?: string;
+  contentId?: string;
+  ctaId?: string;
 }
 
 export interface UsageRecordResult {
@@ -114,7 +132,7 @@ export async function recordUsageEvent(
   env: UsageContextEnv,
   input: UsageEventInput,
 ): Promise<UsageRecordResult> {
-  const { event, sessionId, uiMode, trafficSource } = input;
+  const { event, sessionId, uiMode, trafficSource, campaignId, contentId, ctaId } = input;
   const source = sanitizeTrafficSource(trafficSource);
 
   if (!isValidSessionId(sessionId)) {
@@ -147,8 +165,20 @@ export async function recordUsageEvent(
     await env.TTX_STATE.put(dedupeKey, uiMode, { expirationTtl: SESSION_TTL_SECONDS });
     await recordUiModeView(env, sessionId, uiMode);
 
+    const usageAfterView = await getUsageSummary(env);
+    void runActivationHooks(env, {
+      sessionId,
+      event: "ui_mode_view",
+      trafficSource: source,
+      campaignId,
+      contentId,
+      ctaId,
+      uiMode,
+      signalIntegrity: usageAfterView.signalIntegrity,
+    }).catch(() => {});
+
     return {
-      usage: await getUsageSummary(env),
+      usage: usageAfterView,
       counted: true,
     };
   }
@@ -194,19 +224,58 @@ export async function recordUsageEvent(
         "marketplace_click",
       );
       break;
+    case "service_view":
+      await incrementCounter(env, SERVICE_VIEWS_KEY);
+      break;
+    case "intake_started":
+      await incrementCounter(env, INTAKE_STARTED_KEY);
+      break;
+    case "intake_completed":
+      await incrementCounter(env, INTAKE_COMPLETED_KEY);
+      break;
+    case "checkout_started":
+      await incrementCounter(env, CHECKOUT_STARTED_KEY);
+      break;
+    case "purchase_completed":
+      await incrementCounter(env, PURCHASE_COMPLETED_KEY);
+      break;
     default: {
       const _exhaustive: never = event;
       void _exhaustive;
     }
   }
 
+  const usage = await getUsageSummary(env);
+  void runActivationHooks(env, {
+    sessionId,
+    event,
+    trafficSource: source,
+    campaignId,
+    contentId,
+    ctaId,
+    uiMode,
+    signalIntegrity: usage.signalIntegrity,
+  }).catch(() => {
+    // activation hooks are best-effort
+  });
+
   return {
-    usage: await getUsageSummary(env),
+    usage,
     counted: true,
   };
 }
 
-const VALID_EVENTS: UsageEvent[] = ["visit", "entry_click", "marketplace_click", "ui_mode_view"];
+const VALID_EVENTS: UsageEvent[] = [
+  "visit",
+  "entry_click",
+  "marketplace_click",
+  "ui_mode_view",
+  "service_view",
+  "intake_started",
+  "intake_completed",
+  "checkout_started",
+  "purchase_completed",
+];
 
 export async function handleUsageRoute(
   request: Request,
@@ -218,21 +287,27 @@ export async function handleUsageRoute(
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
   }
 
-  let body: { event?: unknown; sessionId?: unknown; uiMode?: unknown; trafficSource?: unknown };
+  let body: {
+    event?: unknown;
+    sessionId?: unknown;
+    uiMode?: unknown;
+    trafficSource?: unknown;
+    campaignId?: unknown;
+    contentId?: unknown;
+    ctaId?: unknown;
+  };
   try {
-    body = (await request.json()) as {
-      event?: unknown;
-      sessionId?: unknown;
-      uiMode?: unknown;
-      trafficSource?: unknown;
-    };
+    body = (await request.json()) as typeof body;
   } catch {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   if (!VALID_EVENTS.includes(body.event as UsageEvent)) {
     return Response.json(
-      { error: "event must be visit, entry_click, marketplace_click, or ui_mode_view" },
+      {
+        error:
+          "event must be visit, entry_click, marketplace_click, ui_mode_view, service_view, intake_started, intake_completed, checkout_started, or purchase_completed",
+      },
       { status: 400 },
     );
   }
@@ -250,6 +325,9 @@ export async function handleUsageRoute(
     sessionId: body.sessionId,
     uiMode: body.uiMode as AdaptiveUiMode | undefined,
     trafficSource: typeof body.trafficSource === "string" ? body.trafficSource : undefined,
+    campaignId: typeof body.campaignId === "string" ? body.campaignId : undefined,
+    contentId: typeof body.contentId === "string" ? body.contentId : undefined,
+    ctaId: typeof body.ctaId === "string" ? body.ctaId : undefined,
   });
 
   return Response.json({

@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, it, mock } from "node:test";
+import { PLACEHOLDER_DESCRIPTION } from "../../scripts/lib/storefrontBundle.mjs";
 import { runStagingSmoke } from "../../scripts/ci/staging-smoke.mjs";
 
-function jsonResponse(status, body, headers = {}) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json", ...headers },
-  });
-}
+const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const realFixtureHtml = readFileSync(join(root, "tests", "fixtures", "storefront-real", "index.html"), "utf8");
+const placeholderHtml = readFileSync(join(root, "scripts", "fixtures", "storefront-placeholder.html"), "utf8");
 
 function htmlResponse(status, html, headers = {}) {
   return new Response(html, {
@@ -19,6 +20,131 @@ function htmlResponse(status, html, headers = {}) {
     },
   });
 }
+
+function jsonResponse(status, body, headers = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json", ...headers },
+  });
+}
+
+describe("staging-smoke storefront", () => {
+  it("passes real storefront bundle with asset probes", async () => {
+    const storefrontHtml = realFixtureHtml.replace(
+      "<head>",
+      '<head>\n    <meta name="mshops-surface" content="marketplace" />',
+    );
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (input) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url.endsWith("/app/assets/index-test.js")) {
+        return new Response("export {}", { status: 200, headers: { "content-type": "application/javascript" } });
+      }
+      if (url.endsWith("/app/assets/index-test.css")) {
+        return new Response("body{}", { status: 200, headers: { "content-type": "text/css" } });
+      }
+      if (url.includes("/marketplace")) {
+        return htmlResponse(200, storefrontHtml);
+      }
+      return new Response("not found", { status: 404 });
+    };
+
+    try {
+      const report = await runStagingSmoke("https://staging.example", "abc123", {
+        contracts: [
+          {
+            name: "marketplace_surface",
+            method: "GET",
+            path: "/marketplace",
+            expectStatus: 200,
+            contentTypeIncludes: "text/html",
+            htmlIncludes: ["MSH OPS Storefront", 'name="mshops-surface"', 'id="root"'],
+            htmlForbidden: [PLACEHOLDER_DESCRIPTION],
+            validateStorefrontAssets: true,
+          },
+        ],
+        maxAttempts: 1,
+      });
+      assert.equal(report.summary.failed, 0);
+      assert.ok(report.checks[0]?.asset_validation?.references?.length >= 2);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("fails placeholder-only storefront", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => htmlResponse(200, placeholderHtml);
+    try {
+      const report = await runStagingSmoke("https://staging.example", "abc123", {
+        contracts: [
+          {
+            name: "marketplace_surface",
+            method: "GET",
+            path: "/marketplace",
+            expectStatus: 200,
+            contentTypeIncludes: "text/html",
+            htmlIncludes: ["MSH OPS Storefront"],
+            htmlForbidden: [PLACEHOLDER_DESCRIPTION],
+            validateStorefrontAssets: true,
+          },
+        ],
+        maxAttempts: 1,
+      });
+      assert.equal(report.summary.failed, 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("fails when referenced JS asset is missing", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (input) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url.includes("/marketplace")) return htmlResponse(200, realFixtureHtml);
+      return new Response("missing", { status: 404 });
+    };
+    try {
+      const report = await runStagingSmoke("https://staging.example", "abc123", {
+        contracts: [
+          {
+            name: "marketplace_surface",
+            method: "GET",
+            path: "/marketplace",
+            expectStatus: 200,
+            contentTypeIncludes: "text/html",
+            validateStorefrontAssets: true,
+          },
+        ],
+        maxAttempts: 1,
+      });
+      assert.equal(report.summary.failed, 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("fails on 503 storefront body", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => new Response("MSHOPS storefront shell missing", { status: 503 });
+    try {
+      const report = await runStagingSmoke("https://staging.example", "abc123", {
+        contracts: [
+          {
+            name: "marketplace_surface",
+            method: "GET",
+            path: "/marketplace",
+            expectStatus: 200,
+          },
+        ],
+        maxAttempts: 1,
+      });
+      assert.equal(report.summary.failed, 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+});
 
 describe("staging-smoke", () => {
   it("passes HTML and JSON routes with mocked fetch", async () => {

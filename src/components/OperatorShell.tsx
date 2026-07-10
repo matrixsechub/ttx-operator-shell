@@ -1,10 +1,18 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { CommandPalette } from "./CommandPalette";
+import { GlobalCommandHeader } from "./GlobalCommandHeader";
 import { useAuth } from "../lib/AuthContext";
 
 export const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", glyph: "01" },
+  { to: "/dashboard/beacon", label: "Beacon", glyph: "B1" },
+  { to: "/dashboard/runtime", label: "Runtime", glyph: "R1" },
+  { to: "/dashboard/governance", label: "Governance", glyph: "G1" },
+  { to: "/dashboard/agents", label: "Agents", glyph: "A1" },
+  { to: "/dashboard/marketplace", label: "Mkt Intel", glyph: "M1" },
+  { to: "/dashboard/subscription", label: "Entitlements", glyph: "S1" },
+  { to: "/dashboard/audit", label: "Audit", glyph: "AU" },
   { to: "/marketplace", label: "Marketplace", glyph: "02" },
   { to: "/status", label: "Status", glyph: "03" },
   { to: "/about", label: "About", glyph: "04" },
@@ -57,6 +65,8 @@ export function OperatorShell({
           </button>
         </div>
       </header>
+
+      <GlobalCommandHeader />
 
       {hud ? <div className="shrink-0 border-b border-op-border px-4 py-2 sm:px-6">{hud}</div> : null}
 

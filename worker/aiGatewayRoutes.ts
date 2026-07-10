@@ -1,6 +1,9 @@
 import type { BeaconAxis } from "../msh-ops/beacon/beaconSchema";
 import { getAgentGovernanceContextFor } from "../msh-ops/agent/initAgentGovernance";
 import { ingestMcpPayload } from "../msh-ops/mcp/ingestMcpPayload";
+import { evaluateLegacyOperatorApproval } from "./governance/legacyApproval";
+import { extractGovernanceFields } from "./governance/mutationGate";
+import { isGovernedMutationEnvironment } from "./governance/runtimeEnv";
 import { getAccessTokenOperator } from "./auth";
 import type { BackboneEnv } from "./backboneEnv";
 import type { WorkerEnv } from "./env";
@@ -13,6 +16,7 @@ import {
 } from "./aiGateway";
 import { getAiUsageRollup } from "./telemetry";
 import { buildCouncilPacket } from "./councilPacket";
+import { buildPrismCouncilAdvisoryBundle } from "./data/prismCouncilAdvisory";
 import { handleMarketplaceAiRoute } from "./marketplaceAiRoutes";
 
 function jsonResponse(payload: unknown, status = 200): Response {
@@ -95,6 +99,24 @@ export async function handleAiGatewayRoute(
     return jsonResponse({ ok: true, packet });
   }
 
+  if (pathname === "/api/council/prism-advisories" && request.method === "GET") {
+    const url = new URL(request.url);
+    const auditId = url.searchParams.get("auditId") ?? undefined;
+    const limitRaw = url.searchParams.get("limit");
+    const limit = limitRaw ? Number.parseInt(limitRaw, 10) : undefined;
+    try {
+      const advisories = await buildPrismCouncilAdvisoryBundle(env, {
+        auditId,
+        limit: Number.isFinite(limit) ? limit : undefined,
+      });
+      return jsonResponse({ ok: true, advisories });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to assemble PRISM advisories";
+      const status = message.includes("not found") ? 404 : 500;
+      return jsonResponse({ error: message }, status);
+    }
+  }
+
   if (pathname === "/api/telemetry/events" && request.method === "GET") {
     const rollup = await getAiUsageRollup(env);
     const govRaw = await env.TTX_STATE.get("telemetry:governance-events");
@@ -163,8 +185,32 @@ export async function handleAiGatewayRoute(
       const agentId = typeof payload.agentId === "string" ? payload.agentId.trim() : "GuideAgent";
       const axis = n8nAuthorized ? "STABILITY" : parseAxis(payload.axis);
       const actionKind = n8nAuthorized ? "advisory" : parseActionKind(payload.actionKind);
-      const messages = parseMessages(payload.messages);
       const operator = await getAccessTokenOperator(request, env);
+      if (isGovernedMutationEnvironment(env) && actionKind !== "advisory") {
+        if (payload.operator_approval === true) {
+          const legacy = await evaluateLegacyOperatorApproval(env, payload, {
+            actionClass: "C3",
+            systemTarget: "ai-gateway",
+            actorId: operator?.handle ?? "operator",
+            correlationId: crypto.randomUUID(),
+          });
+          if (!legacy.allowed) {
+            return jsonResponse({ error: legacy.reason, code: legacy.code }, 403);
+          }
+        }
+        const fields = extractGovernanceFields(payload);
+        if (!fields) {
+          return jsonResponse(
+            {
+              ok: false,
+              error: "Signed approval receipt required for mutating AI inference (proposalId, approvalId, idempotencyKey)",
+              code: "RECEIPT_REQUIRED",
+            },
+            403,
+          );
+        }
+      }
+      const messages = parseMessages(payload.messages);
 
       const kernelCtx = await resolveEffectiveKernelContext(env);
       const governance = getAgentGovernanceContextFor(agentId);

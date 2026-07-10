@@ -16,6 +16,7 @@ const OPERATOR_PROTECTED = [
   /^\/api\/ai\/mcp\/signal$/,
   /^\/api\/ai\/marketplace\//,
   /^\/api\/council\/packet$/,
+  /^\/api\/council\/prism-advisories$/,
   /^\/api\/telemetry\/events$/,
 ];
 

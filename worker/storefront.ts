@@ -2,7 +2,9 @@ import { injectSecurityHeaders } from "./edge/headers";
 
 const STOREFRONT_SHELL_PATH = "/app/index.html";
 const STOREFRONT_MARKERS = ["MSH OPS Storefront", 'id="root"'] as const;
-const LEGACY_OPERATOR_MARKERS = ["Operator Terminal"] as const;
+const STOREFRONT_PLACEHOLDER_DESCRIPTION =
+  "MSHOPS marketplace storefront shell — operator bundle placeholder until MSHOPS build is assembled.";
+const LEGACY_OPERATOR_MARKERS = ["Operator Terminal", "Ecosystem Entry", "Service Selection Funnel"] as const;
 
 const STOREFRONT_SPA_PATHS = new Set([
   "/storefront",
@@ -22,7 +24,13 @@ export function isStorefrontSpaPath(pathname: string): boolean {
   return false;
 }
 
+function hasGeneratedBundleRefs(html: string): boolean {
+  return /\/app\/assets\/[^"']+\.js/.test(html);
+}
+
 function isStorefrontShellHtml(html: string): boolean {
+  if (html.includes(STOREFRONT_PLACEHOLDER_DESCRIPTION)) return false;
+  if (!hasGeneratedBundleRefs(html)) return false;
   return STOREFRONT_MARKERS.every((marker) => html.includes(marker));
 }
 

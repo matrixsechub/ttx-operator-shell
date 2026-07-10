@@ -1,58 +1,102 @@
 #!/usr/bin/env node
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  FAILURE_CODES,
+  injectStorefrontSurfaceMarker,
+  resolveStorefrontSourceApp,
+  validateStorefrontBundle,
+} from "./lib/storefrontBundle.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const mshopsBuild = join(root, "..", "MSHOPS", "build-final");
 const dist = join(root, "dist");
-const publicDir = join(root, "public");
+const distApp = join(dist, "app");
+const sourceApp = resolveStorefrontSourceApp(root);
+const artifactPath =
+  process.env.ARTIFACT_PATH ?? join(root, "artifacts", "storefront-assembly-report.json");
 
-function assertExists(path, label) {
-  if (!existsSync(path)) {
-    throw new Error(`${label} not found at ${path}. Run MSHOPS build-pages-final first.`);
-  }
-}
-
-assertExists(join(mshopsBuild, "app", "index.html"), "MSHOPS storefront shell");
-assertExists(join(mshopsBuild, "app", "assets"), "MSHOPS storefront assets");
-
-function clearDist(distPath) {
-  if (!existsSync(distPath)) {
-    mkdirSync(distPath, { recursive: true });
+function clearDistApp() {
+  if (!existsSync(distApp)) {
+    mkdirSync(distApp, { recursive: true });
     return;
   }
-
-  for (const entry of readdirSync(distPath)) {
-    if (entry === ".storefront-manifest.json") continue;
-    const target = join(distPath, entry);
-    try {
-      rmSync(target, { recursive: true, force: true });
-    } catch {
-      // Windows file locks: overwrite via copy below.
-    }
+  for (const entry of readdirSync(distApp)) {
+    rmSync(join(distApp, entry), { recursive: true, force: true });
   }
 }
 
-clearDist(dist);
-mkdirSync(dist, { recursive: true });
+function main() {
+  if (!existsSync(join(sourceApp, "index.html"))) {
+    const report = {
+      schema_version: "1.0",
+      status: "fail",
+      sourceDirectory: sourceApp,
+      destinationDirectory: "dist/app",
+      entryFile: "dist/app/index.html",
+      assetCount: 0,
+      placeholderDetected: true,
+      missingAssets: [],
+      failureCodes: [FAILURE_CODES.SOURCE_MISSING],
+      tested_at: new Date().toISOString(),
+      ok: false,
+      errors: [`Storefront source missing at ${sourceApp}`],
+    };
+    writeReport(report);
+    fail(report);
+  }
 
-cpSync(join(mshopsBuild, "app"), join(dist, "app"), { recursive: true });
+  if (!existsSync(join(sourceApp, "assets"))) {
+    const report = {
+      schema_version: "1.0",
+      status: "fail",
+      sourceDirectory: sourceApp,
+      destinationDirectory: "dist/app",
+      entryFile: "dist/app/index.html",
+      assetCount: 0,
+      placeholderDetected: true,
+      missingAssets: [],
+      failureCodes: [FAILURE_CODES.ASSETS_MISSING],
+      tested_at: new Date().toISOString(),
+      ok: false,
+      errors: [`Storefront assets missing at ${join(sourceApp, "assets")}`],
+    };
+    writeReport(report);
+    fail(report);
+  }
 
-const shellHtml = readFileSync(join(mshopsBuild, "index.html"), "utf8");
-writeFileSync(join(dist, "index.html"), shellHtml);
+  mkdirSync(dist, { recursive: true });
+  clearDistApp();
+  cpSync(sourceApp, distApp, { recursive: true });
 
-if (existsSync(join(publicDir, "favicon.svg"))) {
-  cpSync(join(publicDir, "favicon.svg"), join(dist, "favicon.svg"));
+  const entryPath = join(distApp, "index.html");
+  const html = injectStorefrontSurfaceMarker(readFileSync(entryPath, "utf8"));
+  writeFileSync(entryPath, html);
+
+  const report = validateStorefrontBundle(distApp, { sourceDirectory: sourceApp });
+  writeReport(report);
+
+  if (!report.ok) {
+    fail(report);
+  }
+
+  console.log("STOREFRONT_ASSEMBLY::PASS");
+  console.log(JSON.stringify(report, null, 2));
 }
 
-const manifest = {
-  assembledAt: new Date().toISOString(),
-  source: "scripts/assemble-storefront-dist.mjs",
-  mshopsBuild,
-  shellTitle: shellHtml.match(/<title>([^<]+)/)?.[1] ?? "unknown",
-  bundle: shellHtml.match(/\/app\/assets\/[^"']+/)?.[0] ?? "missing",
-};
+function writeReport(report) {
+  mkdirSync(dirname(artifactPath), { recursive: true });
+  writeFileSync(artifactPath, `${JSON.stringify(report, null, 2)}\n`);
+}
 
-writeFileSync(join(dist, ".storefront-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
-console.log("Storefront dist assembled:", manifest);
+function fail(report) {
+  console.error("STOREFRONT_ASSEMBLY::FAIL");
+  for (const error of report.errors ?? []) {
+    console.error(`  - ${error}`);
+  }
+  console.error(JSON.stringify(report, null, 2));
+  process.exit(1);
+}
+
+main();

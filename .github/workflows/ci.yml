@@ -1,31 +1,55 @@
+# PR and main CI run on GitHub-hosted Ubuntu only.
+# Untrusted PR code must not execute on persistent self-hosted runners.
+
 name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  typecheck-test-build:
-    runs-on: self-hosted
-    defaults:
-      run:
-        shell: cmd
-    env:
-      GIT_COMMIT_SHA: ${{ github.sha }}
-      BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
-      NPM_CONFIG_SCRIPT_SHELL: cmd.exe
+  pr-gate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          node-version: 24
-          cache: npm
+          fetch-depth: 0
 
-      - run: npm ci
+      - run: node scripts/ci/workflow-permissions-lint.mjs
 
-      - run: npm run typecheck
+      - run: node scripts/ci/audit-action-pins.mjs
 
-      - run: npm test
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
 
-      - run: npm run build
+      - run: npm run verify:cron-triggers
+
+      - name: Sensitive path advisory
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: node scripts/ci/workflow-permissions-lint.mjs --advisory "$BASE_SHA"
+
+  build-test:
+    uses: ./.github/workflows/_reusable-build-test.yml
+    permissions:
+      contents: read
+      actions: write
+
+  wrangler-dry-run:
+    uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    permissions:
+      contents: read
+      actions: write

@@ -11,6 +11,7 @@ import {
   applyApprovalToAudit,
   listUiUxAuditSummaries,
   PrismUiuxStorageError,
+  readAuditIdByIdempotencyKey,
   readUiUxAudit,
   saveUiUxAudit,
   updateUiUxAudit,
@@ -43,6 +44,13 @@ async function readJsonBody(request: Request): Promise<Record<string, unknown>> 
 
 function parseAuditId(pathname: string): string | null {
   const match = /^\/api\/operator\/uiux\/audits\/([^/]+)(?:\/(approve|reject))?$/.exec(pathname);
+  if (!match) return null;
+  if (match[1] === "idempotency") return null;
+  return match[1];
+}
+
+function parseIdempotencyKey(pathname: string): string | null {
+  const match = /^\/api\/operator\/uiux\/audits\/idempotency\/([^/]+)$/.exec(pathname);
   return match?.[1] ?? null;
 }
 
@@ -103,9 +111,20 @@ async function maybeEnrichAudit(env: PrismUiuxRouteEnv, audit: UiUxAudit): Promi
 async function handleCreateAudit(request: Request, env: PrismUiuxRouteEnv): Promise<Response> {
   const body = await readJsonBody(request);
   const uiRequest = validateUiUxAuditRequest(body);
+
+  if (uiRequest.idempotencyKey) {
+    const existingId = await readAuditIdByIdempotencyKey(env, uiRequest.idempotencyKey);
+    if (existingId) {
+      const existing = await readUiUxAudit(env, existingId);
+      if (existing) {
+        return jsonResponse({ ok: true, audit: existing, status: "prism-uiux-audit-duplicate", duplicate: true });
+      }
+    }
+  }
+
   let audit = await generateUiUxAudit(uiRequest);
   audit = await maybeEnrichAudit(env, audit);
-  await saveUiUxAudit(env, audit);
+  await saveUiUxAudit(env, audit, uiRequest.idempotencyKey);
   return jsonResponse({ ok: true, audit, status: "prism-uiux-audit-complete" });
 }
 
@@ -216,6 +235,21 @@ export async function handlePrismUiuxRoute(
   }
 
   const auditId = parseAuditId(pathname);
+  const idempotencyKey = parseIdempotencyKey(pathname);
+
+  if (idempotencyKey && pathname.startsWith("/api/operator/uiux/audits/idempotency/") && method === "GET") {
+    try {
+      const existingId = await readAuditIdByIdempotencyKey(env, decodeURIComponent(idempotencyKey));
+      if (!existingId) return jsonResponse({ error: "Idempotency key not found" }, 404);
+      const audit = await readUiUxAudit(env, existingId);
+      if (!audit) return jsonResponse({ error: "Audit not found" }, 404);
+      return jsonResponse({ ok: true, audit, duplicate: true });
+    } catch (err) {
+      if (err instanceof PrismUiuxStorageError) return jsonResponse({ error: err.message }, err.status);
+      return jsonResponse({ error: "Failed to resolve idempotency key" }, 500);
+    }
+  }
+
   if (!auditId) return null;
 
   if (pathname === `/api/operator/uiux/audits/${auditId}` && method === "GET") {

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mshops.net/schemas/agent-card.schema.json",
+  "title": "AgentCard",
+  "type": "object",
+  "required": [
+    "agent_id",
+    "name",
+    "version",
+    "role",
+    "owner",
+    "autonomy_level",
+    "tools_allowed",
+    "tools_forbidden",
+    "data_classes",
+    "beacon_required",
+    "recursion_limit",
+    "escalation_triggers",
+    "output_schema",
+    "telemetry_required",
+    "last_reviewed"
+  ],
+  "properties": {
+    "agent_id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "role": { "type": "string", "minLength": 1 },
+    "owner": { "type": "string", "minLength": 1 },
+    "autonomy_level": { "type": "string", "enum": ["A0", "A1", "A2", "A3", "A4", "A5", "A6"] },
+    "tools_allowed": { "type": "array", "items": { "type": "string" } },
+    "tools_forbidden": { "type": "array", "items": { "type": "string" } },
+    "data_classes": { "type": "array", "items": { "type": "string" } },
+    "beacon_required": { "type": "boolean", "const": true },
+    "recursion_limit": { "type": "integer", "minimum": 0, "maximum": 5 },
+    "escalation_triggers": { "type": "array", "items": { "type": "string" } },
+    "output_schema": { "type": "string", "minLength": 1 },
+    "telemetry_required": { "type": "array", "items": { "type": "string" } },
+    "last_reviewed": { "type": "string", "format": "date" }
+  },
+  "additionalProperties": false
+}

@@ -99,6 +99,9 @@ export function validateUiUxAuditRequest(body: Record<string, unknown>): UiUxAud
     component,
     viewport,
     useFixture: body.useFixture === true,
+    useLiveEvidence: body.useLiveEvidence === true,
+    captureId: typeof body.captureId === "string" ? body.captureId.slice(0, 128) : undefined,
+    idempotencyKey: typeof body.idempotencyKey === "string" ? body.idempotencyKey.slice(0, 128) : undefined,
     routeMetadata: parseRouteMetadata(body.routeMetadata),
     componentMetadata: parseComponentMetadata(body.componentMetadata),
     interactionResults: parseInteractionResults(body.interactionResults),
@@ -222,6 +225,19 @@ function categoryScoresFromMetadata(
     if (meta.hasErrorState === false && (meta.formFieldCount ?? 0) > 0) feedbackStates -= 8;
     if (meta.hasLoadingState === false && (meta.formFieldCount ?? 0) > 0) feedbackStates -= 5;
     if (!meta.usesOpPanel || !meta.usesOpAccent) designSystem -= 6;
+    if ((meta.accessibilityViolationCount ?? 0) > 0) {
+      accessibility -= Math.min(25, (meta.accessibilityViolationCount ?? 0) * 4);
+    }
+    if ((meta.consoleErrorCount ?? 0) > 0) {
+      feedbackStates -= Math.min(15, (meta.consoleErrorCount ?? 0) * 3);
+      performance -= Math.min(10, (meta.consoleErrorCount ?? 0) * 2);
+    }
+    if ((meta.failedRequestCount ?? 0) > 0) {
+      performance -= Math.min(20, (meta.failedRequestCount ?? 0) * 5);
+    }
+    if ((meta.landmarkCount ?? 0) === 0) {
+      accessibility -= 8;
+    }
   }
 
   if (componentMeta) {
@@ -315,6 +331,93 @@ function findingFromFixture(
     confidence: 0.85,
     status: "open",
   };
+}
+
+function liveEvidenceFindings(
+  auditId: string,
+  request: UiUxAuditRequest,
+  metadataList: UiUxRouteMetadata[],
+  hashSeed: string,
+): UiUxFinding[] {
+  if (!request.useLiveEvidence) return [];
+  const findings: UiUxFinding[] = [];
+  let idx = 0;
+
+  for (const meta of metadataList) {
+    if ((meta.accessibilityViolationCount ?? 0) > 0) {
+      findings.push({
+        id: stableId(hashSeed, `live-a11y-${idx++}`),
+        auditId,
+        route: meta.route,
+        viewport: request.viewport,
+        category: "accessibility",
+        severity: (meta.accessibilityViolationCount ?? 0) >= 3 ? "high" : "medium",
+        evidence: [
+          buildEvidence(
+            "browser",
+            meta.route,
+            `${meta.accessibilityViolationCount} axe violations captured`,
+            meta.headingOutline?.join(" | "),
+          ),
+        ],
+        userImpact: "Live accessibility scan detected rule violations on this route.",
+        recommendation: "Remediate axe-reported violations and re-run PRISM live capture.",
+        acceptanceCriteria: ["Axe violation count is zero on recapture."],
+        confidence: 0.92,
+        status: "open",
+      });
+    }
+    if ((meta.consoleErrorCount ?? 0) > 0) {
+      findings.push({
+        id: stableId(hashSeed, `live-console-${idx++}`),
+        auditId,
+        route: meta.route,
+        viewport: request.viewport,
+        category: "feedback_states",
+        severity: "medium",
+        evidence: [buildEvidence("browser", meta.route, `${meta.consoleErrorCount} console errors captured`)],
+        userImpact: "Runtime console errors may break user flows or obscure failures.",
+        recommendation: "Fix console errors and verify clean capture on retry.",
+        acceptanceCriteria: ["Console error count is zero on recapture."],
+        confidence: 0.9,
+        status: "open",
+      });
+    }
+    if ((meta.failedRequestCount ?? 0) > 0) {
+      findings.push({
+        id: stableId(hashSeed, `live-network-${idx++}`),
+        auditId,
+        route: meta.route,
+        viewport: request.viewport,
+        category: "performance",
+        severity: "medium",
+        evidence: [buildEvidence("browser", meta.route, `${meta.failedRequestCount} failed network requests`)],
+        userImpact: "Failed network requests can block content and degrade perceived reliability.",
+        recommendation: "Investigate failed requests and ensure required assets load in preview/staging.",
+        acceptanceCriteria: ["Failed request count is zero on recapture."],
+        confidence: 0.88,
+        status: "open",
+      });
+    }
+    if ((meta.landmarkCount ?? 0) === 0) {
+      findings.push({
+        id: stableId(hashSeed, `live-landmark-${idx++}`),
+        auditId,
+        route: meta.route,
+        viewport: request.viewport,
+        category: "accessibility",
+        severity: "low",
+        evidence: [buildEvidence("browser", meta.route, "No main/nav landmarks detected")],
+        userImpact: "Missing landmarks reduce screen-reader navigation efficiency.",
+        recommendation: "Add semantic landmarks (main, nav) to the page shell.",
+        acceptanceCriteria: ["At least one main landmark is present."],
+        confidence: 0.85,
+        status: "open",
+      });
+    }
+  }
+
+  return findings;
 }
 
 function checklistFindings(
@@ -445,22 +548,26 @@ export async function generateUiUxAudit(request: UiUxAuditRequest, auditId?: str
 
   const routes = request.routes ?? [];
   let metadataList = request.routeMetadata ?? [];
-  if (request.useFixture || metadataList.length === 0) {
+  if ((request.useFixture || metadataList.length === 0) && !request.useLiveEvidence) {
     const fixtureMeta = resolveFixtureMetadata(routes.length > 0 ? routes : ["/"]);
     if (fixtureMeta.length > 0) {
       metadataList = fixtureMeta;
     }
+  } else if (request.useFixture && request.useLiveEvidence && metadataList.length === 0) {
+    const fixtureMeta = resolveFixtureMetadata(routes.length > 0 ? routes : ["/"]);
+    if (fixtureMeta.length > 0) metadataList = fixtureMeta;
   }
 
   const categoryValues = categoryScoresFromMetadata(metadataList, request.componentMetadata, request.mode);
   const scorecard = buildScorecard(categoryValues);
 
   const findings: UiUxFinding[] = [];
-  const routesToSeed = routes.length > 0 ? routes : ["/"];
+  const routesToSeed = request.useLiveEvidence ? [] : routes.length > 0 ? routes : ["/"];
   for (let i = 0; i < routesToSeed.length; i++) {
     const fixtureFinding = findingFromFixture(resolvedId, request.viewport, routesToSeed[i], i, hashSeed);
     if (fixtureFinding) findings.push(fixtureFinding);
   }
+  findings.push(...liveEvidenceFindings(resolvedId, request, metadataList, hashSeed));
   findings.push(...checklistFindings(resolvedId, request, metadataList, hashSeed));
 
   const uniqueFindings = dedupeFindings(findings).slice(0, MAX_FINDINGS);

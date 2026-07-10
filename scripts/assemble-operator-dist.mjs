@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execSync } from "node:child_process";
-import { copyFileSync, existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -40,9 +40,8 @@ const ecosystemShell = readFileSync(join(dist, "ecosystem-shell.html"), "utf8");
 writeFileSync(join(dist, "index.html"), ecosystemShell);
 
 if (!existsSync(join(dist, "app", "index.html"))) {
-  console.warn(
-    "assemble-operator-dist: dist/app/ not found — marketplace storefront routes will degrade until MSHOPS bundle is assembled.",
-  );
+  console.error("assemble-operator-dist: dist/app/index.html missing after storefront assembly");
+  process.exit(1);
 }
 
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));

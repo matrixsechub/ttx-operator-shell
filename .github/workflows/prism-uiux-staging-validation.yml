@@ -1,0 +1,42 @@
+name: PRISM UIUX Staging Validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prism-staging-validation:
+    runs-on: ubuntu-latest
+    environment: prism-staging
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d34e6af2bda47ae351bd # v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run typecheck
+
+      - run: npm run test:uiux
+
+      - name: Staging validation full run
+        env:
+          PRISM_STAGING_ORIGIN: ${{ vars.PRISM_STAGING_ORIGIN }}
+          PRISM_OPERATOR_CALLSIGN: ${{ secrets.PRISM_OPERATOR_CALLSIGN }}
+          PRISM_OPERATOR_PASSWORD: ${{ secrets.PRISM_OPERATOR_PASSWORD }}
+          CI: "true"
+        run: npm run uiux:staging:full
+
+      - name: Upload staging validation artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: prism-uiux-staging-validation
+          path: artifacts/uiux/staging/**/*
+          if-no-files-found: error

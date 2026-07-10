@@ -1,5 +1,10 @@
 import { getAgentGovernanceContextFor } from "../msh-ops/agent/initAgentGovernance";
 import { checkAutonomy } from "../msh-ops/governance/checkAutonomy";
+import { evaluateLegacyOperatorApproval } from "./governance/legacyApproval";
+import { extractGovernanceFields, runGovernedRoute } from "./governance/mutationGate";
+import { getProposal } from "./governance/proposalStore";
+import { isGovernedMutationEnvironment, resolveRuntimeEnvironment } from "./governance/runtimeEnv";
+import type { GovernedExecutionEnv } from "./governance/governedMutation";
 import {
   createNorthstarBeaconProposal,
   generateNorthstarBeaconPackage,
@@ -44,6 +49,7 @@ export async function handleNorthstarBeaconApi(
   request: Request,
   pathname: string,
   method: string,
+  env?: GovernedExecutionEnv,
 ): Promise<Response | null> {
   if (method === "GET" && pathname === "/api/northstar-beacon/catalog") {
     trackNorthstarBeaconEvent("marketplace_page_view");
@@ -106,6 +112,70 @@ export async function handleNorthstarBeaconApi(
 
       const input = normalizeNorthstarBeaconIntake(payload);
       const order = await generateNorthstarBeaconPackage(input);
+      if (env && isGovernedMutationEnvironment(env)) {
+        if (payload.operator_approval === true) {
+          const legacy = await evaluateLegacyOperatorApproval(env, payload, {
+            actionClass: "C3",
+            systemTarget: "northstar-beacon",
+            actorId: "operator",
+            correlationId: crypto.randomUUID(),
+          });
+          if (!legacy.allowed) {
+            return jsonResponse({ error: legacy.reason, code: legacy.code }, 403);
+          }
+        }
+        const fields = extractGovernanceFields(payload);
+        if (!fields) {
+          return jsonResponse(
+            {
+              ok: false,
+              error: "Signed approval receipt required (proposalId, approvalId, idempotencyKey)",
+              code: "RECEIPT_REQUIRED",
+            },
+            403,
+          );
+        }
+        const proposal = await getProposal(env, fields.proposalId);
+        if (!proposal) {
+          return jsonResponse({ error: "Proposal not found", code: "PROPOSAL_NOT_FOUND" }, 404);
+        }
+        const governed = await runGovernedRoute(env, {
+          actionType: "northstar-beacon.generate.record",
+          actionClass: proposal.action_class,
+          environment: resolveRuntimeEnvironment(env),
+          proposalId: fields.proposalId,
+          approvalId: fields.approvalId,
+          idempotencyKey: fields.idempotencyKey,
+          input: payload,
+          rollbackReference: proposal.rollback_plan,
+          execute: async () => {
+            const recorded = recordNorthstarBeaconOrder(order);
+            trackNorthstarBeaconEvent("package_generation", {
+              order_id: recorded.order_id,
+              tier: recorded.selected_tier,
+              file_count: String(recorded.file_count),
+            });
+            return recorded;
+          },
+        });
+        if (!governed.ok) {
+          return jsonResponse(
+            { ok: false, error: governed.error, code: governed.code, executionReceipt: governed.executionReceipt },
+            403,
+          );
+        }
+        const recorded = governed.result as ReturnType<typeof recordNorthstarBeaconOrder>;
+        return jsonResponse({
+          ...recorded,
+          status: "northstar-beacon-package-complete",
+          listing: {
+            id: northstarBeaconGovernanceMarketplaceModule.id,
+            slug: northstarBeaconGovernanceMarketplaceModule.slug,
+          },
+          executionReceipt: governed.executionReceipt,
+        });
+      }
+
       const recordDecision = checkAutonomy(
         {
           agentId: AGENT_ID,

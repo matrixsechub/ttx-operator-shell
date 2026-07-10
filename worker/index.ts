@@ -60,6 +60,7 @@ import { handleFlowEventRoute } from "./flowRoute";
 import { handleFlowIntelligenceRoute } from "./flowIntelligenceRoute";
 import { handleFlowExperimentAssignmentRoute, handleFlowExperimentReportRoute } from "./flowExperimentRoute";
 import { handleIntentCaptureRoute } from "./intentCaptureRoute";
+import { handleIntentQualificationRoute } from "./intentQualificationRoute";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
@@ -72,7 +73,13 @@ import { handleRecoveredFunnelApi, isRecoveredPublicRoute, redirectWelcomeToRoot
 import { handleAiGatewayRoute } from "./aiGatewayRoutes";
 import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
 import { handlePrismUiuxRoute } from "./prismUiuxRoutes";
+import { handlePrismTriageRoute } from "./prismTriageRoutes";
+import { handleBeaconRoute } from "./beaconRoutes";
+import { handleGovernanceProposalRoute } from "./governanceRoutes";
+import { handleMcpGovernanceRoute } from "./governance/mcp/routes";
+import { handleOperatorAgentsRoute } from "./operatorAgentsRoutes";
 export { LiveTtxSession } from "./liveSession";
+export { ReceiptAuthority } from "./do/receiptAuthority";
 
 await assertBeaconOnStartup();
 await ensureAgentGovernance();
@@ -401,6 +408,13 @@ export default {
         return fulfillmentOperatorResponse;
       }
 
+      const prismTriageResponse = await handlePrismTriageRoute(request, url.pathname, env);
+
+      if (prismTriageResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, prismTriageResponse.status);
+        return prismTriageResponse;
+      }
+
       const prismUiuxResponse = await handlePrismUiuxRoute(request, url.pathname, env);
 
       if (prismUiuxResponse) {
@@ -538,6 +552,17 @@ export default {
         return intentCaptureResponse;
       }
 
+      const intentQualificationResponse = await handleIntentQualificationRoute(
+        request,
+        url.pathname,
+        env as WorkerEnv,
+      );
+
+      if (intentQualificationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, intentQualificationResponse.status);
+        return intentQualificationResponse;
+      }
+
       const behaviorResponse = await handleBehaviorIntelligenceRoute(request, url.pathname, env as WorkerEnv);
 
       if (behaviorResponse) {
@@ -564,6 +589,45 @@ export default {
       if (trafficInteractionResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, trafficInteractionResponse.status);
         return trafficInteractionResponse;
+      }
+
+      const beaconResponse = await handleBeaconRoute(request, url.pathname, request.method, env);
+      if (beaconResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, beaconResponse.status);
+        return beaconResponse;
+      }
+
+      const governanceProposalResponse = await handleGovernanceProposalRoute(
+        request,
+        url.pathname,
+        request.method,
+        env as WorkerEnv,
+      );
+      if (governanceProposalResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, governanceProposalResponse.status);
+        return governanceProposalResponse;
+      }
+
+      const mcpGovernanceResponse = await handleMcpGovernanceRoute(
+        request,
+        url.pathname,
+        request.method,
+        env as WorkerEnv,
+      );
+      if (mcpGovernanceResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, mcpGovernanceResponse.status);
+        return mcpGovernanceResponse;
+      }
+
+      const operatorAgentsResponse = await handleOperatorAgentsRoute(
+        request,
+        url.pathname,
+        request.method,
+        env as WorkerEnv,
+      );
+      if (operatorAgentsResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, operatorAgentsResponse.status);
+        return operatorAgentsResponse;
       }
 
       const kernelResponse = await handleKernelRoute(request, url.pathname, env as WorkerEnv & BackboneEnv);

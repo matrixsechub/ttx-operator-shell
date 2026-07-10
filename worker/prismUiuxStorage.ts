@@ -3,6 +3,7 @@ import type { UiUxApprovalRecord, UiUxAudit, UiUxAuditSummary } from "./data/pri
 const AUDIT_PREFIX = "mshops:uiux:v1:audit:";
 const INDEX_KEY = "mshops:uiux:v1:index";
 const ROUTE_PREFIX = "mshops:uiux:v1:route:";
+const IDEMPOTENCY_PREFIX = "mshops:uiux:v1:idempotency:";
 const AUDIT_TTL_SECONDS = 60 * 60 * 24 * 30;
 const MAX_INDEX_ENTRIES = 50;
 const MAX_ROUTE_HISTORY = 10;
@@ -82,12 +83,18 @@ async function updateRouteIndex(kv: KVNamespace, route: string, auditId: string)
   await kv.put(key, JSON.stringify(next), { expirationTtl: AUDIT_TTL_SECONDS });
 }
 
-export async function saveUiUxAudit(env: PrismUiuxStorageEnv, audit: UiUxAudit): Promise<void> {
+export async function saveUiUxAudit(env: PrismUiuxStorageEnv, audit: UiUxAudit, idempotencyKey?: string): Promise<void> {
   const kv = requireKv(env);
   try {
     await kv.put(`${AUDIT_PREFIX}${audit.auditId}`, JSON.stringify(audit), {
       expirationTtl: AUDIT_TTL_SECONDS,
     });
+
+    if (idempotencyKey) {
+      await kv.put(`${IDEMPOTENCY_PREFIX}${idempotencyKey}`, audit.auditId, {
+        expirationTtl: AUDIT_TTL_SECONDS,
+      });
+    }
 
     const summary = toSummary(audit);
     const index = await readIndex(kv);
@@ -101,6 +108,11 @@ export async function saveUiUxAudit(env: PrismUiuxStorageEnv, audit: UiUxAudit):
     console.error("prism-uiux: failed to persist audit", audit.auditId, err instanceof Error ? err.message : err);
     throw new PrismUiuxStorageError(500, "Failed to persist audit");
   }
+}
+
+export async function readAuditIdByIdempotencyKey(env: PrismUiuxStorageEnv, key: string): Promise<string | null> {
+  const kv = requireKv(env);
+  return kv.get(`${IDEMPOTENCY_PREFIX}${key}`);
 }
 
 export async function readUiUxAudit(env: PrismUiuxStorageEnv, auditId: string): Promise<UiUxAudit | null> {

@@ -1,3 +1,5 @@
+import type { PrismCouncilEnvelope } from "./prismUiuxCouncil";
+
 export const PRISM_UIUX_AGENT_ID = "PRISM_UIUX_AGENT_V1" as const;
 
 export const UIUX_AUDIT_MODES = [
@@ -62,6 +64,11 @@ export type UiUxRouteMetadata = {
   labelAssociated?: boolean;
   focusVisible?: boolean;
   contrastRatio?: number;
+  accessibilityViolationCount?: number;
+  landmarkCount?: number;
+  headingOutline?: string[];
+  consoleErrorCount?: number;
+  failedRequestCount?: number;
 };
 
 export type UiUxComponentMetadata = {
@@ -86,6 +93,9 @@ export type UiUxAuditRequest = {
   component?: string;
   viewport: UiUxViewport;
   useFixture?: boolean;
+  useLiveEvidence?: boolean;
+  captureId?: string;
+  idempotencyKey?: string;
   routeMetadata?: UiUxRouteMetadata[];
   componentMetadata?: UiUxComponentMetadata;
   interactionResults?: UiUxInteractionResult[];
@@ -96,7 +106,7 @@ export type UiUxAuditRequest = {
 };
 
 export type UiUxEvidence = {
-  type: "metadata" | "fixture" | "interaction" | "screenshot_ref" | "checklist";
+  type: "metadata" | "fixture" | "interaction" | "screenshot_ref" | "checklist" | "browser";
   source: string;
   summary: string;
   detail?: string;
@@ -198,7 +208,7 @@ export type UiUxAudit = {
   ai_model?: string;
   ai_latency_ms?: number;
   ai_enrichment?: string;
-  councilEnvelope: import("./prismUiuxCouncil").PrismCouncilEnvelope;
+  councilEnvelope: PrismCouncilEnvelope;
 };
 
 export function isUiUxAuditMode(value: string): value is UiUxAuditMode {

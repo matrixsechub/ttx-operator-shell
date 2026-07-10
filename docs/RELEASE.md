@@ -69,6 +69,18 @@ npm run deploy:staging
 
 ### 5. Run smoke verification
 
+**GitHub Actions (recommended after Phase 2):** use the `Staging Deploy` workflow; download `staging-release-evidence` after a successful run.
+
+**Local read-only smoke (GET/HEAD only, no credentials):**
+
+```bash
+STAGING_BASE_URL=https://ttx-operator-shell-staging.sogellagepul.workers.dev \
+COMMIT_SHA="$(git rev-parse HEAD)" \
+npm run test:staging-smoke
+```
+
+**Legacy integration script (includes POST checks):**
+
 ```bash
 node scripts/verify-operator-deploy.mjs https://ttx-operator-shell-staging.sogellagepul.workers.dev
 ```
@@ -186,4 +198,13 @@ wrangler deploy --env staging --dry-run --outdir dist-staging-dryrun
 
 ## Branch protection (recommended)
 
-Enable GitHub branch protection on `main` requiring the `CI` workflow (`typecheck` → `test` → `build`) to pass before merge.
+Enable GitHub branch protection on `main` requiring these checks before merge:
+
+| Check | Workflow |
+|---|---|
+| `pr-gate` | CI |
+| `build-test` | CI |
+| `wrangler-dry-run` | CI |
+| `security-pr` | Security PR |
+
+Manual staging deployment procedure: [STAGING-DEPLOYMENT.md](./STAGING-DEPLOYMENT.md).

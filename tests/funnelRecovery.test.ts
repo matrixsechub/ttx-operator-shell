@@ -30,7 +30,7 @@ function createKv() {
 
 describe("funnel route map", () => {
   it("recognizes recovered public routes and rejects unknown routes", () => {
-    assert.equal(isRecoveredPublicRoute("/"), true);
+    assert.equal(isRecoveredPublicRoute("/"), false);
     assert.equal(isRecoveredPublicRoute("/services"), true);
     assert.equal(isRecoveredPublicRoute("/apps/automation-builder"), true);
     assert.equal(isRecoveredPublicRoute("/apps/ai-agent-builder"), true);

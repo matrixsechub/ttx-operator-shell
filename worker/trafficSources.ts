@@ -6,8 +6,15 @@ export const TRAFFIC_SOURCE_CHANNELS = [
   "direct",
   "discord",
   "slack",
+  "linkedin",
+  "email",
+  "referral",
+  "partner",
+  "community",
   "synthetic_injection",
+  "internal",
   "organic",
+  "unknown",
 ] as const;
 
 export type TrafficSourceChannel = (typeof TRAFFIC_SOURCE_CHANNELS)[number];
@@ -16,14 +23,23 @@ function trafficSourceKey(source: TrafficSourceChannel): string {
   return `usage:v3:traffic:source:${source}`;
 }
 
+const LEGACY_SOURCE_ALIASES: Record<string, TrafficSourceChannel> = {
+  twitter: "x",
+  fb: "organic",
+  facebook: "organic",
+  google: "organic",
+  bing: "organic",
+};
+
 export function sanitizeTrafficSource(value: unknown): TrafficSourceChannel | null {
   if (typeof value !== "string") return null;
   const cleaned = value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 32);
   if (!cleaned) return null;
-  if ((TRAFFIC_SOURCE_CHANNELS as readonly string[]).includes(cleaned)) {
-    return cleaned as TrafficSourceChannel;
+  const mapped = LEGACY_SOURCE_ALIASES[cleaned] ?? cleaned;
+  if ((TRAFFIC_SOURCE_CHANNELS as readonly string[]).includes(mapped)) {
+    return mapped as TrafficSourceChannel;
   }
-  return "organic";
+  return "unknown";
 }
 
 async function readCounter(env: UsageEnv, key: string): Promise<number> {

@@ -7,6 +7,11 @@
     "enabled": true,
     "head_sampling_rate": 1
   },
+  // Explicitly clear orphaned dashboard cron triggers — no scheduled() handler exists.
+  // Organizer runs via GitHub Actions (organizer-schedule.yml), not Worker cron.
+  "triggers": {
+    "crons": []
+  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
@@ -51,7 +56,8 @@
       { "name": "GOVERNANCE", "class_name": "GovernanceDO" },
       { "name": "SESSION", "class_name": "SessionDO" },
       { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
-      { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" }
+      { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
+      { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
     ]
   },
   "migrations": [
@@ -62,6 +68,10 @@
     {
       "tag": "v36-live-ttx-sessions",
       "new_sqlite_classes": ["LiveTtxSession"]
+    },
+    {
+      "tag": "v37-receipt-authority",
+      "new_sqlite_classes": ["ReceiptAuthority"]
     }
   ],
   "services": [
@@ -70,6 +80,9 @@
   "env": {
     "staging": {
       "name": "ttx-operator-shell-staging",
+      "triggers": {
+        "crons": []
+      },
       "ai": {
         "binding": "AI"
       },
@@ -104,7 +117,8 @@
           { "name": "GOVERNANCE", "class_name": "GovernanceDO" },
           { "name": "SESSION", "class_name": "SessionDO" },
           { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
-          { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" }
+          { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
+          { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
         ]
       },
       "migrations": [
@@ -115,6 +129,10 @@
         {
           "tag": "v36-live-ttx-sessions",
           "new_sqlite_classes": ["LiveTtxSession"]
+        },
+        {
+          "tag": "v37-receipt-authority",
+          "new_sqlite_classes": ["ReceiptAuthority"]
         }
       ],
       "services": [
