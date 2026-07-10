@@ -22,6 +22,9 @@ export function isPublicApiRoute(pathname: string, method: string): boolean {
   if (matchesPath(pathname, method, "/api/system/status", "GET")) return true;
   if (matchesPath(pathname, method, "/api/usage/event", "POST")) return true;
   if (matchesPath(pathname, method, "/api/flow/event", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/flow/experiment/assignment", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/growth/intent-capture", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/growth/intent-handoff", "POST")) return true;
   if (matchesPath(pathname, method, "/api/behavior/intelligence", "GET")) return true;
   if (matchesPath(pathname, method, "/api/experimentation/report", "GET")) return true;
   if (matchesPath(pathname, method, "/api/experimentation/assignment", "GET")) return true;

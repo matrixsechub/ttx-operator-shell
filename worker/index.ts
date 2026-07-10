@@ -58,6 +58,8 @@ import { handleTelemetryRoute, recordTelemetrySample } from "./telemetry";
 import { handleUsageRoute } from "./usage";
 import { handleFlowEventRoute } from "./flowRoute";
 import { handleFlowIntelligenceRoute } from "./flowIntelligenceRoute";
+import { handleFlowExperimentAssignmentRoute, handleFlowExperimentReportRoute } from "./flowExperimentRoute";
+import { handleIntentCaptureRoute } from "./intentCaptureRoute";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
@@ -65,7 +67,9 @@ import { handleLiveTtxRoute } from "./liveTtxRoute";
 import { handleWildcardRoute } from "./wildcardAdvancement";
 import { handleAuditLiteRoute } from "./auditLite";
 import { handleRecoveredFunnelApi, isRecoveredPublicRoute, serveRecoveredPublicRoute } from "./funnelRecovery";
+import { handleAiGatewayRoute } from "./aiGatewayRoutes";
 import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
+import { handlePrismUiuxRoute } from "./prismUiuxRoutes";
 export { LiveTtxSession } from "./liveSession";
 
 await assertBeaconOnStartup();
@@ -284,7 +288,8 @@ export default {
 
       if (
         url.pathname.startsWith("/api/ttx/local-scenarios") ||
-        url.pathname.startsWith("/api/marketplace/purchase")
+        url.pathname.startsWith("/api/marketplace/purchase") ||
+        url.pathname.startsWith("/api/ai/marketplace/")
       ) {
         try {
           const kernelCtx = await resolveEffectiveKernelContext(env as WorkerEnv & BackboneEnv);
@@ -306,6 +311,16 @@ export default {
         } catch {
           // Governance DO unavailable — continue without injection.
         }
+      }
+
+      const aiGatewayResponse = await handleAiGatewayRoute(
+        request,
+        url.pathname,
+        env as WorkerEnv & BackboneEnv,
+      );
+      if (aiGatewayResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, aiGatewayResponse.status);
+        return aiGatewayResponse;
       }
 
 
@@ -382,6 +397,13 @@ export default {
       if (fulfillmentOperatorResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, fulfillmentOperatorResponse.status);
         return fulfillmentOperatorResponse;
+      }
+
+      const prismUiuxResponse = await handlePrismUiuxRoute(request, url.pathname, env);
+
+      if (prismUiuxResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, prismUiuxResponse.status);
+        return prismUiuxResponse;
       }
 
 
@@ -476,6 +498,35 @@ export default {
       if (flowIntelligenceResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, flowIntelligenceResponse.status);
         return flowIntelligenceResponse;
+      }
+
+      const flowExperimentAssignmentResponse = await handleFlowExperimentAssignmentRoute(
+        request,
+        url.pathname,
+        env as WorkerEnv,
+      );
+
+      if (flowExperimentAssignmentResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, flowExperimentAssignmentResponse.status);
+        return flowExperimentAssignmentResponse;
+      }
+
+      const flowExperimentReportResponse = await handleFlowExperimentReportRoute(
+        request,
+        url.pathname,
+        env as WorkerEnv,
+      );
+
+      if (flowExperimentReportResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, flowExperimentReportResponse.status);
+        return flowExperimentReportResponse;
+      }
+
+      const intentCaptureResponse = await handleIntentCaptureRoute(request, url.pathname, env as WorkerEnv);
+
+      if (intentCaptureResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, intentCaptureResponse.status);
+        return intentCaptureResponse;
       }
 
       const behaviorResponse = await handleBehaviorIntelligenceRoute(request, url.pathname, env as WorkerEnv);

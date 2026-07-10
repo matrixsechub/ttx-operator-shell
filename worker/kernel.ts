@@ -28,13 +28,15 @@ import {
 } from "./sessionBridge";
 import {
   getTelemetrySummary,
+  getAiUsageRollup,
   recordGovernanceEvent,
   recordSessionEvent,
   recordSubsystemFailure,
+  type AiUsageRollup,
   type TelemetryEnv,
 } from "./telemetry";
 import { getUsageSummary } from "./usage";
-const COCKPIT_HTML_PREFIXES = ["/systems", "/ops", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about"] as const;
+const COCKPIT_HTML_PREFIXES = ["/systems", "/ops", "/operator", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about"] as const;
 const COCKPIT_API_PREFIXES = ["/api/ops"] as const;
 const WILDCARD_API_PATHS = [/^\/api\/ttx\/local-scenarios\/import$/];
 
@@ -84,6 +86,12 @@ export interface SystemState {
   experimentation: ExperimentationSnapshot;
   health: {
     overall: "STABLE" | "DEGRADED" | "CRITICAL";
+  };
+  aiGateway: {
+    usageRollup: AiUsageRollup;
+    policyMode: PolicyMode;
+    gatewayHealth: "ok" | "degraded" | "unavailable";
+    recentDenials: number;
   };
 }
 
@@ -186,11 +194,12 @@ export async function buildSystemState(
   const governanceResult = await fetchGovernanceStateSafe(env);
   const governance = governanceResult.state;
 
-  const [telemetry, marketplace, ghost, usage] = await Promise.all([
+  const [telemetry, marketplace, ghost, usage, aiUsageRollup] = await Promise.all([
     getTelemetrySummary(env),
     fetchMarketplaceStateSafe(env),
     fetchGhostSignals(env),
     getUsageSummary(env),
+    getAiUsageRollup(env),
   ]);
 
   const policyBaseline = buildGovernancePolicy(governance);
@@ -291,6 +300,17 @@ export async function buildSystemState(
         governanceSource: governanceResult.source,
         telemetry,
       }),
+    },
+    aiGateway: {
+      usageRollup: aiUsageRollup,
+      policyMode: policy.mode,
+      gatewayHealth:
+        aiUsageRollup.requestCount === 0 && aiUsageRollup.denialCount === 0
+          ? "ok"
+          : aiUsageRollup.denialCount > aiUsageRollup.requestCount
+            ? "degraded"
+            : "ok",
+      recentDenials: aiUsageRollup.denialCount,
     },
   };
 }

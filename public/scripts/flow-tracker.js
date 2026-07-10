@@ -158,6 +158,23 @@
     bindForms();
     bindCtaImpressions();
     bindLifecycle();
+    void loadExperimentAssignment();
+  }
+
+  async function loadExperimentAssignment() {
+    try {
+      const response = await fetch(
+        `/api/flow/experiment/assignment?sessionId=${encodeURIComponent(getOrCreateSessionId())}&page=${encodeURIComponent(state.page)}`,
+      );
+      if (!response.ok) return;
+      const payload = await response.json();
+      if (payload.variant === "B" && payload.experiment) {
+        document.body.dataset.flowExperimentVariant = "B";
+        document.body.dataset.flowExperimentId = payload.experiment.id;
+      }
+    } catch {
+      // Assignment is optional for rendering.
+    }
   }
 
   if (document.readyState === "loading") {

@@ -1,3 +1,6 @@
+import type { BackboneEnv } from "./backboneEnv";
+import type { WorkerEnv } from "./env";
+import type { AiGatewayEnv } from "./aiGateway";
 import { injectSecurityHeaders } from "./edge/headers";
 import {
   handleFulfillmentAgentApi,
@@ -1145,7 +1148,12 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
       );
     }
 
-    const fulfillmentResponse = await handleFulfillmentAgentApi(request, pathname, method);
+    const fulfillmentResponse = await handleFulfillmentAgentApi(
+      request,
+      pathname,
+      method,
+      env as WorkerEnv & BackboneEnv & AiGatewayEnv,
+    );
     if (fulfillmentResponse) {
       return fulfillmentResponse;
     }

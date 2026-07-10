@@ -338,6 +338,7 @@ const SOURCE_TYPES = [
   "service_quote",
   "agent_readiness_result",
   "automation_build_spec",
+  "intent_capture",
   "manual_agent_request",
   "existing_client_need",
   "not_sure",
@@ -764,7 +765,13 @@ export function generateAiAgentBuildSpec(input: AiAgentBuildInput, id?: string):
   const agent_category = AGENT_CATEGORY_MAP[input.agent_goal] || AGENT_CATEGORY_MAP.not_sure;
   const agent_name = AGENT_NAME_MAP[input.agent_goal] || AGENT_NAME_MAP.not_sure;
   const target_user = TARGET_USER_MAP[input.agent_goal] || TARGET_USER_MAP.not_sure;
-  const business_problem = BUSINESS_PROBLEM_MAP[input.agent_goal] || BUSINESS_PROBLEM_MAP.not_sure;
+  let business_problem = BUSINESS_PROBLEM_MAP[input.agent_goal] || BUSINESS_PROBLEM_MAP.not_sure;
+  if (input.source_type === "intent_capture" && input.diagnostic_context) {
+    const capturedIntent = input.diagnostic_context.intent_capture_intent;
+    if (typeof capturedIntent === "string" && capturedIntent.trim()) {
+      business_problem = capturedIntent.trim().slice(0, 500);
+    }
+  }
   const complexity_level = scoreComplexity(input);
   const risk_level = scoreRisk(input, complexity_level);
   const priority = derivePriority(input, risk_level);

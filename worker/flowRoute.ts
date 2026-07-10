@@ -1,6 +1,7 @@
 import { sanitizeTrafficSource } from "./trafficSources";
 import { isValidSessionId } from "./usage";
 import { recordFlowEvent } from "./flowStorage";
+import { recordFlowExperimentOutcome } from "./flowExperimentTracking";
 import type { FlowEventType } from "./flowTypes";
 import { sanitizeCtaId, sanitizeFlowPage } from "./flowTypes";
 import type { FlowStorageEnv } from "./flowStorage";
@@ -75,6 +76,22 @@ export async function handleFlowEventRoute(
     formId: typeof body.formId === "string" ? body.formId : undefined,
     clickDelta,
   });
+
+  if (
+    result.counted &&
+    (body.event === "page_view" ||
+      body.event === "cta_click" ||
+      body.event === "form_start" ||
+      body.event === "form_submit" ||
+      body.event === "click")
+  ) {
+    await recordFlowExperimentOutcome(env, body.sessionId as string, body.page as string, body.event as FlowEventType, {
+      dwellMs,
+      clickDelta,
+    }).catch(() => {
+      // Experiment tracking is best-effort.
+    });
+  }
 
   return Response.json({
     ok: true,

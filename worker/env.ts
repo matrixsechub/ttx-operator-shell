@@ -8,6 +8,8 @@ export interface EdgeSecretsEnv {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   STRIPE_PRICE_ID?: string;
+  CF_AI_API_TOKEN?: string;
+  N8N_WEBHOOK_SECRET?: string;
 }
 
 export type WorkerEnv = Env & EdgeSecretsEnv;

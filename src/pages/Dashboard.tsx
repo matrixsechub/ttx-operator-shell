@@ -18,6 +18,8 @@ import { AINodeConsole } from "./dashboard/AINodeConsole";
 import { OperatorInventory } from "./dashboard/OperatorInventory";
 import { OperatorSignals } from "./dashboard/OperatorSignals";
 import { FlowIntelligencePanel } from "./dashboard/FlowIntelligencePanel";
+import { FlowExperimentPanel } from "./dashboard/FlowExperimentPanel";
+import { IntentCapturePanel } from "./dashboard/IntentCapturePanel";
 import { TTXStatusPanel } from "./dashboard/TTXStatusPanel";
 import { TelemetryFeed } from "./dashboard/TelemetryFeed";
 import { WebhookTriggerPanel } from "./dashboard/WebhookTriggerPanel";
@@ -84,6 +86,8 @@ export function Dashboard() {
             <OperatorInventory />
             <OperatorSignals />
             <FlowIntelligencePanel />
+            <FlowExperimentPanel />
+            <IntentCapturePanel />
             <TTXStatusPanel />
             <TelemetryFeed />
             <WebhookTriggerPanel />

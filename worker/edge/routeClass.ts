@@ -11,6 +11,12 @@ const OPERATOR_PROTECTED = [
   /^\/api\/fedgrade\//,
   /^\/api\/governance\/propose$/,
   /^\/api\/governance\/approve$/,
+  /^\/api\/ai\/infer$/,
+  /^\/api\/ai\/usage$/,
+  /^\/api\/ai\/mcp\/signal$/,
+  /^\/api\/ai\/marketplace\//,
+  /^\/api\/council\/packet$/,
+  /^\/api\/telemetry\/events$/,
 ];
 
 const MARKETPLACE_PROTECTED = [/^\/api\/marketplace\/integrity$/, /^\/api\/hsx$/];
@@ -40,6 +46,9 @@ export function classifyRoute(pathname: string, method: string): RouteClass {
   if (/^\/api\/audit-lite\/result\/[A-Za-z0-9_-]+$/.test(pathname) && method === "GET") return "public";
   if (pathname === "/api/growth/track" && method === "POST") return "public";
   if (pathname === "/api/flow/event" && method === "POST") return "public";
+  if (pathname === "/api/flow/experiment/assignment" && method === "GET") return "public";
+  if (pathname === "/api/growth/intent-capture" && method === "POST") return "public";
+  if (pathname === "/api/growth/intent-handoff" && method === "POST") return "public";
   if (pathname === "/api/growth/posture" && method === "GET") return "public";
   if (pathname === "/api/ai-agent-build-spec-generate" && method === "POST") return "public";
   if (pathname === "/api/security-remediation-plan-generate" && method === "POST") return "public";

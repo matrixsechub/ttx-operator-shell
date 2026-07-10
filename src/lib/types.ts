@@ -238,5 +238,36 @@ export interface SystemStateResponse {
     session: Record<string, unknown>;
     marketplace: Record<string, unknown>;
     health?: { overall: "STABLE" | "DEGRADED" | "CRITICAL" };
+    aiGateway?: {
+      usageRollup: {
+        promptTokens: number;
+        completionTokens: number;
+        totalTokens: number;
+        costEstimateUsd: number;
+        requestCount: number;
+        denialCount: number;
+        byAgent: Record<string, number>;
+        byProfile: Record<string, number>;
+      };
+      policyMode: string;
+      gatewayHealth: "ok" | "degraded" | "unavailable";
+      recentDenials: number;
+    };
+  };
+}
+
+export interface AiUsageResponse {
+  ok: true;
+  rollup: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    costEstimateUsd: number;
+    requestCount: number;
+    denialCount: number;
+    byAgent: Record<string, number>;
+    byProfile: Record<string, number>;
+    updatedAt: string;
+    environment: string;
   };
 }

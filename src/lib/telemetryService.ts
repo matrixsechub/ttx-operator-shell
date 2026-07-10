@@ -6,6 +6,6 @@ import type { TelemetryEvent, TelemetryStream } from "./telemetry";
 // ttxService: fails cleanly via ApiResult until the engine exposes this
 // route, no separate backend wiring needed here.
 export const telemetryService = {
-  getEvents: (stream?: TelemetryStream): Promise<ApiResult<{ events: TelemetryEvent[] }>> =>
+  getEvents: (stream?: TelemetryStream): Promise<ApiResult<{ events: TelemetryEvent[]; aiUsage?: unknown }>> =>
     request(`/api/telemetry/events${stream ? `?stream=${encodeURIComponent(stream)}` : ""}`),
 };

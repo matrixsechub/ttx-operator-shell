@@ -1,0 +1,65 @@
+.intent-capture-block {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 60;
+  width: min(100%, 24rem);
+  padding: 1rem;
+  border: 1px solid rgba(242, 193, 78, 0.35);
+  background: rgba(5, 7, 10, 0.96);
+  color: #e8edf2;
+  font-family: "IBM Plex Mono", "Share Tech Mono", monospace;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.intent-capture-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.intent-capture-header h2 {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f2c14e;
+}
+
+.intent-capture-block textarea,
+.intent-capture-block select {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(242, 193, 78, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  color: inherit;
+}
+
+.intent-capture-block button,
+.intent-capture-block [data-intent-submit] {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(242, 193, 78, 0.45);
+  background: transparent;
+  color: #f2c14e;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}
+
+.intent-capture-handoff {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.intent-capture-handoff a {
+  color: #f2c14e;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}

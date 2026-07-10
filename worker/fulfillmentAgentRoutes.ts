@@ -45,6 +45,13 @@ import {
 } from "./northstarBeaconRoutes";
 import { getAgentGovernanceContextFor } from "../msh-ops/agent/initAgentGovernance";
 import { checkAutonomy } from "../msh-ops/governance/checkAutonomy";
+import type { AiGatewayEnv } from "./aiGateway";
+import { aiFulfillmentEnabled } from "./aiGateway";
+import { maybeEnrichWithAi } from "./aiFulfillmentEnrichment";
+import { resolveEffectiveKernelContext } from "./kernel";
+import type { BackboneEnv } from "./backboneEnv";
+import type { WorkerEnv } from "./env";
+import { readIntentCaptureByCaptureId } from "./intentCaptureStorage";
 
 const AI_AGENT_BUILDER_AGENT_ID = "AiAgentBuilderAgent";
 const SECURITY_REMEDIATION_AGENT_ID = "SecurityRemediationAgent";
@@ -112,6 +119,8 @@ async function handleGenerateWithGovernance(options: {
   generate: () => unknown;
   record: () => void;
   successStatus: string;
+  enrichmentPrompt?: string;
+  env?: WorkerEnv & BackboneEnv & AiGatewayEnv;
 }): Promise<Response> {
   const governance = getAgentGovernanceContextFor(options.agentId);
 
@@ -129,7 +138,26 @@ async function handleGenerateWithGovernance(options: {
     return autonomyErrorResponse("BEACON_AUTONOMY_DENIED", generateDecision.reason, 403);
   }
 
-  const result = options.generate();
+  let result = options.generate() as Record<string, unknown>;
+
+  if (options.env && options.enrichmentPrompt && aiFulfillmentEnabled(options.env)) {
+    const kernelCtx = await resolveEffectiveKernelContext(options.env);
+    result = await maybeEnrichWithAi(
+      options.env,
+      governance,
+      {
+        agentId: options.agentId,
+        actionKind: "advisory",
+        description: options.advisoryDescription,
+        axis: options.advisoryAxis,
+        priorityIndex: options.advisoryPriorityIndex,
+      },
+      result,
+      options.enrichmentPrompt,
+      kernelCtx.policy,
+      kernelCtx.signalStates,
+    );
+  }
 
   const recordDecision = checkAutonomy(
     {
@@ -150,17 +178,49 @@ async function handleGenerateWithGovernance(options: {
   }
 
   options.record();
-  return jsonResponse({ ...(result as Record<string, unknown>), status: options.successStatus });
+  return jsonResponse({ ...result, status: options.successStatus });
+}
+
+async function enrichIntentCapturePayload(
+  env: WorkerEnv & BackboneEnv & AiGatewayEnv,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  if (!env?.TTX_STATE) return;
+  if (payload.source_type !== "intent_capture") return;
+
+  const captureId = typeof payload.source_reference_id === "string" ? payload.source_reference_id.trim() : "";
+  if (!captureId) return;
+
+  const record = await readIntentCaptureByCaptureId(env, captureId);
+  if (!record) return;
+
+  const diagnostic =
+    payload.diagnostic_context && typeof payload.diagnostic_context === "object" && !Array.isArray(payload.diagnostic_context)
+      ? { ...(payload.diagnostic_context as Record<string, unknown>) }
+      : {};
+
+  diagnostic.intent_capture_intent = record.intent;
+  diagnostic.intent_capture_page = record.page;
+  if (record.category) diagnostic.intent_capture_category = record.category;
+  payload.diagnostic_context = diagnostic;
+
+  if (!payload.source_route && record.page) {
+    payload.source_route = record.page;
+  }
 }
 
 export async function handleFulfillmentAgentApi(
   request: Request,
   pathname: string,
   method: string,
+  env?: WorkerEnv & BackboneEnv & AiGatewayEnv,
 ): Promise<Response | null> {
   if (method === "POST" && pathname === "/api/ai-agent-build-spec-generate") {
     try {
       const payload = await readFlexibleJsonBody(request);
+      if (env) {
+        await enrichIntentCapturePayload(env, payload);
+      }
       const input = normalizeAiAgentBuildInput(payload);
       const result = generateAiAgentBuildSpec(input);
       return handleGenerateWithGovernance({
@@ -174,6 +234,8 @@ export async function handleFulfillmentAgentApi(
         generate: () => result,
         record: () => recordAiAgentBuildSubmission(input, result),
         successStatus: "ai-agent-build-spec-complete",
+        enrichmentPrompt: `Enrich this AI agent build spec with advisory implementation notes:\n${JSON.stringify(result)}`,
+        env,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "ai-agent-build-spec-generate-failed";
@@ -197,6 +259,8 @@ export async function handleFulfillmentAgentApi(
         generate: () => result,
         record: () => recordSecurityRemediationSubmission(input, result),
         successStatus: "security-remediation-plan-complete",
+        enrichmentPrompt: `Enrich this security remediation plan:\n${JSON.stringify(result)}`,
+        env,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "security-remediation-plan-generate-failed";
@@ -220,6 +284,8 @@ export async function handleFulfillmentAgentApi(
         generate: () => result,
         record: () => recordRagArchitectureSubmission(input, result),
         successStatus: "rag-architecture-plan-complete",
+        enrichmentPrompt: `Enrich this RAG architecture plan:\n${JSON.stringify(result)}`,
+        env,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "rag-architecture-plan-generate-failed";
@@ -243,6 +309,8 @@ export async function handleFulfillmentAgentApi(
         generate: () => result,
         record: () => recordLocalAiDeploymentSubmission(input, result),
         successStatus: "local-ai-deployment-plan-complete",
+        enrichmentPrompt: `Enrich this local AI deployment plan:\n${JSON.stringify(result)}`,
+        env,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "local-ai-deployment-plan-generate-failed";
