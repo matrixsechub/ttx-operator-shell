@@ -9,6 +9,11 @@ on:
 jobs:
   organizer:
     runs-on: self-hosted
+    defaults:
+      run:
+        shell: cmd
+    env:
+      NPM_CONFIG_SCRIPT_SHELL: cmd.exe
     steps:
       - uses: actions/checkout@v4
 

@@ -7,9 +7,13 @@ on:
 jobs:
   typecheck-test-build:
     runs-on: self-hosted
+    defaults:
+      run:
+        shell: cmd
     env:
       GIT_COMMIT_SHA: ${{ github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+      NPM_CONFIG_SCRIPT_SHELL: cmd.exe
     steps:
       - uses: actions/checkout@v4
 
