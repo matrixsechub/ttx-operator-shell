@@ -80,10 +80,10 @@
         //   wrangler kv namespace create WEBHOOK_EVENTS --env staging
         //   wrangler kv namespace create SECURITY_EVENTS --env staging
         //   wrangler kv namespace create TTX_STATE --env staging
-        { "binding": "AUTH_REVOCATION", "id": "a0000000000000000000000000000001", "preview_id": "a0000000000000000000000000000001" },
-        { "binding": "WEBHOOK_EVENTS", "id": "a0000000000000000000000000000002", "preview_id": "a0000000000000000000000000000002" },
-        { "binding": "SECURITY_EVENTS", "id": "a0000000000000000000000000000003", "preview_id": "a0000000000000000000000000000003" },
-        { "binding": "TTX_STATE", "id": "a0000000000000000000000000000004", "preview_id": "a0000000000000000000000000000004" }
+        { "binding": "AUTH_REVOCATION", "id": "b2b300dfec5540e4b83d24744ab14298", "preview_id": "b2b300dfec5540e4b83d24744ab14298" },
+        { "binding": "WEBHOOK_EVENTS", "id": "cb8e58ad2ef44c93a5c94cba224c7714", "preview_id": "cb8e58ad2ef44c93a5c94cba224c7714" },
+        { "binding": "SECURITY_EVENTS", "id": "c3129893958845d6bacf6c43deff23a2", "preview_id": "c3129893958845d6bacf6c43deff23a2" },
+        { "binding": "TTX_STATE", "id": "e869647c31b248a3ae9ca2f73e2adeb2", "preview_id": "e869647c31b248a3ae9ca2f73e2adeb2" }
       ],
       "durable_objects": {
         "bindings": [
