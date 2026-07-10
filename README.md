@@ -84,9 +84,30 @@ Use `--env staging` for staging secrets. For local `wrangler dev`, use `.dev.var
 
 ### CI
 
-`.github/workflows/ci.yml` runs `typecheck` → `test` → `build` on push/PR.
+GitHub Actions on **ubuntu-latest** (PR and `main`):
 
-**Recommended:** enable branch protection on `main` requiring CI to pass before merge.
+| Job | Workflow | Purpose |
+|---|---|---|
+| `pr-gate` | `ci.yml` | Permission lint + action pin audit (PRs) |
+| `build-test` | `ci.yml` | `typecheck` → `test` → `build` |
+| `wrangler-dry-run` | `ci.yml` | Staging config validation + `wrangler deploy --dry-run` |
+| `security-pr` | `security-pr.yml` | PR security policy checks |
+
+**Recommended:** enable branch protection on `main` requiring `pr-gate`, `build-test`, `wrangler-dry-run`, and `security-pr` before merge.
+
+### Staging deploy (GitHub Actions)
+
+Manual operator-controlled staging deployment: [docs/STAGING-DEPLOYMENT.md](./docs/STAGING-DEPLOYMENT.md).
+
+```bash
+# Actions → Staging Deploy → confirm_deploy: DEPLOY_STAGING → target_ref: main
+```
+
+Local read-only smoke against live staging:
+
+```bash
+npm run test:staging-smoke
+```
 
 ### Release verification
 

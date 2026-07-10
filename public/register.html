@@ -34,7 +34,6 @@
     <link rel="stylesheet" href="/intake.css" />
     <link rel="stylesheet" href="/register.css" />
     <link rel="stylesheet" href="/styles/nav.css" />
-    <link rel="stylesheet" href="/styles/intake-demo-banner.css" />
     <link rel="stylesheet" href="/styles/a11y.css" />
   </head>
   <body>
@@ -104,6 +103,7 @@
           <div class="rgbgold-module-shell-body">
             <form class="surface-form" id="register-form">
               <input id="register-source" name="source" type="hidden" value="public-register" />
+              <input id="register-source-page" name="source_page" type="hidden" />
               <div class="surface-form-grid">
                 <label>
                   <span>Name</span>
@@ -139,7 +139,7 @@
                 <a class="button secondary" href="/enter">Back to Funnel</a>
               </div>
               <p class="register-cta-subtext mono">
-                You will receive cockpit readiness updates automatically.
+                Submissions are persisted and routed to operators for review. You will receive readiness updates as systems activate.
               </p>
               <p class="form-status mono" id="register-form-status" role="status" aria-live="polite">
                 Ready to submit your access request.
@@ -151,11 +151,8 @@
               <p class="system-copy" id="register-confirmation-copy">
                 Access Pending — Operator Review Required
               </p>
-              <p class="register-demo-note mono" id="register-demo-note" hidden>
-                Demo Mode — No data stored
-              </p>
-              <p class="register-cockpit-update-note mono" id="register-cockpit-update-note" hidden>
-                You will receive cockpit readiness updates as systems activate.
+              <p class="register-cockpit-update-note mono" id="register-cockpit-update-note">
+                Your request was stored successfully. Operators were notified when notification wiring is configured.
               </p>
               <div class="cta-row">
                 <a class="button secondary" href="/status">View Status</a>
@@ -191,7 +188,7 @@
     <script src="/scripts/motion-scan.js" defer></script>
     <script src="/scripts/hud-scan.js" defer></script>
     <script src="/scripts/ecosystem-health.js" defer></script>
-    <script src="/scripts/intake-demo-banner.js" defer></script>
+    <script src="/scripts/conversion-telemetry.js" defer></script>
     <script src="/scripts/register-page.js" defer></script>
     <script src="/scripts/flow-tracker.js" defer></script>
     <link rel="stylesheet" href="/styles/intent-capture.css" />

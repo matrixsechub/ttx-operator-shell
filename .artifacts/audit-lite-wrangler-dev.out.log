@@ -1,0 +1,40 @@
+
+ ⛅️ wrangler 4.106.0 (update available 4.110.0)
+───────────────────────────────────────────────
+Using secrets defined in .dev.vars
+Your Worker has access to the following bindings:
+Binding                                                                      Resource                  Mode
+env.GOVERNANCE (GovernanceDO)                                                Durable Object            local
+env.SESSION (SessionDO)                                                      Durable Object            local
+env.MARKETPLACE (MarketplaceDO)                                              Durable Object            local
+env.LIVE_TTX_SESSIONS (LiveTtxSession)                                       Durable Object            local
+env.AUTH_REVOCATION (9a7f43b04fcb439999dd60f3bd9d71a2)                       KV Namespace              local
+env.WEBHOOK_EVENTS (c9b40c1ea3a74816aea05b42968c35d7)                        KV Namespace              local
+env.SECURITY_EVENTS (99bb74eceaaf404ebee703bf3665dfce)                       KV Namespace              local
+env.TTX_STATE (b86a60440f2a4b3db5f949eebf420e56)                             KV Namespace              local
+env.HARNESS (msh-ops-os-harness)                                             Worker                    local [not connected]
+env.ASSETS                                                                   Assets                    local
+env.ENGINE_API_URL ("https://msh-ops-os-harness.sogellagep...")              Environment Variable      local
+env.OPERATOR_ROLE ("operator")                                               Environment Variable      local
+env.OPERATOR_ACCESS_LEVEL ("internal")                                       Environment Variable      local
+env.DEPLOY_ENV ("production")                                                Environment Variable      local
+env.APP_VERSION ("0.1.0")                                                    Environment Variable      local
+env.BUILD_COMMIT_SHA ("unknown")                                             Environment Variable      local
+env.BUILD_TIMESTAMP ("")                                                     Environment Variable      local
+env.SYSTEM_MODE ("PRODUCTION")                                               Environment Variable      local
+env.ORIGIN_URL ("https://ttx-operator-shell.sogellagep...")                  Environment Variable      local
+env.OPERATOR_SECRET ("(hidden)")                                             Environment Variable      local
+env.MARKETPLACE_SECRET ("(hidden)")                                          Environment Variable      local
+env.AUTH_SIGNING_KEY ("(hidden)")                                            Environment Variable      local
+env.OPERATOR_CALLSIGN ("(hidden)")                                           Environment Variable      local
+env.OPERATOR_PASSWORD ("(hidden)")                                           Environment Variable      local
+env.OPERATOR_PASSWORD_HASH ("(hidden)")                                      Environment Variable      local
+
+
+Service bindings, Durable Object bindings, and Tail consumers connect to other Wrangler or Vite dev processes running locally, with their connection status indicated by [connected] or [not connected]. For more details, refer to https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/#local-development
+
+⎔ Starting local server...
+*** std::terminate() called with no exception
+
+[32mIf you think this is a bug then please create an issue at https://github.com/cloudflare/workers-sdk/issues/new/choose[0m
+Note that there is a newer version of Wrangler available (4.110.0). Consider checking whether upgrading resolves this error.

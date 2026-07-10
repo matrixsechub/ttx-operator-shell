@@ -1,0 +1,2785 @@
+{
+  "agentId": "OrganizerAgent",
+  "mode": "advisory",
+  "repoRoot": "C:\\Users\\wevrw\\Dev\\ttx-operator-shell",
+  "scannedAt": "2026-07-10T10:08:25.792Z",
+  "scan": {
+    "repoRoot": "C:\\Users\\wevrw\\Dev\\ttx-operator-shell",
+    "files": [
+      {
+        "relativePath": "auth.html",
+        "extension": ".html",
+        "sizeBytes": 533,
+        "layer": "other"
+      },
+      {
+        "relativePath": "cockpit.html",
+        "extension": ".html",
+        "sizeBytes": 558,
+        "layer": "other"
+      },
+      {
+        "relativePath": "council.html",
+        "extension": ".html",
+        "sizeBytes": 551,
+        "layer": "other"
+      },
+      {
+        "relativePath": "ecosystem.html",
+        "extension": ".html",
+        "sizeBytes": 576,
+        "layer": "other"
+      },
+      {
+        "relativePath": "index.html",
+        "extension": ".html",
+        "sizeBytes": 574,
+        "layer": "other"
+      },
+      {
+        "relativePath": "msh-ops/agent/beaconAlignment.ts",
+        "extension": ".ts",
+        "sizeBytes": 1114,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agent/initAgentGovernance.ts",
+        "extension": ".ts",
+        "sizeBytes": 1638,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agents/OrganizerAgent.ts",
+        "extension": ".ts",
+        "sizeBytes": 1047,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agents/refactorEngine.ts",
+        "extension": ".ts",
+        "sizeBytes": 6434,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agents/runOrganizer.ts",
+        "extension": ".ts",
+        "sizeBytes": 4949,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agents/types.ts",
+        "extension": ".ts",
+        "sizeBytes": 2610,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agents/utils/fileScanner.ts",
+        "extension": ".ts",
+        "sizeBytes": 7506,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agents/utils/importGraph.ts",
+        "extension": ".ts",
+        "sizeBytes": 5963,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/agents/utils/structureAnalyzer.ts",
+        "extension": ".ts",
+        "sizeBytes": 9826,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/beacon/beacon.hash",
+        "extension": ".hash",
+        "sizeBytes": 66,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/beacon/beacon.schema.json",
+        "extension": ".json",
+        "sizeBytes": 1405,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/beacon/beaconHash.ts",
+        "extension": ".ts",
+        "sizeBytes": 204,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/beacon/beaconIntegrity.ts",
+        "extension": ".ts",
+        "sizeBytes": 1585,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/beacon/beaconSchema.ts",
+        "extension": ".ts",
+        "sizeBytes": 3413,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/beacon/loadBeacon.ts",
+        "extension": ".ts",
+        "sizeBytes": 3354,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/beacon/northstar.json",
+        "extension": ".json",
+        "sizeBytes": 1072,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/governance/approveRefactor.ts",
+        "extension": ".ts",
+        "sizeBytes": 2355,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/governance/checkAutonomy.ts",
+        "extension": ".ts",
+        "sizeBytes": 3268,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/mcp/ingestMcpPayload.ts",
+        "extension": ".ts",
+        "sizeBytes": 5798,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/mcp/proposalLog.ts",
+        "extension": ".ts",
+        "sizeBytes": 870,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/mcp/proposalTypes.ts",
+        "extension": ".ts",
+        "sizeBytes": 1799,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/mcp/sourceRegistry.json",
+        "extension": ".json",
+        "sizeBytes": 300,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/mcp/validateMcpPayload.ts",
+        "extension": ".ts",
+        "sizeBytes": 6471,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "msh-ops/README.md",
+        "extension": ".md",
+        "sizeBytes": 6072,
+        "layer": "msh-ops"
+      },
+      {
+        "relativePath": "package.json",
+        "extension": ".json",
+        "sizeBytes": 2297,
+        "layer": "other"
+      },
+      {
+        "relativePath": "scripts/analyze-ecosystem-splash-structure.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1526,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/assemble-operator-dist.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 2571,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/assemble-public-dist.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 3815,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/assemble-storefront-dist.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 2011,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/build.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 281,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/compute-beacon-hash.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1524,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/deploy-mshops-operator.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 496,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/deploy-mshops-public.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 651,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/deploy-staging.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1137,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/evaluate-production-promotion.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 5765,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/hardening-load-test.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1444,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/hash-password.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1105,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/inject-traffic-sessions.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 3208,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/lib/canonical-entry.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 167,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/lib/stagingKvPlaceholders.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 2297,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/list-ttx-links.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 385,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/list-ttx-root-refs.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 326,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/print-outreach-pack.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 3041,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/probe-interactive-surfaces.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1125,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/probe-operator-entrypoints.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1881,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/probe-operator-shell-assets.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1400,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/run-organizer-scheduled.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1496,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/scan-ttx-html-origins.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 368,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/simulate-external-traffic.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1981,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/trace-splash-pipeline.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 967,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/traffic-activation-report.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 2507,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/typecheck.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 217,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-adaptation-feedback.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1449,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-backbone.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1926,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-behavior-intelligence.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1882,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-decommission.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1634,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-ecosystem-entry.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1574,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-experimentation.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1547,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-external-interaction.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 3212,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-ghost-signals.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1474,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-hard-purge-entry.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1820,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-hardening.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 3263,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-live-parity.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 6729,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-no-marketplace-redirect.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1374,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-operator-deploy.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 6145,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-operator-shell-link-rewrite.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1785,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-operator-shell-proxy-1042.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1333,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-operator-shell-proxy-render.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1481,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-operator-shell-root.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1061,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-operator-surface.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 2028,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-os-kernel.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1569,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-policy-response.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 3433,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-production-activation.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 5620,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-public-auth-routes.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1915,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-public-routing.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 2288,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-purge-splash.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1721,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-repo-authority.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1497,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-splash-routing.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1019,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-staging-config.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 551,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-step5-gate.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 4173,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-storefront-primary.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 1737,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "scripts/verify-surface-alignment.mjs",
+        "extension": ".mjs",
+        "sizeBytes": 2563,
+        "layer": "scripts"
+      },
+      {
+        "relativePath": "src/App.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 277,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/AdaptiveEntryHero.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2818,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/AnalyticsCard.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2673,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/Breadcrumbs.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 781,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/CatalogDetailModal.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 5157,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/CatalogGrid.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2031,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/ComingSoon.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 455,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/CommandPalette.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 5235,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/EngineStatusIndicator.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1895,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/GovernanceStatePanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 4223,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/InfoCard.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 433,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/LiveParticipantRoster.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1771,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/LiveSessionLog.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2169,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/LiveTtxPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 12855,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/LiveVoteBoard.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 5043,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/OperatorShell.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 3732,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/RelatedLinksRail.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 881,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/ScenarioAuthoringPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 39026,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/ScenarioNotesModal.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1712,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/SectionHeader.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 611,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/SecurityPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 5251,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/StatusPill.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 760,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/SystemHUD.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 9545,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/SystemTelemetryPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2623,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/TelemetryPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 10059,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/TTXPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 11676,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/components/TTXScorePanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 10964,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/entries/auth-main.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 550,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/entries/cockpit-main.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 559,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/entries/council-main.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 464,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/entries/ecosystem-main.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 470,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/future/FutureIndex.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1240,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/future/FutureModulePage.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1504,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/future/registry.ts",
+        "extension": ".ts",
+        "sizeBytes": 2365,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/adaptiveEntry.ts",
+        "extension": ".ts",
+        "sizeBytes": 4089,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/apiClient.ts",
+        "extension": ".ts",
+        "sizeBytes": 5627,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/AuthContext.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 10154,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/authToken.ts",
+        "extension": ".ts",
+        "sizeBytes": 3048,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ecosystem.ts",
+        "extension": ".ts",
+        "sizeBytes": 7079,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/jwt.ts",
+        "extension": ".ts",
+        "sizeBytes": 1785,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/liveSessionService.ts",
+        "extension": ".ts",
+        "sizeBytes": 4471,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/liveTtxProtocol.ts",
+        "extension": ".ts",
+        "sizeBytes": 2231,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/publicPaths.ts",
+        "extension": ".ts",
+        "sizeBytes": 417,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/RequireAuth.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1404,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/securityService.ts",
+        "extension": ".ts",
+        "sizeBytes": 498,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/securityTypes.ts",
+        "extension": ".ts",
+        "sizeBytes": 743,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/telemetry.ts",
+        "extension": ".ts",
+        "sizeBytes": 682,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/telemetryService.ts",
+        "extension": ".ts",
+        "sizeBytes": 622,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/tone.ts",
+        "extension": ".ts",
+        "sizeBytes": 623,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/tools.ts",
+        "extension": ".ts",
+        "sizeBytes": 262,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxAnalyticsService.ts",
+        "extension": ".ts",
+        "sizeBytes": 636,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxHistoryService.ts",
+        "extension": ".ts",
+        "sizeBytes": 923,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxIntelligenceService.ts",
+        "extension": ".ts",
+        "sizeBytes": 420,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxLocalScenarioService.ts",
+        "extension": ".ts",
+        "sizeBytes": 1875,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxScoringService.ts",
+        "extension": ".ts",
+        "sizeBytes": 930,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxSessionService.ts",
+        "extension": ".ts",
+        "sizeBytes": 1656,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxSessionStorage.ts",
+        "extension": ".ts",
+        "sizeBytes": 1257,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/ttxTypes.ts",
+        "extension": ".ts",
+        "sizeBytes": 6480,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/types.ts",
+        "extension": ".ts",
+        "sizeBytes": 6640,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/usageBeacon.ts",
+        "extension": ".ts",
+        "sizeBytes": 3762,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/useAdaptiveEntryMode.ts",
+        "extension": ".ts",
+        "sizeBytes": 1553,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/useApiResource.ts",
+        "extension": ".ts",
+        "sizeBytes": 1139,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/useDebouncedSystemState.ts",
+        "extension": ".ts",
+        "sizeBytes": 1040,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/useTelemetry.ts",
+        "extension": ".ts",
+        "sizeBytes": 3619,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/webhookTrigger.ts",
+        "extension": ".ts",
+        "sizeBytes": 1134,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/lib/webhookTriggerService.ts",
+        "extension": ".ts",
+        "sizeBytes": 1672,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/main.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 357,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ai-security/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 351,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/analyzer/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 316,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/health/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 331,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/hunter/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 315,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/missions/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 307,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/OperatorSystemShell.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 736,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/perimeter/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 344,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/recon/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 334,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/registry.ts",
+        "extension": ".ts",
+        "sizeBytes": 1995,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/sandbox/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 317,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/signals/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 340,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/terminal/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 317,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/builder.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 3769,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 5536,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/injects.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1920,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/README.md",
+        "extension": ".md",
+        "sizeBytes": 2307,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/roles.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1749,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/scenarioBridge.ts",
+        "extension": ".ts",
+        "sizeBytes": 3429,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/ScenarioContext.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1741,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/scenarioLifecycle.ts",
+        "extension": ".ts",
+        "sizeBytes": 1198,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/score.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2557,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/service.ts",
+        "extension": ".ts",
+        "sizeBytes": 1865,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/timeline.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1888,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/ttx/types.ts",
+        "extension": ".ts",
+        "sizeBytes": 1516,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/vault/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 299,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/operator/workflow/index.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 328,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/AboutPage.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 11453,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/CouncilPage.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1667,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/Dashboard.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 4198,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/AINodeConsole.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 819,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/AlertSystem.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 490,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/MissionBoard.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 975,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/OperatorInventory.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 385,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/OperatorLogbook.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 419,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/OperatorSignals.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1565,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/OperatorStatusRail.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 460,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/OperatorTimeline.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 473,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/TelemetryFeed.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2058,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/TelemetryRails.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 833,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/TTXStatusPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2013,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/dashboard/WebhookTriggerPanel.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 12331,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/divisions/data.ts",
+        "extension": ".ts",
+        "sizeBytes": 2938,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/divisions/DivisionPage.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1757,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/divisions/DivisionsIndex.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1508,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/EcosystemSplash.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 5246,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/Landing.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1853,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/LiveJoin.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 8181,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/Login.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 5749,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/Marketplace.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 3614,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/marketplace/categories.ts",
+        "extension": ".ts",
+        "sizeBytes": 2694,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/marketplace/CategoryPageBody.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 3711,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/marketplace/MarketplaceCategoryPage.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 608,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/marketplace/TTXPacksCategory.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 880,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/NotFound.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 120,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/ops/DeployOps.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2225,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/ops/FedGradeOps.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1096,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/ops/SecurityOps.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 685,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/Status.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 3898,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/systems/SystemDetail.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1780,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/pages/systems/SystemsIndex.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 1209,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/routes/authRouter.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 320,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/routes/cockpitRouter.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 2895,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/routes/councilRouter.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 356,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/routes/ecosystemRouter.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 350,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/routes/router.tsx",
+        "extension": ".tsx",
+        "sizeBytes": 3452,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/styles/index.css",
+        "extension": ".css",
+        "sizeBytes": 2092,
+        "layer": "src"
+      },
+      {
+        "relativePath": "src/vite-env.d.ts",
+        "extension": ".ts",
+        "sizeBytes": 161,
+        "layer": "src"
+      },
+      {
+        "relativePath": "tests/adaptiveEntry.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2337,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/aiAgentBuilderAgent.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 1875,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/apiAuth.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2526,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/auditLite.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 8156,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/behaviorIntelligence.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 3587,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/buildManifest.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 1045,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/experimentation.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 4475,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/funnelRecovery.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 12769,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/governanceAutomation.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 3373,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/localAiDeploymentAgent.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 3064,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/beacon/agentInit.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 4358,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/beacon/loadBeacon.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 3901,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/governance/checkAutonomy.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 3895,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/mcp/ingestMcpPayload.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 7245,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/organizer/approveRefactor.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 1792,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/organizer/fileScanner.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 1784,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/organizer/importGraph.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 1837,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/organizer/organizerAgent.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2070,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/organizer/refactorEngine.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 4765,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/msh-ops/organizer/structureAnalyzer.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 1653,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/operatorAuth.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 9437,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/policyResponse.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2212,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/ragArchitectureAgent.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2512,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/securityRemediationAgent.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2738,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/stagingConfig.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 1907,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/statusRoute.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2272,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/ttxSession.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 2392,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "tests/usage.test.ts",
+        "extension": ".ts",
+        "sizeBytes": 4262,
+        "layer": "tests"
+      },
+      {
+        "relativePath": "worker/adaptation.ts",
+        "extension": ".ts",
+        "sizeBytes": 2780,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/apiAuth.ts",
+        "extension": ".ts",
+        "sizeBytes": 4631,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/auditLite.ts",
+        "extension": ".ts",
+        "sizeBytes": 31100,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/auth.ts",
+        "extension": ".ts",
+        "sizeBytes": 15992,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/backbone.ts",
+        "extension": ".ts",
+        "sizeBytes": 4962,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/backboneEnv.ts",
+        "extension": ".ts",
+        "sizeBytes": 467,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/behaviorIntelligence.ts",
+        "extension": ".ts",
+        "sizeBytes": 4965,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/behaviorRoute.ts",
+        "extension": ".ts",
+        "sizeBytes": 1209,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/buildInfo.ts",
+        "extension": ".ts",
+        "sizeBytes": 1789,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/bundledBuildInfo.ts",
+        "extension": ".ts",
+        "sizeBytes": 272,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/canonical.ts",
+        "extension": ".ts",
+        "sizeBytes": 1185,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/catalogData.ts",
+        "extension": ".ts",
+        "sizeBytes": 4179,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/data/aiAgentBuilderAgent.ts",
+        "extension": ".ts",
+        "sizeBytes": 52665,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/data/customerBeacon/hash.ts",
+        "extension": ".ts",
+        "sizeBytes": 1098,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/data/customerBeacon/schema.ts",
+        "extension": ".ts",
+        "sizeBytes": 10533,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/data/customerBeacon/types.ts",
+        "extension": ".ts",
+        "sizeBytes": 3145,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/data/localAiDeploymentAgent.ts",
+        "extension": ".ts",
+        "sizeBytes": 34737,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/data/ragArchitectureAgent.ts",
+        "extension": ".ts",
+        "sizeBytes": 36697,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/data/securityRemediationAgent.ts",
+        "extension": ".ts",
+        "sizeBytes": 28886,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/do/governance.ts",
+        "extension": ".ts",
+        "sizeBytes": 5288,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/do/marketplace.ts",
+        "extension": ".ts",
+        "sizeBytes": 3965,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/do/session.ts",
+        "extension": ".ts",
+        "sizeBytes": 5133,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/do/types.ts",
+        "extension": ".ts",
+        "sizeBytes": 2085,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/edge/canonical/source-meta.ts",
+        "extension": ".ts",
+        "sizeBytes": 958,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/edge/crypto.ts",
+        "extension": ".ts",
+        "sizeBytes": 3076,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/edge/gate.ts",
+        "extension": ".ts",
+        "sizeBytes": 6596,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/edge/headers.ts",
+        "extension": ".ts",
+        "sizeBytes": 2865,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/edge/rateLimit.ts",
+        "extension": ".ts",
+        "sizeBytes": 673,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/edge/routeClass.ts",
+        "extension": ".ts",
+        "sizeBytes": 3155,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/engine.ts",
+        "extension": ".ts",
+        "sizeBytes": 1893,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/env.ts",
+        "extension": ".ts",
+        "sizeBytes": 357,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/experimentation.ts",
+        "extension": ".ts",
+        "sizeBytes": 9980,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/experimentationBehavior.ts",
+        "extension": ".ts",
+        "sizeBytes": 584,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/experimentationRoute.ts",
+        "extension": ".ts",
+        "sizeBytes": 2590,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/fedgrade.ts",
+        "extension": ".ts",
+        "sizeBytes": 861,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/flowTypes.ts",
+        "extension": ".ts",
+        "sizeBytes": 4640,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/fulfillmentAgentRoutes.ts",
+        "extension": ".ts",
+        "sizeBytes": 14147,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/funnelRecovery.ts",
+        "extension": ".ts",
+        "sizeBytes": 41765,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/ghost.ts",
+        "extension": ".ts",
+        "sizeBytes": 14202,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/governanceAutomation.ts",
+        "extension": ".ts",
+        "sizeBytes": 3230,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/governanceDefaults.ts",
+        "extension": ".ts",
+        "sizeBytes": 1301,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/health.ts",
+        "extension": ".ts",
+        "sizeBytes": 5546,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/hsxEdge.ts",
+        "extension": ".ts",
+        "sizeBytes": 1250,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/index.ts",
+        "extension": ".ts",
+        "sizeBytes": 16773,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/kernel.ts",
+        "extension": ".ts",
+        "sizeBytes": 16902,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/liveSession.ts",
+        "extension": ".ts",
+        "sizeBytes": 23164,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/liveTtxProtocol.ts",
+        "extension": ".ts",
+        "sizeBytes": 3587,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/liveTtxRoute.ts",
+        "extension": ".ts",
+        "sizeBytes": 10608,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/localScenarioRoutes.ts",
+        "extension": ".ts",
+        "sizeBytes": 15870,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/marketplaceEdge.ts",
+        "extension": ".ts",
+        "sizeBytes": 1459,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/mode.ts",
+        "extension": ".ts",
+        "sizeBytes": 1818,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/operator.ts",
+        "extension": ".ts",
+        "sizeBytes": 4101,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/policyResponse.ts",
+        "extension": ".ts",
+        "sizeBytes": 4369,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/publicPaths.ts",
+        "extension": ".ts",
+        "sizeBytes": 368,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/scenarioGraph.ts",
+        "extension": ".ts",
+        "sizeBytes": 3307,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/scenarioManifest.ts",
+        "extension": ".ts",
+        "sizeBytes": 14005,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/security.ts",
+        "extension": ".ts",
+        "sizeBytes": 4237,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/sessionBridge.ts",
+        "extension": ".ts",
+        "sizeBytes": 2528,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/splash.ts",
+        "extension": ".ts",
+        "sizeBytes": 445,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/storefront.ts",
+        "extension": ".ts",
+        "sizeBytes": 3411,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/surface.ts",
+        "extension": ".ts",
+        "sizeBytes": 1821,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/surfaceRegistry.ts",
+        "extension": ".ts",
+        "sizeBytes": 1936,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/surfaceSpa.ts",
+        "extension": ".ts",
+        "sizeBytes": 3866,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/telemetry.ts",
+        "extension": ".ts",
+        "sizeBytes": 10713,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/trafficActivation.ts",
+        "extension": ".ts",
+        "sizeBytes": 4915,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/trafficSources.ts",
+        "extension": ".ts",
+        "sizeBytes": 1958,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/ttx.ts",
+        "extension": ".ts",
+        "sizeBytes": 16330,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/ttxAnalytics.ts",
+        "extension": ".ts",
+        "sizeBytes": 6656,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/ttxHistory.ts",
+        "extension": ".ts",
+        "sizeBytes": 4690,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/ttxIntelligence.ts",
+        "extension": ".ts",
+        "sizeBytes": 4977,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/ttxScoring.ts",
+        "extension": ".ts",
+        "sizeBytes": 9897,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/usage.ts",
+        "extension": ".ts",
+        "sizeBytes": 7716,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/usageModeMetrics.ts",
+        "extension": ".ts",
+        "sizeBytes": 2774,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/webhookTrigger.ts",
+        "extension": ".ts",
+        "sizeBytes": 16580,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "worker/wildcardAdvancement.ts",
+        "extension": ".ts",
+        "sizeBytes": 5353,
+        "layer": "worker"
+      },
+      {
+        "relativePath": "wrangler.jsonc",
+        "extension": ".jsonc",
+        "sizeBytes": 4724,
+        "layer": "other"
+      },
+      {
+        "relativePath": "wrangler.mshops-operator.jsonc",
+        "extension": ".jsonc",
+        "sizeBytes": 1084,
+        "layer": "other"
+      },
+      {
+        "relativePath": "wrangler.mshops-public.jsonc",
+        "extension": ".jsonc",
+        "sizeBytes": 1083,
+        "layer": "other"
+      }
+    ],
+    "anomalies": [
+      {
+        "kind": "naming-component",
+        "relativePath": "src/entries/auth-main.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/entries/cockpit-main.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/entries/council-main.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/entries/ecosystem-main.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/adaptiveEntry.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/jwt.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/publicPaths.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/telemetry.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/tone.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/tools.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/ttxSessionStorage.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/types.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/usageBeacon.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-service",
+        "relativePath": "src/lib/webhookTrigger.ts",
+        "message": "src/lib file does not match service/hook/types naming convention",
+        "severity": "info"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/main.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/ai-security/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/analyzer/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/health/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/hunter/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/missions/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/perimeter/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/recon/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/sandbox/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/signals/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/terminal/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/vault/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/operator/workflow/index.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/routes/authRouter.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/routes/cockpitRouter.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/routes/councilRouter.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/routes/ecosystemRouter.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      },
+      {
+        "kind": "naming-component",
+        "relativePath": "src/routes/router.tsx",
+        "message": "React component file should use PascalCase.tsx",
+        "severity": "warn"
+      }
+    ],
+    "scannedAt": "2026-07-10T10:08:25.792Z"
+  },
+  "issues": [
+    {
+      "ruleId": "circular-import",
+      "severity": "error",
+      "relativePath": "src/components/OperatorShell.tsx",
+      "message": "Circular import chain: src/components/OperatorShell.tsx → src/components/CommandPalette.tsx → src/components/OperatorShell.tsx"
+    },
+    {
+      "ruleId": "circular-import",
+      "severity": "error",
+      "relativePath": "worker/auth.ts",
+      "message": "Circular import chain: worker/auth.ts → worker/sessionBridge.ts → worker/backboneEnv.ts → worker/auth.ts"
+    },
+    {
+      "ruleId": "circular-import",
+      "severity": "error",
+      "relativePath": "worker/usage.ts",
+      "message": "Circular import chain: worker/usage.ts → worker/trafficSources.ts → worker/usage.ts"
+    },
+    {
+      "ruleId": "circular-import",
+      "severity": "error",
+      "relativePath": "worker/scenarioGraph.ts",
+      "message": "Circular import chain: worker/scenarioGraph.ts → worker/scenarioManifest.ts → worker/scenarioGraph.ts"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/entries/auth-main.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/entries/cockpit-main.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/entries/council-main.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/entries/ecosystem-main.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/main.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/ai-security/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/analyzer/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/health/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/hunter/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/missions/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/perimeter/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/recon/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/sandbox/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/signals/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/terminal/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/vault/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/operator/workflow/index.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/routes/authRouter.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/routes/cockpitRouter.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/routes/councilRouter.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/routes/ecosystemRouter.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "naming-component",
+      "severity": "warn",
+      "relativePath": "src/routes/router.tsx",
+      "message": "React component file should use PascalCase.tsx"
+    },
+    {
+      "ruleId": "protocol-drift",
+      "severity": "warn",
+      "relativePath": "src/lib/liveTtxProtocol.ts",
+      "message": "liveTtxProtocol exports differ between src/lib and worker",
+      "details": "src-only: none; worker-only: LiveJoinTokenPayload, ClientMessage"
+    },
+    {
+      "ruleId": "component-page-import",
+      "severity": "warn",
+      "relativePath": "src/components/CommandPalette.tsx",
+      "message": "Component imports from pages/ — layer violation"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/adaptiveEntry.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/jwt.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/publicPaths.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/telemetry.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/tone.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/tools.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/ttxSessionStorage.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/types.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/usageBeacon.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "naming-service",
+      "severity": "info",
+      "relativePath": "src/lib/webhookTrigger.ts",
+      "message": "src/lib file does not match service/hook/types naming convention"
+    },
+    {
+      "ruleId": "orphan-test",
+      "severity": "info",
+      "relativePath": "tests/adaptiveEntry.test.ts",
+      "message": "Test file is not listed in package.json test script"
+    },
+    {
+      "ruleId": "orphan-test",
+      "severity": "info",
+      "relativePath": "tests/behaviorIntelligence.test.ts",
+      "message": "Test file is not listed in package.json test script"
+    },
+    {
+      "ruleId": "orphan-test",
+      "severity": "info",
+      "relativePath": "tests/experimentation.test.ts",
+      "message": "Test file is not listed in package.json test script"
+    },
+    {
+      "ruleId": "orphan-test",
+      "severity": "info",
+      "relativePath": "tests/governanceAutomation.test.ts",
+      "message": "Test file is not listed in package.json test script"
+    },
+    {
+      "ruleId": "orphan-test",
+      "severity": "info",
+      "relativePath": "tests/operatorAuth.test.ts",
+      "message": "Test file is not listed in package.json test script"
+    },
+    {
+      "ruleId": "orphan-test",
+      "severity": "info",
+      "relativePath": "tests/policyResponse.test.ts",
+      "message": "Test file is not listed in package.json test script"
+    },
+    {
+      "ruleId": "orphan-test",
+      "severity": "info",
+      "relativePath": "tests/usage.test.ts",
+      "message": "Test file is not listed in package.json test script"
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "ORG-001",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "msh-ops/mcp/ingestMcpPayload.ts",
+      "description": "Remove potentially dead file (exports: ingestMcpPayload, ingestMcpPayloads, loadPiecesMcpGovernancePayloads, ingestPiecesMcpGovernanceFeed, reviewBeaconProposal)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-002",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "msh-ops/mcp/proposalLog.ts",
+      "description": "Remove potentially dead file (exports: appendMcpProposalLog, listMcpProposalLog, getMcpProposalById, clearMcpProposalLogForTests)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-003",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "src/lib/publicPaths.ts",
+      "description": "Remove potentially dead file (exports: PUBLIC_PATHS, isPublicPath)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-004",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "src/lib/ttxHistoryService.ts",
+      "description": "Remove potentially dead file (exports: ttxHistoryService)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-005",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "src/lib/ttxIntelligenceService.ts",
+      "description": "Remove potentially dead file (exports: ttxIntelligenceService)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-006",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "src/operator/ttx/scenarioLifecycle.ts",
+      "description": "Remove potentially dead file (exports: allowedTransitions, targetStatus, transitionLabel)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-007",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/backbone.ts",
+      "description": "Remove potentially dead file (exports: handleGovernanceRoute, handleMarketplaceBackboneRoute)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-008",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/data/customerBeacon/hash.ts",
+      "description": "Remove potentially dead file (exports: canonicalizeCustomerBeacon, computeCustomerBeaconHash, hashCustomerBeacon)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-009",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/data/customerBeacon/schema.ts",
+      "description": "Remove potentially dead file (exports: CustomerBeaconValidationError, validateCustomerBeaconDocument, customerBeaconSchemaJson)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-010",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/data/localAiDeploymentAgent.ts",
+      "description": "Remove potentially dead file (exports: localAiDeploymentMarketplaceModule, normalizeLocalAiDeploymentInput, generateLocalAiDeploymentPlan, recordLocalAiDeploymentSubmission, attachEngagementToLocalAiDeployment, listLocalAiDeploymentQueue, resolveDeploymentPlanId)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-011",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/data/ragArchitectureAgent.ts",
+      "description": "Remove potentially dead file (exports: ragArchitectureMarketplaceModule, normalizeRagArchitectureInput, generateRagArchitecturePlan, recordRagArchitectureSubmission, attachEngagementToRagArchitecture, listRagArchitectureQueue, resolveRagPlanId)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-012",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/edge/canonical/source-meta.ts",
+      "description": "Remove potentially dead file (exports: CANONICAL_SOURCE)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-013",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/flowTypes.ts",
+      "description": "Remove potentially dead file (exports: FLOW_MIN_SAMPLES, FLOW_MAX_SESSION_STEPS, FLOW_SESSION_TTL_SECONDS, FLOW_ROLLUP_TTL_SECONDS, FLOW_SNAPSHOT_TTL_SECONDS, emptyFlowRollup, sanitizeFlowPage, sanitizeCtaId)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-014",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/operator.ts",
+      "description": "Remove potentially dead file (exports: isOperatorAssetPath, operatorShellAssetPath, isOperatorCockpitPath, isOperatorSpaPath, serveOperatorSpa)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-015",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/publicPaths.ts",
+      "description": "Remove potentially dead file (exports: PUBLIC_PATHS, isPublicPath)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-016",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/storefront.ts",
+      "description": "Remove potentially dead file (exports: isStorefrontAssetPath, isStorefrontSpaPath, serveStorefrontSpa)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    },
+    {
+      "id": "ORG-017",
+      "action": "remove-dead-code",
+      "severity": "info",
+      "relativePath": "worker/surfaceSpa.ts",
+      "description": "Remove potentially dead file (exports: serveSurfaceSpa, isStorefrontAssetPath, isCockpitAssetPath, isAuthAssetPath, isGovernanceAssetPath)",
+      "ruleId": "dead-export",
+      "autoFixable": true
+    }
+  ],
+  "importGraph": {
+    "cycles": [
+      {
+        "chain": [
+          "src/components/OperatorShell.tsx",
+          "src/components/CommandPalette.tsx",
+          "src/components/OperatorShell.tsx"
+        ]
+      },
+      {
+        "chain": [
+          "worker/auth.ts",
+          "worker/sessionBridge.ts",
+          "worker/backboneEnv.ts",
+          "worker/auth.ts"
+        ]
+      },
+      {
+        "chain": [
+          "worker/usage.ts",
+          "worker/trafficSources.ts",
+          "worker/usage.ts"
+        ]
+      },
+      {
+        "chain": [
+          "worker/scenarioGraph.ts",
+          "worker/scenarioManifest.ts",
+          "worker/scenarioGraph.ts"
+        ]
+      }
+    ],
+    "deadExports": [
+      {
+        "relativePath": "msh-ops/mcp/ingestMcpPayload.ts",
+        "exportNames": [
+          "ingestMcpPayload",
+          "ingestMcpPayloads",
+          "loadPiecesMcpGovernancePayloads",
+          "ingestPiecesMcpGovernanceFeed",
+          "reviewBeaconProposal"
+        ]
+      },
+      {
+        "relativePath": "msh-ops/mcp/proposalLog.ts",
+        "exportNames": [
+          "appendMcpProposalLog",
+          "listMcpProposalLog",
+          "getMcpProposalById",
+          "clearMcpProposalLogForTests"
+        ]
+      },
+      {
+        "relativePath": "src/lib/publicPaths.ts",
+        "exportNames": [
+          "PUBLIC_PATHS",
+          "isPublicPath"
+        ]
+      },
+      {
+        "relativePath": "src/lib/ttxHistoryService.ts",
+        "exportNames": [
+          "ttxHistoryService"
+        ]
+      },
+      {
+        "relativePath": "src/lib/ttxIntelligenceService.ts",
+        "exportNames": [
+          "ttxIntelligenceService"
+        ]
+      },
+      {
+        "relativePath": "src/operator/ttx/scenarioLifecycle.ts",
+        "exportNames": [
+          "allowedTransitions",
+          "targetStatus",
+          "transitionLabel"
+        ]
+      },
+      {
+        "relativePath": "worker/backbone.ts",
+        "exportNames": [
+          "handleGovernanceRoute",
+          "handleMarketplaceBackboneRoute"
+        ]
+      },
+      {
+        "relativePath": "worker/data/customerBeacon/hash.ts",
+        "exportNames": [
+          "canonicalizeCustomerBeacon",
+          "computeCustomerBeaconHash",
+          "hashCustomerBeacon"
+        ]
+      },
+      {
+        "relativePath": "worker/data/customerBeacon/schema.ts",
+        "exportNames": [
+          "CustomerBeaconValidationError",
+          "validateCustomerBeaconDocument",
+          "customerBeaconSchemaJson"
+        ]
+      },
+      {
+        "relativePath": "worker/data/localAiDeploymentAgent.ts",
+        "exportNames": [
+          "localAiDeploymentMarketplaceModule",
+          "normalizeLocalAiDeploymentInput",
+          "generateLocalAiDeploymentPlan",
+          "recordLocalAiDeploymentSubmission",
+          "attachEngagementToLocalAiDeployment",
+          "listLocalAiDeploymentQueue",
+          "resolveDeploymentPlanId"
+        ]
+      },
+      {
+        "relativePath": "worker/data/ragArchitectureAgent.ts",
+        "exportNames": [
+          "ragArchitectureMarketplaceModule",
+          "normalizeRagArchitectureInput",
+          "generateRagArchitecturePlan",
+          "recordRagArchitectureSubmission",
+          "attachEngagementToRagArchitecture",
+          "listRagArchitectureQueue",
+          "resolveRagPlanId"
+        ]
+      },
+      {
+        "relativePath": "worker/edge/canonical/source-meta.ts",
+        "exportNames": [
+          "CANONICAL_SOURCE"
+        ]
+      },
+      {
+        "relativePath": "worker/flowTypes.ts",
+        "exportNames": [
+          "FLOW_MIN_SAMPLES",
+          "FLOW_MAX_SESSION_STEPS",
+          "FLOW_SESSION_TTL_SECONDS",
+          "FLOW_ROLLUP_TTL_SECONDS",
+          "FLOW_SNAPSHOT_TTL_SECONDS",
+          "emptyFlowRollup",
+          "sanitizeFlowPage",
+          "sanitizeCtaId"
+        ]
+      },
+      {
+        "relativePath": "worker/operator.ts",
+        "exportNames": [
+          "isOperatorAssetPath",
+          "operatorShellAssetPath",
+          "isOperatorCockpitPath",
+          "isOperatorSpaPath",
+          "serveOperatorSpa"
+        ]
+      },
+      {
+        "relativePath": "worker/publicPaths.ts",
+        "exportNames": [
+          "PUBLIC_PATHS",
+          "isPublicPath"
+        ]
+      },
+      {
+        "relativePath": "worker/storefront.ts",
+        "exportNames": [
+          "isStorefrontAssetPath",
+          "isStorefrontSpaPath",
+          "serveStorefrontSpa"
+        ]
+      },
+      {
+        "relativePath": "worker/surfaceSpa.ts",
+        "exportNames": [
+          "serveSurfaceSpa",
+          "isStorefrontAssetPath",
+          "isCockpitAssetPath",
+          "isAuthAssetPath",
+          "isGovernanceAssetPath"
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "errorCount": 4,
+    "warnCount": 24,
+    "infoCount": 17,
+    "suggestionCount": 17,
+    "cycleCount": 4
+  }
+}

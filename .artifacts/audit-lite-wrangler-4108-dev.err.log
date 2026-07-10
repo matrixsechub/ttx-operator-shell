@@ -1,0 +1,9 @@
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mThe Workers runtime failed to start. There was likely a problem with the workerd binary or your configuration.[0m
+
+  Runtime stderr:
+  *** std::terminate() called with no exception
+  stack: 7ff89d081239 7ff71f0063a5 7ff89d0904ff 7ff89d083a90 7ff89d08f977 7ff89d082c77 7ff89d090310 7ff8bc12482e 7ff8bbfde432 7ff89d08fe75 7ff89d0818f1 7ff89d081d16 7ff89d082d60 7ff89d090310 7ff8bc1247ae 7ff8bbfe21c6 7ff8bc056ea0 7ff8b9741b69 7ff89d085276 7ff72069045f 7ff71f005f63 7ff720695512 7ff72069c416 7ff720695a6b 7ff72069c416 7ff720692fbb 7ff71eff1e77 7ff7224c219e 7ff8bad7e956
+
+
+🪵  Logs were written to "C:\Users\wevrw\.wrangler-config\.wrangler\logs\wrangler-2026-07-10_09-00-04_702.log"
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94

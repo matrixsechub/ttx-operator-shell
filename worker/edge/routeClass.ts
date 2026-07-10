@@ -34,6 +34,8 @@ export function classifyRoute(pathname: string, method: string): RouteClass {
   if (pathname === "/api/engagements" && method === "POST") return "public";
   if (pathname === "/api/engagements/status" && method === "GET") return "public";
   if (pathname === "/api/public/demo-mode" && method === "GET") return "public";
+  if (pathname === "/api/public/calendly-config" && method === "GET") return "public";
+  if (pathname === "/api/public/conversion-event" && method === "POST") return "public";
   if (pathname === "/api/register" && method === "POST") return "public";
   if (pathname === "/api/register-lifecycle" && method === "GET") return "public";
   if (pathname === "/api/register-security" && method === "GET") return "public";

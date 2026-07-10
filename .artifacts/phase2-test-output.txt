@@ -1,0 +1,546 @@
+﻿node.exe : npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm 
+help npmrc` for supported config options.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+> ttx-operator-shell@0.1.0 test
+> node --import tsx --test tests/apiAuth.test.ts tests/auditLite.test.ts tests/prismUiuxAgent.test.ts tests/prismUiuxRoutes.test.ts tests/prismCouncilAdvisory.test.ts tests/prismTriageEngine.test.ts tests/prismPatchProposal.test.ts tests/prismTriageRoutes.test.ts tests/uiux/targetPolicy.test.ts tests/uiux/redact.test.ts tests/uiux/prismAdapter.test.ts tests/uiux/liveEvidenceEngine.test.ts tests/uiux/authBootstrap.test.ts tests/uiux/governance.test.ts tests/uiux/staging/targetPolicy.test.ts tests/uiux/staging/routeTruth.test.ts tests/uiux/staging/thresholds.test.ts tests/uiux/staging/governance.test.ts tests/uiux/staging/verify.test.ts tests/uiux/staging/edgeAuth.test.ts tests/aiAgentBuilderAgent.test.ts tests/securityRemediationAgent.test.ts tests/ragArchitectureAgent.test.ts tests/localAiDeploymentAgent.test.ts tests/buildManifest.test.ts tests/flowIntelligence.test.ts tests/flowExperiment.test.ts tests/intentCapture.test.ts tests/intentQualification.test.ts tests/funnelRecovery.test.ts tests/stagingConfig.test.ts tests/statusRoute.test.ts tests/auditStore.test.ts tests/beaconRoutes.test.ts tests/governanceRoutes.test.ts tests/operatorAgentsRoutes.test.ts tests/runtimeHealth.test.ts tests/governanceEnforcement.test.ts tests/ttxSession.test.ts tests/northstarBeaconGovernanceAgent.test.ts tests/worker/aiModelRegistry.test.ts tests/worker/aiGateway.test.ts tests/worker/surfaceRegistry.test.ts tests/msh-ops/beacon/loadBeacon.test.ts tests/msh-ops/beacon/agentInit.test.ts tests/msh-ops/governance/checkAutonomy.test.ts tests/msh-ops/mcp/ingestMcpPayload.test.ts tests/msh-ops/organizer/fileScanner.test.ts tests/msh-ops/organizer/importGraph.test.ts tests/msh-ops/organizer/structureAnalyzer.test.ts tests/msh-ops/organizer/approveRefactor.test.ts tests/msh-ops/organizer/refactorEngine.test.ts tests/msh-ops/organizer/organizerAgent.test.ts tests/ci/resolve-deploy-ref.test.mjs tests/ci/verify-staging-config.test.mjs tests/ci/staging-smoke.test.mjs tests/ci/storefront-bundle.test.mjs tests/ci/verify-ai-fulfillment-scope.test.mjs tests/ci/verify-ai-gateway.test.mjs tests/ci/generate-staging-evidence.test.mjs tests/ci/audit-action-pins.test.mjs
+
+Γû╢ aiAgentBuilderAgent
+  Γ£ö normalizes intake assistant specs with deterministic ids (7.6131ms)
+  Γ£ö resolves ai agent build ids for engagement attachment (0.5846ms)
+Γ£ö aiAgentBuilderAgent (9.3816ms)
+Γû╢ isPublicApiRoute
+  Γ£ö allows public health and build endpoints (1.1131ms)
+  Γ£ö denies protected operator routes by default (0.3073ms)
+Γ£ö isPublicApiRoute (2.5861ms)
+Γû╢ enforceOperatorApiAuth
+  Γ£ö returns 401 for anonymous protected routes (35.5004ms)
+  Γ£ö allows public routes without a token (0.5854ms)
+Γ£ö enforceOperatorApiAuth (36.3363ms)
+Γû╢ Audit Lite domain validation and scoring
+  Γ£ö normalizes public domains and blocks private targets (1.7314ms)
+  Γ£ö classifies strong and weak posture scores (0.4547ms)
+Γ£ö Audit Lite domain validation and scoring (3.3311ms)
+Γû╢ Audit Lite API lifecycle
+  Γ£ö runs start to locked result, records Stripe payment, and unlocks JSON/PDF delivery (70.0801ms)
+  Γ£ö rejects invalid Stripe webhook signatures (0.8668ms)
+Γ£ö Audit Lite API lifecycle (71.3685ms)
+Γû╢ audit store
+  Γ£ö lists recent audit events in index order (3.1539ms)
+Γ£ö audit store (4.2631ms)
+Γû╢ GET /api/beacon
+  Γ£ö returns active beacon snapshot with hash (35.3856ms)
+Γ£ö GET /api/beacon (40.1854ms)
+Γû╢ GET /api/beacon/v2/draft
+  Γ£ö returns draft beacon v2 payload (0.8951ms)
+Γ£ö GET /api/beacon/v2/draft (1.0523ms)
+Γû╢ assemble-operator-dist script
+  Γ£ö defines required shell renames and build manifest output (1.0404ms)
+Γ£ö assemble-operator-dist script (2.0849ms)
+Γû╢ bundled build info defaults
+  Γ£ö exports fallback build metadata for worker dev (8.007ms)
+Γ£ö bundled build info defaults (12.551ms)
+Γû╢ audit-action-pins cross-repo guard
+  Γ£ö does not pin download-artifact to upload-artifact SHA (0.8209ms)
+Γ£ö audit-action-pins cross-repo guard (1.8358ms)
+Γû╢ generate-staging-evidence
+  Γ£ö fails when ai gateway smoke report is not ok (157.7354ms)
+  Γ£ö fails when storefront assembly report is not ok (176.9959ms)
+Γ£ö generate-staging-evidence (336.0496ms)
+Γû╢ resolve-deploy-ref
+  Γ£ö accepts the required confirmation phrase (0.815ms)
+  Γ£ö rejects incorrect confirmation phrase (0.308ms)
+  Γ£ö rejects unsafe pull request refs (0.2555ms)
+  Γ£ö accepts safe refs (0.2016ms)
+  Γ£ö resolves refs using git rev-parse (0.2765ms)
+  Γ£ö rejects unresolved refs (0.1618ms)
+  Γ£ö authorizes only when confirmation and ref are valid (0.2088ms)
+Γ£ö resolve-deploy-ref (3.5023ms)
+Γû╢ staging-smoke storefront
+  Γ£ö passes real storefront bundle with asset probes (31.2244ms)
+  Γ£ö fails placeholder-only storefront (5.7075ms)
+  Γ£ö fails when referenced JS asset is missing (1.9425ms)
+  Γ£ö fails on 503 storefront body (0.9083ms)
+Γ£ö staging-smoke storefront (49.6931ms)
+Γû╢ staging-smoke
+  Γ£ö passes HTML and JSON routes with mocked fetch (2.1924ms)
+  Γ£ö fails on 5xx responses (0.4626ms)
+  Γ£ö flags unsafe redirects (0.4406ms)
+  Γ£ö writes evidence-compatible report shape (0.5038ms)
+Γ£ö staging-smoke (3.9321ms)
+Γû╢ storefrontBundle
+  Γ£ö detects placeholder-only HTML (1.1989ms)
+  Γ£ö accepts real bundle HTML with generated assets (9.633ms)
+  Γ£ö validates a real fixture bundle (2.8859ms)
+  Γ£ö fails when entry file is missing (0.4352ms)
+  Γ£ö fails when referenced assets are missing (15.9663ms)
+  Γ£ö fails placeholder-only entry (10.2447ms)
+  Γ£ö injects marketplace surface marker once (0.3905ms)
+Γ£ö storefrontBundle (42.2279ms)
+Γû╢ assemble-storefront-dist
+  Γ£ö fails when source output is missing (144.3834ms)
+Γ£ö assemble-storefront-dist (144.6737ms)
+Γû╢ verify-ai-fulfillment-scope
+  Γ£ö passes on repository wrangler configs (2.2676ms)
+  Γ£ö defines all required fulfillment scope targets (0.2941ms)
+  Γ£ö detects enabled fulfillment flags (0.1993ms)
+  Γ£ö fails when production fulfillment is enabled (0.172ms)
+Γ£ö verify-ai-fulfillment-scope (4.232ms)
+Γû╢ verify-ai-gateway
+  Γ£ö redacts bearer tokens and jwt material (1.1229ms)
+  Γ£ö redacts secret keys in nested objects (0.4224ms)
+  Γ£ö fails closed on unauthenticated infer and MCP routes (32.9637ms)
+  Γ£ö passes authenticated governance checks with mocked fetch (4.3625ms)
+  Γ£ö fails when unauthenticated infer is not denied (3.1873ms)
+  Γ£ö fails when OPERATOR_BEARER_TOKEN is required but missing (168.1414ms)
+Γ£ö verify-ai-gateway (211.6951ms)
+Γû╢ verify-staging-config
+  Γ£ö passes on the repository wrangler configuration (2.592ms)
+  Γ£ö detects missing staging environment (0.2916ms)
+  Γ£ö defines distinct production and staging worker constants (0.2421ms)
+  Γ£ö masks KV identifiers in summary output (1.0794ms)
+Γ£ö verify-staging-config (5.5065ms)
+Γû╢ selectPriorityRecommendation
+  Γ£ö ranks by impact times confidence and prefers lower effort (0.8679ms)
+Γ£ö selectPriorityRecommendation (2.0527ms)
+Γû╢ generateFlowExperiment
+  Γ£ö builds experiment object from intelligence (1.6313ms)
+Γ£ö generateFlowExperiment (1.7805ms)
+Γû╢ assignFlowExperimentVariant
+  Γ£ö assigns roughly 80% baseline and 20% experiment (0.7907ms)
+Γ£ö assignFlowExperimentVariant (0.9332ms)
+Γû╢ evaluateExperimentStatus
+  Γ£ö stays RUNNING below sample threshold (0.3092ms)
+  Γ£ö marks WINNING with promotion proposal when variant B improves intent rate (0.2462ms)
+Γ£ö evaluateExperimentStatus (0.7503ms)
+Γû╢ formatFlowExperimentReport
+  Γ£ö renders FLOW_EXPERIMENT_REPORT sections (0.3684ms)
+Γ£ö formatFlowExperimentReport (0.566ms)
+Γû╢ analyzeFlowRollup
+  Γ£ö computes transition rates and dwell averages (3.9906ms)
+  Γ£ö builds ranked top paths (0.382ms)
+  Γ£ö builds drop-off pages by exit rate (0.3061ms)
+Γ£ö analyzeFlowRollup (5.8893ms)
+Γû╢ detectFlowFriction
+  Γ£ö flags high-exit and form-abandon friction (0.743ms)
+  Γ£ö returns empty friction below sample threshold (0.196ms)
+Γ£ö detectFlowFriction (1.1406ms)
+Γû╢ generateFlowRecommendations
+  Γ£ö maps friction points to ranked recommendations (0.5108ms)
+Γ£ö generateFlowRecommendations (0.6786ms)
+Γû╢ buildFlowIntelligenceReport
+  Γ£ö assembles report sections and confidence (2.1589ms)
+  Γ£ö starts in OBSERVING with low sample size (0.2862ms)
+Γ£ö buildFlowIntelligenceReport (2.7233ms)
+Γû╢ funnel route map
+  Γ£ö recognizes recovered public routes and rejects unknown routes (0.9989ms)
+  Γ£ö redirects /welcome to canonical root (30.8189ms)
+Γ£ö funnel route map (33.1649ms)
+Γû╢ recovered funnel API validation
+  Γ£ö requires durable storage for register and engagement writes (9.8852ms)
+  Γ£ö enforces content type and rejects unsupported fields (5.8115ms)
+  Γ£ö preserves allowlisted context and returns safe status summaries only (9.5365ms)
+  Γ£ö generates ai agent build specs via public API (3.9279ms)
+  Γ£ö generates security remediation plans via public API (2.6589ms)
+  Γ£ö generates RAG architecture plans via public API (2.4286ms)
+  Γ£ö generates local AI deployment plans via public API (2.0853ms)
+Γ£ö recovered funnel API validation (46.3811ms)
+node:internal/modules/esm/load:199
+    throw new ERR_UNSUPPORTED_ESM_URL_SCHEME(parsed, schemes);
+          ^
+
+Error [ERR_UNSUPPORTED_ESM_URL_SCHEME]: Only URLs with a scheme in: file, data, and node are supported by the default ESM loader. Received protocol 'cloudflare:'
+    at throwIfUnsupportedURLScheme (node:internal/modules/esm/load:199:11)
+    at defaultLoadSync (node:internal/modules/esm/load:146:3)
+    at #loadAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:770:12)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at load (file:///C:/Users/wevrw/Dev/ttx-operator-shell/node_modules/tsx/dist/register-D5KIhaFJ.mjs:2:5399)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at loadWithHooks (node:internal/modules/customization_hooks:374:18)
+    at #loadSync (node:internal/modules/esm/loader:787:14)
+    at ModuleLoader.load (node:internal/modules/esm/loader:756:26)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:488:31) {
+  code: 'ERR_UNSUPPORTED_ESM_URL_SCHEME'
+}
+
+Node.js v24.16.0
+Γ£û tests\governanceEnforcement.test.ts (538.5693ms)
+Γû╢ governance proposals
+  Γ£û creates and lists a pending proposal (61.3074ms)
+  Γ£ö blocks execution without approval receipt in activation path helper (2.0579ms)
+Γ£û governance proposals (76.6576ms)
+Γû╢ policy gate
+  Γ£û rejects beacon hash mismatch (3.4923ms)
+Γ£û policy gate (3.8888ms)
+Γû╢ evaluateIntentCaptureTrigger
+  Γ£ö does not trigger immediately on page load (1.0435ms)
+  Γ£ö triggers after sufficient dwell (0.2775ms)
+  Γ£ö triggers on click depth (0.2251ms)
+Γ£ö evaluateIntentCaptureTrigger (3.1509ms)
+Γû╢ generateIntentPreview
+  Γ£ö routes automation intents to automation builder (0.6154ms)
+  Γ£ö routes agent intents to ai agent builder (0.2177ms)
+Γ£ö generateIntentPreview (1.1124ms)
+Γû╢ intent capture reporting
+  Γ£ö computes intent rate from engaged sessions (4.9324ms)
+  Γ£ö formats INTENT_CAPTURE_REPORT (0.3349ms)
+  Γ£ö builds commercial handoff links (0.2537ms)
+Γ£ö intent capture reporting (5.8573ms)
+Γû╢ classifyIntentType
+  Γ£ö maps capture category to intent type with high confidence (1.0236ms)
+  Γ£ö classifies security language when category is absent (0.3177ms)
+  Γ£ö falls back to unknown for low-signal intents (1.2525ms)
+  Γ£ö detects enterprise readiness language (0.2949ms)
+Γ£ö classifyIntentType (4.1593ms)
+Γû╢ scoreIntentQualification
+  Γ£ö scores clear operational pain higher than vague text (1.4157ms)
+  Γ£ö assigns priority bands from total score (0.4042ms)
+Γ£ö scoreIntentQualification (2.1041ms)
+Γû╢ routeQualifiedIntent
+  Γ£ö routes ai agent intents to ai-agent-builder (0.9501ms)
+  Γ£ö routes unknown low-priority intents to nurture queue (0.3635ms)
+  Γ£ö routes high-value ambiguous automation to operator review when confidence is low (0.3995ms)
+  Γ£ö routes security audit intents to audit-lite surface (0.3655ms)
+Γ£ö routeQualifiedIntent (2.5831ms)
+Γû╢ advisory proposals
+  Γ£ö generates advisory proposal patterns for qualified intents (2.4963ms)
+Γ£ö advisory proposals (2.6589ms)
+Γû╢ intent qualification reporting
+  Γ£ö builds operator report with type and priority counts (0.6977ms)
+  Γ£ö formats INTENT_QUALIFICATION_REPORT markdown (0.4887ms)
+  Γ£ö resolves system state from rollup depth (0.1905ms)
+Γ£ö intent qualification reporting (1.5925ms)
+Γû╢ qualifyCapturedIntent end-to-end
+  Γ£ö returns full qualification record for a capture (0.2862ms)
+  Γ£ö handles marketplace module category (0.1817ms)
+Γ£ö qualifyCapturedIntent end-to-end (0.6189ms)
+Γû╢ localAiDeploymentAgent
+  Γ£ö normalizes local AI deployment inputs with deterministic plan ids (9.4846ms)
+  Γ£ö resolves deployment plan ids for engagement attachment (0.4426ms)
+Γ£ö localAiDeploymentAgent (11.2081ms)
+Γû╢ agent beacon initialization
+  Γ£ö includes northstar_alignment in AI agent build specs (14.114ms)
+  Γ£ö includes northstar_alignment in security remediation plans (1.6139ms)
+  Γ£ö includes northstar_alignment in wildcard discovery scans (5.6071ms)
+Γ£ö agent beacon initialization (27.4335ms)
+Γû╢ fulfillment route autonomy gate
+  Γ£ö escalates queue writes without operator approval (26.9498ms)
+  Γ£ö allows queue writes when operator approval is present (1.6621ms)
+Γ£ö fulfillment route autonomy gate (29.1262ms)
+Γû╢ loadBeacon
+  Γ£ö loads bundled beacon and matches schema (5.0219ms)
+  Γ£ö verifies integrity hash against expected constant (1.7875ms)
+  Γ£ö freezes beacon objects so agents cannot mutate them (1.4473ms)
+  Γ£ö rejects invalid beacon documents (0.8066ms)
+  Γ£ö rejects tampered beacon hash unless safe mode is enabled (1.4543ms)
+  Γ£ö assertBeaconOnStartup succeeds after bundled init (0.2726ms)
+  Γ£ö enters safe mode when beacon payload is missing required fields (0.2406ms)
+Γ£ö loadBeacon (18.0462ms)
+Γû╢ beacon immutability guarantees
+  Γ£ö does not expose write APIs for northstar.json in worker routes (0.7054ms)
+Γ£ö beacon immutability guarantees (0.8708ms)
+Γû╢ checkAutonomy
+  Γ£ö allows advisory actions with a valid beacon (0.9073ms)
+  Γ£ö denies autonomous execution without operator approval (0.2807ms)
+  Γ£ö escalates mutate_state without approval and allows with approval (0.1935ms)
+  Γ£ö denies non-advisory actions in safe mode (3.5707ms)
+Γ£ö checkAutonomy (12.0921ms)
+Γû╢ initAgentGovernance
+  Γ£ö returns cached governance context for agents (0.2729ms)
+Γ£ö initAgentGovernance (0.5509ms)
+Γû╢ MCP source registry
+  Γ£ö registers pieces-os-mcp as read-only governance source (1.8912ms)
+Γ£ö MCP source registry (3.3738ms)
+Γû╢ validateMcpPayload
+  Γ£ö rejects unregistered sources and disallowed payload types (1.9608ms)
+  Γ£ö rejects payloads that claim mutation rights (0.4829ms)
+  Γ£ö validates governance-signal payloads against beacon axis (0.3382ms)
+  Γ£ö rejects northstar-update payloads identical to active beacon (0.2487ms)
+Γ£ö validateMcpPayload (28.0098ms)
+[MCP_GOVERNANCE_PROPOSAL] id=mcp-proposal-pieces-os-mcp-1783691684518 type=northstar-update status=pending_operator_approval source=pieces-os-mcp
+[MCP_GOVERNANCE_PROPOSAL] id=mcp-proposal-pieces-os-mcp-1783691684523 type=governance-signal status=pending_operator_approval source=pieces-os-mcp
+[MCP_GOVERNANCE_PROPOSAL] id=mcp-proposal-pieces-os-mcp-1783691684523 type=governance-signal status=pending_operator_approval source=pieces-os-mcp
+[MCP_GOVERNANCE_PROPOSAL] id=mcp-proposal-review-test type=governance-signal status=pending_operator_approval source=pieces-os-mcp
+[MCP_GOVERNANCE_PROPOSAL] id=mcp-proposal-review-test type=governance-signal status=denied source=pieces-os-mcp
+[MCP_GOVERNANCE_PROPOSAL] id=mcp-proposal-approve-test type=governance-signal status=pending_operator_approval source=pieces-os-mcp
+[MCP_GOVERNANCE_PROPOSAL] id=mcp-proposal-approve-test type=governance-signal status=approved source=pieces-os-mcp
+Γû╢ ingestMcpPayload
+  Γ£ö creates pending proposals without mutating the beacon (4.7408ms)
+  Γ£ö ingests governance signals as advisory proposals (0.5057ms)
+  Γ£ö loads Pieces MCP feed through fetcher without direct beacon mutation (0.5048ms)
+  Γ£ö requires operator approval to mark proposals approved (0.9251ms)
+Γ£ö ingestMcpPayload (7.524ms)
+Γû╢ approveRefactor
+  Γ£ö denies refactors without operator approval (2.1993ms)
+  Γ£ö approves when operator explicitly approves suggestion IDs (0.2708ms)
+  Γ£ö denies when suggestion list is empty even with operatorApproval true (0.1721ms)
+  Γ£ö records decisions in the log (0.3237ms)
+Γ£ö approveRefactor (4.2272ms)
+Γû╢ fileScanner
+  Γ£ö scans fixture directories and ignores node_modules (32.0427ms)
+  Γ£ö detects naming anomalies in misnamed components (36.9242ms)
+  Γ£ö identifies beacon paths as protected (1.1045ms)
+Γ£ö fileScanner (71.4814ms)
+Γû╢ importGraph
+  Γ£ö detects circular imports in fixture (38.1393ms)
+  Γ£ö detects dead exports when file has no importers (132.1746ms)
+  Γ£ö rewrites import specifiers after a move (0.6699ms)
+Γ£ö importGraph (172.2881ms)
+Γû╢ OrganizerAgent
+  Γ£ö produces an advisory report for the real repository (371.1453ms)
+  Γ£ö does not include beacon paths in auto-fixable move suggestions (267.8054ms)
+  Γ£ö blocks beacon mutation through refactor engine (0.5632ms)
+Γ£ö OrganizerAgent (640.9799ms)
+Γû╢ refactorEngine
+  Γ£ö rejects apply without approval (3.8464ms)
+  Γ£ö moves files and updates imports (17.6204ms)
+  Γ£ö removes dead code when approved (11.3291ms)
+  Γ£ö blocks beacon mutations even with approval (2.1902ms)
+  Γ£ö refuses create-barrel in forbidden directories (3.8602ms)
+Γ£ö refactorEngine (40.6122ms)
+Γû╢ structureAnalyzer
+  Γ£ö warns on barrel index.ts in forbidden components directory (24.6293ms)
+  Γ£ö reports version drift when package.json and wrangler disagree (25.5133ms)
+Γ£ö structureAnalyzer (51.4061ms)
+Γû╢ northstar beacon marketplace routes
+  Γ£ö recognizes public and operator recovered routes (1.1546ms)
+Γ£ö northstar beacon marketplace routes (2.561ms)
+Γû╢ northstar beacon governance agent
+  Γ£ö registers marketplace catalog metadata (0.6525ms)
+  Γ£ö generates a valid customer beacon package without internal leakage (34.2078ms)
+  Γ£ö rejects invalid schema configurations (0.518ms)
+  Γ£ö generates and verifies hash (2.4632ms)
+  Γ£ö creates proposals without mutating active beacon (1.6659ms)
+[NORTHSTAR_BEACON_TELEMETRY] event=tier_selection tier=beacon-governance-pro
+  Γ£ö rejects identical northstar-update proposals (2.0247ms)
+  Γ£ö generates via public API with operator approval (48.9526ms)
+  Γ£ö includes module in marketplace service-modules catalog (1.1097ms)
+  Γ£ö classifies operator northstar routes as protected (0.7326ms)
+Γ£ö northstar beacon governance agent (101.6237ms)
+[NORTHSTAR_BEACON_TELEMETRY] event=package_generation order_id=beacon-order-1004 tier=beacon-governance-pro file_count=17
+Γû╢ operator agents routes
+  Γ£ö returns codex agent registry for authenticated operator (88.2337ms)
+  Γ£ö returns unavailable organizer report when KV is empty (3.0072ms)
+  Γ£ö returns organizer report from KV when published (5.1324ms)
+Γ£ö operator agents routes (98.0483ms)
+Γû╢ PRISM council advisory bridge
+  Γ£ö ranks higher-severity release recommendations first (1.0222ms)
+  Γ£ö projects audits into read-only advisory items with council envelopes (30.4513ms)
+  Γ£ö builds advisory bundles from persisted TTX_STATE audits (3.2293ms)
+  Γ£ö summarizes council envelopes for HSX briefing (1.1289ms)
+Γ£ö PRISM council advisory bridge (37.3569ms)
+Γû╢ PRISM patch proposal generator
+  Γ£ö generates proposals with acceptance criteria, tests, rollback, and telemetry (20.8388ms)
+  Γ£ö increments revision deterministically (3.25ms)
+  Γ£ö exports operator-readable proposal text without execution authority (1.0156ms)
+  Γ£ö AI enrichment cannot add mutation authority when disabled (0.3925ms)
+Γ£ö PRISM patch proposal generator (27.2472ms)
+Γû╢ PRISM triage engine
+  Γ£ö groups findings by route, category, recommendation, and acceptance criteria (29.7503ms)
+  Γ£ö does not group unrelated findings with different recommendations (2.7241ms)
+  Γ£ö ranks critical findings above low severity (0.8251ms)
+  Γ£ö weights accessibility blockers and funnel routes higher (0.3535ms)
+  Γ£ö generates triage idempotently for the same audit (9.1062ms)
+  Γ£ö persists bounded triage index without mutating source audit (5.0317ms)
+Γ£ö PRISM triage engine (49.8519ms)
+Γû╢ PRISM triage routes
+  Γ£ö classifies triage and proposal paths as operator-protected (1.7356ms)
+  Γ£ö rejects unauthenticated triage access at edge gate (33.6808ms)
+  Γ£ö rejects execution authority fields in request bodies (0.7398ms)
+[PRISM_TRIAGE_TELEMETRY] prism_triage_generation_started mutationAuthorized=false
+[PRISM_TRIAGE_TELEMETRY] prism_triage_item_created mutationAuthorized=false
+[PRISM_TRIAGE_TELEMETRY] prism_patch_proposal_requested mutationAuthorized=false
+[PRISM_TRIAGE_TELEMETRY] prism_patch_proposal_generated mutationAuthorized=false
+[PRISM_TRIAGE_TELEMETRY] prism_triage_disposition_recorded mutationAuthorized=false
+  Γ£ö generates triage, proposal, disposition end-to-end without mutating source audit (41.3088ms)
+  Γ£ö redacts sensitive telemetry values (0.3179ms)
+  Γ£ö builds HSX-safe triage summary counts only (2.2584ms)
+  Γ£ö enforces bounded KV index limits (0.1503ms)
+  Γ£ö operator triage UI contains no execution controls (0.8135ms)
+Γ£ö PRISM triage routes (82.9031ms)
+Γû╢ PRISM UI/UX engine
+  Γ£ö produces deterministic scores for fixture-backed homepage mobile audit (26.4459ms)
+  Γ£ö includes cramped mobile navigation finding for homepage fixture (1.8975ms)
+  Γ£ö maps critical findings to BLOCK_RELEASE (0.3323ms)
+  Γ£ö rejects unknown modes and malformed routes (1.2687ms)
+  Γ£ö produces stable evidence hash for identical input (1.733ms)
+  Γ£ö does not include ai enrichment fields in deterministic output (9.0237ms)
+  Γ£ö generates patch proposals in PATCH_PROPOSAL mode (1.2131ms)
+Γ£ö PRISM UI/UX engine (44.0796ms)
+Γû╢ PRISM UI/UX routes
+  Γ£ö classifies operator uiux paths as operator-protected (1.3891ms)
+  Γ£ö rejects unauthenticated access at edge gate (32.9427ms)
+  Γ£ö creates, lists, reads, approves, and rejects audits (36.0977ms)
+  Γ£ö rejects malformed create payloads (1.1845ms)
+  Γ£ö returns 503 when TTX_STATE is missing (0.8846ms)
+prism-uiux: failed to persist audit 30b04a03-9c22-465d-91c9-3af7f4f83e77 kv down
+  Γ£ö returns 500 on persistence failure (3.4476ms)
+  Γ£ö maintains audit index across multiple creates (17.0385ms)
+  Γ£ö deduplicates audits by idempotency key (2.8416ms)
+  Γ£ö allows edge-authenticated requests through gate (3.75ms)
+Γ£ö PRISM UI/UX routes (101.9071ms)
+Γû╢ PRISM storage errors
+  Γ£ö exposes storage error status codes (0.681ms)
+Γ£ö PRISM storage errors (0.8848ms)
+Γû╢ ragArchitectureAgent
+  Γ£ö normalizes RAG risk handoff inputs with deterministic plan ids (3.4193ms)
+  Γ£ö resolves rag plan ids for engagement attachment (0.4474ms)
+Γ£ö ragArchitectureAgent (5.1402ms)
+Γû╢ runtime health
+  Γ£ö returns HALTED when beacon safe mode is active (0.9212ms)
+  Γ£ö returns HEALTHY for clean telemetry (0.4234ms)
+Γ£ö runtime health (2.56ms)
+Γû╢ securityRemediationAgent
+  Γ£ö normalizes prompt injection scan inputs with deterministic plan ids (14.5688ms)
+  Γ£ö maps legacy source_type aliases and resolves plan ids (0.6301ms)
+Γ£ö securityRemediationAgent (16.4606ms)
+Γû╢ staging wrangler config
+  Γ£ö uses dedicated staging KV namespace IDs distinct from production (0.9689ms)
+  Γ£ö sets staging deploy metadata vars (0.3989ms)
+  Γ£ö passes validation when staging KV ids are provisioned (1.2792ms)
+Γ£ö staging wrangler config (3.9992ms)
+Γû╢ GET /api/system/status
+  Γ£ö returns a stable status payload (40.5708ms)
+Γ£ö GET /api/system/status (46.2017ms)
+Γû╢ TTX session happy path
+  Γ£ö lists builtin scenarios, starts a session, and advances (50.0009ms)
+Γ£ö TTX session happy path (51.1692ms)
+Γû╢ PRISM operator auth bootstrap
+  Γ£ö fails closed when credentials are missing (1.4455ms)
+Γ£ö PRISM operator auth bootstrap (2.6313ms)
+Γû╢ PRISM capture governance
+  Γ£ö always sets mutationAuthorized to false (2.0008ms)
+  Γ£ö rejects malformed manifests (0.6372ms)
+Γ£ö PRISM capture governance (3.9291ms)
+Γû╢ PRISM live evidence engine integration
+  Γ£ö maps live metadata into accessibility and reliability findings (34.1004ms)
+  Γ£ö preserves fixture findings when not using live evidence (2.2798ms)
+Γ£ö PRISM live evidence engine integration (37.8485ms)
+Γû╢ PRISM adapter
+  Γ£ö maps capture manifest into UiUxAuditRequest (1.1833ms)
+  Γ£ö produces stable idempotency keys (0.5623ms)
+  Γ£ö always keeps governance mutationAuthorized false (0.175ms)
+Γ£ö PRISM adapter (3.1946ms)
+Γû╢ PRISM artifact redaction
+  Γ£ö redacts bearer tokens and jwt material (1.2297ms)
+  Γ£ö flags secrets in artifact scan (0.6437ms)
+  Γ£ö passes clean artifact text (0.4987ms)
+Γ£ö PRISM artifact redaction (3.6626ms)
+Γû╢ PRISM staging edge auth
+  Γ£ö fails closed without credentials or preconfigured token (0.8525ms)
+Γ£ö PRISM staging edge auth (1.854ms)
+{"prism_staging_telemetry":{"event":"prism_fixture_drift_completed","evidenceHash":"a6ed713ff78d845b31e3a8d314cbbf5e44e7310894bc654c53cc80500212d997","result":"inconclusive","timestamp":"2026-07-10T13:54:45.162Z"}}
+Γû╢ PRISM staging governance and drift
+  Γ£ö always keeps mutationAuthorized false (3.1292ms)
+  Γ£ö generates fixture drift report for all fixtures (2.1525ms)
+  Γ£ö flags expanded secret categories (0.8166ms)
+  Γ£ö keeps performance probe disabled by default (0.288ms)
+Γ£ö PRISM staging governance and drift (8.1566ms)
+Γû╢ PRISM route truth matrix
+  Γ£ö passes when markers and surface match (1.7888ms)
+  Γ£ö classifies route mismatch as infrastructure failure (0.3003ms)
+  Γ£ö detects unauthorized login redirect (0.211ms)
+Γ£ö PRISM route truth matrix (3.7857ms)
+Γû╢ PRISM staging target policy
+  Γ£ö accepts exact configured staging origin (1.2496ms)
+  Γ£ö rejects similar-looking hostname suffix match (0.7865ms)
+  Γ£ö rejects production origin for staging validation (0.428ms)
+  Γ£ö requires HTTPS for staging (0.3683ms)
+  Γ£ö rejects credential-bearing URLs (0.1939ms)
+  Γ£ö rejects redirect escape to production (0.3433ms)
+  Γ£ö rejects redirect to unapproved origin (0.2094ms)
+Γ£ö PRISM staging target policy (4.9975ms)
+Γû╢ PRISM staging thresholds
+  Γ£ö does not treat advisory breaches as infrastructure failures (1.2552ms)
+  Γ£ö fails infrastructure on route mismatch and secret scan (0.3656ms)
+  Γ£ö fails when mutationAuthorized becomes true (0.1672ms)
+Γ£ö PRISM staging thresholds (3.0059ms)
+{"prism_staging_telemetry":{"event":"prism_staging_secret_scan_completed","violationCount":1,"result":"failed","timestamp":"2026-07-10T13:54:45.202Z"}}
+{"prism_staging_telemetry":{"event":"prism_staging_secret_scan_completed","violationCount":0,"result":"ok","timestamp":"2026-07-10T13:54:45.209Z"}}
+Γû╢ PRISM staging artifact verify
+  Γ£ö fails secret scan on JWT material (7.3409ms)
+  Γ£ö passes clean artifacts (4.6074ms)
+Γ£ö PRISM staging artifact verify (13.2706ms)
+Γû╢ PRISM target policy
+  Γ£ö accepts local preview origin (1.0567ms)
+  Γ£ö rejects arbitrary external origins (0.7096ms)
+  Γ£ö rejects redirect to unapproved origin (0.3621ms)
+  Γ£ö denies production unless explicitly allowed (0.2953ms)
+Γ£ö PRISM target policy (3.7921ms)
+Γû╢ aiGateway governance
+  Γ£ö denies mutate_state without operator approval (2.6376ms)
+  Γ£ö returns unavailable when AI binding and token are missing (0.4647ms)
+Γ£ö aiGateway governance (7.7742ms)
+Γû╢ aiModelRegistry
+  Γ£ö resolves known agent profiles (0.7998ms)
+  Γ£ö forces stability profile in RESTRICTIVE mode (0.2624ms)
+  Γ£ö disables wildcard when wildcardFeaturesEnabled is false (0.1731ms)
+  Γ£ö uses Workers AI only in error state (0.219ms)
+  Γ£ö validates model allowlists per profile (0.1547ms)
+Γ£ö aiModelRegistry (2.9236ms)
+Γû╢ surfaceRegistry storefront routing
+  Γ£ö serves ecosystem shell at / (1.0917ms)
+  Γ£ö serves storefront shell for marketplace routes (0.3164ms)
+  Γ£ö keeps operator routes on cockpit shell (0.1616ms)
+  Γ£ö keeps auth shell for /login (0.1284ms)
+Γ£ö surfaceRegistry storefront routing (2.9867ms)
+Γä╣ tests 264
+Γä╣ suites 89
+Γä╣ pass 261
+Γä╣ fail 3
+Γä╣ cancelled 0
+Γä╣ skipped 0
+Γä╣ todo 0
+Γä╣ duration_ms 1599.1102
+
+Γ£û failing tests:
+
+test at tests\governanceEnforcement.test.ts:1:1
+Γ£û tests\governanceEnforcement.test.ts (538.5693ms)
+  'test failed'
+
+test at tests\governanceRoutes.test.ts:1:1025
+Γ£û creates and lists a pending proposal (61.3074ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  403 !== 201
+  
+      at TestContext.<anonymous> (C:\Users\wevrw\Dev\ttx-operator-shell\tests\governanceRoutes.test.ts:62:12)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1771:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 403,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\governanceRoutes.test.ts:1:2453
+Γ£û rejects beacon hash mismatch (3.4923ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'BEACON_SAFE_MODE'
+  - 'BEACON_HASH_MISMATCH'
+            ^
+  
+      at TestContext.<anonymous> (C:\Users\wevrw\Dev\ttx-operator-shell\tests\governanceRoutes.test.ts:100:12)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async Promise.all (index 0)
+      at async Suite.run (node:internal/test_runner/test:1771:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'BEACON_SAFE_MODE',
+    expected: 'BEACON_HASH_MISMATCH',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

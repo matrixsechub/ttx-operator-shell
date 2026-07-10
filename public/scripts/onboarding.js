@@ -1,115 +1,45 @@
 ﻿document.addEventListener("DOMContentLoaded", async () => {
-  const stages = Array.from(document.querySelectorAll(".onboarding-stage"));
-  const progress = document.getElementById("onboarding-progress");
-  const prevButton = document.getElementById("onboarding-prev");
-  const nextButton = document.getElementById("onboarding-next");
-  const stepLabel = document.getElementById("onboarding-step-label");
-  const comingOnlineBanner = document.getElementById("onboarding-coming-online");
-  const cockpitCta = document.getElementById("onboarding-cockpit-cta");
   const registerRef = document.getElementById("onboarding-register-ref");
-
   const params = new URLSearchParams(window.location.search);
   const registerId = params.get("register_id");
+
   if (registerRef instanceof HTMLElement && registerId) {
     registerRef.hidden = false;
-    registerRef.textContent = `REGISTER_ID :: ${registerId}`;
+    registerRef.textContent = `Registration received. Reference: ${registerId}`;
   }
 
-  let currentStep = 0;
-  const totalSteps = stages.length;
+  window.conversionTelemetry?.track("onboarding_viewed", {
+    ctaId: params.get("source_page") ? "source-attributed" : "direct",
+  });
 
-  function buildProgress() {
-    if (!(progress instanceof HTMLElement)) {
-      return;
-    }
-    progress.innerHTML = "";
-    for (let index = 0; index < totalSteps; index += 1) {
-      const dot = document.createElement("span");
-      dot.className = "onboarding-progress-dot";
-      dot.setAttribute("role", "presentation");
-      progress.appendChild(dot);
-    }
-  }
-
-  function updateUi() {
-    stages.forEach((stage, index) => {
-      stage.classList.toggle("is-active", index === currentStep);
-    });
-
-    if (progress instanceof HTMLElement) {
-      progress.querySelectorAll(".onboarding-progress-dot").forEach((dot, index) => {
-        dot.classList.toggle("is-active", index === currentStep);
-        dot.classList.toggle("is-complete", index < currentStep);
+  document.querySelectorAll("[data-onboarding-cta]").forEach((element) => {
+    element.addEventListener("click", () => {
+      if (!(element instanceof HTMLElement)) return;
+      window.conversionTelemetry?.track("onboarding_cta_clicked", {
+        ctaId: element.dataset.onboardingCta ?? "unknown",
       });
-    }
-
-    if (stepLabel instanceof HTMLElement) {
-      stepLabel.textContent = `Step ${currentStep + 1} of ${totalSteps}`;
-    }
-
-    if (prevButton instanceof HTMLButtonElement) {
-      prevButton.disabled = currentStep === 0;
-    }
-
-    if (nextButton instanceof HTMLButtonElement) {
-      const isLast = currentStep === totalSteps - 1;
-      nextButton.textContent = isLast ? "Finish" : "Continue";
-      nextButton.hidden = isLast;
-    }
-  }
-
-  async function loadCockpitStatus() {
-    try {
-      const response = await fetch("/api/public/demo-mode", {
-        headers: { Accept: "application/json" },
-      });
-      if (!response.ok) {
-        return null;
-      }
-      return response.json();
-    } catch (error) {
-      console.warn("MSH OPS cockpit status unavailable", error);
-      return null;
-    }
-  }
-
-  const demoModePayload = await loadCockpitStatus();
-  const cockpitUnderConstruction = demoModePayload?.cockpit_status === "under_construction";
-
-  if (cockpitUnderConstruction) {
-    if (comingOnlineBanner instanceof HTMLElement) {
-      comingOnlineBanner.hidden = false;
-      if (demoModePayload?.cockpit_message) {
-        comingOnlineBanner.textContent = `⚠️ Cockpit Coming Online — ${demoModePayload.cockpit_message}`;
-      }
-    }
-    if (cockpitCta instanceof HTMLAnchorElement) {
-      cockpitCta.textContent = "Cockpit Coming Online";
-      cockpitCta.setAttribute("aria-disabled", "true");
-      cockpitCta.addEventListener("click", (event) => {
-        event.preventDefault();
-      });
-    }
-  }
-
-  buildProgress();
-  updateUi();
-
-  if (prevButton instanceof HTMLButtonElement) {
-    prevButton.addEventListener("click", () => {
-      if (currentStep > 0) {
-        currentStep -= 1;
-        updateUi();
-      }
     });
-  }
+  });
 
-  if (nextButton instanceof HTMLButtonElement) {
-    nextButton.addEventListener("click", () => {
-      if (currentStep < totalSteps - 1) {
-        currentStep += 1;
-        updateUi();
-      }
+  try {
+    const response = await fetch("/api/public/demo-mode", {
+      headers: { Accept: "application/json" },
     });
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (payload.cockpit_status !== "under_construction") return;
+
+    const notice = document.createElement("p");
+    notice.className = "section-copy mono";
+    notice.setAttribute("role", "status");
+    notice.textContent =
+      payload.cockpit_message ||
+      "Operator Cockpit remains in controlled staging while public intake and registration stay active.";
+    const hero = document.querySelector(".onboarding-hero");
+    if (hero instanceof HTMLElement) {
+      hero.appendChild(notice);
+    }
+  } catch {
+    // Non-blocking status banner.
   }
 });

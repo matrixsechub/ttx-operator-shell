@@ -112,6 +112,13 @@ function HudContent({ state, compact }: { state: SystemState; compact?: boolean 
   const signalStates = state.signalStates ?? [];
   const policyAdjustments = state.policyAdjustments ?? [];
   const proposals = state.proposals ?? [];
+  const beaconHash = state.operatorOs?.beacon.hash ?? "";
+  const pendingApprovals = state.operatorOs?.approvals.pending ?? 0;
+  const beaconDisplay = beaconHash
+    ? compact && beaconHash.length > 16
+      ? `${beaconHash.slice(0, 8)}…`
+      : beaconHash.slice(0, 16)
+    : "—";
 
   return (
     <div
@@ -131,6 +138,7 @@ function HudContent({ state, compact }: { state: SystemState; compact?: boolean 
       <div className="flex flex-col gap-2">
         <div className={`grid gap-2 ${compact ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-1 sm:grid-cols-3"}`}>
           <HudMetric label="Northstar" value={northstarDisplay} tone="ok" compact={compact} />
+          <HudMetric label="Beacon Hash" value={beaconDisplay} tone="ok" compact={compact} />
           <HudMetric label="System Mode" value={state.systemMode} tone="ok" compact={compact} />
           <HudMetric
             label="Overall Health"
@@ -143,6 +151,13 @@ function HudContent({ state, compact }: { state: SystemState; compact?: boolean 
               label="Governance"
               value={governanceMode}
               tone={toneForPolicyMode(governanceMode)}
+            />
+          )}
+          {!compact && (
+            <HudMetric
+              label="Approvals"
+              value={String(pendingApprovals)}
+              tone={pendingApprovals > 0 ? "warn" : "ok"}
             />
           )}
         </div>

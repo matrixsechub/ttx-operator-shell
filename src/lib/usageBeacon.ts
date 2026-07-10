@@ -1,6 +1,15 @@
 import type { AdaptiveEntryUiMode } from "./adaptiveEntry";
 
-export type UsageBeaconEvent = "visit" | "entry_click" | "marketplace_click" | "ui_mode_view";
+export type UsageBeaconEvent =
+  | "visit"
+  | "entry_click"
+  | "marketplace_click"
+  | "ui_mode_view"
+  | "service_view"
+  | "intake_started"
+  | "intake_completed"
+  | "checkout_started"
+  | "purchase_completed";
 
 const SESSION_KEY = "msh_session";
 const SESSION_UI_MODE_KEY = "msh_entry_ui_mode";
@@ -9,6 +18,11 @@ const CLIENT_DEDUP_KEYS: Record<Exclude<UsageBeaconEvent, "ui_mode_view">, strin
   visit: "msh_evt_visit",
   entry_click: "msh_evt_entry",
   marketplace_click: "msh_evt_marketplace",
+  service_view: "msh_evt_service",
+  intake_started: "msh_evt_intake_start",
+  intake_completed: "msh_evt_intake_done",
+  checkout_started: "msh_evt_checkout",
+  purchase_completed: "msh_evt_purchase",
 };
 
 /** Stable browser session — one identity per tab origin until storage is cleared. */
@@ -68,18 +82,52 @@ function markUiModeViewOnce(uiMode: AdaptiveEntryUiMode): boolean {
 }
 
 const TRAFFIC_SOURCE_KEY = "msh_traffic_source";
+const CAMPAIGN_ID_KEY = "msh_campaign_id";
+const CONTENT_ID_KEY = "msh_content_id";
+const CTA_ID_KEY = "msh_cta_id";
+
+export interface UrlAttributionParams {
+  trafficSource?: string;
+  campaignId?: string;
+  contentId?: string;
+  ctaId?: string;
+}
+
+export function readAttributionFromUrl(): UrlAttributionParams {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const src = params.get("src");
+    const campaign = params.get("campaign");
+    const content = params.get("content");
+    const cta = params.get("cta");
+
+    if (src) {
+      const cleaned = src.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 32);
+      if (cleaned) sessionStorage.setItem(TRAFFIC_SOURCE_KEY, cleaned);
+    }
+    if (campaign) sessionStorage.setItem(CAMPAIGN_ID_KEY, campaign.slice(0, 64));
+    if (content) sessionStorage.setItem(CONTENT_ID_KEY, content.slice(0, 64));
+    if (cta) sessionStorage.setItem(CTA_ID_KEY, cta.slice(0, 64));
+
+    return {
+      trafficSource: src ? readStoredTrafficSource() : readStoredTrafficSource(),
+      campaignId: campaign ?? readStoredCampaignId(),
+      contentId: content ?? readStoredContentId(),
+      ctaId: cta ?? readStoredCtaId(),
+    };
+  } catch {
+    return {
+      trafficSource: readStoredTrafficSource(),
+      campaignId: readStoredCampaignId(),
+      contentId: readStoredContentId(),
+      ctaId: readStoredCtaId(),
+    };
+  }
+}
 
 export function readTrafficSourceFromUrl(): string | undefined {
-  try {
-    const src = new URLSearchParams(window.location.search).get("src");
-    if (!src) return readStoredTrafficSource();
-    const cleaned = src.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 32);
-    if (!cleaned) return readStoredTrafficSource();
-    sessionStorage.setItem(TRAFFIC_SOURCE_KEY, cleaned);
-    return cleaned;
-  } catch {
-    return readStoredTrafficSource();
-  }
+  readAttributionFromUrl();
+  return readStoredTrafficSource();
 }
 
 function readStoredTrafficSource(): string | undefined {
@@ -90,15 +138,46 @@ function readStoredTrafficSource(): string | undefined {
   }
 }
 
+function readStoredCampaignId(): string | undefined {
+  try {
+    return sessionStorage.getItem(CAMPAIGN_ID_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function readStoredContentId(): string | undefined {
+  try {
+    return sessionStorage.getItem(CONTENT_ID_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function readStoredCtaId(): string | undefined {
+  try {
+    return sessionStorage.getItem(CTA_ID_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export interface UsageBeaconOptions {
   uiMode?: AdaptiveEntryUiMode;
   trafficSource?: string;
+  campaignId?: string;
+  contentId?: string;
+  ctaId?: string;
 }
 
 /** Fire-and-forget external usage signal — public, no auth required. */
 export function recordUsageEvent(event: UsageBeaconEvent, options: UsageBeaconOptions = {}): void {
+  const attribution = readAttributionFromUrl();
   const uiMode = options.uiMode ?? readStoredEntryUiMode();
-  const trafficSource = options.trafficSource ?? readTrafficSourceFromUrl();
+  const trafficSource = options.trafficSource ?? attribution.trafficSource;
+  const campaignId = options.campaignId ?? attribution.campaignId;
+  const contentId = options.contentId ?? attribution.contentId;
+  const ctaId = options.ctaId ?? attribution.ctaId;
 
   if (event === "ui_mode_view") {
     if (!uiMode || !markUiModeViewOnce(uiMode)) return;
@@ -115,6 +194,9 @@ export function recordUsageEvent(event: UsageBeaconEvent, options: UsageBeaconOp
       sessionId: getOrCreateSessionId(),
       ...(uiMode ? { uiMode } : {}),
       ...(trafficSource ? { trafficSource } : {}),
+      ...(campaignId ? { campaignId } : {}),
+      ...(contentId ? { contentId } : {}),
+      ...(ctaId ? { ctaId } : {}),
     }),
     keepalive: true,
   }).catch(() => {

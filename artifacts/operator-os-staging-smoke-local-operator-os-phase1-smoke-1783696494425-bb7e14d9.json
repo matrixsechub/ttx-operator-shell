@@ -1,0 +1,17 @@
+{
+  "run_id": "operator-os-phase1-smoke-1783696494425-bb7e14d9",
+  "mode": "local_validate",
+  "started_at": "2026-07-10T15:14:54.425Z",
+  "completed_at": "2026-07-10T15:14:54.426Z",
+  "commit_sha": "a4a844ae3851e9d0de8c95c4d98309f51791dd24",
+  "overall_status": "READY",
+  "missing_scripts": [],
+  "cf_access_configured": false,
+  "required_runtime_variables": [
+    "STAGING_BASE_URL",
+    "OPERATOR_AUTH_TOKEN",
+    "CF_ACCESS_CLIENT_ID",
+    "CF_ACCESS_CLIENT_SECRET"
+  ],
+  "note": "Deployment not invoked; run against staging after RC deploy authorization."
+}

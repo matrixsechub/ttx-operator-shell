@@ -1,0 +1,14 @@
+{
+  "commitSha": "18304f00dda98823151597305b6742f28c82a0d5",
+  "buildTimestamp": "2026-07-10T22:54:55.953Z",
+  "appVersion": "0.1.0",
+  "environment": "build",
+  "assembledAt": "2026-07-10T22:54:55.953Z",
+  "source": "scripts/assemble-operator-dist.mjs",
+  "shells": [
+    "/ecosystem-shell.html",
+    "/operator-shell.html",
+    "/auth-shell.html",
+    "/council-shell.html"
+  ]
+}

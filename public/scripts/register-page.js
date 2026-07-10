@@ -2,12 +2,18 @@
   const form = document.getElementById("register-form");
   const status = document.getElementById("register-form-status");
   const submitButton = document.getElementById("register-submit");
-  const confirmation = document.getElementById("register-confirmation");
-  const confirmationCopy = document.getElementById("register-confirmation-copy");
-  const demoNote = document.getElementById("register-demo-note");
-  const cockpitNote = document.getElementById("register-cockpit-update-note");
+  const sourcePageInput = document.getElementById("register-source-page");
   const underConstructionBanner = document.getElementById("register-under-construction");
   const underConstructionCopy = document.getElementById("register-under-construction-copy");
+
+  if (sourcePageInput instanceof HTMLInputElement) {
+    const params = new URLSearchParams(window.location.search);
+    sourcePageInput.value = params.get("source_page") || document.referrer || window.location.pathname;
+  }
+
+  window.conversionTelemetry?.track("registration_started", {
+    ctaId: "register-form",
+  });
 
   async function loadCockpitStatus() {
     try {
@@ -32,7 +38,7 @@
     if (underConstructionCopy instanceof HTMLElement) {
       underConstructionCopy.textContent =
         demoModePayload.cockpit_message ||
-        "Operator Cockpit Under Construction — Your registration will receive updates as systems come online.";
+        "Operator Cockpit is in controlled staging. Your registration is persisted and queued for operator review.";
     }
     document.body.classList.add("register-under-construction-active");
   }
@@ -41,11 +47,21 @@
     return;
   }
 
+  form.addEventListener("focusin", () => {
+    window.conversionTelemetry?.track("registration_started", {
+      ctaId: "register-form-focus",
+    });
+  }, { once: true });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const payload = Object.fromEntries(new FormData(form).entries());
     status.textContent = "Submitting access request...";
     status.dataset.state = "";
+
+    window.conversionTelemetry?.track("registration_submitted", {
+      ctaId: "register-form-submit",
+    });
 
     if (submitButton instanceof HTMLButtonElement) {
       submitButton.disabled = true;
@@ -73,6 +89,7 @@
       if (result.role) {
         onboardingParams.set("role", result.role);
       }
+      onboardingParams.set("source_page", "/register");
       window.location.assign(`/onboarding?${onboardingParams.toString()}`);
       return;
     } catch (error) {

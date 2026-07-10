@@ -16,12 +16,23 @@ import {
   resolveRagPlanId,
   resolveRemediationPlanId,
 } from "./fulfillmentAgentRoutes";
-import { routeDisabledInGovernedEnvironment } from "./governance/routeDisabled";
 import type { ModeEnv } from "./mode";
 import type { BuildInfoEnv } from "./buildInfo";
+import {
+  resolveCalendlyConfig,
+  resolveLeadNotificationConfig,
+  type PublicConversionEnv,
+} from "./publicConversionConfig";
+import { deliverLeadNotification, type LeadNotificationResult } from "./leadNotification";
+import {
+  CLIENT_CONVERSION_EVENTS,
+  recordConversionEvent,
+  type ConversionEventName,
+} from "./conversionTelemetry";
 
 type FunnelRecoveryEnv = ModeEnv &
-  BuildInfoEnv & {
+  BuildInfoEnv &
+  PublicConversionEnv & {
     TTX_STATE?: KVNamespace;
   };
 
@@ -43,6 +54,8 @@ type RegisterRecord = {
   email: string;
   role: string;
   reason: string;
+  source: string | null;
+  source_page: string | null;
   created_at: string;
   lifecycle_status: string;
   lifecycle_label: string;
@@ -52,6 +65,9 @@ type RegisterRecord = {
   permission_profile: string;
   security_stage: string;
   agent_config_key: string;
+  notification_status: "pending" | "accepted" | "failed" | "skipped";
+  notification_message_id: string | null;
+  notification_attempted_at: string | null;
 };
 
 type EngagementRecord = {
@@ -288,6 +304,8 @@ const ROUTE_METHODS = new Map<string, readonly string[]>([
   ["/api/growth/track", ["POST"]],
   ["/api/growth/posture", ["GET"]],
   ["/api/public/demo-mode", ["GET"]],
+  ["/api/public/calendly-config", ["GET"]],
+  ["/api/public/conversion-event", ["POST"]],
   ["/api/service-selector/catalog", ["GET"]],
   ["/api/service-selector", ["POST"]],
   ["/api/register", ["POST"]],
@@ -320,7 +338,8 @@ const SERVICE_SELECTOR_KEYS = [
   "source_route",
 ] as const;
 
-const REGISTER_KEYS = ["name", "email", "role", "reason"] as const;
+const REGISTER_KEYS = ["name", "email", "role", "reason", "source", "source_page"] as const;
+const CONVERSION_EVENT_KEYS = ["event", "leadId", "sourceRoute", "ctaId", "result", "failureCode", "sessionId"] as const;
 
 const ENGAGEMENT_KEYS = [
   "operator_handle",
@@ -685,10 +704,107 @@ function normalizeRegisterPayload(payload: Record<string, unknown>) {
   const email = normalizeEmail(payload.email);
   const role = validateCleanText(normalizeText(payload.role, 64) || "observer", "role", true);
   const reason = validateCleanText(normalizeMultilineText(payload.reason, 1_000), "reason", true);
+  const source = validateCleanText(normalizeText(payload.source, 96) || "public-register", "source", true);
+  const sourcePage = normalizeNullable(payload.source_page, 160);
   if (!isValidEmail(email)) {
     throw new ApiError(400, "email must be a valid email address");
   }
-  return { name, email, role, reason };
+  return { name, email, role, reason, source, sourcePage };
+}
+
+function appendRegisterTimeline(
+  record: RegisterRecord,
+  status: string,
+  label: string,
+  note?: string,
+): RegisterRecord {
+  const at = new Date().toISOString();
+  return {
+    ...record,
+    lifecycle_status: status,
+    lifecycle_label: label,
+    lifecycle_timeline: [...record.lifecycle_timeline, { status, label, at, note }],
+  };
+}
+
+function mapNotificationStatus(result: LeadNotificationResult): RegisterRecord["notification_status"] {
+  if (result.status === "accepted") return "accepted";
+  if (result.status === "skipped") return "skipped";
+  return "failed";
+}
+
+async function notifyRegisterLead(
+  env: FunnelRecoveryEnv,
+  kv: KVNamespace,
+  record: RegisterRecord,
+  sourcePage: string | null,
+): Promise<RegisterRecord> {
+  const config = resolveLeadNotificationConfig(env);
+  const correlationMarker = `MSHOPS-LEAD-PROOF-${record.register_id}`;
+  await recordConversionEvent(env, {
+    event: "lead_notification_requested",
+    leadId: record.register_id,
+    sourceRoute: sourcePage ?? "/register",
+  });
+
+  const notificationResult = await deliverLeadNotification(kv, config, {
+    kind: "register",
+    leadId: record.register_id,
+    correlationMarker,
+    timestamp: record.created_at,
+    sourcePage: sourcePage ?? "/register",
+    name: record.name,
+    email: record.email,
+    role: record.role,
+    reason: record.reason,
+  });
+
+  const notificationEvent: ConversionEventName =
+    notificationResult.status === "accepted"
+      ? "lead_notification_accepted"
+      : "lead_notification_failed";
+
+  await recordConversionEvent(env, {
+    event: notificationEvent,
+    leadId: record.register_id,
+    sourceRoute: sourcePage ?? "/register",
+    result: notificationResult.status,
+    failureCode: notificationResult.status === "failed" ? notificationResult.code : undefined,
+  });
+
+  const attemptedAt = new Date().toISOString();
+  let updated: RegisterRecord = {
+    ...record,
+    notification_status: mapNotificationStatus(notificationResult),
+    notification_message_id:
+      notificationResult.status === "accepted" ? notificationResult.messageId : null,
+    notification_attempted_at: attemptedAt,
+  };
+
+  if (notificationResult.status === "accepted") {
+    updated = appendRegisterTimeline(
+      updated,
+      "notified",
+      "Operator Notified",
+      "Lead notification accepted by provider.",
+    );
+  } else if (notificationResult.status === "failed") {
+    updated = appendRegisterTimeline(
+      updated,
+      "notification_failed",
+      "Notification Pending",
+      "Lead persisted; operator notification will be retried manually.",
+    );
+  } else {
+    updated = appendRegisterTimeline(
+      updated,
+      "notification_skipped",
+      "Notification Not Configured",
+      "Lead persisted without outbound notification wiring.",
+    );
+  }
+
+  return updated;
 }
 
 function normalizeEngagementPayload(payload: Record<string, unknown>) {
@@ -834,11 +950,15 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
     if (method === "POST" && pathname === "/api/growth/track") {
       if (env.TTX_STATE) {
         try {
-          const payload = await readJsonBody(request, ["event", "sessionId", "trafficSource", "campaignId"], 4096);
+          const payload = await readJsonBody(
+            request,
+            ["event", "sessionId", "trafficSource", "campaignId", "sourceRoute", "ctaId"],
+            4096,
+          );
           const event = typeof payload.event === "string" ? payload.event : "";
           const sessionId = payload.sessionId;
           if (isValidSessionId(sessionId) && event) {
-            const allowed = [
+            const usageEvents = [
               "visit",
               "entry_click",
               "marketplace_click",
@@ -848,12 +968,34 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
               "checkout_started",
               "purchase_completed",
             ];
-            if (allowed.includes(event)) {
+            const conversionEvents = [
+              "onboarding_viewed",
+              "onboarding_cta_clicked",
+              "registration_started",
+              "registration_submitted",
+              "registration_persisted",
+              "lead_notification_requested",
+              "lead_notification_accepted",
+              "lead_notification_failed",
+              "calendly_block_viewed",
+              "calendly_booking_clicked",
+              "calendly_embed_loaded",
+              "calendly_embed_failed",
+            ];
+            if (usageEvents.includes(event)) {
               await recordUsageEvent(env as WorkerEnv, {
                 event: event as Parameters<typeof recordUsageEvent>[1]["event"],
                 sessionId,
                 trafficSource: typeof payload.trafficSource === "string" ? payload.trafficSource : undefined,
                 campaignId: typeof payload.campaignId === "string" ? payload.campaignId : undefined,
+              });
+            }
+            if (conversionEvents.includes(event)) {
+              await recordConversionEvent(env, {
+                event: event as ConversionEventName,
+                sourceRoute: typeof payload.sourceRoute === "string" ? payload.sourceRoute : undefined,
+                ctaId: typeof payload.ctaId === "string" ? payload.ctaId : undefined,
+                sessionId,
               });
             }
           }
@@ -872,12 +1014,55 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
       return jsonResponse(
         {
           demo_mode: false,
+          enabled: false,
           cockpit_status: "under_construction",
-          cockpit_message: "Operator Cockpit Under Construction - your registration will receive updates as systems come online.",
+          cockpit_message:
+            "Operator Cockpit is in controlled staging. Registration persists and operators are notified for review.",
         },
         200,
         { "Cache-Control": "no-store" },
       );
+    }
+
+    if (method === "GET" && pathname === "/api/public/calendly-config") {
+      const config = resolveCalendlyConfig(env);
+      if (!config) {
+        return jsonResponse(
+          {
+            error: "Calendly booking URL is not configured",
+            code: "BLOCKED_CALENDLY_URL_REQUIRED",
+          },
+          503,
+          { "Cache-Control": "no-store" },
+        );
+      }
+      return jsonResponse(
+        {
+          url: config.url,
+          title: config.title,
+          duration_minutes: config.durationMinutes,
+        },
+        200,
+        { "Cache-Control": "no-store" },
+      );
+    }
+
+    if (method === "POST" && pathname === "/api/public/conversion-event") {
+      const payload = await readJsonBody(request, CONVERSION_EVENT_KEYS, 2048);
+      const event = typeof payload.event === "string" ? payload.event : "";
+      if (!CLIENT_CONVERSION_EVENTS.has(event as ConversionEventName)) {
+        throw new ApiError(400, "event is not allowed");
+      }
+      await recordConversionEvent(env, {
+        event: event as ConversionEventName,
+        leadId: typeof payload.leadId === "string" ? payload.leadId : undefined,
+        sourceRoute: typeof payload.sourceRoute === "string" ? payload.sourceRoute : undefined,
+        ctaId: typeof payload.ctaId === "string" ? payload.ctaId : undefined,
+        result: typeof payload.result === "string" ? payload.result : undefined,
+        failureCode: typeof payload.failureCode === "string" ? payload.failureCode : undefined,
+        sessionId: typeof payload.sessionId === "string" ? payload.sessionId : undefined,
+      });
+      return jsonResponse({ ok: true }, 202, { "Cache-Control": "no-store" });
     }
 
     if (method === "GET" && pathname === "/api/service-selector/catalog") {
@@ -919,9 +1104,6 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
     }
 
     if (method === "POST" && pathname === "/api/register") {
-      const disabled = routeDisabledInGovernedEnvironment(env, "Public registration pending governance migration");
-      if (disabled) return disabled;
-
       const limited = checkRateLimit(request, "register:write", WRITE_LIMIT);
       if (limited) return limited;
 
@@ -935,13 +1117,15 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
       const register_id = randomOpaqueId("reg");
       const register_lookup_id = randomOpaqueId("rlook");
       const created_at = new Date().toISOString();
-      const record: RegisterRecord = {
+      let record: RegisterRecord = {
         register_id,
         register_lookup_id,
         name: normalized.name,
         email: normalized.email,
         role: normalized.role,
         reason: normalized.reason,
+        source: normalized.source,
+        source_page: normalized.sourcePage,
         created_at,
         lifecycle_status: "received",
         lifecycle_label: "Pending Intake",
@@ -958,8 +1142,19 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
         permission_profile: "public_intake",
         security_stage: "intake",
         agent_config_key: "intake_agent_v2",
+        notification_status: "pending",
+        notification_message_id: null,
+        notification_attempted_at: null,
       };
 
+      await saveRegister(kv, record);
+      await recordConversionEvent(env, {
+        event: "registration_persisted",
+        leadId: register_id,
+        sourceRoute: normalized.sourcePage ?? "/register",
+      });
+
+      record = await notifyRegisterLead(env, kv, record, normalized.sourcePage);
       await saveRegister(kv, record);
 
       return jsonResponse(
@@ -970,6 +1165,10 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
           register_id,
           register_lookup_id,
           role: record.role,
+          notification: {
+            status: record.notification_status,
+            message_id: record.notification_message_id,
+          },
           lifecycle: {
             register_id: record.register_id,
             lifecycle_status: record.lifecycle_status,

@@ -1,0 +1,9 @@
+[
+  {
+    "version": "2.0.0",
+    "beaconHash": "50a56303603f6fb65653764dca13ae1d7100197f48d4b7c055fbd68da4fac65c",
+    "publishedAt": "2026-07-10T15:36:29.418Z",
+    "keyId": "beacon-signing-key-v1",
+    "environment": "staging"
+  }
+]

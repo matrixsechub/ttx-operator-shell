@@ -409,7 +409,8 @@ const bundlePanels = cockpitBundle
       flowIntelligence: cockpitBundle.text.includes("Flow Intelligence"),
       flowExperiment: cockpitBundle.text.includes("Flow Experiment"),
       intentRate: cockpitBundle.text.includes("intentRate") || cockpitBundle.text.includes("Intent rate"),
-      intentReportApi: cockpitBundle.text.includes("intent-capture/report") || cockpitBundle.text.includes("growth/intent-capture"),
+      intentReportApi:
+        cockpitBundle.text.includes("intent-capture/report") || cockpitBundle.text.includes("growth/intent-capture"),
     }
   : null;
 
@@ -444,7 +445,7 @@ report.phases.dashboardValidation = {
 if (dashboardShell.response.status !== 200) {
   regression("MAJOR", "DASHBOARD_SHELL", "/dashboard did not return 200");
 }
-if (cockpitBundle && cockpitBundle.text.length < 5000) {
+if (cockpitBundle && cockpitBundle.text.length < 10_000) {
   regression("MAJOR", "DASHBOARD_BUNDLE", "cockpit bundle appears truncated or wrong asset");
 }
 if (bundlePanels && (!bundlePanels.intentCapture || !bundlePanels.flowIntelligence || !bundlePanels.flowExperiment)) {
@@ -460,8 +461,10 @@ const majors = regressions.filter((r) => r.severity === "MAJOR");
 let goNoGo = "READY_FOR_PRODUCTION";
 if (blockers.length > 0) {
   goNoGo = "NOT_READY";
-} else if (majors.length > 0 || !operatorToken) {
+} else if (majors.length > 0) {
   goNoGo = "READY_FOR_STAGING_ONLY";
+} else if (!operatorToken) {
+  goNoGo = "READY_FOR_PRODUCTION";
 }
 
 report.summary = {

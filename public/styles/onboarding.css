@@ -1,0 +1,79 @@
+.onboarding-shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.onboarding-hero {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.onboarding-section-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.onboarding-status-list,
+.onboarding-flow-list,
+.onboarding-boundary-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-status-list li,
+.onboarding-flow-list li,
+.onboarding-boundary-list li {
+  border: 1px solid color-mix(in srgb, var(--color-op-border, #1a2a2a) 80%, transparent);
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: color-mix(in srgb, var(--color-op-panel, #0a0d12) 92%, transparent);
+}
+
+.onboarding-status-tag {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.onboarding-status-tag.is-live {
+  color: #39ffc7;
+}
+
+.onboarding-status-tag.is-staging {
+  color: #f2c14e;
+}
+
+.onboarding-status-tag.is-dev {
+  color: #8fb7ff;
+}
+
+.onboarding-status-tag.is-operator {
+  color: #ff9f68;
+}
+
+.onboarding-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.onboarding-register-ref {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .onboarding-cta-row {
+    flex-direction: column;
+  }
+
+  .onboarding-cta-row .button,
+  .onboarding-cta-row .register-cta-enterprise {
+    width: 100%;
+    text-align: center;
+  }
+}

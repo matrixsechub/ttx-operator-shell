@@ -13,14 +13,24 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": true
   },
+  "ai": {
+    "binding": "AI"
+  },
   "vars": {
+    "AI_GATEWAY_ID": "mshops-net-governance",
+    "AI_GATEWAY_ACCOUNT_ID": "f02eebce2a5c46b33b0d204f3cd4950a",
+    "EXPECTED_BEACON_SHA256": "5f5101f0bc8aea36bc43ceac0e9df8a4a0ec4e2dc768ab79c3016ef6b605e283",
+    "AI_FULFILLMENT_ENABLED": "false",
     "MSHOPS_SURFACE": "public",
     "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
     "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev",
     "OPERATOR_ROLE": "operator",
     "OPERATOR_ACCESS_LEVEL": "internal",
     "DEPLOY_ENV": "production",
-    "APP_VERSION": "0.1.0"
+    "APP_VERSION": "0.1.0",
+    "PUBLIC_CALENDLY_URL": "https://calendly.com/matrixsechub/30min"
+    // Secrets: wrangler secret put LEAD_NOTIFICATION_WEBHOOK_URL
+    // Optional recipient var: LEAD_NOTIFICATION_EMAIL
   },
   "kv_namespaces": [
     { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },

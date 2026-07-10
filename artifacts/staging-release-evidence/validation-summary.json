@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "environment": "staging",
+  "generated_at": "2026-07-10T22:55:07.719Z",
+  "validation": {
+    "permissions_lint": "PASS",
+    "action_pin_audit": "PASS",
+    "staging_config": "PASS",
+    "ai_fulfillment_scope": "PASS",
+    "typecheck": "PASS",
+    "tests": "PASS",
+    "build": "PASS",
+    "wrangler_dry_run": "PASS",
+    "deployment": "PASS",
+    "smoke": "PASS",
+    "ai_gateway_smoke": "PASS",
+    "storefront_assembly": "FAIL",
+    "phase_1_governance_proof": "PASS",
+    "phase_2b_governance_proof": "NOT_RUN"
+  },
+  "smoke_summary": {
+    "failed": 0
+  },
+  "ai_gateway_summary": {
+    "mandatory_failed": 0
+  },
+  "ai_fulfillment_scope_summary": {
+    "passed": 4,
+    "failed": 0
+  },
+  "storefront_assembly_summary": {
+    "status": "fail",
+    "placeholderDetected": true
+  },
+  "phase_1_governance_proof_summary": {
+    "status": "PASS",
+    "passed": 17
+  },
+  "phase_2b_governance_proof_summary": null
+}

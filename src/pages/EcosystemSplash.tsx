@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { AdaptiveEntryHero } from "../components/AdaptiveEntryHero";
+import { IntentCaptureBlock } from "../components/IntentCaptureBlock";
 import { useAdaptiveEntryMode } from "../lib/useAdaptiveEntryMode";
 import { recordUsageEvent } from "../lib/usageBeacon";
+import { attachInteractionBeacon } from "../lib/interactionBeacon";
 import { DIVISIONS } from "./divisions/data";
 import { OPERATOR_SYSTEMS } from "../operator/registry";
 import { MARKETPLACE_CATEGORIES } from "./marketplace/categories";
@@ -56,6 +58,7 @@ export function EcosystemSplash() {
 
   useEffect(() => {
     recordUsageEvent("visit");
+    attachInteractionBeacon();
   }, []);
 
   useEffect(() => {
@@ -74,6 +77,7 @@ export function EcosystemSplash() {
       />
 
       <AdaptiveEntryHero uiMode={uiMode} />
+      <IntentCaptureBlock page="/" />
 
       <main className="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12 sm:px-10">
         <section>

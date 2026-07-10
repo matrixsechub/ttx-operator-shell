@@ -41,4 +41,28 @@ writeFileSync(
   "utf8",
 );
 
+if (process.env.ORGANIZER_KV_PUBLISH === "1") {
+  const kvArgs = [
+    "kv",
+    "key",
+    "put",
+    "organizer:v1:latest",
+    `--path=${reportFile}`,
+    "--binding=TTX_STATE",
+  ];
+  if (process.env.WRANGLER_ENV) {
+    kvArgs.push(`--env=${process.env.WRANGLER_ENV}`);
+  }
+  const kvResult = spawnSync("npx", ["wrangler", ...kvArgs], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    shell: process.platform === "win32",
+  });
+  if (kvResult.status !== 0) {
+    console.error(kvResult.stderr || kvResult.stdout);
+    process.exit(kvResult.status ?? 1);
+  }
+  console.log("OrganizerAgent report published to TTX_STATE KV (organizer:v1:latest)");
+}
+
 console.log(`OrganizerAgent scheduled report written to ${reportFile}`);

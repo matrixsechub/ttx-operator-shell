@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "ttx-operator-shell" generated at 2026-07-10T14:41:34.724Z.

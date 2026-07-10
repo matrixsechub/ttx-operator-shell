@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "status": "fail",
+  "sourceDirectory": "C:\\Users\\wevrw\\Dev\\ttx-operator-shell\\tests\\fixtures\\missing-mshops-root\\build-final\\app",
+  "destinationDirectory": "dist/app",
+  "entryFile": "dist/app/index.html",
+  "assetCount": 0,
+  "placeholderDetected": true,
+  "missingAssets": [],
+  "failureCodes": [
+    "STOREFRONT_SOURCE_MISSING"
+  ],
+  "tested_at": "2026-07-10T22:55:07.724Z",
+  "ok": false,
+  "errors": [
+    "Storefront source missing at C:\\Users\\wevrw\\Dev\\ttx-operator-shell\\tests\\fixtures\\missing-mshops-root\\build-final\\app"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "name": "organic-activation-daily-brief-stub",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * *" }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily 08:00 UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.ACTIVATION_OPERATOR_BASE_URL}}/api/operator/activation/overview",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "fetch-overview",
+      "name": "GET activation overview",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const overview = $json.overview ?? $json;\nconst progress = overview.progress ?? {};\nreturn [{\n  json: {\n    subject: 'Organic Activation Daily Brief',\n    qualifiedOrganic: progress.qualifiedOrganicSessions,\n    blockers: progress.blockers,\n    confidence: progress.confidence,\n    promotionWinner: progress.promotionEligibleWinner,\n    generatedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "format-brief",
+      "name": "Format brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.ACTIVATION_OPERATOR_NOTIFY_URL}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json}}",
+        "options": {}
+      },
+      "id": "notify-operator",
+      "name": "POST operator notify URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 300]
+    }
+  ],
+  "connections": {
+    "Daily 08:00 UTC": {
+      "main": [[{ "node": "GET activation overview", "type": "main", "index": 0 }]]
+    },
+    "GET activation overview": {
+      "main": [[{ "node": "Format brief", "type": "main", "index": 0 }]]
+    },
+    "Format brief": {
+      "main": [[{ "node": "POST operator notify URL", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Stub workflow — operator configures credentials and notify URL. No auto-posting."
+  }
+}

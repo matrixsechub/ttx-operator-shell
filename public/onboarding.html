@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MSHOPS | Operator Onboarding</title>
+    <title>MSHOPS | Activate Operator OS</title>
     <meta
       name="description"
-      content="Guided operator onboarding for new MSHOPS members — identity, ecosystem, cockpit preview, and membership activation."
+      content="Understand Operator OS, current build status, activation flow, and public/private boundaries before requesting access."
     />
     <script>
       (function canonicalizeOnboardingRoute() {
@@ -42,11 +42,11 @@
         <span class="brand-mark">MSH</span>
         <span class="brand-copy">
           <strong>MSHOPS</strong>
-          <span>Operator Onboarding</span>
+          <span>Operator OS Activation</span>
         </span>
       </a>
       <nav class="nav-ecosystem mono" aria-label="Public navigation">
-        <a href="/marketplace">Marketplace</a>
+        <a href="/services">Services</a>
         <a class="register-cta-enterprise pulse mono" href="/register">Register</a>
         <a href="/ecosystem">Ecosystem</a>
         <a href="/status">Status</a>
@@ -54,101 +54,154 @@
     </header>
 
     <main class="onboarding-shell page-shell">
-      <section class="onboarding-hero rgbgold-module-shell hud-frame reveal" data-reveal="up">
-        <span class="hud-tag">Activation // Guided</span>
-        <p class="section-label mono">[ OPERATOR_ONBOARDING ]</p>
-        <h1 class="glow-pulse cinematic-hook">Welcome, Operator.</h1>
+      <section class="onboarding-hero rgbgold-module-shell hud-frame reveal" data-reveal="up" aria-labelledby="onboarding-hero-title">
+        <span class="hud-tag">Activation // Operator OS</span>
+        <p class="section-label mono">[ ACTIVATE_OPERATOR_OS ]</p>
+        <h1 id="onboarding-hero-title" class="glow-pulse cinematic-hook">Activate Operator OS</h1>
         <p class="hero-mission">
-          You have entered the MSHOPS operator mission — align with the multi-agent ecosystem,
-          understand cockpit capabilities, and prepare for command-surface access as systems activate.
+          MSHOPS.NET is an operator-controlled system for designing, securing, deploying, and supervising AI agents
+          and automations — with public diagnostics up front and governed operator surfaces behind authentication.
         </p>
-        <p class="section-copy mono" id="onboarding-register-ref" hidden></p>
+        <p class="section-copy mono onboarding-register-ref" id="onboarding-register-ref" hidden></p>
+        <div class="onboarding-cta-row">
+          <a class="button primary" href="/services" data-onboarding-cta="explore-services">Explore Services</a>
+          <a class="register-cta-enterprise pulse mono" href="/register" data-onboarding-cta="register-updates">Register for Updates</a>
+          <a class="button secondary" href="#onboarding-booking" data-onboarding-cta="book-consultation">Book a Consultation</a>
+        </div>
       </section>
 
-      <div class="onboarding-progress" id="onboarding-progress" aria-label="Onboarding progress"></div>
-
-      <div class="onboarding-stage-viewport" id="onboarding-stage-viewport">
-        <article class="onboarding-stage is-active" data-step="0" aria-labelledby="onboarding-step-1-title">
-          <span class="onboarding-hud-overlay">Step 01 // Identity</span>
-          <p class="section-label mono">[ OPERATOR_IDENTITY ]</p>
-          <h2 id="onboarding-step-1-title">Your operator identity</h2>
+      <section class="rgbgold-module-shell hud-frame reveal" data-reveal="up" aria-labelledby="onboarding-what-title">
+        <header class="rgbgold-module-shell-header">
+          <span class="hud-tag">Overview // Control Plane</span>
+          <p class="section-label mono">[ WHAT_OPERATOR_OS_IS ]</p>
+          <h2 id="onboarding-what-title">What Operator OS is</h2>
+        </header>
+        <div class="rgbgold-module-shell-body">
           <p>
-            Registration establishes your operator profile inside the MSHOPS membership plane.
-            Your role, access tier, and intake signals route through the security plane for validation.
+            Operator OS is the control plane that connects public diagnostics and intake to governed execution.
+            It coordinates service selection, agent workflows, marketplace fulfillment, security controls, telemetry,
+            and the authenticated Operator Cockpit.
           </p>
-          <p class="section-copy mono">IDENTITY :: registered member :: intake-validated pathway</p>
-        </article>
-
-        <article class="onboarding-stage" data-step="1" aria-labelledby="onboarding-step-2-title">
-          <span class="onboarding-hud-overlay">Step 02 // Ecosystem</span>
-          <p class="section-label mono">[ MULTI_AGENT_ECOSYSTEM ]</p>
-          <h2 id="onboarding-step-2-title">Multi-agent ecosystem</h2>
-          <p>
-            MSHOPS orchestrates intake, security intake, Aurelius analysis, and governance agents
-            through a unified registry. Each agent operates within permission profiles and lifecycle stages.
-          </p>
-          <p class="section-copy mono">AGENTS :: intake_agent_v2 :: security_intake :: aurelius</p>
-        </article>
-
-        <article class="onboarding-stage" data-step="2" aria-labelledby="onboarding-step-3-title">
-          <span class="onboarding-hud-overlay">Step 03 // Cockpit</span>
-          <p class="section-label mono">[ COCKPIT_CAPABILITIES ]</p>
-          <h2 id="onboarding-step-3-title">Cockpit capabilities</h2>
-          <p>
-            The operator cockpit consolidates queues, telemetry, agent orchestration, and security plane
-            insights into one command surface.
-          </p>
-          <div class="onboarding-cockpit-preview" aria-hidden="true"></div>
-        </article>
-
-        <article class="onboarding-stage" data-step="3" aria-labelledby="onboarding-step-4-title">
-          <span class="onboarding-hud-overlay">Step 04 // Membership</span>
-          <p class="section-label mono">[ MEMBERSHIP_BENEFITS ]</p>
-          <h2 id="onboarding-step-4-title">Membership benefits</h2>
-          <p>Your membership unlocks the same benefits surfaced on the marketplace operator theme:</p>
-          <ul class="onboarding-benefit-list">
-            <li>Threat intel stream and federation sync</li>
-            <li>Ecosystem lifecycle visibility from intake to processed</li>
-            <li>Security plane insights and module certification badges</li>
-            <li>Operator-exclusive multi-agent tooling</li>
+          <ul class="onboarding-boundary-list">
+            <li><strong>Public diagnostics and intake</strong> — guided service selection, registration, and structured lead capture.</li>
+            <li><strong>Governed AI agents</strong> — scoped agent builders and advisory flows with explicit approval gates.</li>
+            <li><strong>Workflow automation</strong> — intake-to-fulfillment routing with operator review checkpoints.</li>
+            <li><strong>Marketplace fulfillment</strong> — module catalog, entitlement checks, and delivery evidence.</li>
+            <li><strong>Security and governance controls</strong> — non-certifying governance metadata, mutation gates, and audit trails.</li>
+            <li><strong>Telemetry and evidence</strong> — structured conversion and operational signals without storing sensitive free text.</li>
+            <li><strong>Operator Cockpit</strong> — authenticated command surface for queues, status, and operator actions.</li>
           </ul>
-        </article>
+        </div>
+      </section>
 
-        <article class="onboarding-stage" data-step="4" aria-labelledby="onboarding-step-5-title">
-          <span class="onboarding-hud-overlay">Step 05 // Prepare</span>
-          <p class="section-label mono">[ COCKPIT_PREP ]</p>
-          <h2 id="onboarding-step-5-title">Prepare for cockpit access</h2>
+      <section class="rgbgold-module-shell hud-frame reveal" data-reveal="up" aria-labelledby="onboarding-build-title">
+        <header class="rgbgold-module-shell-header">
+          <span class="hud-tag">Build Status // Transparent</span>
+          <p class="section-label mono">[ WHAT_IS_BEING_BUILT ]</p>
+          <h2 id="onboarding-build-title">What is being built</h2>
+        </header>
+        <div class="rgbgold-module-shell-body">
+          <ul class="onboarding-status-list">
+            <li>
+              <span class="onboarding-status-tag is-live">Available now</span>
+              <p>Public service-selection surfaces, registration, intake funnel, marketplace catalog, and status visibility.</p>
+            </li>
+            <li>
+              <span class="onboarding-status-tag is-staging">In controlled staging</span>
+              <p>Operator Cockpit panels, governance console flows, AI gateway advisory routes, and activation telemetry.</p>
+            </li>
+            <li>
+              <span class="onboarding-status-tag is-dev">Under development</span>
+              <p>Agent orchestration depth, Beacon governance automation, ReceiptAuthority evidence controls, and deployment telemetry expansion.</p>
+            </li>
+            <li>
+              <span class="onboarding-status-tag is-operator">Operator-only</span>
+              <p>Protected operator queues, mutation approvals, session enforcement, and authenticated marketplace integrity routes.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="rgbgold-module-shell hud-frame reveal" data-reveal="up" aria-labelledby="onboarding-flow-title">
+        <header class="rgbgold-module-shell-header">
+          <span class="hud-tag">Activation // Sequence</span>
+          <p class="section-label mono">[ HOW_ACTIVATION_WORKS ]</p>
+          <h2 id="onboarding-flow-title">How activation works</h2>
+        </header>
+        <div class="rgbgold-module-shell-body">
+          <ol class="onboarding-flow-list">
+            <li><strong>Explore services</strong> — review public diagnostics and choose the best-fit intake path.</li>
+            <li><strong>Submit intake or registration</strong> — provide contact details and context for operator review.</li>
+            <li><strong>Receive operator review</strong> — submissions are persisted and routed to the operator queue.</li>
+            <li><strong>Schedule a consultation when appropriate</strong> — use booking when you need a faster handoff.</li>
+            <li><strong>Receive activation guidance</strong> — operators respond with readiness updates and next steps.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="rgbgold-module-shell hud-frame reveal" data-reveal="up" aria-labelledby="onboarding-boundary-title">
+        <header class="rgbgold-module-shell-header">
+          <span class="hud-tag">Boundary // Public vs Operator</span>
+          <p class="section-label mono">[ PUBLIC_PRIVATE_BOUNDARY ]</p>
+          <h2 id="onboarding-boundary-title">Public and operator-only boundary</h2>
+        </header>
+        <div class="rgbgold-module-shell-body">
           <p>
-            You are aligned for operator activation. When the cockpit comes online, your registration
-            ensures you receive readiness updates automatically.
+            Registration and intake do not automatically grant cockpit access. Public forms create reviewable records;
+            operator-only systems remain protected behind authentication, session enforcement, and governance gates.
           </p>
-          <div class="onboarding-coming-online" id="onboarding-coming-online" role="status" hidden>
-            ⚠️ Cockpit Coming Online — you will be notified when command-surface access activates.
-          </div>
-          <div class="cta-row" style="margin-top: 1rem">
-            <a class="register-cta-enterprise pulse mono onboarding-final-cta" id="onboarding-cockpit-cta" href="/operator">
-              Enter Operator Cockpit
-            </a>
-            <a class="button secondary" href="/marketplace">Explore Marketplace</a>
-          </div>
-        </article>
-      </div>
+          <ul class="onboarding-boundary-list">
+            <li>No autonomous account creation on the public surface.</li>
+            <li>No automatic approval or instant cockpit unlock.</li>
+            <li>Operator review is required before protected surfaces open.</li>
+          </ul>
+        </div>
+      </section>
 
-      <div class="onboarding-controls">
-        <button class="button ghost" type="button" id="onboarding-prev" disabled>Previous</button>
-        <p class="section-copy mono" id="onboarding-step-label">Step 1 of 5</p>
-        <button class="button primary" type="button" id="onboarding-next">Continue</button>
-      </div>
+      <section
+        class="rgbgold-module-shell hud-frame reveal"
+        data-reveal="up"
+        id="onboarding-booking"
+        aria-labelledby="onboarding-booking-title"
+      >
+        <header class="rgbgold-module-shell-header">
+          <span class="hud-tag">Consultation // Optional</span>
+          <p class="section-label mono">[ BOOK_CONSULTATION ]</p>
+          <h2 id="onboarding-booking-title">Book a consultation</h2>
+        </header>
+        <div
+          class="rgbgold-module-shell-body"
+          data-calendly-block
+          id="onboarding-calendly-block"
+          data-calendly-title="MSHOPS Operator Consultation"
+          data-calendly-description="Review intake scope, activation readiness, and recommended next steps with an operator."
+        ></div>
+      </section>
+
+      <section class="rgbgold-module-shell hud-frame reveal" data-reveal="up" aria-labelledby="onboarding-next-title">
+        <header class="rgbgold-module-shell-header">
+          <span class="hud-tag">Next Steps // Conversion</span>
+          <p class="section-label mono">[ NEXT_ACTIONS ]</p>
+          <h2 id="onboarding-next-title">Continue your activation path</h2>
+        </header>
+        <div class="rgbgold-module-shell-body onboarding-cta-row">
+          <a class="button primary" href="/services" data-onboarding-cta="explore-services-footer">Explore Services</a>
+          <a class="register-cta-enterprise pulse mono" href="/register" data-onboarding-cta="register-updates-footer">Register for Updates</a>
+          <a class="button secondary" href="/login" data-onboarding-cta="login-boundary">Continue to Login Boundary</a>
+        </div>
+      </section>
     </main>
 
     <footer class="footer mono">
       <div class="footer-copy">
-        <span>MSHOPS operator onboarding</span>
-        <span>Registration → activation → cockpit readiness</span>
+        <span>MSHOPS Operator OS activation overview</span>
+        <span>Public intake → operator review → governed cockpit access</span>
       </div>
     </footer>
 
+    <script src="/scripts/conversion-telemetry.js" defer></script>
     <script src="/scripts/onboarding.js" defer></script>
+    <script src="/scripts/calendly-booking.js" defer></script>
     <script src="/scripts/rgbgold-motion.js" defer></script>
     <script src="/scripts/a11y.js" defer></script>
   </body>

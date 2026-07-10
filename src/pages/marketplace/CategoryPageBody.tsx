@@ -72,6 +72,7 @@ export function CategoryPageBody({ category, showBreadcrumbs = true }: { categor
           items={matched}
           onSelect={(item) => {
             recordUsageEvent("marketplace_click");
+            recordUsageEvent("service_view");
             setSelected(item);
           }}
         />

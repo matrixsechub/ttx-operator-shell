@@ -1,0 +1,357 @@
+{
+  "origin": "http://127.0.0.1:8787",
+  "testedAt": "2026-07-10T14:02:02.705Z",
+  "auth": {
+    "ok": true,
+    "callsign": "operator"
+  },
+  "routes": [
+    {
+      "path": "/dashboard",
+      "label": "Executive overview",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard",
+      "authProblem": false,
+      "markersExpected": [
+        "Operator Cockpit",
+        "global-command-header"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Operator Cockpit",
+        "global-command-header"
+      ],
+      "degradedMarkersOnPage": [
+        "No pending proposals",
+        "safe mode",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/engine/health"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/engine/version"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/build-info"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/governance/proposals?status=pending"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE OPERATOR COCKPIT Executive command surface — d"
+    },
+    {
+      "path": "/dashboard/beacon",
+      "label": "Beacon deep panel",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard/beacon",
+      "authProblem": false,
+      "markersExpected": [
+        "Beacon Panel"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Beacon Panel"
+      ],
+      "degradedMarkersOnPage": [
+        "safe mode",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/beacon"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/beacon/v2/draft"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE COCKPIT / BEACON BEACON PANEL BEACON Immutable"
+    },
+    {
+      "path": "/dashboard/runtime",
+      "label": "Runtime deep panel",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard/runtime",
+      "authProblem": false,
+      "markersExpected": [
+        "Runtime Panel"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Runtime Panel"
+      ],
+      "degradedMarkersOnPage": [
+        "safe mode",
+        "DEGRADED",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/telemetry/summary"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE COCKPIT / RUNTIME RUNTIME PANEL SAFE-MODE INDI"
+    },
+    {
+      "path": "/dashboard/marketplace",
+      "label": "Marketplace deep panel",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard/marketplace",
+      "authProblem": false,
+      "markersExpected": [
+        "Marketplace Panel"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Marketplace Panel"
+      ],
+      "degradedMarkersOnPage": [
+        "safe mode",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE COCKPIT / MARKETPLACE MARKETPLACE PANEL Activi"
+    },
+    {
+      "path": "/dashboard/agents",
+      "label": "Agents deep panel",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard/agents",
+      "authProblem": false,
+      "markersExpected": [
+        "Agent Panel"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Agent Panel"
+      ],
+      "degradedMarkersOnPage": [
+        "No report published to KV",
+        "safe mode",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/operator/agents"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/operator/organizer/report"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE COCKPIT / AGENTS AGENT PANEL AGENT REGISTRY Co"
+    },
+    {
+      "path": "/dashboard/governance",
+      "label": "Governance deep panel",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard/governance",
+      "authProblem": false,
+      "markersExpected": [
+        "Governance Panel"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Governance Panel"
+      ],
+      "degradedMarkersOnPage": [
+        "No pending proposals",
+        "safe mode",
+        "WATCH",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/governance/proposals?status=pending"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/telemetry/events"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE COCKPIT / GOVERNANCE GOVERNANCE PANEL APPROVAL"
+    },
+    {
+      "path": "/dashboard/subscription",
+      "label": "Subscription deep panel",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard/subscription",
+      "authProblem": false,
+      "markersExpected": [
+        "Subscription Panel"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Subscription Panel"
+      ],
+      "degradedMarkersOnPage": [
+        "safe mode",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE COCKPIT / SUBSCRIPTION SUBSCRIPTION PANEL OPER"
+    },
+    {
+      "path": "/dashboard/audit",
+      "label": "Audit deep panel",
+      "httpStatus": 200,
+      "finalUrl": "http://127.0.0.1:8787/dashboard/audit",
+      "authProblem": false,
+      "markersExpected": [
+        "Audit Panel"
+      ],
+      "markersFound": [],
+      "markersMissing": [
+        "Audit Panel"
+      ],
+      "degradedMarkersOnPage": [
+        "No audit events recorded yet",
+        "safe mode",
+        "HALTED"
+      ],
+      "apiRequests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/auth/me"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/system/state"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/marketplace/catalog"
+        },
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:8787/api/governance/audit/events?limit=50"
+        }
+      ],
+      "consoleErrors": [],
+      "failedRequests": [],
+      "renderedSnippet": "▲ MSH OPS OPERATOR // OPERATOR · OPERATOR ⌘K QUICK NAV LOGOUT BEACON 5F5101…05E283 SAFE MODE BEACON HALT RUNTIME HALTED · 0 MARKETPLACE 0 CLICKS · 10 ITEMS ENTITLEMENTS 1 ACTIVE 01 DASHBOARD B1 BEACON R1 RUNTIME G1 GOVERNANCE A1 AGENTS M1 MKT INTEL S1 ENTITLEMENTS AU AUDIT 02 MARKETPLACE 03 STATUS 04 ABOUT 05 DIVISIONS 06 SYSTEMS 07 TTX SAAS 08 FUTURE COCKPIT / AUDIT AUDIT PANEL AUDIT EVENT STREAM"
+    }
+  ],
+  "globalConsoleErrors": [],
+  "globalFailedRequests": [],
+  "degradedMarkersObserved": [
+    "No pending proposals",
+    "safe mode",
+    "HALTED",
+    "DEGRADED",
+    "No report published to KV",
+    "WATCH",
+    "No audit events recorded yet"
+  ]
+}

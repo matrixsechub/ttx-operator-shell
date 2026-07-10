@@ -103,6 +103,13 @@ npm run organizer:scheduled -- --force  # ignore 72h gate (manual)
 
 On Windows, you can also point Task Scheduler at `npm run organizer:scheduled` for a local 72h trigger.
 
+To publish the latest report to Worker KV for the operator dashboard (`GET /api/operator/organizer/report`):
+
+```bash
+ORGANIZER_KV_PUBLISH=1 npm run organizer:scheduled -- --force
+# optional: WRANGLER_ENV=staging
+```
+
 Decisions are logged to `.artifacts/organizer-decisions.jsonl`.
 
 Barrel `index.ts` files in `src/components/` and `src/pages/` are **reported as policy warnings only** — OrganizerAgent never auto-creates them.

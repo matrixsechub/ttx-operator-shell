@@ -36,6 +36,8 @@ export function isPublicApiRoute(pathname: string, method: string): boolean {
   if (matchesPath(pathname, method, "/api/engagements", "POST")) return true;
   if (matchesPath(pathname, method, "/api/engagements/status", "GET")) return true;
   if (matchesPath(pathname, method, "/api/public/demo-mode", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/public/calendly-config", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/public/conversion-event", "POST")) return true;
   if (matchesPath(pathname, method, "/api/register", "POST")) return true;
   if (matchesPath(pathname, method, "/api/register-lifecycle", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register-security", "GET")) return true;

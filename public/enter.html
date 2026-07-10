@@ -198,9 +198,10 @@
                 structured route and audit metadata.
               </p>
               <div
-                class="calendly-inline-widget"
-                data-url="https://calendly.com/matrixsechub/30min"
-                style="min-width: 320px; height: 700px"
+                data-calendly-block
+                id="calendly-shell"
+                data-calendly-title="MSHOPS Intake Consultation"
+                data-calendly-description="Optional calendar handoff for faster intake review while the structured lead form preserves audit metadata."
               ></div>
             </div>
           </article>
@@ -220,7 +221,8 @@
       </nav>
     </footer>
 
-    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <script src="/scripts/conversion-telemetry.js" defer></script>
+    <script src="/scripts/calendly-booking.js" defer></script>
     <script src="/enter.js" defer></script>
     <script src="/scripts/rgbgold-motion.js" defer></script>
     <script src="/scripts/a11y.js" defer></script>

@@ -11,5 +11,12 @@ worker-configuration.d.ts
 .dev.vars
 .dev.vars.*
 
+# PRISM Phase 2A browser capture artifacts (generated, may contain screenshots)
+artifacts/uiux/
+
+# Playwright output
+playwright-report/
+test-results/
+
 # Local machine config, not project config (e.g. Windows script-shell overrides)
 .npmrc

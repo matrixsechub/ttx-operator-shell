@@ -1,0 +1,47 @@
+{
+  "phase": "2.5",
+  "repository": "matrixsechub/ttx-operator-shell",
+  "branch": "release/phase-1-2-staging-foundation",
+  "deployedSha": "b3421ff5ffdd4784d870cf21e6f29d63a65fd242",
+  "followUpSha": null,
+  "workflowRunId": "local-wrangler-deploy-supplemental",
+  "operatorActor": "local-wrangler-oauth",
+  "stagingWorker": "ttx-operator-shell-staging",
+  "deploymentVersionId": "2785d063-edb2-4626-b86f-ff335b011b47",
+  "events": [
+    "CI::PHASE_1::VALIDATED",
+    "STAGING::CONFIG::VALIDATED",
+    "STAGING::DEPLOYMENT::SUCCEEDED",
+    "STAGING::SMOKE::SUCCEEDED",
+    "MARKETPLACE::SHELL::VALIDATED",
+    "RELEASE_EVIDENCE::UPLOADED",
+    "PHASE_3_GATE::BLOCKED"
+  ],
+  "ciResults": {
+    "prGate": "UNVERIFIED",
+    "buildTest": "UNVERIFIED",
+    "wranglerDryRun": "UNVERIFIED",
+    "securityPr": "UNVERIFIED",
+    "note": "GitHub CLI not authenticated; PR not created; remote CI not executed"
+  },
+  "stagingConfig": "PASS",
+  "deploymentResult": "SUCCEEDED",
+  "deploymentMethod": "local-wrangler-supplemental-not-workflow-bound",
+  "smokeSummary": { "passed": 6, "failed": 0, "warnings": 5 },
+  "marketplaceResult": { "path": "/marketplace", "status": 200, "marker": "MSH OPS Storefront" },
+  "evidenceArtifact": {
+    "name": "staging-release-evidence",
+    "location": "artifacts/staging-release-evidence/",
+    "uploadResult": "LOCAL_ONLY",
+    "retention": "14 days"
+  },
+  "phase3Decision": "NOT_READY_FOR_PHASE_3",
+  "failedGates": [
+    "GitHub PR not created (gh auth required)",
+    "Remote CI checks not green on main",
+    "Changes not merged to main",
+    "GitHub staging Environment UNVERIFIED",
+    "Workflow-bound staging deploy and evidence upload not executed"
+  ],
+  "timestamp": "2026-07-10T12:35:00.000Z"
+}

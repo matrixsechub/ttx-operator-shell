@@ -13,7 +13,14 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": true
   },
+  "ai": {
+    "binding": "AI"
+  },
   "vars": {
+    "AI_GATEWAY_ID": "mshops-net-governance",
+    "AI_GATEWAY_ACCOUNT_ID": "f02eebce2a5c46b33b0d204f3cd4950a",
+    "EXPECTED_BEACON_SHA256": "5f5101f0bc8aea36bc43ceac0e9df8a4a0ec4e2dc768ab79c3016ef6b605e283",
+    "AI_FULFILLMENT_ENABLED": "false",
     "MSHOPS_SURFACE": "operator",
     "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
     "ORIGIN_URL": "https://mshops-operator.sogellagepul.workers.dev",

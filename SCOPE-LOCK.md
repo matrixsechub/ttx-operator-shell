@@ -43,8 +43,10 @@ If a future document reintroduces any of these as if already built, that's scope
 - CI (typecheck + build gate), staging activation (existing `env.staging` block), observability (Workers logging), rollback runbook (`wrangler rollback`/`versions`), rate limiting on `/api/*`
 - Governance metadata as non-certifying labels only (no badges, no RBAC, no sign-off workflow)
 - Explainability as a simple source/last-updated surface on catalog items
+- **Operator OS v3 governance spine (in scope):** immutable Northstar Beacon (`msh-ops/beacon/`), governed approval-gated agents (`msh-ops/agents/`, `worker/data/*Agent.ts`), `checkAutonomy()` operator-approval gate, Codex manifest (`codex/manifest.json`), Action Proposal + Approval Receipt lifecycle (`/api/governance/proposals`), evidence bundles (`/api/governance/audit/bundle/:id`), single-operator JWT auth (existing `auth.ts` — not multi-operator RBAC)
+- OrganizerAgent / RefactorAgent as dev-side tooling only (no autonomous repo mutation without operator approval)
 
-No auth. No agents. No RAG. No orchestration mesh. No RBAC. No compliance certification. No Upwork consulting system.
+**Still out of scope:** autonomous agent mesh, RBAC, RAG/vector orchestration, compliance certification theater, multi-operator identity tiers. Governed agents may propose and analyze; they may not execute mutating or external actions without operator approval or a valid approval receipt.
 
 ---
 
@@ -63,4 +65,4 @@ This rule applies starting now, through Master Packet v1.4 and every phase after
 
 ## CONFIRMATION
 
-MatrixSecHub is a frontend SPA with a marketplace, registries, a TTX module, and non-certifying governance metadata — not an AI agent platform. The fictional platform is retired. Future synthesis work applies this scope lock automatically.
+MatrixSecHub is a frontend SPA with a marketplace, registries, a TTX module, and a governed Operator OS layer (Beacon, Codex, proposal/approval fabric) — not an unconstrained autonomous agent platform. The fictional platform is retired. Future synthesis work applies this scope lock automatically.

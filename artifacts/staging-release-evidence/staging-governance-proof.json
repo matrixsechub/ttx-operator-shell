@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.1",
+  "environment": "staging",
+  "base_url": "https://ttx-operator-shell-staging.sogellagepul.workers.dev",
+  "commit_sha": "307d635686a55f3452880fa3ef918af58acd19d1",
+  "tested_at": "2026-07-10T16:11:19.041Z",
+  "status": "PASS",
+  "deployment_id": "127b531a-7ebc-4cf1-a9e8-59b331dbbdf3",
+  "beacon_hash": "50a56303603f6fb65653764dca13ae1d7100197f48d4b7c055fbd68da4fac65c",
+  "codex_hash": "c8f0ab1ee8f84812be5f54d3906c05bab4da25f724386778466d8b277ee48826",
+  "durable_object_migration": "v37-receipt-authority",
+  "concurrency_result": "single_mutation",
+  "proposal_id": "813cab16-64ba-4101-b6de-b9c76ddba550",
+  "approval_id": "6170c079-aa3c-41b9-8fb1-238efe122c8b",
+  "execution_id": "7d74d8f7-83b9-4cf1-8610-e276c7a4ffdb",
+  "audit_bundle_id": "60bd7659-133b-47dd-af9a-a81f78b52f9c",
+  "access": {
+    "access_method": "cloudflare_access_service_token",
+    "access_application": "ttx-operator-shell-staging.sogellagepul.workers.dev",
+    "service_token_configured": true,
+    "worker_reached": true,
+    "worker_auth_still_required": true
+  },
+  "checks": [
+    {
+      "name": "access_token_missing_interstitial",
+      "result": "PASS",
+      "status": 302,
+      "code": "ACCESS_TOKEN_MISSING",
+      "group": "access"
+    },
+    {
+      "name": "access_service_token_configured",
+      "result": "PASS",
+      "group": "access"
+    },
+    {
+      "name": "access_reached_worker",
+      "result": "PASS",
+      "status": 200,
+      "code": "ACCESS_REACHED_WORKER",
+      "group": "access"
+    },
+    {
+      "name": "worker_auth_still_required",
+      "result": "PASS",
+      "status": 401,
+      "code": "WORKER_AUTH_REJECTED",
+      "group": "access"
+    },
+    {
+      "name": "operator_auth",
+      "result": "PASS",
+      "group": "governance"
+    },
+    {
+      "name": "beacon_v2_verified",
+      "result": "PASS",
+      "status": 200,
+      "beaconHash": "50a56303603f6fb65653764dca13ae1d7100197f48d4b7c055fbd68da4fac65c",
+      "group": "governance"
+    },
+    {
+      "name": "commit_sha_match",
+      "result": "PASS",
+      "expected": "307d635686a55f3452880fa3ef918af58acd19d1",
+      "observed": "307d635686a55f3452880fa3ef918af58acd19d1",
+      "group": "governance"
+    },
+    {
+      "name": "valid_receipt_proposal_create",
+      "result": "PASS",
+      "status": 201,
+      "proposalId": "813cab16-64ba-4101-b6de-b9c76ddba550",
+      "group": "governance"
+    },
+    {
+      "name": "valid_receipt_proposal_approve",
+      "result": "PASS",
+      "status": 200,
+      "approvalId": "6170c079-aa3c-41b9-8fb1-238efe122c8b",
+      "group": "governance"
+    },
+    {
+      "name": "concurrent_receipt_reserve",
+      "result": "PASS",
+      "mutations": 1,
+      "rejections": 4,
+      "codes": [
+        "RECEIPT_IN_PROGRESS",
+        "RECEIPT_IN_PROGRESS",
+        "RECEIPT_IN_PROGRESS",
+        "RECEIPT_IN_PROGRESS"
+      ],
+      "group": "governance"
+    },
+    {
+      "name": "valid_receipt_execute_once",
+      "result": "PASS",
+      "executionId": "7d74d8f7-83b9-4cf1-8610-e276c7a4ffdb",
+      "mutation_count": 1,
+      "group": "governance"
+    },
+    {
+      "name": "consumed_receipt_rejected",
+      "result": "PASS",
+      "status": 403,
+      "code": "RECEIPT_CONSUMED",
+      "group": "governance"
+    },
+    {
+      "name": "tampered_payload_rejected",
+      "result": "PASS",
+      "status": 403,
+      "code": "ACTION_DIGEST_MISMATCH",
+      "group": "governance"
+    },
+    {
+      "name": "missing_receipt_rejected",
+      "result": "PASS",
+      "status": 404,
+      "code": "PROPOSAL_NOT_FOUND",
+      "group": "governance"
+    },
+    {
+      "name": "legacy_boolean_rejected",
+      "result": "PASS",
+      "status": 403,
+      "code": "RECEIPT_REQUIRED",
+      "group": "governance"
+    },
+    {
+      "name": "beacon_drift_rejected",
+      "result": "PASS",
+      "status": 403,
+      "code": "BEACON_HASH_MISMATCH",
+      "group": "governance"
+    },
+    {
+      "name": "audit_bundle_links",
+      "result": "PASS",
+      "auditBundleId": "60bd7659-133b-47dd-af9a-a81f78b52f9c",
+      "status": 200,
+      "group": "governance"
+    }
+  ],
+  "concurrency": {
+    "attempt_count": 5,
+    "successful_reservations": 1,
+    "successful_mutations": 1,
+    "rejected_attempts": 4,
+    "final_receipt_state": "consumed"
+  },
+  "failure_code": null,
+  "summary": {
+    "passed": 17,
+    "failed": 0
+  },
+  "redaction_result": "PASS"
+}

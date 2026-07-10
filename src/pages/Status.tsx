@@ -7,12 +7,24 @@ import { useApiResource } from "../lib/useApiResource";
 
 const POLL_INTERVAL_MS = 10_000;
 
+function truncateHash(hash: string): string {
+  if (hash.length <= 20) return hash;
+  return `${hash.slice(0, 10)}…${hash.slice(-10)}`;
+}
+
+async function copyHash(hash: string): Promise<void> {
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(hash);
+  }
+}
+
 export function Status() {
   const { result, loading, lastFetchedAt, refresh } = useApiResource(api.getSystemState, {
     pollIntervalMs: POLL_INTERVAL_MS,
   });
 
   const state = result?.ok ? result.data.state : null;
+  const operatorOs = state?.operatorOs;
 
   return (
     <OperatorShell>
@@ -44,6 +56,76 @@ export function Status() {
           <div className="op-panel rounded-sm p-6 text-center text-xs text-op-text-dim">Empty kernel state</div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="op-panel rounded-sm p-4">
+              <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Beacon</h2>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <div>
+                  <p className="font-mono text-xs text-op-text">
+                    {operatorOs?.beacon.hash ? truncateHash(operatorOs.beacon.hash) : "—"}
+                  </p>
+                  <p className="mt-1 text-[11px] text-op-text-dim">
+                    v{operatorOs?.beacon.version ?? 1} · {operatorOs?.beacon.id ?? "BEACON::NORTHSTAR"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {operatorOs?.beacon.hash ? (
+                    <button
+                      type="button"
+                      onClick={() => void copyHash(operatorOs.beacon.hash)}
+                      className="rounded-sm border border-op-border px-2 py-1 text-[10px] uppercase tracking-widest text-op-text-dim hover:border-op-accent/50"
+                    >
+                      copy
+                    </button>
+                  ) : null}
+                  <StatusPill tone={operatorOs?.beacon.safeMode ? "warn" : "ok"}>
+                    {operatorOs?.beacon.safeMode ? "safe mode" : "verified"}
+                  </StatusPill>
+                </div>
+              </div>
+            </div>
+
+            <div className="op-panel rounded-sm p-4">
+              <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Codex Manifest</h2>
+              <div className="mt-3">
+                <p className="font-mono text-xs text-op-text">
+                  {operatorOs?.codex.manifestHash ? truncateHash(operatorOs.codex.manifestHash) : "—"}
+                </p>
+                <p className="mt-1 text-[11px] text-op-text-dim">
+                  drift {operatorOs?.codex.driftCount ?? 0}
+                  {operatorOs?.codex.lastValidatedAt
+                    ? ` · validated ${new Date(operatorOs.codex.lastValidatedAt).toLocaleString()}`
+                    : " · not validated"}
+                </p>
+              </div>
+            </div>
+
+            <div className="op-panel rounded-sm p-4">
+              <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Queues</h2>
+              <div className="mt-3 space-y-2 text-sm text-op-text">
+                <p>
+                  Activation {operatorOs?.queues.activation.pending ?? 0} pending /{" "}
+                  {operatorOs?.queues.activation.total ?? 0} total
+                </p>
+                <p className="text-[11px] text-op-text-dim">
+                  {operatorOs?.queues.activation.date ?? "—"} · max{" "}
+                  {operatorOs?.queues.activation.maxPerDay ?? 0}/day
+                </p>
+                <p>Registration queue {operatorOs?.queues.registration.length ?? 0}</p>
+              </div>
+            </div>
+
+            <div className="op-panel rounded-sm p-4">
+              <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Approvals</h2>
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-sm text-op-text">
+                  {operatorOs?.approvals.pending ?? 0} pending · {operatorOs?.approvals.expired ?? 0} expired
+                </span>
+                <StatusPill tone={(operatorOs?.approvals.pending ?? 0) > 0 ? "warn" : "ok"}>
+                  {(operatorOs?.approvals.pending ?? 0) > 0 ? "action needed" : "clear"}
+                </StatusPill>
+              </div>
+            </div>
+
             <div className="op-panel rounded-sm p-4">
               <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Ghost layer</h2>
               <div className="mt-3 flex items-center justify-between">
