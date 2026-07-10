@@ -19,6 +19,9 @@ export function isPublicApiRoute(pathname: string, method: string): boolean {
   if (matchesPath(pathname, method, "/api/engine/version", "GET")) return true;
   if (matchesPath(pathname, method, "/api/build-info", "GET")) return true;
   if (matchesPath(pathname, method, "/api/system/health", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/system/status", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/usage/event", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/behavior/intelligence", "GET")) return true;
   if (matchesPath(pathname, method, "/api/webhooks/ingest", "POST")) return true;
   if (matchesPath(pathname, method, "/api/ttx/live/join", "GET")) return true;
   if (matchesPath(pathname, method, "/api/engagements/create", "POST")) return true;

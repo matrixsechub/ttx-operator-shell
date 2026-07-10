@@ -38,9 +38,8 @@ describe("staging wrangler config", () => {
     assert.match(stagingBlock, /"BUILD_COMMIT_SHA"/);
   });
 
-  it("fails validation while placeholder staging KV ids remain", () => {
+  it("passes validation when staging KV ids are provisioned", () => {
     const result = validateStagingKvConfig(readWranglerKvBindings());
-    assert.equal(result.ok, false);
-    assert.ok(result.errors.length >= 4);
+    assert.equal(result.ok, true);
   });
 });

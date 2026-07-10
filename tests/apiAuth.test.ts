@@ -17,7 +17,7 @@ describe("isPublicApiRoute", () => {
     assert.equal(isPublicApiRoute("/api/ttx/sessions/scenarios", "GET"), false);
     assert.equal(isPublicApiRoute("/api/ttx/intelligence", "GET"), false);
     assert.equal(isPublicApiRoute("/api/system/state", "GET"), false);
-    assert.equal(isPublicApiRoute("/api/system/status", "GET"), false);
+    assert.equal(isPublicApiRoute("/api/system/status", "GET"), true);
   });
 });
 
