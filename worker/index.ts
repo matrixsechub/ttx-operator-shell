@@ -75,6 +75,7 @@ import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
 import { handlePrismUiuxRoute } from "./prismUiuxRoutes";
 import { handlePrismTriageRoute } from "./prismTriageRoutes";
 import { handleBeaconRoute } from "./beaconRoutes";
+import { handleOperatorGovernanceRoute } from "./operatorGovernanceRoutes";
 import { handleGovernanceProposalRoute } from "./governanceRoutes";
 import { handleMcpGovernanceRoute } from "./governance/mcp/routes";
 import { handleOperatorAgentsRoute } from "./operatorAgentsRoutes";
@@ -595,6 +596,17 @@ export default {
       if (beaconResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, beaconResponse.status);
         return beaconResponse;
+      }
+
+      const operatorGovernanceResponse = await handleOperatorGovernanceRoute(
+        request,
+        url.pathname,
+        request.method,
+        env as WorkerEnv,
+      );
+      if (operatorGovernanceResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, operatorGovernanceResponse.status);
+        return operatorGovernanceResponse;
       }
 
       const governanceProposalResponse = await handleGovernanceProposalRoute(

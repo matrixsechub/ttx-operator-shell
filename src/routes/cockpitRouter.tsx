@@ -6,6 +6,7 @@ import { RuntimeDashboard } from "../pages/dashboard/RuntimeDashboard";
 import { MarketplaceDashboard } from "../pages/dashboard/MarketplaceDashboard";
 import { AgentsDashboard } from "../pages/dashboard/AgentsDashboard";
 import { GovernanceDashboard } from "../pages/dashboard/GovernanceDashboard";
+import { GovernanceConsole } from "../pages/dashboard/GovernanceConsole";
 import { SubscriptionDashboard } from "../pages/dashboard/SubscriptionDashboard";
 import { AuditDashboard } from "../pages/dashboard/AuditDashboard";
 import { Status } from "../pages/Status";
@@ -45,6 +46,7 @@ export const cockpitRouter = createBrowserRouter([
       { path: "/dashboard/marketplace", element: <MarketplaceDashboard /> },
       { path: "/dashboard/agents", element: <AgentsDashboard /> },
       { path: "/dashboard/governance", element: <GovernanceDashboard /> },
+      { path: "/operator/governance", element: <GovernanceConsole /> },
       { path: "/dashboard/subscription", element: <SubscriptionDashboard /> },
       { path: "/dashboard/audit", element: <AuditDashboard /> },
       { path: "/status", element: <Status /> },

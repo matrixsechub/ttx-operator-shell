@@ -176,6 +176,38 @@ function main() {
   }
   if (!manifest.telemetry_events?.length) warnings.push("telemetry_events inventory is empty");
 
+  const operatorGovernanceRoutes = path.join(root, "worker/operatorGovernanceRoutes.ts");
+  if (!existsSync(operatorGovernanceRoutes)) {
+    critical.push("Phase 2B operator governance routes missing");
+  } else {
+    const operatorGovernanceSource = readFileSync(operatorGovernanceRoutes, "utf8");
+    if (!operatorGovernanceSource.includes("/api/operator/governance/")) {
+      critical.push("UNPROTECTED_GOVERNANCE_ROUTE: operator governance namespace incomplete");
+    }
+  }
+
+  const councilReviewSource = path.join(root, "worker/governance/councilReview.ts");
+  if (existsSync(councilReviewSource)) {
+    const councilSource = readFileSync(councilReviewSource, "utf8");
+    if (councilSource.includes("receiptAuthority") || councilSource.includes("runGovernedMutation")) {
+      critical.push("COUNCIL_EXECUTION_PATH_DETECTED");
+    }
+  }
+
+  const workerSources = [
+    "worker/activation/activationRoutes.ts",
+    "worker/governance/legacyApproval.ts",
+    "worker/operatorGovernanceRoutes.ts",
+  ];
+  for (const relative of workerSources) {
+    const filePath = path.join(root, relative);
+    if (!existsSync(filePath)) continue;
+    const source = readFileSync(filePath, "utf8");
+    if (source.includes("operatorApproval: true") && !source.includes("LEGACY_BYPASS_FORBIDDEN") && !source.includes("evaluateLegacyOperatorApproval")) {
+      critical.push(`LEGACY_APPROVAL_BYPASS_DETECTED in ${relative}`);
+    }
+  }
+
   const report = {
     ok: critical.length === 0,
     status: critical.length === 0 ? (warnings.length ? "warnings" : "pass") : "fail",

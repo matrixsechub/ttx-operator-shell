@@ -1,7 +1,7 @@
 import type { BeaconAxis } from "../../msh-ops/beacon/beaconSchema";
 
 export type ActionClass = "C0" | "C1" | "C2" | "C3" | "C4" | "C5" | "C6";
-export type ProposalStatus = "draft" | "pending" | "approved" | "denied" | "executed" | "expired";
+export type ProposalStatus = "draft" | "pending" | "approved" | "denied" | "executed" | "expired" | "rolled_back";
 export type RuntimeEnvironment = "development" | "staging" | "production";
 export type ExecutionStatus = "succeeded" | "failed" | "rolled_back" | "audit_incomplete";
 

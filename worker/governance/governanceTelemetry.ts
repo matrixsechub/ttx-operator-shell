@@ -46,3 +46,31 @@ export function buildTelemetryEvent(
     ...fields,
   };
 }
+
+export async function listGovernanceTelemetry(
+  env: ProposalStoreEnv,
+  options: { limit?: number } = {},
+): Promise<GovernanceTelemetryEvent[]> {
+  const limit = options.limit ?? 50;
+  const raw = await env.TTX_STATE.get(TELEMETRY_INDEX_KEY);
+  const index = raw ? (JSON.parse(raw) as string[]) : [];
+  const events: GovernanceTelemetryEvent[] = [];
+  for (const eventId of index.slice(0, limit)) {
+    const eventRaw = await env.TTX_STATE.get(`${TELEMETRY_PREFIX}${eventId}`);
+    if (!eventRaw) continue;
+    try {
+      events.push(JSON.parse(eventRaw) as GovernanceTelemetryEvent);
+    } catch {
+      // skip corrupt entries
+    }
+  }
+  return events;
+}
+
+export async function countTelemetryByOutcome(
+  env: ProposalStoreEnv,
+  namePrefix: string,
+): Promise<number> {
+  const events = await listGovernanceTelemetry(env, { limit: 200 });
+  return events.filter((event) => event.name.startsWith(namePrefix)).length;
+}

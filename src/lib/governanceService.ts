@@ -1,7 +1,14 @@
 import { request, type ApiResult } from "./apiClient";
 
 export type ActionClass = "C0" | "C1" | "C2" | "C3" | "C4" | "C5" | "C6";
-export type ProposalStatus = "draft" | "pending" | "approved" | "denied" | "executed" | "expired";
+export type ProposalStatus =
+  | "draft"
+  | "pending"
+  | "approved"
+  | "denied"
+  | "executed"
+  | "expired"
+  | "rolled_back";
 
 export interface ActionProposal {
   proposal_id: string;
@@ -38,18 +45,21 @@ export interface ActionProposal {
 }
 
 export interface ApprovalReceipt {
-  approval_id: string;
-  proposal_id: string;
-  operator_id: string;
-  approved_at: string;
-  approved_action_exact_hash: string;
-  constraints: string[];
-  expiration: string;
-  environment: "dev" | "staging" | "prod";
-  rollback_required: boolean;
-  beacon_hash: string;
-  codex_hash: string;
+  approvalId: string;
+  proposalId: string;
+  proposalRevision: number;
+  actionClass: ActionClass;
+  actionDigest: string;
+  beaconHash: string;
+  codexHash: string;
+  targetEnvironment: string;
+  approvedBy: string;
+  approvedAt: string;
+  expiresAt: string;
+  nonce: string;
   signature: string;
+  consumed?: boolean;
+  consumedAt?: string;
 }
 
 export interface CreateProposalPayload {
@@ -79,11 +89,12 @@ export const governanceService = {
     }),
   approveProposal: (
     proposalId: string,
+    body: { actionType?: string; mutationPayload?: Record<string, unknown> } = {},
   ): Promise<ApiResult<{ ok: true; proposal: ActionProposal; receipt: ApprovalReceipt }>> =>
     request(`/api/governance/proposals/${encodeURIComponent(proposalId)}/approve`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
+      body: JSON.stringify(body),
     }),
   denyProposal: (
     proposalId: string,
