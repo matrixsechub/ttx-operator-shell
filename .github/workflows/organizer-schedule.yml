@@ -1,3 +1,6 @@
+# Scheduled organizer runs on self-hosted Windows (local .artifacts cache path).
+# PR CI intentionally uses ubuntu-latest — do not move this job to self-hosted for PRs.
+
 name: Organizer Schedule
 
 on:
@@ -5,6 +8,14 @@ on:
     # Daily at 12:00 UTC — scripts/run-organizer-scheduled.mjs enforces a 72h minimum interval
     - cron: "0 12 * * *"
   workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: organizer-schedule
+  cancel-in-progress: false
 
 jobs:
   organizer:
@@ -15,14 +26,14 @@ jobs:
     env:
       NPM_CONFIG_SCRIPT_SHELL: cmd.exe
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
           cache: npm
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .artifacts/organizer-last-run.json
           key: organizer-last-run-state
@@ -31,7 +42,7 @@ jobs:
 
       - run: npm run organizer:scheduled
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: organizer-scheduled-report
