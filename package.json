@@ -12,11 +12,13 @@
     "deploy": "node scripts/build.mjs && wrangler deploy",
     "deploy:staging": "node scripts/deploy-staging.mjs",
     "verify:staging-config": "node scripts/verify-staging-config.mjs",
+    "verify:deploy:handoff": "node scripts/verify-operator-deploy.mjs --handoff",
+    "verify:deploy:beta": "node scripts/verify-operator-deploy.mjs --beta",
     "deploy:mshops-public": "node scripts/deploy-mshops-public.mjs",
     "deploy:mshops-operator": "node scripts/deploy-mshops-operator.mjs",
     "verify:step5": "node scripts/verify-step5-gate.mjs",
     "cf-typegen": "wrangler types",
-    "test": "node --import tsx --test tests/apiAuth.test.ts tests/buildManifest.test.ts tests/stagingConfig.test.ts tests/statusRoute.test.ts tests/ttxSession.test.ts"
+    "test": "node --import tsx --test tests/apiAuth.test.ts tests/buildManifest.test.ts tests/stagingConfig.test.ts tests/statusRoute.test.ts tests/ttxSession.test.ts tests/verifyOperatorDeploy.test.ts"
   },
   "dependencies": {
     "react": "^19.0.0",

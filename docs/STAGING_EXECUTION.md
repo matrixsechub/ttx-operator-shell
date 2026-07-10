@@ -128,7 +128,13 @@ Replace `<RELEASE_SHA>` with full `git rev-parse HEAD` from step 4.
 node scripts/verify-operator-deploy.mjs https://ttx-operator-shell-staging.sogellagepul.workers.dev <RELEASE_SHA>
 ```
 
-**Do not proceed if:** script exits non-zero. Inspect JSON `failedChecks`.
+Or (recommended):
+
+```bash
+npm run verify:deploy:handoff -- https://ttx-operator-shell-staging.sogellagepul.workers.dev <RELEASE_SHA>
+```
+
+**Do not proceed if:** handoff verifier exits non-zero. Inspect JSON `failedChecks` and `mode`.
 
 ---
 
@@ -181,7 +187,7 @@ curl -si https://ttx-operator-shell-staging.sogellagepul.workers.dev/api/system/
 |------|----------------|
 | `verify:staging-config` | Exit 0 after real KV ids pasted |
 | `deploy:staging` | Completes without error |
-| `verify-operator-deploy` | Exit 0 with expected commit SHA |
+| `verify-operator-deploy` (handoff) | Exit 0 with `npm run verify:deploy:handoff` |
 | `/api/build-info` | `commitSha` matches release commit |
 | Anonymous protected APIs | 401 |
 | `/api/system/status` | 200 |
@@ -211,4 +217,4 @@ Investigate locally, fix, and repeat from step 4.
 4. Anonymous `GET /api/security/events` (or TTX/webhooks) returns **200**.
 5. `GET /api/system/status` returns **404** or **502**.
 6. `/api/build-info` `commitSha` ≠ intended release commit.
-7. `verify-operator-deploy.mjs` exits non-zero.
+7. `verify-operator-deploy.mjs` handoff mode exits non-zero.
