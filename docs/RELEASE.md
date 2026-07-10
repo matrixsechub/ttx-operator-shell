@@ -69,11 +69,19 @@ npm run deploy:staging
 
 ### 5. Run smoke verification
 
+**Operator-shell handoff gate (production promotion):**
+
 ```bash
-node scripts/verify-operator-deploy.mjs https://ttx-operator-shell-staging.sogellagepul.workers.dev
+npm run verify:deploy:handoff -- https://ttx-operator-shell-staging.sogellagepul.workers.dev "$(git rev-parse HEAD)"
 ```
 
-Optional: assert build provenance matches the commit you intended to ship:
+**Full MSHOPS beta gate (optional — not required for operator-shell-only release):**
+
+```bash
+npm run verify:deploy:beta -- https://ttx-operator-shell-staging.sogellagepul.workers.dev
+```
+
+Legacy positional form (defaults to `--handoff`):
 
 ```bash
 node scripts/verify-operator-deploy.mjs https://ttx-operator-shell-staging.sogellagepul.workers.dev "$(git rev-parse HEAD)"
@@ -112,29 +120,61 @@ curl -si https://ttx-operator-shell-staging.sogellagepul.workers.dev/api/engine/
 
 ## Production Promotion Gate
 
-**Do not deploy production until all staging gates pass.**
+**Do not deploy production until operator-shell handoff gates pass on staging.**
+
+See [PRODUCTION_RELEASE.md](./PRODUCTION_RELEASE.md) for the deployed production record.
+
+### Operator-shell handoff (required)
 
 | Gate | Requirement |
 |------|-------------|
-| Staging smoke | `node scripts/verify-operator-deploy.mjs <staging-url>` exits 0 |
-| Build provenance | `/api/build-info.commitSha` on staging matches intended git commit |
+| Handoff verifier | `npm run verify:deploy:handoff -- <staging-url> <commit-sha>` exits 0 |
+| Build provenance | `/api/build-info.commitSha` matches intended git commit |
 | Auth lockdown | Anonymous `GET /api/security/events`, `/api/ttx/sessions/scenarios`, `/api/webhooks/events` → 401 |
 | Public health | `/api/build-info`, `/api/engine/health`, `/api/engine/version` → 200 |
 | Status contract | `/api/system/status` → 200 (not engine-proxy 404) |
+| System mode | Staging: `OPERATOR_BETA`; Production: `PRODUCTION` (per `deployEnv`) |
 | CI | `npm run typecheck`, `npm test`, `npm run build` green on the release commit |
 
+### Full MSHOPS beta (optional — not required for operator-shell-only)
+
+| Gate | Requirement |
+|------|-------------|
+| Beta verifier | `npm run verify:deploy:beta -- <url>` exits 0 |
+| Storefront routes | `/enter`, `/marketplace` serve storefront shell (not 503) |
+| Session HTML gate | `/systems` redirects unauthenticated users to `/login` |
+| Subsystems | Ghost, telemetry, governance state probes pass |
+
+**Known beta blockers while `dist/app/` is absent:** `/enter` and `/marketplace` return **503**.
+
 ### Promote to production
+
+Deploy from a **clean worktree** at the release commit (do not build from a dirty tree).
+
+**bash / zsh:**
 
 ```bash
 export GIT_COMMIT_SHA="$(git rev-parse HEAD)"
 export BUILD_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-npm run deploy
+npm run build
+npx wrangler deploy \
+  --var "BUILD_COMMIT_SHA:${GIT_COMMIT_SHA}" \
+  --var "BUILD_TIMESTAMP:${BUILD_TIMESTAMP}"
 ```
 
-Re-verify on production:
+**PowerShell:**
+
+```powershell
+$env:GIT_COMMIT_SHA = git rev-parse HEAD
+$env:BUILD_TIMESTAMP = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+npm run build
+npx wrangler deploy --var "BUILD_COMMIT_SHA:$env:GIT_COMMIT_SHA" --var "BUILD_TIMESTAMP:$env:BUILD_TIMESTAMP"
+```
+
+Re-verify on production (handoff gate only):
 
 ```bash
-node scripts/verify-operator-deploy.mjs https://ttx-operator-shell.sogellagepul.workers.dev "$(git rev-parse HEAD)"
+npm run verify:deploy:handoff -- https://ttx-operator-shell.sogellagepul.workers.dev "$(git rev-parse HEAD)"
 curl -s https://ttx-operator-shell.sogellagepul.workers.dev/api/build-info
 ```
 

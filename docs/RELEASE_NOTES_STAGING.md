@@ -76,11 +76,15 @@ See [STAGING_EXECUTION.md](./STAGING_EXECUTION.md).
 | `npm run verify:staging-config` | **Expected fail** until KV provisioned |
 | `wrangler deploy --env staging --dry-run` | Pass (structural) |
 
-## Release verdict (current)
+## Release verdict (post-production)
 
 | Gate | Verdict |
 |------|---------|
 | Code readiness | **GO** |
-| Commit readiness | **Pending** — large mixed working tree; see commit plan in handoff |
-| Staging deploy | **NO-GO** — KV placeholders + secrets not provisioned |
-| Production deploy | **NO-GO** — blocked on staging smoke + build-info provenance |
+| Operator-shell production | **DEPLOYED** — see [PRODUCTION_RELEASE.md](./PRODUCTION_RELEASE.md) |
+| Full MSHOPS beta | **NO-GO** — `/enter`, `/marketplace` 503 without `dist/app/` |
+
+Verifier modes:
+
+- `npm run verify:deploy:handoff` — operator-shell production gate
+- `npm run verify:deploy:beta` — full MSHOPS beta gate

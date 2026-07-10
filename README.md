@@ -93,7 +93,7 @@ Use `--env staging` for staging secrets. For local `wrangler dev`, use `.dev.var
 See [docs/RELEASE.md](./docs/RELEASE.md) for the full staging → production checklist.
 
 ```bash
-node scripts/verify-operator-deploy.mjs https://ttx-operator-shell-staging.sogellagepul.workers.dev
+npm run verify:deploy:handoff -- https://ttx-operator-shell-staging.sogellagepul.workers.dev "$(git rev-parse HEAD)"
 wrangler deploy --dry-run --outdir /tmp/ttx-dry-run
 ```
 
