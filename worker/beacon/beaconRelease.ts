@@ -1,9 +1,13 @@
 import releaseHistory from "../../msh-ops/beacon/releases/history.json";
+import stagingRelease from "../../msh-ops/beacon/releases/staging/current.json";
+import developmentRelease from "../../msh-ops/beacon/releases/development/current.json";
+import legacyRelease from "../../msh-ops/beacon/releases/current.json";
 import type { BeaconReleaseHistoryEntry } from "../../msh-ops/beacon/signedBeaconRelease";
 import { resolveBeaconSigningKey, type SigningKeyEnv } from "../governance/signingKeys";
 import { BEACON_RELEASE_DOMAIN } from "../governance/signingKeys";
 import type { SignedBeaconRelease } from "../../msh-ops/beacon/signedBeaconRelease";
 import { computeBeaconV2Hash } from "../../msh-ops/beacon/signedBeaconRelease";
+import { resolveRuntimeEnvironment } from "../governance/runtimeEnv";
 import type { ModeEnv } from "../mode";
 import type { BuildInfoEnv } from "../buildInfo";
 
@@ -19,18 +23,32 @@ export interface VerifiedBeaconV2State {
   release: SignedBeaconRelease | null;
 }
 
-let cachedRelease: SignedBeaconRelease | null | undefined;
+const releaseCache = new Map<string, SignedBeaconRelease | null>();
 
-async function loadBundledRelease(): Promise<SignedBeaconRelease | null> {
-  if (cachedRelease !== undefined) return cachedRelease;
-  try {
-    const module = await import("../../msh-ops/beacon/releases/current.json");
-    cachedRelease = module.default as SignedBeaconRelease;
-    return cachedRelease;
-  } catch {
-    cachedRelease = null;
-    return null;
+const RUNTIME_RELEASES: Record<string, SignedBeaconRelease> = {
+  staging: stagingRelease as SignedBeaconRelease,
+  development: developmentRelease as SignedBeaconRelease,
+  production: legacyRelease as SignedBeaconRelease,
+};
+
+async function loadBundledRelease(env: BeaconReleaseEnv): Promise<SignedBeaconRelease | null> {
+  const runtime = resolveRuntimeEnvironment(env);
+  const cached = releaseCache.get(runtime);
+  if (cached !== undefined) return cached;
+
+  const candidates = [
+    RUNTIME_RELEASES[runtime],
+    RUNTIME_RELEASES.development,
+    legacyRelease as SignedBeaconRelease,
+  ].filter((release): release is SignedBeaconRelease => Boolean(release));
+
+  for (const release of candidates) {
+    releaseCache.set(runtime, release);
+    return release;
   }
+
+  releaseCache.set(runtime, null);
+  return null;
 }
 
 async function verifyRelease(release: SignedBeaconRelease, signing: NonNullable<ReturnType<typeof resolveBeaconSigningKey>>): Promise<boolean> {
@@ -41,7 +59,7 @@ async function verifyRelease(release: SignedBeaconRelease, signing: NonNullable<
     version: release.version,
     beaconHash: release.beaconHash,
     publishedAt: release.publishedAt,
-    keyId: signing.keyId,
+    keyId: release.signature.keyId,
   };
   const key = await crypto.subtle.importKey(
     "raw",
@@ -62,7 +80,7 @@ async function verifyRelease(release: SignedBeaconRelease, signing: NonNullable<
 
 export async function getVerifiedBeaconV2State(env: BeaconReleaseEnv): Promise<VerifiedBeaconV2State> {
   const signing = resolveBeaconSigningKey(env);
-  const release = await loadBundledRelease();
+  const release = await loadBundledRelease(env);
   if (!release) {
     return {
       verified: false,

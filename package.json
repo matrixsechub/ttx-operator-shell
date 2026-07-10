@@ -47,6 +47,8 @@
     "organizer:scheduled": "node scripts/run-organizer-scheduled.mjs",
     "codex:validate": "node scripts/codex-validate.mjs",
     "test:staging-governance-proof": "node scripts/ci/staging-governance-proof.mjs",
+    "operator-os:staging-smoke": "node scripts/operator-os-staging-smoke.mjs",
+    "operator-os:staging-cleanup": "node scripts/operator-os-staging-cleanup.mjs",
     "codex:publish-beacon": "node scripts/publish-beacon-v2.mjs",
     "docs:operator-os": "node scripts/docs-scribe-operator-os.mjs"
   },

@@ -88,9 +88,14 @@ function main() {
     warnings.push("AUTH_SIGNING_KEY purpose should be auth-only");
   }
 
-  const beaconRelease = path.join(root, "msh-ops/beacon/releases/current.json");
-  if (!existsSync(beaconRelease)) {
-    warnings.push("signed beacon v2 release missing at msh-ops/beacon/releases/current.json");
+  const beaconRelease =
+    path.join(root, "msh-ops/beacon/releases/development/current.json");
+  const canonicalBeacon = path.join(root, "msh-ops/beacon/releases/canonical.payload.json");
+  if (!existsSync(beaconRelease) && !existsSync(path.join(root, "msh-ops/beacon/releases/current.json"))) {
+    warnings.push("signed beacon v2 development release missing");
+  }
+  if (!existsSync(canonicalBeacon)) {
+    warnings.push("canonical beacon payload missing at msh-ops/beacon/releases/canonical.payload.json");
   }
 
   if (!existsSync(receiptSchemaPath)) {
@@ -111,6 +116,14 @@ function main() {
   }
 
   let ungovernedC2C6 = 0;
+  let enabledUnmigratedC2C6 = 0;
+  const disabledHandlerFiles = {
+    "POST /api/governance/propose": "worker/backbone.ts",
+    "POST /api/governance/approve": "worker/backbone.ts",
+    "POST /api/ttx/local-scenarios/create": "worker/localScenarioRoutes.ts",
+    "POST /api/register": "worker/funnelRecovery.ts",
+  };
+
   for (const route of mutationRoutes) {
     const rank = actionClassRank(route.action_class);
     const governed = route.governed === true;
@@ -118,6 +131,20 @@ function main() {
     if (rank >= 2 && rank <= 6 && !governed && !disabled) {
       ungovernedC2C6 += 1;
       critical.push(`ungoverned C2-C6 route: ${route.method} ${route.path}`);
+    }
+    if (rank >= 2 && rank <= 6 && !governed && disabled) {
+      const handlerKey = `${route.method} ${route.path}`;
+      const handlerFile = disabledHandlerFiles[handlerKey];
+      if (!handlerFile || !existsSync(path.join(root, handlerFile))) {
+        enabledUnmigratedC2C6 += 1;
+        critical.push(`disabled route missing handler mapping: ${handlerKey}`);
+      } else {
+        const source = readFileSync(path.join(root, handlerFile), "utf8");
+        if (!source.includes("routeDisabledInGovernedEnvironment")) {
+          enabledUnmigratedC2C6 += 1;
+          critical.push(`enabled unmigrated C2-C6 route (missing staging guard): ${handlerKey}`);
+        }
+      }
     }
     if (governed) {
       const handlerHints = [
@@ -140,6 +167,9 @@ function main() {
   if (ungovernedC2C6 > 0) {
     critical.push(`ungoverned_c2_c6_routes=${ungovernedC2C6}`);
   }
+  if (enabledUnmigratedC2C6 > 0) {
+    critical.push(`enabled_unmigrated_c2_c6_routes=${enabledUnmigratedC2C6}`);
+  }
 
   if (!manifest.telemetry_events?.includes("organizer.scan.completed")) {
     warnings.push("telemetry_events missing organizer.scan.completed");
@@ -153,6 +183,7 @@ function main() {
     manifest_version: manifest.system?.codex_version ?? "unknown",
     drift_count: critical.length + warnings.length,
     ungoverned_c2_c6_routes: ungovernedC2C6,
+    enabled_unmigrated_c2_c6_routes: enabledUnmigratedC2C6,
     critical,
     warnings,
     validated_at: new Date().toISOString(),

@@ -14,6 +14,17 @@ function jsonResponse(payload: unknown, status = 200): Response {
   return Response.json(payload, { status, headers: { "Cache-Control": "no-store" } });
 }
 
+export function stripGovernanceFields(body: Record<string, unknown>): Record<string, unknown> {
+  const {
+    proposalId: _proposalId,
+    approvalId: _approvalId,
+    idempotencyKey: _idempotencyKey,
+    operatorApproval: _operatorApproval,
+    ...mutationPayload
+  } = body;
+  return mutationPayload;
+}
+
 export async function executeGovernedActivationMutation<TResult>(
   env: ActivationRouteEnv & GovernedExecutionEnv,
   options: {
@@ -50,7 +61,7 @@ export async function executeGovernedActivationMutation<TResult>(
     proposalId: fields.proposalId,
     approvalId: fields.approvalId,
     idempotencyKey: fields.idempotencyKey,
-    input: options.body,
+    input: options.mutationPayload,
     rollbackReference: options.rollbackReference ?? proposal.rollback_plan,
     execute: options.execute,
   });

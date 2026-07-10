@@ -16,6 +16,13 @@ export type {
 
 export { evaluateReceiptReserve } from "../governance/receiptReserveLogic";
 
+function optionalReservationRow(
+  cursor: { toArray(): Record<string, unknown>[] },
+): ReservationRow | undefined {
+  const row = cursor.toArray()[0];
+  return row ? (row as unknown as ReservationRow) : undefined;
+}
+
 export class ReceiptAuthority extends DurableObject {
   private schemaReady = false;
 
@@ -44,12 +51,12 @@ export class ReceiptAuthority extends DurableObject {
       return { status: "expired" };
     }
 
-    const byIdempotency = this.ctx.storage.sql
-      .exec(
+    const byIdempotency = optionalReservationRow(
+      this.ctx.storage.sql.exec(
         "SELECT * FROM reservation WHERE idempotency_key = ?",
         input.idempotencyKey,
-      )
-      .one() as unknown as ReservationRow | undefined;
+      ),
+    );
     if (byIdempotency) {
       if (byIdempotency.action_digest !== input.actionDigest) {
         return { status: "conflict", reasonCode: "IDEMPOTENCY_DIGEST_MISMATCH" };
@@ -65,9 +72,9 @@ export class ReceiptAuthority extends DurableObject {
       }
     }
 
-    const existing = this.ctx.storage.sql
-      .exec("SELECT * FROM reservation WHERE approval_id = ?", input.approvalId)
-      .one() as unknown as ReservationRow | undefined;
+    const existing = optionalReservationRow(
+      this.ctx.storage.sql.exec("SELECT * FROM reservation WHERE approval_id = ?", input.approvalId),
+    );
     if (existing) {
       if (existing.idempotency_key === input.idempotencyKey) {
         if (existing.status === "completed") {
@@ -96,9 +103,9 @@ export class ReceiptAuthority extends DurableObject {
       );
       return { status: "reserved", executionId: input.executionId };
     } catch {
-      const raced = this.ctx.storage.sql
-        .exec("SELECT * FROM reservation WHERE approval_id = ?", input.approvalId)
-        .one() as unknown as ReservationRow | undefined;
+      const raced = optionalReservationRow(
+        this.ctx.storage.sql.exec("SELECT * FROM reservation WHERE approval_id = ?", input.approvalId),
+      );
       if (raced?.idempotency_key === input.idempotencyKey && raced.status === "reserved") {
         return { status: "in_progress", executionId: raced.execution_id };
       }

@@ -24,6 +24,7 @@ import { evaluateLegacyOperatorApproval } from "../governance/legacyApproval";
 import {
   activationMutationRequiresGovernance,
   executeGovernedActivationMutation,
+  stripGovernanceFields,
 } from "./governedActivation";
 import type { ActivationOverview } from "./types";
 
@@ -141,7 +142,7 @@ async function executeGovernedActivationCreate(
   return executeGovernedActivationMutation(env, {
     actionType: "activation.campaign.create",
     body,
-    mutationPayload: body,
+    mutationPayload: stripGovernanceFields(body),
     execute: async () =>
       createCampaign(env, {
         name,

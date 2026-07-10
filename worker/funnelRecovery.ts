@@ -16,10 +16,14 @@ import {
   resolveRagPlanId,
   resolveRemediationPlanId,
 } from "./fulfillmentAgentRoutes";
+import { routeDisabledInGovernedEnvironment } from "./governance/routeDisabled";
+import type { ModeEnv } from "./mode";
+import type { BuildInfoEnv } from "./buildInfo";
 
-type FunnelRecoveryEnv = {
-  TTX_STATE?: KVNamespace;
-};
+type FunnelRecoveryEnv = ModeEnv &
+  BuildInfoEnv & {
+    TTX_STATE?: KVNamespace;
+  };
 
 type ServiceCatalogItem = {
   slug: string;
@@ -915,6 +919,9 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
     }
 
     if (method === "POST" && pathname === "/api/register") {
+      const disabled = routeDisabledInGovernedEnvironment(env, "Public registration pending governance migration");
+      if (disabled) return disabled;
+
       const limited = checkRateLimit(request, "register:write", WRITE_LIMIT);
       if (limited) return limited;
 

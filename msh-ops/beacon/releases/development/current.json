@@ -117,10 +117,10 @@
     }
   },
   "beaconHash": "50a56303603f6fb65653764dca13ae1d7100197f48d4b7c055fbd68da4fac65c",
-  "publishedAt": "2026-07-10T15:36:29.418Z",
+  "publishedAt": "2026-07-10T14:04:53.109Z",
   "signature": {
     "algorithm": "HMAC-SHA-256",
     "keyId": "beacon-signing-key-v1",
-    "value": "5888a510f9bcc59ae97ed35801b46ed043842bbdf805784fdb99689443a57dd7"
+    "value": "3cc3642bc4b85fd8dcc08e4cb782705579f44ab4533bf67520b7d4beddd5d704"
   }
 }

@@ -6,7 +6,9 @@ Manual checklist for promoting governed enforcement to `ttx-operator-shell-stagi
 
 ```text
 PHASE_0::COMPLETE
-PHASE_1::SYSTEM_WIDE_CLOSED
+PHASE_1::LOCAL_IMPLEMENTATION_VERIFIED
+PHASE_1::STAGING_RC_CREATED
+PHASE_1::STAGING_PROOF_PENDING
 PHASE_2A::CODEX_DX_FOUNDATION_COMPLETE
 PHASE_2B::REFACTOR_PROPOSALS_READY
 PHASE_3::NOT_STARTED
@@ -36,16 +38,17 @@ npm run codex:validate
 npm test
 ```
 
-Expected codex gate: `ungoverned_c2_c6_routes: 0`.
+Expected codex gate: `ungoverned_c2_c6_routes: 0`, `enabled_unmigrated_c2_c6_routes: 0`.
 
 ## Beacon v2 publish (before staging smoke)
 
 ```bash
-BEACON_SIGNING_KEY="<staging-beacon-key>" node scripts/publish-beacon-v2.mjs
+BEACON_SIGNING_KEY="<staging-beacon-key>" node scripts/publish-beacon-v2.mjs --env staging --force
 npm run build
 ```
 
-Verify `msh-ops/beacon/releases/current.json` signature uses domain `MSHOPS::BEACON_RELEASE::V2`.
+Canonical unsigned payload: `msh-ops/beacon/releases/canonical.payload.json`.  
+Environment signed envelope: `msh-ops/beacon/releases/staging/current.json` (staging only).
 
 ## Staging deploy (manual)
 

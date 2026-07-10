@@ -17,7 +17,7 @@ import {
   GOVERNANCE_RECEIPT_DOMAIN,
   GOVERNANCE_RECEIPT_KEY_ID,
 } from "../worker/governance/signingKeys.ts";
-import release from "../msh-ops/beacon/releases/current.json" with { type: "json" };
+import release from "../msh-ops/beacon/releases/development/current.json" with { type: "json" };
 
 function mockKv(): KVNamespace {
   const store = new Map<string, string>();
