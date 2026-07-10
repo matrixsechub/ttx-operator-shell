@@ -1,0 +1,55 @@
+name: Reusable Wrangler Dry Run
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to checkout
+        required: false
+        type: string
+      git_commit_sha:
+        description: Build provenance commit SHA
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  wrangler-dry-run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    env:
+      GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
+      BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+
+      - uses: ./.github/actions/setup-node-npm
+        with:
+          node-version: "24"
+
+      - run: npm run verify:staging-config
+
+      - run: npm run build
+
+      - run: mkdir -p .artifacts/wrangler-production .artifacts/wrangler-staging
+
+      - name: Wrangler production dry run
+        run: npx wrangler deploy --dry-run --outdir .artifacts/wrangler-production
+
+      - name: Wrangler staging dry run
+        run: npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: wrangler-dry-run-metadata
+          path: |
+            .artifacts/wrangler-production
+            .artifacts/wrangler-staging
+          retention-days: 7
+          if-no-files-found: error

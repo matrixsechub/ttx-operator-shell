@@ -186,4 +186,15 @@ wrangler deploy --env staging --dry-run --outdir dist-staging-dryrun
 
 ## Branch protection (recommended)
 
-Enable GitHub branch protection on `main` requiring the `CI` workflow (`typecheck` → `test` → `build`) to pass before merge.
+Enable GitHub branch protection on `main` requiring these CI checks before merge:
+
+| Check | Workflow |
+|---|---|
+| `pr-gate` | CI |
+| `build-test` | CI |
+| `wrangler-dry-run` | CI |
+| `security-pr` | Security PR |
+
+Remove the legacy `typecheck-test-build` required check after the new checks have passed at least once.
+
+Manual staging deployment via GitHub Actions is documented in [STAGING-DEPLOYMENT.md](./STAGING-DEPLOYMENT.md).

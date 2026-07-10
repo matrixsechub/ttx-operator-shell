@@ -1,0 +1,61 @@
+name: Security PR
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  security-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-node-npm
+        with:
+          node-version: "24"
+
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+      - name: Secret pattern scan
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          scan_file() {
+            local file="$1"
+            if grep -qE '(BEGIN (RSA |OPENSSH )?PRIVATE KEY|sk_live_|CLOUDFLARE_API_TOKEN=|AUTH_SIGNING_KEY=.{16,})' "$file" 2>/dev/null; then
+              echo "SECRET_SCAN::FAIL::pattern-match::$file"
+              return 1
+            fi
+            return 0
+          }
+          failed=0
+          if git ls-files --error-unmatch .dev.vars >/dev/null 2>&1; then
+            echo "SECRET_SCAN::FAIL::tracked-file::.dev.vars"
+            failed=1
+          fi
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            [ -f "$file" ] || continue
+            case "$file" in
+              *.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico|package-lock.json) continue ;;
+            esac
+            scan_file "$file" || failed=1
+          done < <(git diff --name-only "$BASE_SHA" HEAD)
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+          echo "SECRET_SCAN::PASS"
+
+      - run: node scripts/ci/workflow-permissions-lint.mjs
+
+      - run: node scripts/ci/audit-action-pins.mjs
