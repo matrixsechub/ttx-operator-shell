@@ -14,7 +14,7 @@ export const SMOKE_ROUTE_CONTRACTS = [
     path: "/",
     expectStatus: 200,
     contentTypeIncludes: "text/html",
-    htmlIncludes: ["Ecosystem Entry", "Operator Terminal"],
+    htmlIncludes: ["MSHOPS.NET", "Service Selection Funnel"],
     securityHeaders: true,
   },
   {

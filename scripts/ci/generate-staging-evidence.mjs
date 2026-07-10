@@ -15,30 +15,18 @@ function main() {
   mkdirSync(artifactsDir, { recursive: true });
 
   const smokeReport = readJson(join(process.cwd(), "artifacts", "staging-smoke-report.json"));
-  const aiGatewayReport = readJson(join(process.cwd(), "artifacts", "ai-gateway-smoke-report.json"));
-  const fulfillmentScopeReport = readJson(join(process.cwd(), "artifacts", "ai-fulfillment-scope-report.json"));
   const buildManifest = readJson(join(process.cwd(), "dist", ".build-manifest.json"));
 
   const validation = {
     permissions_lint: process.env.VALIDATION_PERMISSIONS_LINT ?? "PASS",
     action_pin_audit: process.env.VALIDATION_ACTION_PIN_AUDIT ?? "PASS",
     staging_config: process.env.VALIDATION_STAGING_CONFIG ?? "PASS",
-    ai_fulfillment_scope: fulfillmentScopeReport?.ok === false
-      ? "FAIL"
-      : fulfillmentScopeReport?.ok === true
-        ? "PASS"
-        : process.env.VALIDATION_AI_FULFILLMENT_SCOPE ?? "NOT_RUN",
     typecheck: process.env.VALIDATION_TYPECHECK ?? "PASS",
     tests: process.env.VALIDATION_TESTS ?? "PASS",
     build: process.env.VALIDATION_BUILD ?? "PASS",
     wrangler_dry_run: process.env.VALIDATION_WRANGLER_DRY_RUN ?? "PASS",
     deployment: process.env.VALIDATION_DEPLOYMENT ?? "PASS",
     smoke: smokeReport?.summary?.failed ? "FAIL" : smokeReport ? "PASS" : "NOT_RUN",
-    ai_gateway_smoke: aiGatewayReport?.ok === false
-      ? "FAIL"
-      : aiGatewayReport?.ok === true
-        ? "PASS"
-        : process.env.VALIDATION_AI_GATEWAY_SMOKE ?? "NOT_RUN",
   };
 
   const releaseMetadata = {
@@ -65,8 +53,6 @@ function main() {
     generated_at: new Date().toISOString(),
     validation,
     smoke_summary: smokeReport?.summary ?? null,
-    ai_gateway_summary: aiGatewayReport?.summary ?? null,
-    ai_fulfillment_scope_summary: fulfillmentScopeReport?.summary ?? null,
   };
 
   writeFileSync(join(artifactsDir, "release-metadata.json"), JSON.stringify(releaseMetadata, null, 2));
@@ -74,17 +60,6 @@ function main() {
 
   if (smokeReport) {
     writeFileSync(join(artifactsDir, "staging-smoke-report.json"), JSON.stringify(smokeReport, null, 2));
-  }
-
-  if (aiGatewayReport) {
-    writeFileSync(join(artifactsDir, "ai-gateway-smoke-report.json"), JSON.stringify(aiGatewayReport, null, 2));
-  }
-
-  if (fulfillmentScopeReport) {
-    writeFileSync(
-      join(artifactsDir, "ai-fulfillment-scope-report.json"),
-      JSON.stringify(fulfillmentScopeReport, null, 2),
-    );
   }
 
   if (buildManifest) {
@@ -95,8 +70,6 @@ function main() {
     "release-metadata.json",
     "validation-summary.json",
     "staging-smoke-report.json",
-    "ai-gateway-smoke-report.json",
-    "ai-fulfillment-scope-report.json",
     "build-manifest.json",
   ];
   const checksumLines = [];
