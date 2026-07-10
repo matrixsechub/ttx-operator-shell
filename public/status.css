@@ -1,0 +1,27 @@
+﻿.footer-divider {
+  width: min(1180px, calc(100% - 2rem));
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
+  opacity: 0.55;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.status-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text);
+}
+
+@media (max-width: 1080px) {
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+}

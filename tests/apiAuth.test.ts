@@ -9,6 +9,14 @@ describe("isPublicApiRoute", () => {
     assert.equal(isPublicApiRoute("/api/build-info", "GET"), true);
     assert.equal(isPublicApiRoute("/api/system/health", "GET"), true);
     assert.equal(isPublicApiRoute("/api/marketplace/catalog", "GET"), true);
+    assert.equal(isPublicApiRoute("/api/register", "POST"), true);
+    assert.equal(isPublicApiRoute("/api/register-lifecycle", "GET"), true);
+    assert.equal(isPublicApiRoute("/api/service-selector", "POST"), true);
+    assert.equal(isPublicApiRoute("/api/engagements/status", "GET"), true);
+    assert.equal(isPublicApiRoute("/api/audit-lite/start", "POST"), true);
+    assert.equal(isPublicApiRoute("/api/audit-lite/status/aud_123", "GET"), true);
+    assert.equal(isPublicApiRoute("/api/audit-lite/result/aud_123", "GET"), true);
+    assert.equal(isPublicApiRoute("/api/audit-lite/webhook", "POST"), true);
   });
 
   it("denies protected operator routes by default", () => {

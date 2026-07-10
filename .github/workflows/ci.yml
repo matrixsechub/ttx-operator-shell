@@ -6,7 +6,7 @@ on:
 
 jobs:
   typecheck-test-build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       GIT_COMMIT_SHA: ${{ github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp }}

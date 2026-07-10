@@ -1,0 +1,112 @@
+﻿/**
+ * RGB+GOLD OPERATOR DESIGN SYSTEM — TOKENS
+ * -----------------------------------------------------------------------
+ * Ports the shared RGB+Gold Matrix-Tron design system (originally built for
+ * the MSHOPS.NET marketing site) into the ttx-operator-shell console as an
+ * ADDITIVE layer.
+ *
+ * IMPORTANT — NAMESPACING RATIONALE:
+ * This app already has its own complete, live token set in /public/styles.css
+ * (--gold, --blue, --neon-cyan, --space-*, --radius-*, --duration-*, etc.)
+ * powering every existing page. Those values differ from the marketing
+ * site's tokens of the same conceptual name (e.g. this app's --gold is
+ * #f2c14e, the marketing system's is #f5c451). Re-declaring `--gold` etc.
+ * on :root here would silently override the existing token used
+ * everywhere, causing a global, unreviewed color-shift regression.
+ *
+ * To guarantee zero regression, every custom property in this system is
+ * prefixed `--rgbgold-*`. Existing tokens and selectors in styles.css are
+ * never touched. New utility classes (see rgbgold-motion.css,
+ * rgbgold-components.css, rgbgold-hud.css) consume ONLY these prefixed
+ * tokens, and use class names that do not collide with existing classes
+ * (.hud-frame, .badge, .marketplace-card, .button, .bracket, .hud-ticker
+ * already exist with different implementations and are intentionally left
+ * untouched).
+ *
+ * Load order: rgbgold-tokens.css -> rgbgold-motion.css ->
+ * rgbgold-components.css -> rgbgold-hud.css -> styles.css (existing).
+ *
+ * DRIFT-MARKER: layer=tokens file=public/styles/rgbgold-tokens.css version=1.0
+ */
+
+:root {
+  /* Accent palette (mirrors the marketing system's RGB+Gold values) */
+  --rgbgold-cyan: #3cf2ff;
+  --rgbgold-magenta: #d34bff;
+  --rgbgold-violet: #7f6dff;
+  --rgbgold-lime: #8eff75;
+  --rgbgold-gold: #f5c451;
+  --rgbgold-gold-soft: #ffe6a3;
+  --rgbgold-gold-deep: #9a6a1c;
+  --rgbgold-critical: #ff5470;
+  --rgbgold-critical-soft: #ffb3c0;
+
+  /* Gradients */
+  --rgbgold-gradient-main: linear-gradient(120deg, #08d9ff 0%, #945cff 45%, #ff4dd8 100%);
+  --rgbgold-gradient-rgbgold: linear-gradient(115deg, #3cf2ff 0%, #945cff 28%, #ff4dd8 54%, #f5c451 82%, #3cf2ff 100%);
+  --rgbgold-gradient-gold: linear-gradient(120deg, #ffe6a3 0%, #f5c451 50%, #9a6a1c 100%);
+
+  /* Shadows / glows */
+  --rgbgold-shadow-glow: 0 0 0 1px rgba(60, 242, 255, 0.18), 0 16px 38px rgba(60, 242, 255, 0.15);
+  --rgbgold-shadow-gold: 0 0 0 1px rgba(245, 196, 81, 0.4), 0 16px 34px rgba(245, 196, 81, 0.22);
+  --rgbgold-shadow-premium: 0 0 0 1px rgba(245, 196, 81, 0.3), 0 0 30px rgba(60, 242, 255, 0.2), 0 18px 40px rgba(211, 75, 255, 0.18);
+  --rgbgold-shadow-critical: 0 0 0 1px rgba(255, 84, 112, 0.4), 0 16px 34px rgba(255, 84, 112, 0.22);
+  --rgbgold-glow-cyan-sm: 0 0 12px rgba(60, 242, 255, 0.6);
+  --rgbgold-glow-gold-sm: 0 0 12px rgba(245, 196, 81, 0.6);
+
+  /* Radii (aliases; reuse the app's own radius scale where equivalent) */
+  --rgbgold-radius-sm: var(--radius-sm, 12px);
+  --rgbgold-radius-md: var(--radius-md, 18px);
+  --rgbgold-radius-lg: var(--radius-lg, 28px);
+  --rgbgold-radius-pill: 999px;
+
+  /* Spacing (aliases onto the app's existing scale so new components share rhythm) */
+  --rgbgold-space-1: var(--space-1, 4px);
+  --rgbgold-space-2: var(--space-2, 8px);
+  --rgbgold-space-3: var(--space-3, 12px);
+  --rgbgold-space-4: var(--space-4, 16px);
+  --rgbgold-space-5: var(--space-5, 24px);
+  --rgbgold-space-6: var(--space-6, 32px);
+
+  /* Motion */
+  --rgbgold-ease-standard: var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
+  --rgbgold-ease-emphasized: cubic-bezier(0.2, 0.9, 0.2, 1);
+  --rgbgold-duration-slow: 620ms;
+  --rgbgold-duration-reveal: 720ms;
+  --rgbgold-duration-glow-pulse: 3.4s;
+  --rgbgold-duration-border-flow: 7s;
+  --rgbgold-duration-shimmer: 6s;
+  --rgbgold-duration-blink: 1.8s;
+
+  /* Z-index (kept out of the app's stacking scale entirely to avoid clashes) */
+  --rgbgold-z-decoration: -1;
+
+  /* ---------------------------------------------------------------------
+   * RESERVED NAMESPACES — FUTURE MODULE / OPERATOR SURFACE EXPANSION
+   * `--rgbgold-future-*` is reserved for new cinematic tokens introduced by
+   * future modules, operator surfaces, or marketplace entries, so they
+   * never collide with the `--rgbgold-*` tokens above OR with this app's
+   * own existing token set (--gold, --blue, --neon-cyan, etc.).
+   * `--a11y-future-*` is reserved the same way for new high-contrast/
+   * accessibility tokens (see a11y.css, which owns the live `--a11y-*`
+   * tokens actually consumed today).
+   *
+   * HOW TO ADD A NEW TOKEN SAFELY:
+   *   1. Never repurpose or redefine an existing `--rgbgold-*` token, and
+   *      never redeclare any of this app's pre-existing tokens (--gold,
+   *      --blue, --neon-cyan, --space-*, --radius-*, --duration-*, etc.) -
+   *      that would silently regress every existing page.
+   *   2. Add the new token in the matching section above (palette/
+   *      gradient/shadow/spacing/motion), prefixed `--rgbgold-`, not down
+   *      here - these two placeholders exist only to reserve the naming
+   *      convention ahead of time.
+   *   3. If the token belongs to a not-yet-built module/operator surface,
+   *      prefix it `--rgbgold-future-<name>` until the surface ships, then
+   *      rename it into its permanent `--rgbgold-<name>` home in the same
+   *      change that wires up the surface.
+   *   4. Accessibility-specific tokens always go through a11y.css under
+   *      `--a11y-*` (or `--a11y-future-*` pre-launch), never here.
+   * ------------------------------------------------------------------- */
+  --rgbgold-future-reserved: initial;
+  --a11y-future-reserved: initial;
+}

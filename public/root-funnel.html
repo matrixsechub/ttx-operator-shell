@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Service Selection Funnel</title>
+    <meta
+      name="description"
+      content="MSHOPS.NET public funnel for service selection, guided intake, and public-safe ecosystem onboarding."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23050608'/%3E%3Cpath d='M18 18h10l4 11 4-11h10v28h-7V30l-5 13h-4l-5-13v16h-7V18Z' fill='%23f2c14e'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/nav.css" />
+    <link rel="stylesheet" href="/styles/splash.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+    <link rel="stylesheet" href="/styles/growth-indicators.css" />
+      <script src="/scripts/route-canonicalize.js" defer></script>
+  </head>
+  <body>
+    <!-- FEDGRADE: ACCESSIBILITY OK — skip link for keyboard users -->
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MSHOPS public homepage">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Service Selection Funnel</span>
+        </span>
+      </a>
+      <nav class="nav-ecosystem mono" aria-label="Public navigation">
+        <a href="/services" aria-label="Start service selection">Services</a>
+        <a class="register-cta-enterprise pulse mono" href="/enter" aria-label="Open the guided intake funnel">Start Intake</a>
+        <a href="/register" aria-label="Register for access updates">Register</a>
+        <a href="/ecosystem" aria-label="Open the public ecosystem overview">Ecosystem</a>
+        <a href="/status" aria-label="View public status">Status</a>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="hero-shell" data-splash-hero>
+        <article class="rgbgold-module-shell hud-frame reveal a11y-override-card" data-reveal="up" data-version="1.0">
+          <header class="rgbgold-module-shell-header">
+            <span class="hud-tag a11y-override-badge">Public // Funnel</span>
+            <p class="section-label mono">[ MSHOPS_SERVICE_SELECTION ]</p>
+            <h1 class="glow-pulse cinematic-hook">MSHOPS.NET service selection starts here.</h1>
+            <p class="hero-sub splash-hero-copy">
+              Choose the right AI service path, carry that context into guided intake, and keep every operator-facing
+              surface behind the existing public handoff boundary.
+            </p>
+          </header>
+          <div class="rgbgold-module-shell-body">
+            <div class="cta-row">
+              <a class="button primary" href="/services" aria-label="Start service selection">Start Service Selection</a>
+              <a class="register-cta-enterprise pulse mono" href="/enter" aria-label="Open the guided intake funnel">Open Guided Intake</a>
+              <a class="button secondary" href="/register" aria-label="Register for access updates">Register for Access</a>
+              <a class="button secondary" href="/ecosystem" aria-label="Explore the ecosystem overview">Explore Ecosystem</a>
+              <a class="button secondary" href="/apps/ai-service-quote" aria-label="Get an AI service quote">Get AI Service Quote</a>
+              <a class="button secondary" href="/apps/automation-builder" aria-label="Plan an AI automation build">Plan an AI Automation Build</a>
+              <a class="button secondary" href="/apps/ai-agent-builder" aria-label="Plan an AI agent build">Plan an AI Agent Build</a>
+              <a class="button secondary" href="/apps/security-fleet" aria-label="Analyze a security event">Analyze a Security Event</a>
+              <a class="button secondary" href="/apps/security-remediation-planner" aria-label="Generate a security remediation plan">Generate Remediation Plan</a>
+              <a class="button secondary" href="/apps/rag-architecture-planner" aria-label="Plan a RAG architecture">Plan RAG Architecture</a>
+            </div>
+            <div class="splash-signal-grid" aria-label="Unified public surface signals">
+              <div class="splash-signal-card">
+                <strong>Register</strong>
+                <span>Routes directly into the public registration surface at <code>/register</code>.</span>
+              </div>
+              <div class="splash-signal-card">
+                <strong>Service Selection</strong>
+                <span>The primary CTA routes into <code>/services</code> for recommendation-based public intake.</span>
+              </div>
+              <div class="splash-signal-card">
+                <strong>Guided Intake</strong>
+                <span>The intake funnel preserves selector, quote, and diagnostic context without exposing private tools.</span>
+              </div>
+            </div>
+            <div class="cinematic-hook" data-cinematic hidden></div>
+            <div class="motion-scan" data-motion-scan hidden></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div class="footer-divider" aria-hidden="true"></div>
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET public funnel</span>
+        <span class="splash-footer-note">Service selection, guided intake, and public-safe handoff into the MSHOPS ecosystem.</span>
+      </div>
+      <nav class="nav-ecosystem" aria-label="Footer navigation">
+        <a href="/services" aria-label="Start service selection">Services</a>
+        <a class="register-cta-enterprise pulse mono" href="/enter" aria-label="Open the guided intake funnel">Start Intake</a>
+        <a href="/register" aria-label="Register for access updates">Register</a>
+        <a href="/ecosystem" aria-label="Open the public ecosystem overview">Ecosystem</a>
+        <a href="/status" aria-label="View public status">Status</a>
+      </nav>
+    </footer>
+
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/growth-indicators.js" defer></script>
+    <script src="/scripts/splash.js" defer></script>
+  </body>
+</html>

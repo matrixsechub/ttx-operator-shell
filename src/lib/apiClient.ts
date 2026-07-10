@@ -1,4 +1,16 @@
-import type { BuildInfo, CatalogResponse, EngineHealth, EngineVersion, LoginPayload, LoginResponse, Operator, SystemStateResponse, SystemStatus } from "./types";
+import type {
+  BehaviorIntelligenceResponse,
+  BuildInfo,
+  CatalogResponse,
+  EngineHealth,
+  EngineVersion,
+  ExperimentationAssignmentResponse,
+  LoginPayload,
+  LoginResponse,
+  Operator,
+  SystemStateResponse,
+  SystemStatus,
+} from "./types";
 import { getToken, getStoredIdentity } from "./authToken";
 
 export interface ApiSuccess<T> {
@@ -120,4 +132,9 @@ export const api = {
   engineHealth: () => request<EngineHealth>("/api/engine/health"),
   engineVersion: () => request<EngineVersion>("/api/engine/version"),
   buildInfo: () => request<BuildInfo>("/api/build-info"),
+  getBehaviorIntelligence: () => request<BehaviorIntelligenceResponse>("/api/behavior/intelligence"),
+  getExperimentationAssignment: (sessionId: string) =>
+    request<ExperimentationAssignmentResponse>(
+      `/api/experimentation/assignment?sessionId=${encodeURIComponent(sessionId)}`,
+    ),
 };

@@ -14,7 +14,15 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true
   },
-  "include": ["worker", "worker-configuration.d.ts"]
+  "include": [
+    "worker",
+    "msh-ops/beacon",
+    "msh-ops/agent",
+    "msh-ops/governance/checkAutonomy.ts",
+    "msh-ops/mcp",
+    "worker-configuration.d.ts"
+  ]
 }

@@ -24,6 +24,50 @@ export interface CatalogResponse {
   items: CatalogItem[];
 }
 
+export interface BehaviorIntelligenceSnapshot {
+  metrics: {
+    entryRate: number;
+    marketplaceRate: number;
+    dropOffRate: number;
+  };
+  behaviorClass: string | null;
+  systemState: "LEARNING_ACTIVE" | "SIGNAL_WEAK" | "NOISE" | "SIGNAL_INVALID";
+}
+
+export interface BehaviorIntelligenceResponse {
+  ok: boolean;
+  intelligence: BehaviorIntelligenceSnapshot;
+  report?: string;
+}
+
+export type ExperimentUiMode = "CONFUSION" | "FRICTION" | "ENGAGED" | "DEFAULT";
+
+export interface ExperimentationSnapshot {
+  modeDistribution: Record<ExperimentUiMode, number>;
+  performanceByMode: Record<
+    ExperimentUiMode,
+    {
+      views: number;
+      entryRate: number;
+      marketplaceRate: number;
+      dropOffRate: number;
+    }
+  >;
+  winningMode: "CONFUSION" | "FRICTION" | "ENGAGED" | null;
+  worstMode: "CONFUSION" | "FRICTION" | "ENGAGED" | null;
+  confidenceLevel: "LOW" | "MEDIUM" | "HIGH";
+  systemState: "EXPERIMENTING" | "OPTIMIZING";
+  behaviorMode: ExperimentUiMode;
+}
+
+export interface ExperimentationAssignmentResponse {
+  ok: boolean;
+  assignedMode: ExperimentUiMode;
+  behaviorMode: ExperimentUiMode;
+  source: "behavior" | "explore" | "biased";
+  experimentation: ExperimentationSnapshot;
+}
+
 export interface SystemStatus {
   harness?: {
     state: string;
@@ -121,6 +165,55 @@ export interface SystemStateResponse {
       approvalsRequireOperator: boolean;
       eventsLoggedPermanently: boolean;
     };
+    usage?: {
+      visits: number;
+      entryClicks: number;
+      marketplaceClicks: number;
+      environment?: string;
+      updatedAt?: string;
+      signalIntegrity?: "VALID" | "INVALID_RATIOS";
+    };
+    behaviorIntelligence?: BehaviorIntelligenceSnapshot & {
+      governanceProposals: {
+        id: string;
+        type: string;
+        reason: string;
+        priority: string;
+        advisory?: boolean;
+        source?: string;
+      }[];
+    };
+    adaptation?: {
+      modes: {
+        CONFUSION: {
+          views: number;
+          entryRate: number;
+          marketplaceRate: number;
+          dropOffRate: number;
+        };
+        FRICTION: {
+          views: number;
+          entryRate: number;
+          marketplaceRate: number;
+          dropOffRate: number;
+        };
+        ENGAGED: {
+          views: number;
+          entryRate: number;
+          marketplaceRate: number;
+          dropOffRate: number;
+          conversionSignal: number;
+        };
+        DEFAULT: {
+          views: number;
+          entryRate: number;
+          marketplaceRate: number;
+          dropOffRate: number;
+        };
+      };
+      updatedAt: string;
+    };
+    experimentation?: ExperimentationSnapshot;
     telemetry: {
       environment?: string;
       governanceEventCount?: number;

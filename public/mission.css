@@ -1,0 +1,57 @@
+﻿/**
+ * PUBLIC MISSION FRAMEWORK - PAGE COMPOSITION
+ * -----------------------------------------------------------------------
+ * DRIFT-MARKER: layer=page file=public/mission.css version=2.0
+ *
+ * Page-specific composition for the public Mission Framework page
+ * (/mission.html) only. Rebuilt during the Public Mission Framework
+ * Rebuild pass (July 2026) to replace the legacy internal UCIP/AMG/CBA/
+ * CAL/IHL/IARL/ACL operator telemetry dashboard that previously lived at
+ * this public route (it linked directly to /operator and /os and is no
+ * longer appropriate for a public surface - that dashboard's concerns
+ * belong on operator-only pages, not here).
+ *
+ * Follows the same pattern as index.css/scenario.css/mission-engine.css:
+ * a small, page-scoped stylesheet layered on top of the shared RGB+Gold
+ * system rather than editing any protected design-system file
+ * (rgbgold-tokens/motion/components/hud/hooks.css, styles.css, a11y.css).
+ *
+ * Load order on mission.html: rgbgold-tokens.css -> rgbgold-motion.css ->
+ * rgbgold-components.css -> rgbgold-hud.css -> rgbgold-hooks.css ->
+ * styles.css -> mission.css -> a11y.css (last).
+ *
+ * Defines `.mission-timeline-panel` (a thin visual variant of
+ * `.rgbgold-module-shell` used for the Mission Timeline section - see
+ * DESIGN_SYSTEM.md's Mission Engine sections for the interactive
+ * counterpart) and `.footer-divider`. `.footer-divider` is an
+ * intentional, independent duplicate of index.css's rule of the same
+ * name (mission.html does not load index.css, so this page needs its own
+ * copy) - same pattern already used by `.mission-doctrine-tag` duplicating
+ * `.scenario-doctrine-tag` on the Mission Engine console. Introduces no
+ * new pseudo-elements of its own (see the budget table in
+ * rgbgold-hud.css) and no animation - reduced-motion and Accessibility
+ * Mode are unaffected by anything in this file.
+ */
+
+.footer-divider {
+  width: min(1180px, calc(100% - 2rem));
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
+  opacity: 0.55;
+}
+
+.mission-timeline-panel {
+  display: grid;
+  gap: var(--rgbgold-space-4);
+  padding: var(--rgbgold-space-6);
+  border-radius: var(--rgbgold-radius-lg);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+}
+
+.mission-timeline-panel code {
+  font-family: var(--font-mono, monospace);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}

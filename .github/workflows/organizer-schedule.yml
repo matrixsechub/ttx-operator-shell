@@ -1,0 +1,34 @@
+name: Organizer Schedule
+
+on:
+  schedule:
+    # Daily at 12:00 UTC — scripts/run-organizer-scheduled.mjs enforces a 72h minimum interval
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+jobs:
+  organizer:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: actions/cache@v4
+        with:
+          path: .artifacts/organizer-last-run.json
+          key: organizer-last-run-state
+
+      - run: npm ci
+
+      - run: npm run organizer:scheduled
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: organizer-scheduled-report
+          path: .artifacts/organizer-scheduled-report.json
+          if-no-files-found: ignore

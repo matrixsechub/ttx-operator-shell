@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Northstar Beacon Governance App</title>
+    <meta
+      name="description"
+      content="Operator-controlled AI governance for multi-agent systems. Create a tamper-evident strategic Beacon every agent must load and obey."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/scripts/route-canonicalize.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Northstar Beacon Governance</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#tiers">Tiers</a>
+        <a href="#intake-form">Configure</a>
+        <a href="/services">Services</a>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ MARKETPLACE_APP :: NORTHSTAR_BEACON_GOVERNANCE ]</p>
+            <h1>Northstar Beacon Governance App</h1>
+            <p class="hero-sub">
+              Operator-controlled AI governance for multi-agent systems. Create an immutable strategic Beacon that every
+              agent must load at initialization, validate before use, and reference when generating recommendations or
+              requesting execution approval.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#intake-form">[ SELECT TIER AND CONFIGURE BEACON ]</a>
+              <a class="button secondary" href="#trust">[ VIEW GOVERNANCE GUARANTEES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ BEACON_FLOW ]</p>
+            <h2>Governance flow</h2>
+          </div>
+        </div>
+        <div class="services-layout">
+          <article class="service-card bracket">
+            <div class="bracket-inner">
+              <p class="mono">1. INTAKE → 2. GENERATE → 3. HASH VERIFY → 4. OPERATOR APPROVAL → 5. DEPLOY</p>
+              <p class="system-copy">
+                Agents read the Beacon as read-only. MCP sources may propose governance signals but cannot mutate
+                northstar.json. Operator approval is required before any beacon change is manually applied.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="tiers">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ PRICING_TIERS ]</p>
+            <h2>Choose your governance tier</h2>
+          </div>
+        </div>
+        <div class="services-layout" id="northstar-tier-grid"></div>
+      </section>
+
+      <section class="section-block" id="trust">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ TRUST_AND_AUDIT ]</p>
+            <h2>Security and governance guarantees</h2>
+          </div>
+        </div>
+        <ul class="mono system-copy">
+          <li>Beacon is read-only to agents</li>
+          <li>No MCP source can mutate the active Beacon</li>
+          <li>No agent can self-approve governance changes</li>
+          <li>SHA-256 integrity verification with safe-mode failure</li>
+          <li>Proposal logging separate from manual apply</li>
+          <li>No private MSHOPS internal doctrine in generated packages</li>
+        </ul>
+      </section>
+
+      <section class="section-block" id="intake-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ BEACON_INTAKE ]</p>
+            <h2>Configure your customer Beacon</h2>
+          </div>
+          <p class="mono" id="northstar-step-label">Step 1 of 2</p>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <form class="contact-form" id="northstar-beacon-form">
+                <input type="hidden" name="selected_tier" id="selected-tier-input" value="beacon-core" />
+                <div class="quote-step is-active" data-northstar-step="0">
+                  <label>
+                    <span>Organization name</span>
+                    <input name="organization_name" type="text" required placeholder="Acme AI Agency" />
+                  </label>
+                  <label>
+                    <span>Strategic Northstar</span>
+                    <textarea name="strategic_northstar" rows="4" required placeholder="Your strategic mission statement for all agents."></textarea>
+                  </label>
+                  <label>
+                    <span>Strategic axis (comma-separated)</span>
+                    <input name="strategic_axis" type="text" required placeholder="STABILITY, TRUST, CONTROLLED_GROWTH" />
+                  </label>
+                  <label>
+                    <span>Priorities (comma-separated)</span>
+                    <input name="priorities" type="text" required placeholder="Revenue validation, operator approval, audit logging" />
+                  </label>
+                  <label>
+                    <span>Prohibited actions (comma-separated)</span>
+                    <input name="prohibited_actions" type="text" placeholder="Autonomous production deploy, credential rotation" />
+                  </label>
+                  <label>
+                    <span>Approval-required actions (comma-separated)</span>
+                    <input name="approval_required_actions" type="text" placeholder="State mutation, external API calls" />
+                  </label>
+                </div>
+                <div class="quote-step" data-northstar-step="1" hidden>
+                  <label>
+                    <span>Agent roles (comma-separated)</span>
+                    <input name="agent_roles" type="text" placeholder="planner, executor, reviewer" />
+                  </label>
+                  <label>
+                    <span>Recursion depth limit</span>
+                    <input name="recursion_depth_limit" type="number" min="0" max="16" value="3" />
+                  </label>
+                  <label>
+                    <span>Deployment environment</span>
+                    <select name="deployment_environment">
+                      <option value="cloudflare_workers">Cloudflare Workers</option>
+                      <option value="node_service">Node service</option>
+                      <option value="kubernetes">Kubernetes</option>
+                      <option value="hybrid">Hybrid</option>
+                      <option value="local_only">Local only</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Preferred implementation language</span>
+                    <select name="preferred_language">
+                      <option value="typescript">TypeScript</option>
+                      <option value="python">Python</option>
+                      <option value="go">Go</option>
+                      <option value="mixed">Mixed</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Compliance framework (optional)</span>
+                    <input name="compliance_framework" type="text" placeholder="NIST CSF, SOC 2 readiness" />
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="assisted_implementation" value="true" />
+                    Request assisted implementation
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="operator_authority_confirm" value="true" required />
+                    I confirm operator retains execution authority over all agents
+                  </label>
+                </div>
+                <div class="form-actions">
+                  <button class="button secondary" type="button" id="northstar-prev" hidden>[ PREVIOUS ]</button>
+                  <button class="button primary" type="button" id="northstar-next">[ NEXT ]</button>
+                  <button class="button primary" type="submit" id="northstar-submit" hidden>[ GENERATE BEACON PACKAGE ]</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="northstar-beacon-status" role="status" aria-live="polite"></p>
+              <div id="northstar-beacon-result"></div>
+            </div>
+          </article>
+          <article class="service-card bracket">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ SAMPLE_BEACON_PREVIEW ]</p>
+              <pre class="mono system-copy" id="northstar-sample-preview">Loading sample preview…</pre>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block" id="faq">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ FAQ ]</p>
+            <h2>Frequently asked questions</h2>
+          </div>
+        </div>
+        <div id="northstar-faq-list" class="services-layout"></div>
+      </section>
+
+      <section class="section-block">
+        <div class="cta-row">
+          <a class="button primary" href="#intake-form">[ PURCHASE AND CONFIGURE ]</a>
+          <a class="button secondary" href="/enter?service=northstar_beacon_governance">[ REQUEST ASSISTED IMPLEMENTATION ]</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="/northstar-beacon.js" defer></script>
+  </body>
+</html>

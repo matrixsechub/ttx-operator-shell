@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | RAG Risk Analyzer</title>
+    <meta
+      name="description"
+      content="Assess whether your knowledge assistant, document AI system, or RAG pipeline is exposing sensitive data, weak retrieval boundaries, or governance gaps."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>RAG Risk Analyzer</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#rag-risk-form">Analyzer</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: RAG_RISK_ANALYZER_V1 ]</p>
+            <h1>RAG Risk Analyzer</h1>
+            <p class="hero-sub">
+              Assess whether your knowledge assistant, document AI system, or RAG pipeline is exposing sensitive data, weak retrieval boundaries, or governance gaps.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#rag-risk-form">[ ANALYZE RAG RISK ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="rag-risk-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ RAG_RISK_FORM ]</p>
+            <h2>Answer the RAG risk questionnaire</h2>
+          </div>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>RAG risk questionnaire</h3>
+              <p class="system-copy">
+                This is a deterministic advisory tool. It scores retrieval exposure, access-control maturity, governance, and prompt-injection risk without ingesting documents or executing RAG.
+              </p>
+              <form class="contact-form" id="rag-risk-form-element">
+                <label>
+                  <span>1. RAG System Type</span>
+                  <select name="rag_system_type" required>
+                    <option value="internal_knowledge_assistant">Internal knowledge assistant</option>
+                    <option value="customer_support_rag">Customer support RAG</option>
+                    <option value="sales_enablement_assistant">Sales enablement assistant</option>
+                    <option value="legal_or_policy_assistant">Legal or policy assistant</option>
+                    <option value="technical_docs_assistant">Technical docs assistant</option>
+                    <option value="research_assistant">Research assistant</option>
+                    <option value="employee_copilot">Employee copilot</option>
+                    <option value="document_qna_tool">Document Q&A tool</option>
+                    <option value="agent_with_rag">Agent with RAG</option>
+                    <option value="planning_only">Planning only</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>2. Deployment Context</span>
+                  <select name="deployment_context" required>
+                    <option value="internal_only">Internal only</option>
+                    <option value="customer_facing">Customer facing</option>
+                    <option value="public_website">Public website</option>
+                    <option value="partner_or_client_portal">Partner or client portal</option>
+                    <option value="employee_copilot">Employee copilot</option>
+                    <option value="connected_to_business_tools">Connected to business tools</option>
+                    <option value="planning_only">Planning only</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>3. Data Sources</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="data_sources" value="public_docs" /> Public docs</label>
+                    <label><input type="checkbox" name="data_sources" value="internal_docs" /> Internal docs</label>
+                    <label><input type="checkbox" name="data_sources" value="customer_records" /> Customer records</label>
+                    <label><input type="checkbox" name="data_sources" value="sales_materials" /> Sales materials</label>
+                    <label><input type="checkbox" name="data_sources" value="support_tickets" /> Support tickets</label>
+                    <label><input type="checkbox" name="data_sources" value="legal_docs" /> Legal docs</label>
+                    <label><input type="checkbox" name="data_sources" value="financial_docs" /> Financial docs</label>
+                    <label><input type="checkbox" name="data_sources" value="health_or_patient_docs" /> Health or patient docs</label>
+                    <label><input type="checkbox" name="data_sources" value="policy_or_hr_docs" /> Policy or HR docs</label>
+                    <label><input type="checkbox" name="data_sources" value="source_code" /> Source code</label>
+                    <label><input type="checkbox" name="data_sources" value="credentials_or_secrets" /> Credentials or secrets</label>
+                    <label><input type="checkbox" name="data_sources" value="regulated_data" /> Regulated data</label>
+                    <label><input type="checkbox" name="data_sources" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>4. Retrieval Scope</span>
+                  <select name="retrieval_scope" required>
+                    <option value="public_only">Public only</option>
+                    <option value="team_specific">Team specific</option>
+                    <option value="department_specific">Department specific</option>
+                    <option value="company_wide">Company wide</option>
+                    <option value="customer_specific">Customer specific</option>
+                    <option value="mixed_sensitive_and_public">Mixed sensitive and public</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>5. Access Controls</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="access_controls" value="user_role_filtering" /> User role filtering</label>
+                    <label><input type="checkbox" name="access_controls" value="document_level_permissions" /> Document-level permissions</label>
+                    <label><input type="checkbox" name="access_controls" value="tenant_isolation" /> Tenant isolation</label>
+                    <label><input type="checkbox" name="access_controls" value="source_based_filtering" /> Source-based filtering</label>
+                    <label><input type="checkbox" name="access_controls" value="approval_required_for_sensitive_docs" /> Approval required for sensitive docs</label>
+                    <label><input type="checkbox" name="access_controls" value="no_access_controls" /> No access controls</label>
+                    <label><input type="checkbox" name="access_controls" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>6. Source Governance</span>
+                  <select name="source_governance" required>
+                    <option value="curated_approved_sources">Curated approved sources</option>
+                    <option value="mostly_curated">Mostly curated</option>
+                    <option value="mixed_sources">Mixed sources</option>
+                    <option value="user_uploaded_docs">User uploaded docs</option>
+                    <option value="web_crawled_sources">Web crawled sources</option>
+                    <option value="unknown_or_unmanaged">Unknown or unmanaged</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>7. Retrieval Quality Controls</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="citations_required" /> Citations required</label>
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="source_links_shown" /> Source links shown</label>
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="confidence_scoring" /> Confidence scoring</label>
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="answer_abstention" /> Answer abstention</label>
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="retrieval_evaluation" /> Retrieval evaluation</label>
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="hallucination_testing" /> Hallucination testing</label>
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="no_quality_controls" /> No quality controls</label>
+                    <label><input type="checkbox" name="retrieval_quality_controls" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="services-fieldset">
+                  <legend><span>8. Prompt Injection Controls</span></legend>
+                  <div class="services-checkbox-grid">
+                    <label><input type="checkbox" name="prompt_injection_controls" value="instruction_hierarchy" /> Instruction hierarchy</label>
+                    <label><input type="checkbox" name="prompt_injection_controls" value="retrieved_content_sandboxing" /> Retrieved content sandboxing</label>
+                    <label><input type="checkbox" name="prompt_injection_controls" value="input_filtering" /> Input filtering</label>
+                    <label><input type="checkbox" name="prompt_injection_controls" value="output_filtering" /> Output filtering</label>
+                    <label><input type="checkbox" name="prompt_injection_controls" value="prompt_injection_testing" /> Prompt injection testing</label>
+                    <label><input type="checkbox" name="prompt_injection_controls" value="tool_permission_limits" /> Tool permission limits</label>
+                    <label><input type="checkbox" name="prompt_injection_controls" value="no_prompt_injection_controls" /> No prompt injection controls</label>
+                    <label><input type="checkbox" name="prompt_injection_controls" value="not_sure" /> Not sure</label>
+                  </div>
+                </fieldset>
+
+                <label>
+                  <span>9. Logging and Monitoring</span>
+                  <select name="logging_monitoring" required>
+                    <option value="full_query_and_response_logging">Full query and response logging</option>
+                    <option value="security_event_logging">Security event logging</option>
+                    <option value="limited_usage_logging">Limited usage logging</option>
+                    <option value="no_logging">No logging</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>10. Business Impact</span>
+                  <select name="business_impact" required>
+                    <option value="experimental">Experimental</option>
+                    <option value="internal_productivity">Internal productivity</option>
+                    <option value="customer_support">Customer support</option>
+                    <option value="revenue_workflow">Revenue workflow</option>
+                    <option value="compliance_or_legal_workflow">Compliance or legal workflow</option>
+                    <option value="mission_critical">Mission critical</option>
+                    <option value="not_sure">Not sure</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>11. Timeline</span>
+                  <select name="timeline" required>
+                    <option value="this_week">This week</option>
+                    <option value="this_month">This month</option>
+                    <option value="this_quarter">This quarter</option>
+                    <option value="exploring">Exploring</option>
+                  </select>
+                </label>
+
+                <div class="hero-actions">
+                  <button class="button primary" type="submit" id="rag-risk-submit">Analyze RAG Risk</button>
+                  <button class="button ghost" type="reset">Reset</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="rag-risk-status" role="status" aria-live="polite">
+                Analyzer ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket">
+            <div class="bracket-inner" id="rag-risk-result">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>RAG risk findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive a RAG risk score, exposure tiering, governance findings, and a direct intake route.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner footer-architecture">
+            <div class="section-heading">
+              <div>
+                <p class="section-label mono">[ CTA_SECTION ]</p>
+                <h2>Request RAG Governance Review</h2>
+              </div>
+            </div>
+            <p class="system-copy">
+              Use the governance review intake when you want operator guidance on retrieval boundaries, sensitive source handling, prompt-injection controls, and rollout safety.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/enter?service=rag_governance_review&source=rag-risk-analyzer">[ REQUEST RAG GOVERNANCE REVIEW ]</a>
+              <a class="button secondary" href="/apps/ai-security-audit">[ OPEN AI SECURITY RISK CHECK ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET RAG risk analyzer</span>
+        <span>Defensive-only RAG scoring with funnel handoff to governance review</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/rag-risk-analyzer.js" defer></script>
+  </body>
+</html>

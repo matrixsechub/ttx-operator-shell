@@ -15,7 +15,14 @@
 
     "strict": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "msh-ops/agents",
+    "msh-ops/governance/approveRefactor.ts"
+  ]
 }

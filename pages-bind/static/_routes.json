@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "description": "Invoke Pages Functions on every path so traffic proxies to mshops-public (no static bypass).",
+  "include": ["/*"],
+  "exclude": []
+}

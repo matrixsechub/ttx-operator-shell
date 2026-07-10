@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | AI Service Quote Generator</title>
+    <meta
+      name="description"
+      content="Get a fast estimated scope, pricing range, and delivery path for AI security, automation, agents, RAG, local AI, and governance services."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>AI Service Quote Generator</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#quote-form">Quote</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: AI_SERVICE_QUOTE_V1 ]</p>
+            <h1>AI Service Quote Generator</h1>
+            <p class="hero-sub">
+              Get a fast estimated scope, pricing range, and delivery path for AI security, automation, agents, RAG, local AI, and governance services.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#quote-form">[ GENERATE MY AI SERVICE QUOTE ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+              <a class="button secondary" href="/apps/microservice-packager?source_type=service_quote">[ TURN THIS QUOTE INTO A PRODUCTIZED PACKAGE ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="quote-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SERVICE_QUOTE_FORM ]</p>
+            <h2>Answer the service quote questionnaire</h2>
+          </div>
+          <p class="mono" id="quote-step-label">Step 1 of 4</p>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>AI service quote questionnaire</h3>
+              <p class="system-copy">
+                This is a deterministic advisory quote generator. Pricing is presented as an estimated range only — not a binding guarantee.
+              </p>
+              <form class="contact-form" id="service-quote-form">
+                <div class="quote-step is-active" data-quote-step="0">
+                  <label>
+                    <span>1. Source App</span>
+                    <select name="source_app" required>
+                      <option value="direct_quote_request">Direct quote request</option>
+                      <option value="service_selector">Service selector</option>
+                      <option value="ai_security_audit_lite">AI security audit lite</option>
+                      <option value="prompt_injection_scanner">Prompt injection scanner</option>
+                      <option value="ai_agent_readiness_checker">AI agent readiness checker</option>
+                      <option value="automation_roi_calculator">Automation ROI calculator</option>
+                      <option value="rag_risk_analyzer">RAG risk analyzer</option>
+                      <option value="local_ai_readiness_checker">Local AI readiness checker</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>2. Primary Service Interest</span>
+                    <select name="primary_service_interest" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="ai_security_audit">AI security audit</option>
+                      <option value="prompt_injection_review">Prompt injection review</option>
+                      <option value="ai_agent_build">AI agent build</option>
+                      <option value="ai_agent_security_review">AI agent security review</option>
+                      <option value="ai_automation_build">AI automation build</option>
+                      <option value="automation_blueprint_session">Automation blueprint session</option>
+                      <option value="rag_governance_review">RAG governance review</option>
+                      <option value="private_rag_system_build">Private RAG system build</option>
+                      <option value="local_ai_setup">Local AI setup</option>
+                      <option value="private_ai_architecture_review">Private AI architecture review</option>
+                      <option value="copilot_governance">Copilot governance</option>
+                      <option value="multimodal_ai_risk_review">Multimodal AI risk review</option>
+                      <option value="aeo_visibility_setup">AEO visibility setup</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>3. Business Type</span>
+                    <select name="business_type" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="solo_operator">Solo operator</option>
+                      <option value="small_business">Small business</option>
+                      <option value="agency">Agency</option>
+                      <option value="startup">Startup</option>
+                      <option value="saas_company">SaaS company</option>
+                      <option value="mid_market">Mid-market</option>
+                      <option value="enterprise_team">Enterprise team</option>
+                      <option value="regulated_business">Regulated business</option>
+                      <option value="public_sector_or_gov_vendor">Public sector / gov vendor</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-quote-step="1" hidden>
+                  <label>
+                    <span>4. Project Goal</span>
+                    <select name="project_goal" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="reduce_ai_security_risk">Reduce AI security risk</option>
+                      <option value="build_ai_agent">Build AI agent</option>
+                      <option value="automate_manual_workflow">Automate manual workflow</option>
+                      <option value="secure_rag_or_knowledge_assistant">Secure RAG or knowledge assistant</option>
+                      <option value="deploy_private_local_ai">Deploy private / local AI</option>
+                      <option value="govern_enterprise_ai_or_copilot">Govern enterprise AI or Copilot</option>
+                      <option value="improve_ai_search_visibility">Improve AI search visibility</option>
+                      <option value="assess_multimodal_ai">Assess multimodal AI</option>
+                      <option value="create_ai_operating_system">Create AI operating system</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>5. Current State</span>
+                    <select name="current_state" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="idea_only">Idea only</option>
+                      <option value="using_ai_tools_informally">Using AI tools informally</option>
+                      <option value="pilot_or_prototype">Pilot or prototype</option>
+                      <option value="production_system_live">Production system live</option>
+                      <option value="production_system_with_risk">Production system with risk</option>
+                      <option value="broken_or_underperforming_workflow">Broken or underperforming workflow</option>
+                      <option value="compliance_or_audit_pressure">Compliance or audit pressure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>6. Desired Deliverable</span>
+                    <select name="desired_deliverable" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="quick_assessment">Quick assessment</option>
+                      <option value="written_report">Written report</option>
+                      <option value="implementation_blueprint">Implementation blueprint</option>
+                      <option value="working_automation">Working automation</option>
+                      <option value="working_ai_agent">Working AI agent</option>
+                      <option value="security_review">Security review</option>
+                      <option value="governance_package">Governance package</option>
+                      <option value="private_ai_setup">Private AI setup</option>
+                      <option value="ongoing_retainer">Ongoing retainer</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-quote-step="2" hidden>
+                  <fieldset>
+                    <legend>7. Technical Complexity (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="technical_complexity" value="no_integrations" /> No integrations</label>
+                      <label><input type="checkbox" name="technical_complexity" value="email_or_calendar" /> Email or calendar</label>
+                      <label><input type="checkbox" name="technical_complexity" value="crm" /> CRM</label>
+                      <label><input type="checkbox" name="technical_complexity" value="database" /> Database</label>
+                      <label><input type="checkbox" name="technical_complexity" value="file_storage" /> File storage</label>
+                      <label><input type="checkbox" name="technical_complexity" value="workflow_automation" /> Workflow automation</label>
+                      <label><input type="checkbox" name="technical_complexity" value="rag_or_vector_database" /> RAG or vector database</label>
+                      <label><input type="checkbox" name="technical_complexity" value="ai_agent_tools" /> AI agent tools</label>
+                      <label><input type="checkbox" name="technical_complexity" value="local_or_self_hosted_models" /> Local or self-hosted models</label>
+                      <label><input type="checkbox" name="technical_complexity" value="multimodal_inputs" /> Multimodal inputs</label>
+                      <label><input type="checkbox" name="technical_complexity" value="user_permissions" /> User permissions</label>
+                      <label><input type="checkbox" name="technical_complexity" value="payments_or_financial_systems" /> Payments or financial systems</label>
+                      <label><input type="checkbox" name="technical_complexity" value="regulated_data" /> Regulated data</label>
+                      <label><input type="checkbox" name="technical_complexity" value="external_customer_access" /> External customer access</label>
+                      <label><input type="checkbox" name="technical_complexity" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>8. Risk Factors (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="risk_factors" value="customer_data" /> Customer data</label>
+                      <label><input type="checkbox" name="risk_factors" value="financial_data" /> Financial data</label>
+                      <label><input type="checkbox" name="risk_factors" value="health_data" /> Health data</label>
+                      <label><input type="checkbox" name="risk_factors" value="legal_data" /> Legal data</label>
+                      <label><input type="checkbox" name="risk_factors" value="credentials_or_secrets" /> Credentials or secrets</label>
+                      <label><input type="checkbox" name="risk_factors" value="regulated_data" /> Regulated data</label>
+                      <label><input type="checkbox" name="risk_factors" value="public_facing_ai" /> Public-facing AI</label>
+                      <label><input type="checkbox" name="risk_factors" value="autonomous_actions" /> Autonomous actions</label>
+                      <label><input type="checkbox" name="risk_factors" value="prompt_injection_concern" /> Prompt injection concern</label>
+                      <label><input type="checkbox" name="risk_factors" value="rag_data_exposure" /> RAG data exposure</label>
+                      <label><input type="checkbox" name="risk_factors" value="weak_access_controls" /> Weak access controls</label>
+                      <label><input type="checkbox" name="risk_factors" value="no_logging_or_monitoring" /> No logging or monitoring</label>
+                      <label><input type="checkbox" name="risk_factors" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="quote-step" data-quote-step="3" hidden>
+                  <label>
+                    <span>9. Timeline</span>
+                    <select name="timeline" required>
+                      <option value="exploring">Exploring</option>
+                      <option value="this_week">This week</option>
+                      <option value="this_month">This month</option>
+                      <option value="this_quarter">This quarter</option>
+                      <option value="flexible">Flexible</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>10. Budget Expectation</span>
+                    <select name="budget_expectation" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="under_1000">Under $1,000</option>
+                      <option value="1000_2500">$1,000 – $2,500</option>
+                      <option value="2500_7500">$2,500 – $7,500</option>
+                      <option value="7500_15000">$7,500 – $15,000</option>
+                      <option value="15000_30000">$15,000 – $30,000</option>
+                      <option value="30000_plus">$30,000+</option>
+                    </select>
+                  </label>
+                </div>
+
+                <p class="form-status mono" id="service-quote-status" role="status" aria-live="polite">Quote generator ready.</p>
+                <div class="cta-row">
+                  <button class="button secondary" type="button" id="quote-prev" disabled>[ PREVIOUS ]</button>
+                  <button class="button primary" type="button" id="quote-next">[ NEXT ]</button>
+                  <button class="button primary" type="submit" id="quote-submit" hidden>[ GENERATE QUOTE ]</button>
+                  <button class="button secondary" type="reset">[ RESET ]</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket" id="service-quote-result">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Service quote findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive an estimated scope, pricing range, delivery timeline, and intake route.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET AI Service Quote Generator</span>
+        <span>Estimated pricing only — final scope depends on discovery</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/ai-service-quote.js" defer></script>
+  </body>
+</html>

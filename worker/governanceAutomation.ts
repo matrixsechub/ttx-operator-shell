@@ -1,10 +1,16 @@
 import { SIGNAL_THRESHOLDS, type PolicyMode, type SignalFlag } from "./policyResponse";
+import { getAgentGovernanceContext } from "../msh-ops/agent/initAgentGovernance";
 
 export type GovernanceProposalType =
   | "restrict_wildcard_operations"
   | "increase_validation_strictness"
   | "limit_agent_recursion"
-  | "enter_defensive_mode";
+  | "enter_defensive_mode"
+  | "improve_entry_clarity"
+  | "optimize_marketplace_conversion"
+  | "increase_capture_points"
+  | `promote_ui_mode::${string}`
+  | `deprecate_ui_mode::${string}`;
 
 export type GovernanceProposalPriority = "low" | "medium" | "high";
 
@@ -37,6 +43,12 @@ function isSustainedHighRisk(state: GovernanceProposalStateInput): boolean {
   );
 }
 
+function beaconPriorityPrefix(priorityIndex: number): string {
+  const ctx = getAgentGovernanceContext();
+  const priority = ctx.beacon.priorities[priorityIndex];
+  return priority ? `[Northstar P${priorityIndex + 1}: ${priority}] ` : "";
+}
+
 export function generateGovernanceProposals(state: GovernanceProposalStateInput): GovernanceProposal[] {
   const proposals: GovernanceProposal[] = [];
   const { volatility, oversoulDepth } = state.ghost.depth;
@@ -46,7 +58,7 @@ export function generateGovernanceProposals(state: GovernanceProposalStateInput)
     proposals.push({
       id: proposalId("restrict_wildcard_operations", state.assembledAt),
       type: "restrict_wildcard_operations",
-      reason: "HIGH_RISK volatility",
+      reason: `${beaconPriorityPrefix(5)}HIGH_RISK volatility`,
       priority: "high",
       advisory: true,
     });
@@ -56,7 +68,7 @@ export function generateGovernanceProposals(state: GovernanceProposalStateInput)
     proposals.push({
       id: proposalId("increase_validation_strictness", state.assembledAt),
       type: "increase_validation_strictness",
-      reason: "ERROR_STATE errorCount",
+      reason: `${beaconPriorityPrefix(0)}ERROR_STATE errorCount`,
       priority: "high",
       advisory: true,
     });
@@ -66,7 +78,7 @@ export function generateGovernanceProposals(state: GovernanceProposalStateInput)
     proposals.push({
       id: proposalId("limit_agent_recursion", state.assembledAt),
       type: "limit_agent_recursion",
-      reason: "LOW_INTELLIGENCE oversoulDepth",
+      reason: `${beaconPriorityPrefix(5)}LOW_INTELLIGENCE oversoulDepth`,
       priority: "medium",
       advisory: true,
     });

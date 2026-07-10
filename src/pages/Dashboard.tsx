@@ -17,6 +17,7 @@ import { OperatorStatusRail } from "./dashboard/OperatorStatusRail";
 import { AINodeConsole } from "./dashboard/AINodeConsole";
 import { OperatorInventory } from "./dashboard/OperatorInventory";
 import { OperatorSignals } from "./dashboard/OperatorSignals";
+import { FlowIntelligencePanel } from "./dashboard/FlowIntelligencePanel";
 import { TTXStatusPanel } from "./dashboard/TTXStatusPanel";
 import { TelemetryFeed } from "./dashboard/TelemetryFeed";
 import { WebhookTriggerPanel } from "./dashboard/WebhookTriggerPanel";
@@ -82,6 +83,7 @@ export function Dashboard() {
             <AINodeConsole />
             <OperatorInventory />
             <OperatorSignals />
+            <FlowIntelligencePanel />
             <TTXStatusPanel />
             <TelemetryFeed />
             <WebhookTriggerPanel />

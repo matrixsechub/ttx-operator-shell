@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Northstar Beacon Orders</title>
+    <meta name="description" content="Operator queue for Northstar Beacon governance package orders and proposals." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/operator">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Northstar Beacon Orders</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/operator">Operator</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PRIVATE_ROUTE :: /OPERATOR/NORTHSTAR-BEACON-ORDERS ]</p>
+            <h1>Northstar Beacon Orders</h1>
+            <p class="hero-sub">
+              Review purchased beacon packages, integrity hashes, validation state, governance proposals, and fulfillment
+              status. Agents cannot modify beacons without explicit operator-controlled workflow.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ ORDERS ]</p>
+            <h2>Package fulfillment queue</h2>
+          </div>
+          <button class="button secondary" type="button" id="northstar-orders-refresh">[ REFRESH ]</button>
+        </div>
+        <p class="form-status mono" id="northstar-operator-status" role="status"></p>
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Organization</th>
+                <th>Tier</th>
+                <th>Hash</th>
+                <th>Status</th>
+                <th>Assisted</th>
+              </tr>
+            </thead>
+            <tbody id="northstar-orders-rows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ PROPOSALS ]</p>
+            <h2>Governance proposals</h2>
+          </div>
+        </div>
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th>Proposal</th>
+                <th>Order</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Current hash</th>
+              </tr>
+            </thead>
+            <tbody id="northstar-proposals-rows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/northstar-beacon-operator.js" defer></script>
+  </body>
+</html>

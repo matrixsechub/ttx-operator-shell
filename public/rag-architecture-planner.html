@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | RAG Architecture Planner</title>
+    <meta
+      name="description"
+      content="Design Retrieval-Augmented Generation architectures for businesses using AI systems with deterministic advisory plans."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/scripts/route-canonicalize.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>RAG Architecture Planner</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#rag-form">Planner</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: RAG_ARCHITECTURE_AGENT_V1 ]</p>
+            <h1>RAG Architecture Planner</h1>
+            <p class="hero-sub">
+              Design enterprise-grade Retrieval-Augmented Generation architectures with chunking, embedding, retrieval,
+              ranking, memory layers, and governance controls — advisory only, no deployment.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#rag-form">[ GENERATE RAG ARCHITECTURE PLAN ]</a>
+              <a class="button secondary" href="/apps/rag-risk-analyzer">[ RUN RAG RISK ANALYZER ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="rag-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ RAG_ARCHITECTURE_FORM ]</p>
+            <h2>Answer the RAG architecture questionnaire</h2>
+          </div>
+          <p class="mono" id="rag-step-label">Step 1 of 3</p>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>RAG architecture planner questionnaire</h3>
+              <p class="system-copy">
+                Advisory only. This planner produces a deterministic RAG architecture specification — no vector DB setup,
+                embedding API calls, OpenAI usage, or deployment are performed.
+              </p>
+              <form class="contact-form" id="rag-architecture-form">
+                <div class="quote-step is-active" data-rag-step="0">
+                  <label>
+                    <span>1. Source Type</span>
+                    <select name="source_type" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="rag_risk_result">RAG risk result</option>
+                      <option value="ai_security_audit">AI security audit</option>
+                      <option value="service_quote">Service quote</option>
+                      <option value="agent_readiness_result">Agent readiness result</option>
+                      <option value="manual_rag_request">Manual RAG request</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>2. Source Reference ID (optional)</span>
+                    <input name="source_reference_id" type="text" placeholder="rag-risk-1001, quote-1001" />
+                  </label>
+                  <label>
+                    <span>3. Use Case</span>
+                    <select name="use_case" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="customer_support">Customer support</option>
+                      <option value="internal_knowledge" selected>Internal knowledge</option>
+                      <option value="sales_enablement">Sales enablement</option>
+                      <option value="compliance_qa">Compliance Q&A</option>
+                      <option value="research_assistant">Research assistant</option>
+                      <option value="operator_copilot">Operator copilot</option>
+                      <option value="document_analysis">Document analysis</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>4. Use Case Description (optional)</span>
+                    <textarea name="use_case_description" rows="3" placeholder="Describe the knowledge assistant goal and users."></textarea>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-rag-step="1" hidden>
+                  <fieldset>
+                    <legend>5. Data Sources (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="data_sources" value="google_drive" checked /> Google Drive</label>
+                      <label><input type="checkbox" name="data_sources" value="notion" /> Notion</label>
+                      <label><input type="checkbox" name="data_sources" value="confluence" /> Confluence</label>
+                      <label><input type="checkbox" name="data_sources" value="sharepoint" /> SharePoint</label>
+                      <label><input type="checkbox" name="data_sources" value="website_crawl" /> Website crawl</label>
+                      <label><input type="checkbox" name="data_sources" value="database" /> Database</label>
+                      <label><input type="checkbox" name="data_sources" value="github" /> GitHub</label>
+                      <label><input type="checkbox" name="data_sources" value="crm" /> CRM</label>
+                      <label><input type="checkbox" name="data_sources" value="tickets" /> Tickets</label>
+                      <label><input type="checkbox" name="data_sources" value="pdf_repository" /> PDF repository</label>
+                      <label><input type="checkbox" name="data_sources" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <label>
+                    <span>6. Data Sensitivity</span>
+                    <select name="data_sensitivity" required>
+                      <option value="internal" selected>Internal</option>
+                      <option value="public">Public</option>
+                      <option value="confidential">Confidential</option>
+                      <option value="regulated">Regulated</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>7. Document Volume</span>
+                    <select name="document_volume" required>
+                      <option value="small">Small</option>
+                      <option value="medium" selected>Medium</option>
+                      <option value="large">Large</option>
+                      <option value="enterprise">Enterprise</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <fieldset>
+                    <legend>8. Query Patterns (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="query_patterns" value="single_hop_faq" checked /> Single-hop FAQ</label>
+                      <label><input type="checkbox" name="query_patterns" value="multi_hop_research" /> Multi-hop research</label>
+                      <label><input type="checkbox" name="query_patterns" value="structured_lookup" /> Structured lookup</label>
+                      <label><input type="checkbox" name="query_patterns" value="semantic_exploration" /> Semantic exploration</label>
+                      <label><input type="checkbox" name="query_patterns" value="citation_required" /> Citation required</label>
+                      <label><input type="checkbox" name="query_patterns" value="real_time_freshness" /> Real-time freshness</label>
+                    </div>
+                  </fieldset>
+                  <label>
+                    <span>9. Freshness Requirement</span>
+                    <select name="freshness_requirement" required>
+                      <option value="static">Static</option>
+                      <option value="daily" selected>Daily</option>
+                      <option value="hourly">Hourly</option>
+                      <option value="near_real_time">Near real-time</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>10. Citation Requirement</span>
+                    <select name="citation_requirement" required>
+                      <option value="optional">Optional</option>
+                      <option value="recommended" selected>Recommended</option>
+                      <option value="required">Required</option>
+                      <option value="strict_source_only">Strict source only</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-rag-step="2" hidden>
+                  <label>
+                    <span>11. Infrastructure Preference</span>
+                    <select name="infra_preference" required>
+                      <option value="not_sure" selected>Not sure</option>
+                      <option value="cloudflare">Cloudflare</option>
+                      <option value="local">Local</option>
+                      <option value="hybrid">Hybrid</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>12. Latency Requirement</span>
+                    <select name="latency_requirement" required>
+                      <option value="balanced" selected>Balanced</option>
+                      <option value="low">Low latency</option>
+                      <option value="cost_optimized">Cost optimized</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>13. Access Model</span>
+                    <select name="access_model" required>
+                      <option value="authenticated" selected>Authenticated</option>
+                      <option value="public_read">Public read</option>
+                      <option value="role_based">Role based</option>
+                      <option value="tenant_isolated">Tenant isolated</option>
+                      <option value="operator_only">Operator only</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>14. Timeline</span>
+                    <select name="timeline" required>
+                      <option value="this_month" selected>This month</option>
+                      <option value="this_week">This week</option>
+                      <option value="this_quarter">This quarter</option>
+                      <option value="flexible">Flexible</option>
+                      <option value="exploring">Exploring</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>15. Budget Band</span>
+                    <select name="budget_band" required>
+                      <option value="not_sure" selected>Not sure</option>
+                      <option value="under_1000">Under $1,000</option>
+                      <option value="1000_2500">$1,000 – $2,500</option>
+                      <option value="2500_7500">$2,500 – $7,500</option>
+                      <option value="7500_15000">$7,500 – $15,000</option>
+                      <option value="15000_30000">$15,000 – $30,000</option>
+                      <option value="30000_plus">$30,000+</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>16. Compliance Notes (optional)</span>
+                    <textarea name="compliance_notes" rows="3" placeholder="HIPAA, SOC2, GDPR, or other constraints."></textarea>
+                  </label>
+                </div>
+
+                <div class="cta-row">
+                  <button class="button secondary" type="button" id="rag-prev" hidden>[ PREVIOUS ]</button>
+                  <button class="button primary" type="button" id="rag-next">[ NEXT ]</button>
+                  <button class="button primary" type="submit" id="rag-submit" hidden>[ GENERATE PLAN ]</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="rag-architecture-status" role="status" aria-live="polite">
+                RAG architecture planner ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket" id="rag-architecture-result">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>RAG architecture plan findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive chunking, embedding, retrieval, ranking, memory, and governance
+                recommendations with intake handoff. Advisory only — no vector DB or deployment.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-shell">
+      <p class="mono">MSHOPS.NET :: RAG_ARCHITECTURE_AGENT_V1 :: ADVISORY ONLY :: NO DEPLOYMENT</p>
+    </footer>
+
+    <script src="/rag-architecture-planner.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "id": "pieces-os-mcp",
+      "type": "governance-source",
+      "description": "Pieces OS MCP governance feed",
+      "allowedPayloadTypes": ["northstar-update", "governance-signal"],
+      "mutationRights": "none",
+      "approvalRequired": true
+    }
+  ]
+}

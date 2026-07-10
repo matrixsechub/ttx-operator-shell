@@ -1,0 +1,62 @@
+﻿/**
+ * PUBLIC SCENARIO FRAMEWORK - PAGE COMPOSITION
+ * -----------------------------------------------------------------------
+ * DRIFT-MARKER: layer=page file=public/scenario.css version=2.0
+ *
+ * Page-specific composition for the public Scenario Framework page
+ * (/scenario.html) only. Rebuilt during the Public Scenario Framework
+ * Rebuild pass (July 2026) to replace the interactive Scenario Engine
+ * operator console (control panel, doctrine broker panel/viewers, event
+ * feed) that previously lived at this public route. That console's
+ * concerns - live inject control, broker-verified doctrine access, and
+ * the full evidence trail - now belong on the Scenario Engine route
+ * (`/scenario-engine`), not on this public overview page. See the same
+ * rebuild already applied to `/mission.html` (`mission.css` v2.0) for the
+ * identical precedent on the Mission side of the ecosystem.
+ *
+ * Follows the same pattern as index.css/mission.css/mission-engine.css: a
+ * small, page-scoped stylesheet layered on top of the shared RGB+Gold
+ * system rather than editing any protected design-system file
+ * (rgbgold-tokens/motion/components/hud/hooks.css, styles.css, a11y.css).
+ *
+ * Load order on scenario.html: rgbgold-tokens.css -> rgbgold-motion.css ->
+ * rgbgold-components.css -> rgbgold-hud.css -> rgbgold-hooks.css ->
+ * styles.css -> scenario.css -> a11y.css (last).
+ *
+ * Defines `.scenario-timeline-panel` (a thin visual variant of
+ * `.rgbgold-module-shell` used for the Scenario Timeline section - see
+ * DESIGN_SYSTEM.md's Scenario Engine sections for the interactive
+ * counterpart) and `.footer-divider`. `.footer-divider` is patterned
+ * directly on index.css's rule of the same name but kept as an
+ * independent, duplicate copy (scenario.html does not load index.css, so
+ * this page needs its own copy) - same pattern already used by
+ * mission.css duplicating this exact rule, and by
+ * `.mission-doctrine-tag` duplicating `.scenario-doctrine-tag` on the
+ * Mission Engine console before this rebuild. Introduces no new
+ * pseudo-elements of its own (see the budget table in rgbgold-hud.css)
+ * and no animation - reduced-motion and Accessibility Mode are unaffected
+ * by anything in this file.
+ */
+
+.footer-divider {
+  width: min(1180px, calc(100% - 2rem));
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--blue), transparent);
+  opacity: 0.55;
+}
+
+.scenario-timeline-panel {
+  display: grid;
+  gap: var(--rgbgold-space-4);
+  padding: var(--rgbgold-space-6);
+  border-radius: var(--rgbgold-radius-lg);
+  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+}
+
+.scenario-timeline-panel code {
+  font-family: var(--font-mono, monospace);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+}

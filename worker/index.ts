@@ -2,7 +2,8 @@
 
 // into worker-configuration.d.ts — do not hand-write the binding shape here.
 
-
+import { assertBeaconOnStartup } from "../msh-ops/beacon/loadBeacon";
+import { ensureAgentGovernance } from "../msh-ops/agent/initAgentGovernance";
 
 import { CATALOG_ITEMS } from "./catalogData";
 
@@ -20,7 +21,7 @@ import { handleSecurityRoute } from "./security";
 
 import { handleTtxRoute } from "./ttx";
 
-import { edgeAuthGate, handleOperatorAuth } from "./edge/gate";
+import { edgeAuthGate, handleOperatorAuth, handleOperatorSession } from "./edge/gate";
 
 import { injectSecurityHeaders } from "./edge/headers";
 
@@ -54,10 +55,21 @@ import {
 } from "./kernel";
 import { blockAutonomousInBeta } from "./mode";
 import { handleTelemetryRoute, recordTelemetrySample } from "./telemetry";
+import { handleUsageRoute } from "./usage";
+import { handleFlowEventRoute } from "./flowRoute";
+import { handleFlowIntelligenceRoute } from "./flowIntelligenceRoute";
+import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
+import { handleExperimentationRoute } from "./experimentationRoute";
+import { handleTrafficActivationRoute } from "./trafficActivation";
 import { handleLiveTtxRoute } from "./liveTtxRoute";
+import { handleWildcardRoute } from "./wildcardAdvancement";
+import { handleAuditLiteRoute } from "./auditLite";
+import { handleRecoveredFunnelApi, isRecoveredPublicRoute, serveRecoveredPublicRoute } from "./funnelRecovery";
+import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
 export { LiveTtxSession } from "./liveSession";
 
-
+await assertBeaconOnStartup();
+await ensureAgentGovernance();
 
 const API_PREFIX = "/api/";
 
@@ -204,11 +216,29 @@ export default {
         return betaBlocked;
       }
 
+      const auditLiteResponse = await handleAuditLiteRoute(request, url.pathname, env);
+
+      if (auditLiteResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, auditLiteResponse.status);
+        return auditLiteResponse;
+      }
+
+      const recoveredFunnelResponse = await handleRecoveredFunnelApi(request, url, env as { TTX_STATE?: KVNamespace });
+
+      if (recoveredFunnelResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, recoveredFunnelResponse.status);
+        return recoveredFunnelResponse;
+      }
+
 
 
       const operatorAuth = await handleOperatorAuth(request, url.pathname, edgeEnv);
 
       if (operatorAuth) return operatorAuth;
+
+      const operatorSession = await handleOperatorSession(request, url.pathname, edgeEnv);
+
+      if (operatorSession) return operatorSession;
 
 
 
@@ -340,6 +370,20 @@ export default {
 
       }
 
+      const wildcardResponse = await handleWildcardRoute(request, url.pathname);
+
+      if (wildcardResponse) return wildcardResponse;
+
+      const fulfillmentOperatorResponse = handleOperatorFulfillmentAgentApi(
+        url.pathname,
+        request.method.toUpperCase(),
+      );
+
+      if (fulfillmentOperatorResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, fulfillmentOperatorResponse.status);
+        return fulfillmentOperatorResponse;
+      }
+
 
 
       if (url.pathname.startsWith("/api/ttx/live")) {
@@ -413,7 +457,47 @@ export default {
         return ghostResponse;
       }
 
+      const usageResponse = await handleUsageRoute(request, url.pathname, env as WorkerEnv);
 
+      if (usageResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, usageResponse.status);
+        return usageResponse;
+      }
+
+      const flowEventResponse = await handleFlowEventRoute(request, url.pathname, env as WorkerEnv);
+
+      if (flowEventResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, flowEventResponse.status);
+        return flowEventResponse;
+      }
+
+      const flowIntelligenceResponse = await handleFlowIntelligenceRoute(request, url.pathname, env as WorkerEnv);
+
+      if (flowIntelligenceResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, flowIntelligenceResponse.status);
+        return flowIntelligenceResponse;
+      }
+
+      const behaviorResponse = await handleBehaviorIntelligenceRoute(request, url.pathname, env as WorkerEnv);
+
+      if (behaviorResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, behaviorResponse.status);
+        return behaviorResponse;
+      }
+
+      const experimentationResponse = await handleExperimentationRoute(request, url.pathname, env as WorkerEnv);
+
+      if (experimentationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, experimentationResponse.status);
+        return experimentationResponse;
+      }
+
+      const trafficActivationResponse = await handleTrafficActivationRoute(request, url.pathname, env as WorkerEnv);
+
+      if (trafficActivationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, trafficActivationResponse.status);
+        return trafficActivationResponse;
+      }
 
       const kernelResponse = await handleKernelRoute(request, url.pathname, env as WorkerEnv & BackboneEnv);
 
@@ -439,6 +523,13 @@ export default {
 
 
 
+    if (isRecoveredPublicRoute(pathname)) {
+      const recoveredPublic = await serveRecoveredPublicRoute(request, pathname, env.ASSETS);
+      if (recoveredPublic) {
+        return recoveredPublic;
+      }
+    }
+
     if (mode === "public") {
 
       return redirectToCanonicalEntry(request);
@@ -449,7 +540,9 @@ export default {
 
     const routed = await routeStorefrontSurface(request, pathname, env.ASSETS);
 
-    if (routed) return routed;
+    if (routed) {
+      return routed;
+    }
 
     const assetResponse = await env.ASSETS.fetch(request);
 

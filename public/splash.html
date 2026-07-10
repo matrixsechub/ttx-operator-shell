@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<meta name="application-name" content="MSHOPS Operator System" />
+<!-- public splash // worker-served -->
+<title>MatrixSecHub — Ops Division</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+:root {
+  --bg-0: #03040a;
+  --bg-1: #060810;
+  --bg-2: #080b15;
+  --bg-card: #0b0e1a;
+  --bg-card-hover: #0e1220;
+  --bg-glass: rgba(8, 11, 21, 0.85);
+  --green: #00c47a;
+  --green-dim: #007a4d;
+  --green-glow: rgba(0, 196, 122, 0.12);
+  --gold: #c9941a;
+  --gold-dim: #7a5a0f;
+  --gold-glow: rgba(201, 148, 26, 0.12);
+  --blue: #0ea5e9;
+  --blue-dim: #0369a1;
+  --blue-glow: rgba(14, 165, 233, 0.12);
+  --red: #dc2626;
+  --red-dim: #7f1d1d;
+  --red-glow: rgba(220, 38, 38, 0.12);
+  --text-0: #f1f5f9;
+  --text-1: #94a3b8;
+  --text-2: #4a5568;
+  --text-accent: #00c47a;
+  --border-tron: 1px solid rgba(0, 196, 122, 0.18);
+  --border-gold: 1px solid rgba(201, 148, 26, 0.25);
+  --border-blue: 1px solid rgba(14, 165, 233, 0.2);
+  --border-red: 1px solid rgba(220, 38, 38, 0.2);
+  --font-display: 'Orbitron', monospace;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --shadow-tron: 0 0 12px rgba(0, 196, 122, 0.15), 0 0 40px rgba(0, 196, 122, 0.04);
+  --shadow-gold: 0 0 12px rgba(201, 148, 26, 0.2), 0 0 40px rgba(201, 148, 26, 0.05);
+  --shadow-blue: 0 0 12px rgba(14, 165, 233, 0.15), 0 0 40px rgba(14, 165, 233, 0.04);
+  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+  --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* ─── 1. GLOBAL RGB AMBIENT GRID UPGRADE ─── */
+@keyframes gridShift {
+  0% { background-position: 0 0, 0 0, center top, center bottom; }
+  100% { background-position: 60px 60px, 60px 60px, center top, center bottom; }
+}
+body {
+  font-family: var(--font-body);
+  background:
+    linear-gradient(rgba(0, 196, 122, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 196, 122, 0.035) 1px, transparent 1px),
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,196,122,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(14,165,233,0.03) 0%, transparent 60%),
+    var(--bg-0);
+  background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%;
+  animation: gridShift 8s linear infinite;
+  color: var(--text-0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+::selection { background: rgba(0, 196, 122, 0.3); color: var(--text-0); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-0); }
+::-webkit-scrollbar-thumb { background: var(--green-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--green); }
+
+/* ─── 2. TRON SCANLINE OVERLAY ─── */
+@keyframes scanScroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -80px; }
+}
+#tron-scanlines {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,196,122,0.012) 2px, rgba(0,196,122,0.012) 4px);
+  animation: scanScroll 3s linear infinite;
+  pointer-events: none; z-index: 1; opacity: 1;
+}
+
+/* ─── 3. RGB TRON CORNER BRACKETS — Enhanced ─── */
+@keyframes cornerRGB {
+  0%   { border-color: rgba(0,196,122,0.6); }
+  33%  { border-color: rgba(14,165,233,0.5); }
+  66%  { border-color: rgba(201,148,26,0.5); }
+  100% { border-color: rgba(0,196,122,0.6); }
+}
+.tron-card {
+  position: relative; overflow: hidden;
+}
+.tron-card > .tron-corner { position: absolute; width: 16px; height: 16px; border-style: solid; border-width: 0; animation: cornerRGB 6s ease-in-out infinite; pointer-events: none; z-index: 2; }
+.tron-corner.tl { top: 0; left: 0; border-top-width: 1.5px; border-left-width: 1.5px; }
+.tron-corner.tr { top: 0; right: 0; border-top-width: 1.5px; border-right-width: 1.5px; animation-delay: -1.5s; }
+.tron-corner.bl { bottom: 0; left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; animation-delay: -3s; }
+.tron-corner.br { bottom: 0; right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; animation-delay: -4.5s; }
+
+/* ─── 4. ANIMATED TRON BORDER — Hover sweep ─── */
+@keyframes borderSweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.tron-card .tron-sweep-line {
+  position: absolute; top: 0; left: 0; width: 100%; height: 1.5px; z-index: 3; pointer-events: none; overflow: hidden;
+}
+.tron-card .tron-sweep-line::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,196,122,0.9) 50%, transparent 100%);
+  transform: translateX(-100%); opacity: 0; transition: opacity 0.2s;
+}
+.tron-card:hover .tron-sweep-line::after {
+  opacity: 1; animation: borderSweep 1.5s linear infinite;
+}
+
+/* ─── 5. RGB GLOW PULSE — Section Headings ─── */
+@keyframes headingGlow {
+  0%   { text-shadow: 0 0 20px rgba(0,196,122,0.15), 0 0 60px rgba(0,196,122,0.05); }
+  50%  { text-shadow: 0 0 30px rgba(0,196,122,0.25), 0 0 80px rgba(14,165,233,0.08); }
+  100% { text-shadow: 0 0 20px rgba(0,196,122,0.15), 0 0 60px rgba(0,196,122,0.05); }
+}
+@keyframes heroGlow {
+  0%   { text-shadow: 0 0 40px rgba(0,196,122,0.2), 0 0 100px rgba(0,196,122,0.06), 0 0 2px rgba(0,196,122,0.4); }
+  33%  { text-shadow: 0 0 40px rgba(14,165,233,0.15), 0 0 100px rgba(14,165,233,0.04), 0 0 2px rgba(14,165,233,0.3); }
+  66%  { text-shadow: 0 0 40px rgba(201,148,26,0.15), 0 0 100px rgba(201,148,26,0.04), 0 0 2px rgba(201,148,26,0.3); }
+  100% { text-shadow: 0 0 40px rgba(0,196,122,0.2), 0 0 100px rgba(0,196,122,0.06), 0 0 2px rgba(0,196,122,0.4); }
+}
+.page h2, .page h1 { animation: headingGlow 4s ease-in-out infinite; }
+.hero-headline-glow { animation: heroGlow 8s ease-in-out infinite !important; }
+
+/* ─── 6. TRON LINE DIVIDERS ─── */
+@keyframes dividerSweep {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+.tron-divider {
+  height: 1px; width: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,196,122,0.6) 20%, rgba(14,165,233,0.4) 50%, rgba(201,148,26,0.3) 80%, transparent 100%);
+  background-size: 60% 100%;
+  animation: dividerSweep 4s ease-in-out infinite;
+  filter: blur(0.5px);
+  box-shadow: 0 0 8px rgba(0,196,122,0.2);
+  pointer-events: none;
+}
+
+/* ─── 7. RGB ACCENT LINES — Active nav ─── */
+@keyframes navAccent {
+  0%   { border-color: var(--green); }
+  33%  { border-color: var(--blue); }
+  66%  { border-color: var(--gold); }
+  100% { border-color: var(--green); }
+}
+.nav-link-a9.active {
+  background: linear-gradient(90deg, rgba(0,196,122,0.06) 0%, transparent 100%);
+  padding: 4px 8px; border-radius: 2px;
+}
+.nav-link-a9.active::after {
+  content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+  height: 2px; animation: navAccent 5s ease-in-out infinite;
+  background: none; border-bottom: 2px solid var(--green);
+}
+
+/* ─── 8. BUTTON TRON EFFECTS ─── */
+@keyframes btnSweep {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+@keyframes btnSweepGold {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+.tron-btn {
+  position: relative !important; overflow: hidden !important;
+}
+.tron-btn::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,196,122,0.12), transparent);
+  pointer-events: none; z-index: 0;
+}
+.tron-btn:hover::before {
+  animation: btnSweep 0.7s ease forwards;
+}
+.tron-btn:hover {
+  box-shadow: 0 0 20px rgba(0,196,122,0.25), 0 0 60px rgba(0,196,122,0.08), inset 0 0 20px rgba(0,196,122,0.04) !important;
+}
+.tron-btn-gold {
+  position: relative !important; overflow: hidden !important;
+}
+.tron-btn-gold::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201,148,26,0.12), transparent);
+  pointer-events: none; z-index: 0;
+}
+.tron-btn-gold:hover::before {
+  animation: btnSweepGold 0.7s ease forwards;
+}
+.tron-btn-gold:hover {
+  box-shadow: 0 0 20px rgba(201,148,26,0.25), 0 0 60px rgba(201,148,26,0.08), inset 0 0 20px rgba(201,148,26,0.04) !important;
+}
+
+/* ─── 8b. ENTER SYSTEM — Enhanced pulse ─── */
+@keyframes enterPulseEnhanced {
+  0%   { box-shadow: 0 0 0 0 rgba(0,196,122,0.4), 0 0 12px rgba(0,196,122,0.3); }
+  50%  { box-shadow: 0 0 0 8px rgba(0,196,122,0), 0 0 24px rgba(0,196,122,0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(0,196,122,0), 0 0 12px rgba(0,196,122,0.3); }
+}
+#enter-btn-j8 {
+  animation: enterPulseEnhanced 2s ease-in-out infinite !important;
+}
+#enter-btn-j8.enter-btn-hidden { animation: none !important; }
+@keyframes ringPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50%      { transform: translate(-50%, -50%) scale(1.06); opacity: 0.15; }
+}
+.enter-ring {
+  position: absolute; top: 50%; left: 50%;
+  width: 110%; height: 140%;
+  border: 1px solid rgba(0,196,122,0.15); border-radius: 2px;
+  transform: translate(-50%, -50%);
+  animation: ringPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ─── 9. HOLOGRAM OVERLAY — Cards ─── */
+.tron-card .tron-holo {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: linear-gradient(135deg, rgba(0,196,122,0.025) 0%, transparent 40%, rgba(14,165,233,0.015) 60%, transparent 100%);
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.tron-card:hover .tron-holo {
+  opacity: 1;
+  background:
+    linear-gradient(135deg, rgba(0,196,122,0.025) 0%, transparent 40%, rgba(14,165,233,0.015) 60%, transparent 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,196,122,0.015) 3px, rgba(0,196,122,0.015) 4px);
+}
+
+/* ─── 10. HERO TRON LINES ─── */
+@keyframes tronLinePulse {
+  0%, 100% { opacity: 0.12; }
+  50%      { opacity: 0.25; }
+}
+.hero-tron-line {
+  position: absolute; pointer-events: none; z-index: 0;
+}
+.hero-tron-line-diag-tl {
+  top: 80px; left: 60px; width: 200px; height: 1px;
+  background: var(--green); opacity: 0.15; transform: rotate(-45deg); transform-origin: top left;
+  animation: tronLinePulse 3s ease-in-out infinite;
+}
+.hero-tron-line-diag-br {
+  bottom: 80px; right: 60px; width: 200px; height: 1px;
+  background: var(--blue); opacity: 0.10; transform: rotate(-45deg); transform-origin: bottom right;
+  animation: tronLinePulse 3s ease-in-out infinite 0.75s;
+}
+.hero-tron-line-v-left {
+  top: 50%; left: 30px; width: 1px; height: 80px;
+  background: var(--green); opacity: 0.12; transform: translateY(-50%);
+  animation: tronLinePulse 3s ease-in-out infinite 1.5s;
+}
+.hero-tron-line-v-right {
+  top: 50%; right: 30px; width: 1px; height: 80px;
+  background: var(--green); opacity: 0.12; transform: translateY(-50%);
+  animation: tronLinePulse 3s ease-in-out infinite 2.25s;
+}
+
+/* ─── 11. STATUS DOT — RGB cycle ─── */
+@keyframes dotRGB {
+  0%   { background: #00c47a; box-shadow: 0 0 6px rgba(0,196,122,0.8); }
+  33%  { background: #0ea5e9; box-shadow: 0 0 6px rgba(14,165,233,0.8); }
+  66%  { background: #c9941a; box-shadow: 0 0 6px rgba(201,148,26,0.8); }
+  100% { background: #00c47a; box-shadow: 0 0 6px rgba(0,196,122,0.8); }
+}
+.status-dot-anim {
+  width: 6px; height: 6px; border-radius: 50%;
+  animation: dotRGB 4s ease-in-out infinite !important; display: inline-block;
+}
+
+/* ─── 12. VIDEO CONTAINER — Enhanced TRON Frame ─── */
+@keyframes vidCornerPulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.8; }
+}
+@keyframes vidOuterGlow {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(0,196,122,0.1), 0 0 30px rgba(0,196,122,0.08); }
+  50%      { box-shadow: 0 0 0 1px rgba(0,196,122,0.2), 0 0 40px rgba(0,196,122,0.12); }
+}
+.video-container-k2 {
+  position: relative; padding-top: 56.25%; border-radius: 2px; overflow: hidden;
+  background: var(--bg-card); transition: var(--transition);
+  animation: vidOuterGlow 3s ease-in-out infinite;
+}
+.video-container-k2.gold-vid {
+  animation: none;
+}
+@keyframes vidOuterGlowGold {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(201,148,26,0.1), 0 0 30px rgba(201,148,26,0.08); }
+  50%      { box-shadow: 0 0 0 1px rgba(201,148,26,0.2), 0 0 40px rgba(201,148,26,0.12); }
+}
+.video-container-k2.gold-vid { animation: vidOuterGlowGold 3s ease-in-out infinite; }
+.video-container-k2:hover { box-shadow: var(--shadow-tron); }
+.video-container-k2.gold-vid:hover { box-shadow: var(--shadow-gold); }
+.video-container-k2 .vid-inner {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px;
+}
+@keyframes scanLine {
+  0% { top: -2px; opacity: 0.6; } 100% { top: 100%; opacity: 0; }
+}
+.video-container-k2.scanning::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 1px;
+  background: rgba(0,196,122,0.4); animation: scanLine 0.8s linear forwards;
+}
+.video-container-k2.gold-vid.scanning::after { background: rgba(201,148,26,0.4); }
+
+/* ─── 13. MARQUEE — RGB text glow ─── */
+@keyframes marqueeTextGlow {
+  0%   { color: rgba(0,196,122,0.7); text-shadow: 0 0 10px rgba(0,196,122,0.3); }
+  50%  { color: rgba(0,196,122,0.9); text-shadow: 0 0 15px rgba(0,196,122,0.5), 0 0 30px rgba(14,165,233,0.1); }
+  100% { color: rgba(0,196,122,0.7); text-shadow: 0 0 10px rgba(0,196,122,0.3); }
+}
+.marquee-glow { animation: marqueeTextGlow 3s ease-in-out infinite; }
+
+@keyframes threatGlow {
+  0%, 100% { text-shadow: 0 0 8px rgba(220,38,38,0.4); }
+  50%      { text-shadow: 0 0 16px rgba(220,38,38,0.7), 0 0 32px rgba(220,38,38,0.2); }
+}
+.threat-glow { animation: threatGlow 2s ease-in-out infinite; }
+
+/* ─── 14. SECTION BACKGROUND — RGB gradient bands ─── */
+.section-rgb-left {
+  position: relative;
+}
+.section-rgb-left::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 2px; height: 120px;
+  background: linear-gradient(180deg, var(--green) 0%, var(--blue) 50%, var(--gold) 100%);
+  opacity: 0.4; pointer-events: none; z-index: 0;
+}
+.section-gold-glow {
+  position: relative;
+}
+.section-gold-glow::after {
+  content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 80px;
+  background: linear-gradient(0deg, rgba(201,148,26,0.04) 0%, transparent 100%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ─── 15. LAUNCH SCREEN — RGB enhancement ─── */
+@keyframes launchBg {
+  0%   { background-color: #03040a; }
+  33%  { background-color: #030a07; }
+  66%  { background-color: #03060a; }
+  100% { background-color: #03040a; }
+}
+#launch-screen-x1a0 {
+  position: fixed; inset: 0; z-index: 9999;
+  background-color: var(--bg-0);
+  background-image:
+    linear-gradient(rgba(0, 196, 122, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 196, 122, 0.035) 1px, transparent 1px);
+  background-size: 60px 60px;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  animation: launchFadeIn 0.8s ease-out, launchBg 8s ease-in-out infinite;
+}
+@keyframes launchFadeIn { from { opacity: 0; } to { opacity: 1; } }
+#launch-screen-x1a0.exiting {
+  opacity: 0; transform: translateY(-8px);
+  transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+}
+.launch-status { opacity: 0; transform: translateY(6px); transition: opacity 0.5s, transform 0.5s; }
+.launch-status.visible { opacity: 1; transform: translateY(0); }
+@keyframes blink3dot {
+  0%, 25% { content: '...'; } 25.1%, 50% { content: '..'; } 50.1%, 75% { content: '.'; } 75.1%, 100% { content: ''; }
+}
+.blink-dots::after { content: '...'; animation: blink3dot 1.5s steps(1) infinite; }
+.enter-btn-hidden { opacity: 0; pointer-events: none; }
+
+/* ─── PYRAMID LOGO ANIMATIONS ─── */
+@keyframes pyramidFloat {
+  0%, 100% { transform: translateY(0px); filter: drop-shadow(0 0 24px rgba(0,196,122,0.35)) drop-shadow(0 0 60px rgba(0,196,122,0.12)); }
+  50% { transform: translateY(-8px); filter: drop-shadow(0 0 36px rgba(0,196,122,0.5)) drop-shadow(0 0 80px rgba(0,196,122,0.18)); }
+}
+@keyframes pyramidRGB {
+  0%   { filter: hue-rotate(0deg) drop-shadow(0 0 24px rgba(0,196,122,0.35)) drop-shadow(0 0 60px rgba(0,196,122,0.12)); }
+  33%  { filter: hue-rotate(15deg) drop-shadow(0 0 30px rgba(0,196,122,0.4)) drop-shadow(0 0 70px rgba(0,196,122,0.15)); }
+  66%  { filter: hue-rotate(-10deg) drop-shadow(0 0 28px rgba(0,196,122,0.38)) drop-shadow(0 0 65px rgba(0,196,122,0.13)); }
+  100% { filter: hue-rotate(0deg) drop-shadow(0 0 24px rgba(0,196,122,0.35)) drop-shadow(0 0 60px rgba(0,196,122,0.12)); }
+}
+.pyramid-launch-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  animation: pyramidFloat 6s ease-in-out infinite, pyramidRGB 10s ease-in-out infinite;
+}
+.pyramid-hero-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  opacity: 0.88;
+  filter: drop-shadow(0 0 20px rgba(0,196,122,0.3)) drop-shadow(0 0 50px rgba(0,196,122,0.1));
+  animation: pyramidFloat 6s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* ─── NAV ─── */
+#nav-r4b2 {
+  height: 60px; position: fixed; top: 0; width: 100%; z-index: 1000;
+  background: rgba(6, 8, 16, 0.92);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 196, 122, 0.12);
+  box-shadow: 0 1px 0 rgba(0,196,122,0.05), 0 4px 24px rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+}
+.nav-link-a9 {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em;
+  color: var(--text-1); text-decoration: none; transition: var(--transition);
+  position: relative; cursor: pointer; padding: 4px 0;
+}
+.nav-link-a9:hover { color: var(--text-0); }
+.nav-link-a9.active { color: var(--green); }
+
+/* ─── MOBILE NAV ─── */
+#mobile-menu-m3x1 {
+  display: none; position: fixed; inset: 0; z-index: 2000;
+  background: rgba(3,4,10,0.97); flex-direction: column; padding: 24px;
+  backdrop-filter: blur(20px);
+}
+#mobile-menu-m3x1.open { display: flex; }
+.mobile-nav-link {
+  font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.15em;
+  color: var(--text-1); text-decoration: none; padding: 16px 0;
+  border-bottom: 1px solid rgba(0,196,122,0.08); transition: var(--transition); cursor: pointer;
+}
+.mobile-nav-link:hover, .mobile-nav-link.active { color: var(--green); }
+
+/* ─── PAGE TRANSITIONS ─── */
+.page { display: none; opacity: 0; transition: opacity 0.3s ease; }
+.page.active { display: block; }
+.page.visible { opacity: 1; }
+
+/* ─── SCROLLING MARQUEE ─── */
+@keyframes marqueeLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes marqueeRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+.marquee-track { display: flex; white-space: nowrap; }
+.marquee-left { animation: marqueeLeft 40s linear infinite; }
+.marquee-right { animation: marqueeRight 55s linear infinite; }
+
+/* ─── THREAT TICKER ─── */
+@keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.threat-ticker { animation: tickerScroll 35s linear infinite; }
+
+/* ─── CORNER BRACKETS (legacy) ─── */
+.corner-bracket { position: relative; }
+.corner-bracket::before, .corner-bracket::after {
+  content: ''; position: absolute; width: 12px; height: 12px;
+  border-color: rgba(0,196,122,0.35); border-style: solid; border-width: 0;
+}
+.corner-bracket::before { top: 8px; left: 8px; border-top-width: 1px; border-left-width: 1px; }
+.corner-bracket::after { bottom: 8px; right: 8px; border-bottom-width: 1px; border-right-width: 1px; }
+.corner-bracket-gold::before, .corner-bracket-gold::after { border-color: rgba(201,148,26,0.4); }
+.corner-bracket-lg::before, .corner-bracket-lg::after { width: 16px; height: 16px; }
+
+/* ─── HEXAGON ─── */
+.hex-avatar {
+  width: 80px; height: 92px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: rgba(0,196,122,0.05); border: none; display: flex;
+  align-items: center; justify-content: center; margin: 0 auto 16px;
+  transition: var(--transition); position: relative;
+}
+.hex-avatar-border {
+  width: 84px; height: 96px;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: rgba(0,196,122,0.18); display: flex; align-items: center;
+  justify-content: center; margin: 0 auto 16px;
+}
+
+/* ─── FADE IN ON SCROLL ─── */
+.fade-in-on-scroll { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.fade-in-on-scroll.vis { opacity: 1; transform: translateY(0); }
+
+/* ─── CTA BUTTON PULSE ─── */
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: var(--shadow-tron); }
+}
+.cta-pulse { animation: ctaPulse 3s infinite ease-in-out; }
+@keyframes ctaPulseGold {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: var(--shadow-gold); }
+}
+.cta-pulse-gold { animation: ctaPulseGold 3s infinite ease-in-out; }
+
+/* ─── TIMELINE ─── */
+.timeline-line-v8 {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+  background: rgba(0,196,122,0.2); transform: translateX(-50%);
+}
+@media (max-width: 767px) {
+  .timeline-line-v8 { left: 16px; }
+}
+.timeline-node {
+  width: 12px; height: 12px; border-radius: 50%; border: var(--border-tron);
+  background: var(--bg-card); position: relative; display: flex; align-items: center; justify-content: center;
+}
+.timeline-node::after {
+  content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--green);
+}
+
+/* ─── CURSOR GLOW ─── */
+#cursor-glow-e3 {
+  position: fixed; width: 120px; height: 120px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,196,122,0.04) 0%, transparent 70%);
+  pointer-events: none; z-index: 0; transform: translate(-50%, -50%);
+  display: none;
+}
+
+/* ─── AUDIO BTN ─── */
+#audio-btn-f7 {
+  position: fixed; bottom: 20px; right: 20px; width: 40px; height: 40px;
+  background: rgba(6,8,16,0.9); border: var(--border-tron); border-radius: 2px;
+  display: none; align-items: center; justify-content: center; cursor: pointer;
+  z-index: 999; transition: var(--transition); color: var(--green);
+}
+#audio-btn-f7:hover { background: rgba(0,196,122,0.08); }
+@keyframes audioPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+#audio-btn-f7.playing i { animation: audioPulse 2s ease-in-out infinite; }
+
+/* ─── HERO DECORATIVE ─── */
+.hero-diag-tl::before {
+  content: ''; position: absolute; top: 60px; left: 40px;
+  width: 1px; height: 120px; background: rgba(0,196,122,0.15);
+  transform: rotate(-30deg); transform-origin: top left;
+}
+.hero-diag-br::after {
+  content: ''; position: absolute; bottom: 60px; right: 40px;
+  width: 1px; height: 120px; background: rgba(0,196,122,0.15);
+  transform: rotate(-30deg); transform-origin: bottom right;
+}
+.hero-bracket-tl { position: absolute; top: 40px; left: 40px; }
+.hero-bracket-tl::before {
+  content: ''; position: absolute; top: 0; left: 0; width: 20px; height: 1px;
+  background: rgba(0,196,122,0.3);
+}
+.hero-bracket-tl::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 1px; height: 20px;
+  background: rgba(0,196,122,0.3);
+}
+.hero-bracket-br { position: absolute; bottom: 40px; right: 40px; }
+.hero-bracket-br::before {
+  content: ''; position: absolute; bottom: 0; right: 0; width: 20px; height: 1px;
+  background: rgba(0,196,122,0.3);
+}
+.hero-bracket-br::after {
+  content: ''; position: absolute; bottom: 0; right: 0; width: 1px; height: 20px;
+  background: rgba(0,196,122,0.3);
+}
+
+/* ─── SECTION UTILITY ─── */
+.section-pad { padding: 80px 0; }
+@media (max-width: 767px) { .section-pad { padding: 48px 0; } }
+.max-container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 767px) { .max-container { padding: 0 16px; } }
+
+/* ─── FORM ─── */
+.form-input-z4 {
+  background: var(--bg-card); border: var(--border-tron); color: var(--text-0);
+  font-family: var(--font-body); font-size: 14px; padding: 12px 16px;
+  border-radius: 2px; width: 100%; outline: none; transition: var(--transition);
+}
+.form-input-z4:focus { border-color: var(--green); }
+.form-input-z4::placeholder { color: var(--text-2); }
+
+/* ─── SOCIAL CHANNEL LINKS ─── */
+.social-channel-link {
+  display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+  border-radius: 2px; text-decoration: none; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.social-channel-link.green-link {
+  background: rgba(0,196,122,0.04);
+  border: 1px solid rgba(0,196,122,0.22);
+}
+.social-channel-link.green-link:hover {
+  border-color: rgba(0,196,122,0.5);
+  background: rgba(0,196,122,0.08);
+  box-shadow: 0 0 12px rgba(0,196,122,0.12);
+}
+.social-channel-link.blue-link {
+  background: rgba(14,165,233,0.04);
+  border: 1px solid rgba(14,165,233,0.22);
+}
+.social-channel-link.blue-link:hover {
+  border-color: rgba(14,165,233,0.5);
+  background: rgba(14,165,233,0.08);
+  box-shadow: 0 0 12px rgba(14,165,233,0.12);
+}
+.social-icon-box {
+  width: 22px; height: 22px; min-width: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 2px;
+}
+.social-icon-box.green-icon {
+  border: var(--border-tron); background: rgba(0,196,122,0.08);
+}
+.social-icon-box.blue-icon {
+  border: 1px solid rgba(14,165,233,0.22); background: rgba(14,165,233,0.08);
+}
+
+/* ─── FOOTER SOCIAL ICONS ─── */
+.footer-social-icon {
+  width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 2px; text-decoration: none; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.footer-social-icon.green-fs {
+  background: rgba(0,196,122,0.06); border: var(--border-tron);
+}
+.footer-social-icon.green-fs:hover {
+  background: rgba(0,196,122,0.14); border-color: rgba(0,196,122,0.45);
+  box-shadow: 0 0 10px rgba(0,196,122,0.15);
+}
+.footer-social-icon.blue-fs {
+  background: rgba(14,165,233,0.06); border: var(--border-blue);
+}
+.footer-social-icon.blue-fs:hover {
+  background: rgba(14,165,233,0.14); border-color: rgba(14,165,233,0.45);
+  box-shadow: 0 0 10px rgba(14,165,233,0.15);
+}
+
+/* ─── FOUNDER CONNECT STRIP ─── */
+.founder-connect-strip {
+  background: rgba(0,196,122,0.03);
+  border-top: var(--border-tron); border-bottom: var(--border-tron);
+  padding: 20px 0;
+}
+.founder-connect-inner {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.founder-connect-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 20px; background: transparent; border-radius: 2px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  text-decoration: none; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.founder-connect-cta.green-cta {
+  border: var(--border-tron); color: var(--green);
+}
+.founder-connect-cta.green-cta:hover {
+  background: rgba(0,196,122,0.08); box-shadow: var(--shadow-tron);
+}
+.founder-connect-cta.blue-cta {
+  border: var(--border-blue); color: var(--blue);
+}
+.founder-connect-cta.blue-cta:hover {
+  background: rgba(14,165,233,0.08); box-shadow: var(--shadow-blue);
+}
+@media (max-width: 767px) {
+  .founder-connect-inner { flex-direction: column; align-items: flex-start; }
+}
+
+/* ─── HERO PYRAMID RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .hero-pyramid-col { display: none !important; }
+}
+</style>
+</head>
+<body data-id="0">
+<app-icon data-id="1" hidden data-icon="shield" data-palette="Dark"></app-icon>
+
+<!-- ═══ TRON SCANLINES OVERLAY ═══ -->
+<div data-id="2" id="tron-scanlines"></div>
+
+<!-- ═══ CURSOR GLOW ═══ -->
+<div data-id="3" id="cursor-glow-e3"></div>
+
+<!-- ═══ LAUNCH SCREEN ═══ -->
+<div data-id="4" id="launch-screen-x1a0">
+  <div data-id="5" style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:700px;text-align:center;padding:24px;">
+    <!-- PLACEMENT 1 — PYRAMID LOGO (Launch Screen Hero) -->
+    <div data-id="6" style="width:100%; max-width:700px; margin:0 auto 32px auto; position:relative; overflow:hidden;">
+      <img data-id="7" src="assets/images/msh-pyramid-logo.png" alt="MatrixSecHub Pyramid" class="pyramid-launch-img" />
+    </div>
+    <p data-id="8" style="font-family:var(--font-mono);font-size:11px;color:var(--green);letter-spacing:0.3em;" class="blink-dots">SYSTEM INITIALIZING</p>
+    <h1 data-id="9" class="hero-headline-glow" style="font-family:var(--font-display);font-size:42px;font-weight:900;color:var(--text-0);letter-spacing:0.04em;">MATRIXSECHUB</h1>
+    <p data-id="10" style="font-family:var(--font-mono);font-size:12px;color:var(--green);letter-spacing:0.5em;">OPS DIVISION</p>
+    <div data-id="11" style="width:80px;height:1px;background:var(--green);opacity:0.4;"></div>
+    <div data-id="12" style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;margin-top:8px;">
+      <p data-id="13" class="launch-status" style="font-family:var(--font-mono);font-size:11px;color:var(--green);">► IDENTITY VERIFIED</p>
+      <p data-id="14" class="launch-status" style="font-family:var(--font-mono);font-size:11px;color:var(--green);">► CLEARANCE LEVEL: ALPHA</p>
+      <p data-id="15" class="launch-status" style="font-family:var(--font-mono);font-size:11px;color:var(--green);">► ENCRYPTION: ACTIVE</p>
+      <p data-id="16" class="launch-status" style="font-family:var(--font-mono);font-size:11px;color:var(--green);">► DIVISION: ONLINE</p>
+    </div>
+    <div data-id="17" style="position:relative;display:inline-block;margin-top:16px;">
+      <div class="enter-ring" data-id="18"></div>
+      <button data-id="19" id="enter-btn-j8" class="enter-btn-hidden tron-btn" style="width:180px;height:48px;border:1px solid var(--green);background:transparent;color:var(--green);font-family:var(--font-display);font-size:11px;letter-spacing:0.2em;cursor:pointer;transition:var(--transition);">ENTER SYSTEM</button>
+    </div>
+    <p data-id="20" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);margin-top:12px;">OPERATOR_HSX // AUTHORIZED PERSONNEL ONLY</p>
+  </div>
+</div>
+
+<!-- ═══ MAIN APP ═══ -->
+<div data-id="21" id="app" style="display:none;">
+
+<!-- ═══ NAV ═══ -->
+<nav data-id="22" id="nav-r4b2">
+  <div data-id="23" style="display:flex;align-items:center;gap:10px;">
+    <span data-id="24" style="font-family:var(--font-display);font-size:14px;font-weight:800;color:var(--green);text-shadow:0 0 12px rgba(0,196,122,0.3);">MSH</span>
+    <span data-id="25" style="color:var(--text-2);font-size:12px;">·</span>
+    <span data-id="26" style="font-family:var(--font-mono);font-size:10px;color:var(--text-1);letter-spacing:0.2em;">OPS DIVISION</span>
+    <span data-id="27" class="status-dot-anim" style="margin-left:6px;"></span>
+  </div>
+  <div data-id="28" class="hidden md:flex" style="gap:32px;" id="desktop-nav-w2">
+    <a data-id="29" class="nav-link-a9 active" data-route="home">HOME</a>
+    <a data-id="30" class="nav-link-a9" data-route="founder">FOUNDER</a>
+    <a data-id="31" class="nav-link-a9" data-route="divisions">DIVISIONS</a>
+    <a data-id="32" class="nav-link-a9" data-route="agents">AGENTS</a>
+    <a data-id="33" class="nav-link-a9" data-route="marketplace">MARKETPLACE</a>
+    <a data-id="34" class="nav-link-a9" data-route="contact">CONTACT</a>
+  </div>
+  <button data-id="35" id="hamburger-btn-n5" class="md:hidden" style="background:none;border:none;color:var(--text-1);cursor:pointer;padding:8px;">
+    <i data-id="36" data-lucide="menu" class="w-6 h-6"></i>
+  </button>
+</nav>
+
+<!-- ═══ MOBILE MENU ═══ -->
+<div data-id="37" id="mobile-menu-m3x1">
+  <button data-id="38" id="mobile-close-btn-c2" style="align-self:flex-end;background:none;border:none;color:var(--text-1);cursor:pointer;padding:8px;margin-bottom:24px;">
+    <i data-id="39" data-lucide="x" class="w-6 h-6"></i>
+  </button>
+  <a data-id="40" class="mobile-nav-link active" data-route="home">HOME</a>
+  <a data-id="41" class="mobile-nav-link" data-route="founder">FOUNDER</a>
+  <a data-id="42" class="mobile-nav-link" data-route="divisions">DIVISIONS</a>
+  <a data-id="43" class="mobile-nav-link" data-route="agents">AGENTS</a>
+  <a data-id="44" class="mobile-nav-link" data-route="marketplace">MARKETPLACE</a>
+  <a data-id="45" class="mobile-nav-link" data-route="contact">CONTACT</a>
+  <div data-id="46" style="margin-top:auto;padding:24px 0;">
+    <p data-id="47" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">MATRIXSECHUB — OPS DIVISION</p>
+    <p data-id="48" style="font-family:var(--font-mono);font-size:10px;color:var(--green);opacity:0.5;margin-top:4px;">● SYSTEM ONLINE</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ HOME ═══════════════════════════ -->
+<div data-id="49" class="page active" id="page-home" data-page="home">
+
+<!-- HERO — Two-column layout with pyramid -->
+<section data-id="50" id="hero-h1a0" style="min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+  <div data-id="51" class="hero-bracket-tl hidden md:block"></div>
+  <div data-id="52" class="hero-bracket-br hidden md:block"></div>
+  <div data-id="53" class="hero-diag-tl hero-diag-br hidden md:block" style="position:absolute;inset:0;pointer-events:none;"></div>
+  <!-- TRON decorative lines (10) -->
+  <div data-id="54" class="hero-tron-line hero-tron-line-diag-tl hidden md:block"></div>
+  <div data-id="55" class="hero-tron-line hero-tron-line-diag-br hidden md:block"></div>
+  <div data-id="56" class="hero-tron-line hero-tron-line-v-left hidden md:block"></div>
+  <div data-id="57" class="hero-tron-line hero-tron-line-v-right hidden md:block"></div>
+  <div data-id="58" style="position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(0,196,122,0.04) 0%, transparent 60%);pointer-events:none;"></div>
+  <div data-id="59" style="display:flex;flex-wrap:wrap;align-items:center;gap:48px;max-width:1200px;width:100%;padding:120px 24px 80px;position:relative;z-index:1;">
+    <!-- LEFT COLUMN: Hero text content -->
+    <div data-id="60" style="flex:1;min-width:0;text-align:left;">
+      <p data-id="61" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.35em;margin-bottom:24px;">SOVEREIGN AI SECURITY & EXECUTIVE COMPLIANCE</p>
+      <h1 data-id="62" class="fade-in-on-scroll hero-headline-glow" style="font-family:var(--font-display);font-size:clamp(36px,6vw,64px);font-weight:900;color:var(--text-0);line-height:1.1;margin-bottom:28px;">
+        PROTECTING THE AI<br data-id="63">INFRASTRUCTURE OF<br data-id="64"><span data-id="65" style="position:relative;display:inline-block;">TOMORROW<span data-id="66" style="position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--green);box-shadow:0 0 8px var(--green);"></span></span>
+      </h1>
+      <p data-id="67" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:clamp(14px,2vw,18px);color:var(--text-1);max-width:560px;line-height:1.6;margin-bottom:36px;">MatrixSecHub — Ops Division delivers sovereign AI red teaming, LLM security audits, executive compliance, and threat intelligence for enterprise-grade AI systems.</p>
+      <div data-id="68" class="fade-in-on-scroll" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;">
+        <button data-id="69" class="cta-pulse tron-btn nav-route-btn" data-route="divisions" style="font-family:var(--font-display);font-size:11px;letter-spacing:0.15em;color:var(--green);border:1px solid var(--green);background:transparent;padding:14px 28px;cursor:pointer;transition:var(--transition);">ENTER DIVISIONS →</button>
+        <button data-id="70" class="nav-route-btn tron-btn" data-route="founder" style="font-family:var(--font-display);font-size:11px;letter-spacing:0.15em;color:var(--text-1);border:1px solid var(--text-2);background:transparent;padding:14px 28px;cursor:pointer;transition:var(--transition);">VIEW OPERATOR BRIEF</button>
+      </div>
+      <p data-id="71" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">STATUS: ACTIVE // THREAT LEVEL: ELEVATED // LAST SCAN: 2026-05-22</p>
+    </div>
+    <!-- PLACEMENT 2 — RIGHT COLUMN: Pyramid Logo (desktop only) -->
+    <div data-id="72" class="hero-pyramid-col" style="flex:0 0 420px;display:flex;align-items:center;justify-content:center;">
+      <div data-id="73" style="position:relative; width:100%; max-width:420px;">
+        <img data-id="74" src="assets/images/msh-pyramid-logo.png" alt="MSH Pyramid" class="pyramid-hero-img" />
+        <!-- Thin TRON-line frame around the image area -->
+        <div data-id="75" style="position:absolute; top:-8px; left:-8px; right:-8px; bottom:-8px; border: 1px solid rgba(0,196,122,0.12); pointer-events:none;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRON DIVIDER -->
+<div data-id="76" class="tron-divider"></div>
+
+<!-- MARQUEE -->
+<section data-id="77" id="marquee-s2b1" style="background:rgba(0,196,122,0.04);border-top:var(--border-tron);border-bottom:var(--border-tron);overflow:hidden;padding:8px 0;">
+  <div data-id="78" style="overflow:hidden;">
+    <div data-id="79" class="marquee-track marquee-left">
+      <span data-id="80" class="marquee-glow" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.15em;white-space:nowrap;">AI RED TEAMING &nbsp;•&nbsp; SOVEREIGN AI SECURITY &nbsp;•&nbsp; SOC 2 COMPLIANCE &nbsp;•&nbsp; NIST AI RMF &nbsp;•&nbsp; LLM SECURITY AUDITS &nbsp;•&nbsp; ADVERSARIAL TESTING &nbsp;•&nbsp; AI GOVERNANCE FRAMEWORKS &nbsp;•&nbsp; THREAT INTELLIGENCE &nbsp;•&nbsp; ZERO TRUST AI ARCHITECTURE &nbsp;•&nbsp; EXECUTIVE BRIEFINGS &nbsp;•&nbsp; AGENTIC SECURITY &nbsp;•&nbsp; AI SUPPLY CHAIN DEFENSE &nbsp;&nbsp;&nbsp;</span>
+      <span data-id="81" class="marquee-glow" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.15em;white-space:nowrap;">AI RED TEAMING &nbsp;•&nbsp; SOVEREIGN AI SECURITY &nbsp;•&nbsp; SOC 2 COMPLIANCE &nbsp;•&nbsp; NIST AI RMF &nbsp;•&nbsp; LLM SECURITY AUDITS &nbsp;•&nbsp; ADVERSARIAL TESTING &nbsp;•&nbsp; AI GOVERNANCE FRAMEWORKS &nbsp;•&nbsp; THREAT INTELLIGENCE &nbsp;•&nbsp; ZERO TRUST AI ARCHITECTURE &nbsp;•&nbsp; EXECUTIVE BRIEFINGS &nbsp;•&nbsp; AGENTIC SECURITY &nbsp;•&nbsp; AI SUPPLY CHAIN DEFENSE &nbsp;&nbsp;&nbsp;</span>
+    </div>
+  </div>
+  <div data-id="82" style="overflow:hidden;margin-top:4px;">
+    <div data-id="83" class="marquee-track marquee-right">
+      <span data-id="84" class="marquee-glow" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.15em;opacity:0.5;white-space:nowrap;">AI RED TEAMING &nbsp;•&nbsp; SOVEREIGN AI SECURITY &nbsp;•&nbsp; SOC 2 COMPLIANCE &nbsp;•&nbsp; NIST AI RMF &nbsp;•&nbsp; LLM SECURITY AUDITS &nbsp;•&nbsp; ADVERSARIAL TESTING &nbsp;•&nbsp; AI GOVERNANCE FRAMEWORKS &nbsp;•&nbsp; THREAT INTELLIGENCE &nbsp;•&nbsp; ZERO TRUST AI ARCHITECTURE &nbsp;•&nbsp; EXECUTIVE BRIEFINGS &nbsp;•&nbsp; AGENTIC SECURITY &nbsp;•&nbsp; AI SUPPLY CHAIN DEFENSE &nbsp;&nbsp;&nbsp;</span>
+      <span data-id="85" class="marquee-glow" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.15em;opacity:0.5;white-space:nowrap;">AI RED TEAMING &nbsp;•&nbsp; SOVEREIGN AI SECURITY &nbsp;•&nbsp; SOC 2 COMPLIANCE &nbsp;•&nbsp; NIST AI RMF &nbsp;•&nbsp; LLM SECURITY AUDITS &nbsp;•&nbsp; ADVERSARIAL TESTING &nbsp;•&nbsp; AI GOVERNANCE FRAMEWORKS &nbsp;•&nbsp; THREAT INTELLIGENCE &nbsp;•&nbsp; ZERO TRUST AI ARCHITECTURE &nbsp;•&nbsp; EXECUTIVE BRIEFINGS &nbsp;•&nbsp; AGENTIC SECURITY &nbsp;•&nbsp; AI SUPPLY CHAIN DEFENSE &nbsp;&nbsp;&nbsp;</span>
+    </div>
+  </div>
+</section>
+
+<!-- THREAT TICKER -->
+<section data-id="86" id="threat-ticker-t3c2" style="background:rgba(220,38,38,0.03);overflow:hidden;padding:8px 0;border-bottom:var(--border-red);">
+  <div data-id="87" style="overflow:hidden;">
+    <div data-id="88" class="marquee-track threat-ticker">
+      <span data-id="89" class="threat-glow" style="font-family:var(--font-mono);font-size:10px;color:var(--red);white-space:nowrap;">[ LATEST: CASE_LOG_0000008 // AI_SUPPLY_CHAIN_COMPROMISE — THREAT: CRITICAL ] &nbsp;&nbsp; [ CASE_LOG_0000007 // UNGOVERNED_INSIDER — THREAT: CRITICAL ] &nbsp;&nbsp; [ CASE_LOG_045 // SILENT_KRAKEN_BREACH — NATION-STATE ] &nbsp;&nbsp; [ CASE_LOG_000005 // GOVERNANCE_FRACTURE — PENTAGON AI ] &nbsp;&nbsp;&nbsp;</span>
+      <span data-id="90" class="threat-glow" style="font-family:var(--font-mono);font-size:10px;color:var(--red);white-space:nowrap;">[ LATEST: CASE_LOG_0000008 // AI_SUPPLY_CHAIN_COMPROMISE — THREAT: CRITICAL ] &nbsp;&nbsp; [ CASE_LOG_0000007 // UNGOVERNED_INSIDER — THREAT: CRITICAL ] &nbsp;&nbsp; [ CASE_LOG_045 // SILENT_KRAKEN_BREACH — NATION-STATE ] &nbsp;&nbsp; [ CASE_LOG_000005 // GOVERNANCE_FRACTURE — PENTAGON AI ] &nbsp;&nbsp;&nbsp;</span>
+    </div>
+  </div>
+</section>
+
+<!-- TRON DIVIDER -->
+<div data-id="91" class="tron-divider"></div>
+
+<!-- MISSION STATEMENT -->
+<section data-id="92" class="section-pad section-rgb-left" id="mission-s4d3" style="position:relative;overflow:hidden;">
+  <div data-id="93" class="max-container">
+    <div data-id="94" style="display:flex;flex-wrap:wrap;gap:60px;align-items:center;">
+      <div data-id="95" style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:40px;">
+        <div data-id="96" class="fade-in-on-scroll"><span data-id="97" class="stat-counter" data-target="12" style="font-family:var(--font-display);font-size:48px;color:var(--green);">0</span><span data-id="98" style="font-family:var(--font-display);font-size:48px;color:var(--green);">+</span><p data-id="99" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);margin-top:4px;">ACTIVE DIVISIONS</p></div>
+        <div data-id="100" class="fade-in-on-scroll"><span data-id="101" class="stat-counter" data-target="47" style="font-family:var(--font-display);font-size:48px;color:var(--green);">0</span><span data-id="102" style="font-family:var(--font-display);font-size:48px;color:var(--green);">+</span><p data-id="103" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);margin-top:4px;">AI OPERATORS ONLINE</p></div>
+        <div data-id="104" class="fade-in-on-scroll"><span data-id="105" class="stat-counter" data-target="100" style="font-family:var(--font-display);font-size:48px;color:var(--green);">0</span><span data-id="106" style="font-family:var(--font-display);font-size:48px;color:var(--green);">%</span><p data-id="107" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);margin-top:4px;">SOVEREIGN ARCHITECTURE</p></div>
+      </div>
+      <div data-id="108" style="flex:2;min-width:300px;border-left:1px solid rgba(0,196,122,0.15);padding-left:40px;" class="fade-in-on-scroll">
+        <h2 data-id="109" style="font-family:var(--font-display);font-size:clamp(22px,3vw,32px);color:var(--text-0);margin-bottom:20px;line-height:1.3;">AI SECURITY THAT OPERATES AT THE SPEED OF THREAT</h2>
+        <p data-id="110" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);line-height:1.7;margin-bottom:16px;">We are a veteran-owned sovereign AI security firm operating at the intersection of artificial intelligence, executive compliance, and adversarial defense. Our operators provide audit-ready AI governance, automated red teaming, and intelligence-grade LLM security for enterprise systems.</p>
+        <p data-id="111" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">OPERATOR_HSX // EST. 2024 // DENVER, CO</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRON DIVIDER -->
+<div data-id="112" class="tron-divider"></div>
+
+<!-- DIVISIONS PREVIEW -->
+<section data-id="113" class="section-pad" id="divisions-preview-s5e4" style="background:var(--bg-1);overflow:hidden;">
+  <div data-id="114" class="max-container">
+    <p data-id="115" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:12px;">ACTIVE DIVISIONS</p>
+    <h2 data-id="116" class="fade-in-on-scroll" style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);color:var(--text-0);margin-bottom:8px;">WHERE OPERATIONS BEGIN</h2>
+    <p data-id="117" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:15px;color:var(--text-1);margin-bottom:40px;">Specialized divisions for every layer of enterprise AI security.</p>
+    <div data-id="118" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;">
+      <div data-id="119" class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);border-radius:2px;padding:28px;transition:var(--transition);cursor:pointer;" id="div-card-01">
+        <div data-id="120" class="tron-holo"></div><div data-id="121" class="tron-sweep-line"></div><span data-id="122" class="tron-corner tl"></span><span data-id="123" class="tron-corner tr"></span><span data-id="124" class="tron-corner bl"></span><span data-id="125" class="tron-corner br"></span>
+        <p data-id="126" style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;position:relative;z-index:1;">[DIV-01]</p>
+        <h3 data-id="127" style="font-family:var(--font-display);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:10px;position:relative;z-index:1;">SOVEREIGN AI DIVISION</h3>
+        <p data-id="128" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.6;margin-bottom:14px;position:relative;z-index:1;">Governance frameworks and sovereignty architecture for enterprise AI deployments.</p>
+        <div data-id="129" style="display:flex;align-items:center;gap:6px;position:relative;z-index:1;"><span data-id="130" class="status-dot-anim"></span><span data-id="131" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">OPERATIONAL</span></div>
+      </div>
+      <div data-id="132" class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);border-radius:2px;padding:28px;transition:var(--transition);cursor:pointer;" id="div-card-02">
+        <div data-id="133" class="tron-holo"></div><div data-id="134" class="tron-sweep-line"></div><span data-id="135" class="tron-corner tl"></span><span data-id="136" class="tron-corner tr"></span><span data-id="137" class="tron-corner bl"></span><span data-id="138" class="tron-corner br"></span>
+        <p data-id="139" style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;position:relative;z-index:1;">[DIV-02]</p>
+        <h3 data-id="140" style="font-family:var(--font-display);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:10px;position:relative;z-index:1;">RED TEAM DIVISION</h3>
+        <p data-id="141" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.6;margin-bottom:14px;position:relative;z-index:1;">Adversarial AI testing, jailbreak analysis, and automated LLM vulnerability assessment.</p>
+        <div data-id="142" style="display:flex;align-items:center;gap:6px;position:relative;z-index:1;"><span data-id="143" class="status-dot-anim"></span><span data-id="144" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">OPERATIONAL</span></div>
+      </div>
+      <div data-id="145" class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);border-radius:2px;padding:28px;transition:var(--transition);cursor:pointer;" id="div-card-03">
+        <div data-id="146" class="tron-holo"></div><div data-id="147" class="tron-sweep-line"></div><span data-id="148" class="tron-corner tl"></span><span data-id="149" class="tron-corner tr"></span><span data-id="150" class="tron-corner bl"></span><span data-id="151" class="tron-corner br"></span>
+        <p data-id="152" style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;position:relative;z-index:1;">[DIV-03]</p>
+        <h3 data-id="153" style="font-family:var(--font-display);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:10px;position:relative;z-index:1;">EXECUTIVE COMPLIANCE</h3>
+        <p data-id="154" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.6;margin-bottom:14px;position:relative;z-index:1;">SOC 2 Type II, NIST AI RMF, and audit-ready executive positioning.</p>
+        <div data-id="155" style="display:flex;align-items:center;gap:6px;position:relative;z-index:1;"><span data-id="156" class="status-dot-anim"></span><span data-id="157" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">OPERATIONAL</span></div>
+      </div>
+      <div data-id="158" class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);border-radius:2px;padding:28px;transition:var(--transition);cursor:pointer;" id="div-card-04">
+        <div data-id="159" class="tron-holo"></div><div data-id="160" class="tron-sweep-line"></div><span data-id="161" class="tron-corner tl"></span><span data-id="162" class="tron-corner tr"></span><span data-id="163" class="tron-corner bl"></span><span data-id="164" class="tron-corner br"></span>
+        <p data-id="165" style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;position:relative;z-index:1;">[DIV-04]</p>
+        <h3 data-id="166" style="font-family:var(--font-display);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:10px;position:relative;z-index:1;">INTEL DIVISION</h3>
+        <p data-id="167" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.6;margin-bottom:14px;position:relative;z-index:1;">Threat intelligence, AI supply chain monitoring, and adversarial signal analysis.</p>
+        <div data-id="168" style="display:flex;align-items:center;gap:6px;position:relative;z-index:1;"><span data-id="169" class="status-dot-anim"></span><span data-id="170" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">OPERATIONAL</span></div>
+      </div>
+      <div data-id="171" class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);border-radius:2px;padding:28px;transition:var(--transition);cursor:pointer;" id="div-card-05">
+        <div data-id="172" class="tron-holo"></div><div data-id="173" class="tron-sweep-line"></div><span data-id="174" class="tron-corner tl"></span><span data-id="175" class="tron-corner tr"></span><span data-id="176" class="tron-corner bl"></span><span data-id="177" class="tron-corner br"></span>
+        <p data-id="178" style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;position:relative;z-index:1;">[DIV-05]</p>
+        <h3 data-id="179" style="font-family:var(--font-display);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:10px;position:relative;z-index:1;">ROBOTICS DIVISION</h3>
+        <p data-id="180" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.6;margin-bottom:14px;position:relative;z-index:1;">Physical AI and robotics security, anthropomorphic drift analysis.</p>
+        <div data-id="181" style="display:flex;align-items:center;gap:6px;position:relative;z-index:1;"><span data-id="182" class="status-dot-anim"></span><span data-id="183" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">OPERATIONAL</span></div>
+      </div>
+      <div data-id="184" class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);border-radius:2px;padding:28px;transition:var(--transition);cursor:pointer;" id="div-card-06">
+        <div data-id="185" class="tron-holo"></div><div data-id="186" class="tron-sweep-line"></div><span data-id="187" class="tron-corner tl"></span><span data-id="188" class="tron-corner tr"></span><span data-id="189" class="tron-corner bl"></span><span data-id="190" class="tron-corner br"></span>
+        <p data-id="191" style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;position:relative;z-index:1;">[DIV-06]</p>
+        <h3 data-id="192" style="font-family:var(--font-display);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:10px;position:relative;z-index:1;">ENTERPRISE FABRIC</h3>
+        <p data-id="193" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.6;margin-bottom:14px;position:relative;z-index:1;">Enterprise AI agent fabric security, privilege drift detection, and agentic containment.</p>
+        <div data-id="194" style="display:flex;align-items:center;gap:6px;position:relative;z-index:1;"><span data-id="195" class="status-dot-anim"></span><span data-id="196" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">OPERATIONAL</span></div>
+      </div>
+    </div>
+    <div data-id="197" style="text-align:center;margin-top:36px;">
+      <a data-id="198" class="nav-route-btn" data-route="divisions" style="font-family:var(--font-mono);font-size:12px;color:var(--green);cursor:pointer;transition:var(--transition);text-decoration:none;">VIEW ALL DIVISIONS →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRON DIVIDER -->
+<div data-id="199" class="tron-divider"></div>
+
+<!-- AGENTS PREVIEW -->
+<section data-id="200" class="section-pad" id="agents-preview-s6f5" style="overflow:hidden;">
+  <div data-id="201" class="max-container">
+    <p data-id="202" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:12px;">ACTIVE OPERATORS</p>
+    <h2 data-id="203" class="fade-in-on-scroll" style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);color:var(--text-0);margin-bottom:32px;">FIELD AGENTS</h2>
+    <div data-id="204" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;">
+      <div data-id="205" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px;text-align:center;transition:var(--transition);cursor:pointer;" id="agent-prev-1">
+        <div data-id="206" class="tron-holo"></div><div data-id="207" class="tron-sweep-line"></div><span data-id="208" class="tron-corner tl"></span><span data-id="209" class="tron-corner tr"></span><span data-id="210" class="tron-corner bl"></span><span data-id="211" class="tron-corner br"></span>
+        <div data-id="212" class="hex-avatar-border" style="position:relative;z-index:1;"><div data-id="213" class="hex-avatar"><span data-id="214" style="font-family:var(--font-display);font-size:18px;color:var(--green);">OX</span></div></div>
+        <p data-id="215" style="font-family:var(--font-display);font-size:12px;color:var(--text-0);letter-spacing:0.08em;margin-bottom:4px;position:relative;z-index:1;">OPERATOR_HSX</p>
+        <p data-id="216" style="font-family:var(--font-mono);font-size:10px;color:var(--text-1);margin-bottom:8px;position:relative;z-index:1;">Primary Operations Lead, Sovereign AI Security</p>
+        <div data-id="217" style="display:flex;align-items:center;justify-content:center;gap:6px;position:relative;z-index:1;"><span data-id="218" class="status-dot-anim"></span><span data-id="219" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">ACTIVE</span></div>
+      </div>
+      <div data-id="220" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px;text-align:center;transition:var(--transition);cursor:pointer;" id="agent-prev-2">
+        <div data-id="221" class="tron-holo"></div><div data-id="222" class="tron-sweep-line"></div><span data-id="223" class="tron-corner tl"></span><span data-id="224" class="tron-corner tr"></span><span data-id="225" class="tron-corner bl"></span><span data-id="226" class="tron-corner br"></span>
+        <div data-id="227" class="hex-avatar-border" style="position:relative;z-index:1;"><div data-id="228" class="hex-avatar"><span data-id="229" style="font-family:var(--font-display);font-size:18px;color:var(--green);">S7</span></div></div>
+        <p data-id="230" style="font-family:var(--font-display);font-size:12px;color:var(--text-0);letter-spacing:0.08em;margin-bottom:4px;position:relative;z-index:1;">SENTINEL-7</p>
+        <p data-id="231" style="font-family:var(--font-mono);font-size:10px;color:var(--text-1);margin-bottom:8px;position:relative;z-index:1;">Automated Threat Detection & LLM Monitoring</p>
+        <div data-id="232" style="display:flex;align-items:center;justify-content:center;gap:6px;position:relative;z-index:1;"><span data-id="233" class="status-dot-anim"></span><span data-id="234" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">ACTIVE</span></div>
+      </div>
+      <div data-id="235" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px;text-align:center;transition:var(--transition);cursor:pointer;" id="agent-prev-3">
+        <div data-id="236" class="tron-holo"></div><div data-id="237" class="tron-sweep-line"></div><span data-id="238" class="tron-corner tl"></span><span data-id="239" class="tron-corner tr"></span><span data-id="240" class="tron-corner bl"></span><span data-id="241" class="tron-corner br"></span>
+        <div data-id="242" class="hex-avatar-border" style="position:relative;z-index:1;"><div data-id="243" class="hex-avatar"><span data-id="244" style="font-family:var(--font-display);font-size:18px;color:var(--green);">C9</span></div></div>
+        <p data-id="245" style="font-family:var(--font-display);font-size:12px;color:var(--text-0);letter-spacing:0.08em;margin-bottom:4px;position:relative;z-index:1;">CIPHER-9</p>
+        <p data-id="246" style="font-family:var(--font-mono);font-size:10px;color:var(--text-1);margin-bottom:8px;position:relative;z-index:1;">Encryption Protocols & Data Sovereignty</p>
+        <div data-id="247" style="display:flex;align-items:center;justify-content:center;gap:6px;position:relative;z-index:1;"><span data-id="248" class="status-dot-anim"></span><span data-id="249" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">ACTIVE</span></div>
+      </div>
+      <div data-id="250" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px;text-align:center;transition:var(--transition);cursor:pointer;" id="agent-prev-4">
+        <div data-id="251" class="tron-holo"></div><div data-id="252" class="tron-sweep-line"></div><span data-id="253" class="tron-corner tl"></span><span data-id="254" class="tron-corner tr"></span><span data-id="255" class="tron-corner bl"></span><span data-id="256" class="tron-corner br"></span>
+        <div data-id="257" class="hex-avatar-border" style="position:relative;z-index:1;"><div data-id="258" class="hex-avatar"><span data-id="259" style="font-family:var(--font-display);font-size:18px;color:var(--green);">PX</span></div></div>
+        <p data-id="260" style="font-family:var(--font-display);font-size:12px;color:var(--text-0);letter-spacing:0.08em;margin-bottom:4px;position:relative;z-index:1;">PHANTOM-X</p>
+        <p data-id="261" style="font-family:var(--font-mono);font-size:10px;color:var(--text-1);margin-bottom:8px;position:relative;z-index:1;">Red Team Operations, Adversarial AI</p>
+        <div data-id="262" style="display:flex;align-items:center;justify-content:center;gap:6px;position:relative;z-index:1;"><span data-id="263" class="status-dot-anim"></span><span data-id="264" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">ACTIVE</span></div>
+      </div>
+    </div>
+    <div data-id="265" style="text-align:center;margin-top:36px;">
+      <a data-id="266" class="nav-route-btn" data-route="agents" style="font-family:var(--font-mono);font-size:12px;color:var(--green);cursor:pointer;transition:var(--transition);text-decoration:none;">VIEW ALL AGENTS →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRON DIVIDER -->
+<div data-id="267" class="tron-divider"></div>
+
+<!-- OPERATOR HSX HIGHLIGHT -->
+<section data-id="268" class="section-pad section-gold-glow" id="hsx-highlight-s7g6" style="background:linear-gradient(135deg, rgba(201,148,26,0.03) 0%, transparent 60%);position:relative;overflow:hidden;">
+  <div data-id="269" class="max-container">
+    <div data-id="270" style="display:flex;flex-wrap:wrap;gap:48px;align-items:center;">
+      <div data-id="271" style="flex:1;min-width:300px;" class="fade-in-on-scroll">
+        <p data-id="272" style="font-family:var(--font-mono);font-size:10px;color:var(--gold);letter-spacing:0.3em;margin-bottom:16px;">OPERATOR_HSX</p>
+        <h2 data-id="273" style="font-family:var(--font-display);font-size:clamp(20px,3vw,28px);color:var(--text-0);margin-bottom:20px;line-height:1.3;">VETERAN-OWNED. OPERATOR-LED. AI-SOVEREIGN.</h2>
+        <p data-id="274" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);line-height:1.7;margin-bottom:24px;">Guadalupe Gallegos founded MatrixSecHub with one directive: build a sovereign AI security firm that operates without compromise. Every division, every agent, every protocol is built for one purpose — protecting the AI infrastructure of the enterprise.</p>
+        <button data-id="275" class="cta-pulse-gold tron-btn-gold nav-route-btn" data-route="founder" style="font-family:var(--font-display);font-size:11px;letter-spacing:0.15em;color:var(--gold);border:1px solid var(--gold);background:transparent;padding:14px 28px;cursor:pointer;transition:var(--transition);">MEET THE FOUNDER →</button>
+      </div>
+      <div data-id="276" style="flex:0 0 auto;" class="fade-in-on-scroll">
+        <div data-id="277" class="tron-card corner-bracket corner-bracket-gold" style="width:280px;height:280px;border:var(--border-gold);display:flex;align-items:center;justify-content:center;background:var(--bg-card);">
+          <div data-id="278" class="tron-holo"></div><div data-id="279" class="tron-sweep-line"></div><span data-id="280" class="tron-corner tl"></span><span data-id="281" class="tron-corner tr"></span><span data-id="282" class="tron-corner bl"></span><span data-id="283" class="tron-corner br"></span>
+          <p data-id="284" style="font-family:var(--font-mono);font-size:11px;color:var(--gold);text-align:center;letter-spacing:0.1em;opacity:0.7;position:relative;z-index:1;">SECURITY<br data-id="285">CLEARANCE<br data-id="286">REQUIRED</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRON DIVIDER -->
+<div data-id="287" class="tron-divider"></div>
+
+<!-- SERVICES GRID -->
+<section data-id="288" class="section-pad" id="services-s8h7" style="background:var(--bg-1);overflow:hidden;">
+  <div data-id="289" class="max-container">
+    <p data-id="290" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:12px;">CORE CAPABILITIES</p>
+    <h2 data-id="291" class="fade-in-on-scroll" style="font-family:var(--font-display);font-size:clamp(24px,4vw,36px);color:var(--text-0);margin-bottom:40px;">OPERATIONAL SERVICES</h2>
+    <div data-id="292" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+      <div data-id="293" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px 28px;display:flex;gap:16px;align-items:flex-start;transition:var(--transition);">
+        <div data-id="294" class="tron-holo"></div><div data-id="295" class="tron-sweep-line"></div><span data-id="296" class="tron-corner tl"></span><span data-id="297" class="tron-corner tr"></span><span data-id="298" class="tron-corner bl"></span><span data-id="299" class="tron-corner br"></span>
+        <div data-id="300" style="width:16px;height:16px;min-width:16px;background:var(--green);border-radius:2px;margin-top:3px;position:relative;z-index:1;"></div>
+        <div data-id="301" style="position:relative;z-index:1;"><p data-id="302" style="font-family:var(--font-body);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:6px;">AI Red Teaming</p><p data-id="303" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.5;">Systematic adversarial testing of AI systems, LLMs, and agentic pipelines.</p></div>
+      </div>
+      <div data-id="304" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px 28px;display:flex;gap:16px;align-items:flex-start;transition:var(--transition);">
+        <div data-id="305" class="tron-holo"></div><div data-id="306" class="tron-sweep-line"></div><span data-id="307" class="tron-corner tl"></span><span data-id="308" class="tron-corner tr"></span><span data-id="309" class="tron-corner bl"></span><span data-id="310" class="tron-corner br"></span>
+        <div data-id="311" style="width:16px;height:16px;min-width:16px;background:var(--blue);border-radius:2px;margin-top:3px;position:relative;z-index:1;"></div>
+        <div data-id="312" style="position:relative;z-index:1;"><p data-id="313" style="font-family:var(--font-body);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:6px;">LLM Security Audits</p><p data-id="314" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.5;">Deep security analysis of large language model deployments and API surfaces.</p></div>
+      </div>
+      <div data-id="315" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px 28px;display:flex;gap:16px;align-items:flex-start;transition:var(--transition);">
+        <div data-id="316" class="tron-holo"></div><div data-id="317" class="tron-sweep-line"></div><span data-id="318" class="tron-corner tl"></span><span data-id="319" class="tron-corner tr"></span><span data-id="320" class="tron-corner bl"></span><span data-id="321" class="tron-corner br"></span>
+        <div data-id="322" style="width:16px;height:16px;min-width:16px;background:var(--gold);border-radius:2px;margin-top:3px;position:relative;z-index:1;"></div>
+        <div data-id="323" style="position:relative;z-index:1;"><p data-id="324" style="font-family:var(--font-body);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:6px;">SOC 2 Compliance</p><p data-id="325" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.5;">End-to-end SOC 2 Type II audit readiness and executive reporting.</p></div>
+      </div>
+      <div data-id="326" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px 28px;display:flex;gap:16px;align-items:flex-start;transition:var(--transition);">
+        <div data-id="327" class="tron-holo"></div><div data-id="328" class="tron-sweep-line"></div><span data-id="329" class="tron-corner tl"></span><span data-id="330" class="tron-corner tr"></span><span data-id="331" class="tron-corner bl"></span><span data-id="332" class="tron-corner br"></span>
+        <div data-id="333" style="width:16px;height:16px;min-width:16px;background:var(--blue);border-radius:2px;margin-top:3px;position:relative;z-index:1;"></div>
+        <div data-id="334" style="position:relative;z-index:1;"><p data-id="335" style="font-family:var(--font-body);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:6px;">NIST AI RMF</p><p data-id="336" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.5;">Full implementation of the NIST AI Risk Management Framework.</p></div>
+      </div>
+      <div data-id="337" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px 28px;display:flex;gap:16px;align-items:flex-start;transition:var(--transition);">
+        <div data-id="338" class="tron-holo"></div><div data-id="339" class="tron-sweep-line"></div><span data-id="340" class="tron-corner tl"></span><span data-id="341" class="tron-corner tr"></span><span data-id="342" class="tron-corner bl"></span><span data-id="343" class="tron-corner br"></span>
+        <div data-id="344" style="width:16px;height:16px;min-width:16px;background:var(--red);border-radius:2px;margin-top:3px;position:relative;z-index:1;"></div>
+        <div data-id="345" style="position:relative;z-index:1;"><p data-id="346" style="font-family:var(--font-body);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:6px;">Threat Intelligence</p><p data-id="347" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.5;">Real-time AI threat feeds, supply chain monitoring, and adversarial signals.</p></div>
+      </div>
+      <div data-id="348" class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:24px 28px;display:flex;gap:16px;align-items:flex-start;transition:var(--transition);">
+        <div data-id="349" class="tron-holo"></div><div data-id="350" class="tron-sweep-line"></div><span data-id="351" class="tron-corner tl"></span><span data-id="352" class="tron-corner tr"></span><span data-id="353" class="tron-corner bl"></span><span data-id="354" class="tron-corner br"></span>
+        <div data-id="355" style="width:16px;height:16px;min-width:16px;background:var(--gold);border-radius:2px;margin-top:3px;position:relative;z-index:1;"></div>
+        <div data-id="356" style="position:relative;z-index:1;"><p data-id="357" style="font-family:var(--font-body);font-size:15px;color:var(--text-0);font-weight:600;margin-bottom:6px;">Executive Briefings</p><p data-id="358" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);line-height:1.5;">C-suite AI security briefings and board-ready governance documentation.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRON DIVIDER -->
+<div data-id="359" class="tron-divider"></div>
+
+<!-- CONTACT CTA BAND -->
+<section data-id="360" class="section-pad" id="cta-band-s9i8" style="text-align:center;">
+  <div data-id="361" class="max-container fade-in-on-scroll">
+    <h2 data-id="362" style="font-family:var(--font-display);font-size:clamp(24px,4vw,32px);color:var(--text-0);margin-bottom:12px;">INITIATE CONTACT</h2>
+    <p data-id="363" style="font-family:var(--font-mono);font-size:12px;color:var(--text-1);margin-bottom:32px;">Cleared for operations. Awaiting your signal.</p>
+    <button data-id="364" class="cta-pulse-gold tron-btn-gold nav-route-btn" data-route="contact" style="font-family:var(--font-display);font-size:12px;letter-spacing:0.15em;color:var(--gold);border:1px solid var(--gold);background:transparent;padding:16px 36px;cursor:pointer;transition:var(--transition);">CONTACT OPS CENTER →</button>
+  </div>
+</section>
+
+</div><!-- /page-home -->
+
+<!-- ═══════════════════════════ FOUNDER ═══════════════════════════ -->
+<div data-id="365" class="page" id="page-founder" data-page="founder" style="padding-top:60px;">
+
+<!-- FOUNDER HERO -->
+<section data-id="366" class="section-pad" id="founder-hero-f1" style="text-align:center;padding-top:120px;">
+  <div data-id="367" class="max-container">
+    <p data-id="368" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:20px;">MATRIXSECHUB OPS DIVISION // COMMAND STRUCTURE</p>
+    <h1 data-id="369" class="fade-in-on-scroll hero-headline-glow" style="font-family:var(--font-display);font-size:clamp(32px,6vw,56px);font-weight:900;color:var(--text-0);margin-bottom:12px;">GUADALUPE GALLEGOS</h1>
+    <h2 data-id="370" class="fade-in-on-scroll" style="font-family:var(--font-display);font-size:clamp(16px,2.5vw,20px);color:var(--gold);margin-bottom:20px;">Founder & Head of AI — Ops Division</h2>
+    <div data-id="371" style="width:200px;height:1px;background:var(--gold);opacity:0.4;margin:0 auto 20px;"></div>
+    <p data-id="372" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--text-1);">DESIGNATION: FOUNDER_ALPHA // CLEARANCE: SOVEREIGN // STATUS: ACTIVE</p>
+  </div>
+</section>
+
+<div data-id="373" class="tron-divider"></div>
+
+<!-- BIO -->
+<section data-id="374" class="section-pad" id="founder-bio-f2">
+  <div data-id="375" class="max-container">
+    <div data-id="376" style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+      <div data-id="377" style="flex:0 0 auto;" class="fade-in-on-scroll">
+        <div data-id="378" class="tron-card corner-bracket corner-bracket-gold corner-bracket-lg" style="width:280px;height:280px;border:var(--border-gold);display:flex;align-items:center;justify-content:center;background:var(--bg-card);">
+          <div data-id="379" class="tron-holo"></div><div data-id="380" class="tron-sweep-line"></div><span data-id="381" class="tron-corner tl"></span><span data-id="382" class="tron-corner tr"></span><span data-id="383" class="tron-corner bl"></span><span data-id="384" class="tron-corner br"></span>
+          <p data-id="385" style="font-family:var(--font-mono);font-size:11px;color:var(--gold);text-align:center;letter-spacing:0.08em;line-height:2;position:relative;z-index:1;">G.GALLEGOS<br data-id="386">// FOUNDER</p>
+        </div>
+      </div>
+      <div data-id="387" style="flex:1;min-width:300px;" class="fade-in-on-scroll">
+        <p data-id="388" style="font-family:var(--font-mono);font-size:11px;color:var(--green);letter-spacing:0.3em;margin-bottom:16px;">PROFILE</p>
+        <p data-id="389" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);line-height:1.8;margin-bottom:16px;">Guadalupe Gallegos is the Founder and Head of AI Operations at MatrixSecHub — Ops Division. A veteran-driven leader with deep expertise in sovereign AI security, executive compliance, and adversarial AI defense, Guadalupe built MatrixSecHub from the ground up with a singular mission: to protect the AI infrastructure of the enterprise at every layer.</p>
+        <p data-id="390" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);line-height:1.8;margin-bottom:20px;font-style:italic;opacity:0.7;">[BIO PLACEHOLDER — Full biography to be added by Ops Division communications team. Include background, military service, AI expertise, founding story, and current mandate.]</p>
+        <p data-id="391" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">VETERAN-OWNED & OPERATED // DENVER, CO</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLACEMENT 3 — FOUNDER CONNECT STRIP -->
+<section data-id="392" class="founder-connect-strip" id="founder-connect-strip-f2b">
+  <div data-id="393" class="max-container">
+    <div data-id="394" class="founder-connect-inner">
+      <p data-id="395" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.25em;">CONNECT WITH THE FOUNDER</p>
+      <div data-id="396" style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a data-id="397" href="https://matrixsechub.carrd.co/" target="_blank" rel="noopener" class="founder-connect-cta green-cta">◈ CARRD.CO ↗</a>
+        <a data-id="398" href="#" id="founder-linkedin-link" target="_blank" rel="noopener" class="founder-connect-cta blue-cta">in LINKEDIN ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div data-id="399" class="tron-divider"></div>
+
+<!-- CREDENTIALS -->
+<section data-id="400" class="section-pad" id="founder-creds-f3" style="background:var(--bg-1);overflow:hidden;">
+  <div data-id="401" class="max-container">
+    <p data-id="402" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:32px;">CREDENTIALS & CERTIFICATIONS</p>
+    <div data-id="403" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+      <div data-id="404" class="tron-card fade-in-on-scroll" style="border:var(--border-gold);padding:24px;background:var(--bg-card);">
+        <div data-id="405" class="tron-holo"></div><div data-id="406" class="tron-sweep-line"></div><span data-id="407" class="tron-corner tl"></span><span data-id="408" class="tron-corner tr"></span><span data-id="409" class="tron-corner bl"></span><span data-id="410" class="tron-corner br"></span>
+        <p data-id="411" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-bottom:6px;position:relative;z-index:1;">CERTIFIED AI SECURITY ENGINEER</p>
+        <p data-id="412" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">[Certification body — placeholder]</p>
+      </div>
+      <div data-id="413" class="tron-card fade-in-on-scroll" style="border:var(--border-gold);padding:24px;background:var(--bg-card);">
+        <div data-id="414" class="tron-holo"></div><div data-id="415" class="tron-sweep-line"></div><span data-id="416" class="tron-corner tl"></span><span data-id="417" class="tron-corner tr"></span><span data-id="418" class="tron-corner bl"></span><span data-id="419" class="tron-corner br"></span>
+        <p data-id="420" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-bottom:6px;position:relative;z-index:1;">SOC 2 AUDIT LEAD</p>
+        <p data-id="421" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">[Certification body — placeholder]</p>
+      </div>
+      <div data-id="422" class="tron-card fade-in-on-scroll" style="border:var(--border-gold);padding:24px;background:var(--bg-card);">
+        <div data-id="423" class="tron-holo"></div><div data-id="424" class="tron-sweep-line"></div><span data-id="425" class="tron-corner tl"></span><span data-id="426" class="tron-corner tr"></span><span data-id="427" class="tron-corner bl"></span><span data-id="428" class="tron-corner br"></span>
+        <p data-id="429" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-bottom:6px;position:relative;z-index:1;">NIST AI RMF PRACTITIONER</p>
+        <p data-id="430" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">[Certification body — placeholder]</p>
+      </div>
+      <div data-id="431" class="tron-card fade-in-on-scroll" style="border:var(--border-gold);padding:24px;background:var(--bg-card);">
+        <div data-id="432" class="tron-holo"></div><div data-id="433" class="tron-sweep-line"></div><span data-id="434" class="tron-corner tl"></span><span data-id="435" class="tron-corner tr"></span><span data-id="436" class="tron-corner bl"></span><span data-id="437" class="tron-corner br"></span>
+        <p data-id="438" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-bottom:6px;position:relative;z-index:1;">LLM RED TEAM SPECIALIST</p>
+        <p data-id="439" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">[Certification body — placeholder]</p>
+      </div>
+      <div data-id="440" class="tron-card fade-in-on-scroll" style="border:var(--border-gold);padding:24px;background:var(--bg-card);">
+        <div data-id="441" class="tron-holo"></div><div data-id="442" class="tron-sweep-line"></div><span data-id="443" class="tron-corner tl"></span><span data-id="444" class="tron-corner tr"></span><span data-id="445" class="tron-corner bl"></span><span data-id="446" class="tron-corner br"></span>
+        <p data-id="447" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-bottom:6px;position:relative;z-index:1;">MILITARY SERVICE</p>
+        <p data-id="448" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">[Branch & rank — placeholder]</p>
+      </div>
+      <div data-id="449" class="tron-card fade-in-on-scroll" style="border:var(--border-gold);padding:24px;background:var(--bg-card);">
+        <div data-id="450" class="tron-holo"></div><div data-id="451" class="tron-sweep-line"></div><span data-id="452" class="tron-corner tl"></span><span data-id="453" class="tron-corner tr"></span><span data-id="454" class="tron-corner bl"></span><span data-id="455" class="tron-corner br"></span>
+        <p data-id="456" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);margin-bottom:6px;position:relative;z-index:1;">EXECUTIVE AI GOVERNANCE</p>
+        <p data-id="457" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">[Certification body — placeholder]</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div data-id="458" class="tron-divider"></div>
+
+<!-- TIMELINE -->
+<section data-id="459" class="section-pad" id="founder-timeline-f4">
+  <div data-id="460" class="max-container">
+    <p data-id="461" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:40px;text-align:center;">OPERATIONAL TIMELINE</p>
+    <div data-id="462" style="position:relative;max-width:800px;margin:0 auto;">
+      <div data-id="463" class="timeline-line-v8"></div>
+      <div data-id="464" style="display:flex;flex-direction:column;gap:48px;">
+        <div data-id="465" class="fade-in-on-scroll" style="display:flex;align-items:flex-start;gap:24px;padding-left:calc(50% + 24px);" id="tl-1">
+          <div data-id="466" class="timeline-node" style="min-width:12px;"></div>
+          <div data-id="467"><p data-id="468" style="font-family:var(--font-display);font-size:14px;color:var(--green);margin-bottom:6px;">2020</p><p data-id="469" style="font-family:var(--font-body);font-size:16px;color:var(--text-0);font-weight:600;margin-bottom:4px;">MILITARY SERVICE</p><p data-id="470" style="font-family:var(--font-body);font-size:14px;color:var(--text-1);">Service record and AI specialization development. [Placeholder]</p></div>
+        </div>
+        <div data-id="471" class="fade-in-on-scroll" style="display:flex;align-items:flex-start;gap:24px;padding-right:calc(50% + 24px);flex-direction:row-reverse;text-align:right;" id="tl-2">
+          <div data-id="472" class="timeline-node" style="min-width:12px;"></div>
+          <div data-id="473"><p data-id="474" style="font-family:var(--font-display);font-size:14px;color:var(--green);margin-bottom:6px;">2022</p><p data-id="475" style="font-family:var(--font-body);font-size:16px;color:var(--text-0);font-weight:600;margin-bottom:4px;">AI EXPERTISE DEVELOPMENT</p><p data-id="476" style="font-family:var(--font-body);font-size:14px;color:var(--text-1);">Advanced AI and cybersecurity training. [Placeholder]</p></div>
+        </div>
+        <div data-id="477" class="fade-in-on-scroll" style="display:flex;align-items:flex-start;gap:24px;padding-left:calc(50% + 24px);" id="tl-3">
+          <div data-id="478" class="timeline-node" style="min-width:12px;"></div>
+          <div data-id="479"><p data-id="480" style="font-family:var(--font-display);font-size:14px;color:var(--green);margin-bottom:6px;">2023</p><p data-id="481" style="font-family:var(--font-body);font-size:16px;color:var(--text-0);font-weight:600;margin-bottom:4px;">MATRIXSECHUB FOUNDED</p><p data-id="482" style="font-family:var(--font-body);font-size:14px;color:var(--text-1);">Establishment of sovereign AI security practice. [Placeholder]</p></div>
+        </div>
+        <div data-id="483" class="fade-in-on-scroll" style="display:flex;align-items:flex-start;gap:24px;padding-right:calc(50% + 24px);flex-direction:row-reverse;text-align:right;" id="tl-4">
+          <div data-id="484" class="timeline-node" style="min-width:12px;"></div>
+          <div data-id="485"><p data-id="486" style="font-family:var(--font-display);font-size:14px;color:var(--green);margin-bottom:6px;">2024</p><p data-id="487" style="font-family:var(--font-body);font-size:16px;color:var(--text-0);font-weight:600;margin-bottom:4px;">OPS DIVISION ACTIVATED</p><p data-id="488" style="font-family:var(--font-body);font-size:14px;color:var(--text-1);">Launch of the Ops Division and agent framework.</p></div>
+        </div>
+        <div data-id="489" class="fade-in-on-scroll" style="display:flex;align-items:flex-start;gap:24px;padding-left:calc(50% + 24px);" id="tl-5">
+          <div data-id="490" class="timeline-node" style="min-width:12px;"></div>
+          <div data-id="491"><p data-id="492" style="font-family:var(--font-display);font-size:14px;color:var(--green);margin-bottom:6px;">2025</p><p data-id="493" style="font-family:var(--font-body);font-size:16px;color:var(--text-0);font-weight:600;margin-bottom:4px;">ENTERPRISE EXPANSION</p><p data-id="494" style="font-family:var(--font-body);font-size:14px;color:var(--text-1);">Scale-up of enterprise AI security operations. [Placeholder]</p></div>
+        </div>
+        <div data-id="495" class="fade-in-on-scroll" style="display:flex;align-items:flex-start;gap:24px;padding-right:calc(50% + 24px);flex-direction:row-reverse;text-align:right;" id="tl-6">
+          <div data-id="496" class="timeline-node" style="min-width:12px;"></div>
+          <div data-id="497"><p data-id="498" style="font-family:var(--font-display);font-size:14px;color:var(--green);margin-bottom:6px;">2026</p><p data-id="499" style="font-family:var(--font-body);font-size:16px;color:var(--text-0);font-weight:600;margin-bottom:4px;">CURRENT OPERATIONS</p><p data-id="500" style="font-family:var(--font-body);font-size:14px;color:var(--text-1);">Active defense operations across all 12 divisions.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div data-id="501" class="tron-divider"></div>
+
+<!-- FOUNDER VIDEOS -->
+<section data-id="502" class="section-pad" id="founder-videos-f5" style="background:var(--bg-1);">
+  <div data-id="503" class="max-container">
+    <p data-id="504" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:12px;">FOUNDER VIDEO SHOWCASE</p>
+    <h2 data-id="505" class="fade-in-on-scroll" style="font-family:var(--font-display);font-size:clamp(24px,4vw,32px);color:var(--text-0);margin-bottom:40px;">OPERATIONAL BRIEFINGS</h2>
+    <div data-id="506" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:32px;">
+      <div data-id="507" class="fade-in-on-scroll">
+        <p data-id="508" style="font-family:var(--font-display);font-size:16px;color:var(--text-0);margin-bottom:4px;">DIVISION OPS — OPERATIONAL OVERVIEW</p>
+        <p data-id="509" style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;">[DIV-OPS-VID-01]</p>
+        <p data-id="510" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);margin-bottom:16px;line-height:1.5;">A complete operational overview of MatrixSecHub's active divisions, protocols, and AI security mandates. [Video description placeholder — to be updated by Ops Division communications team.]</p>
+        <div data-id="511" class="video-container-k2 corner-bracket corner-bracket-lg vid-hover-scan" style="border:1px solid rgba(0,196,122,0.25);">
+          <div data-id="512" class="vid-inner">
+            <span data-id="513" style="font-size:32px;color:var(--green);opacity:0.6;">▶</span>
+            <p data-id="514" style="font-family:var(--font-mono);font-size:12px;color:var(--green);opacity:0.7;">EMBED READY // DIVISION OPS VIDEO</p>
+          </div>
+        </div>
+      </div>
+      <div data-id="515" class="fade-in-on-scroll">
+        <p data-id="516" style="font-family:var(--font-display);font-size:16px;color:var(--gold);margin-bottom:4px;">OPERATOR HSX — VIDEO BRIEFING</p>
+        <p data-id="517" style="font-family:var(--font-mono);font-size:10px;color:var(--gold);margin-bottom:8px;">[OPS-HSX-VID-01]</p>
+        <p data-id="518" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);margin-bottom:16px;line-height:1.5;">A personal briefing from Operator HSX on the mission, mandate, and operational principles of MatrixSecHub. [Video description placeholder — to be updated by Ops Division communications team.]</p>
+        <div data-id="519" class="video-container-k2 gold-vid corner-bracket corner-bracket-gold corner-bracket-lg vid-hover-scan" style="border:var(--border-gold);">
+          <div data-id="520" class="vid-inner">
+            <span data-id="521" style="font-size:32px;color:var(--gold);opacity:0.6;">▶</span>
+            <p data-id="522" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);opacity:0.7;">EMBED READY // OPERATOR HSX VIDEO</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page-founder -->
+
+<!-- ═══════════════════════════ DIVISIONS ═══════════════════════════ -->
+<div data-id="523" class="page" id="page-divisions" data-page="divisions" style="padding-top:60px;">
+
+<section data-id="524" style="padding:120px 0 40px;text-align:center;" id="div-hero-d1">
+  <div data-id="525" class="max-container">
+    <p data-id="526" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:16px;">ACTIVE DIVISIONS // 12 OPERATIONAL UNITS</p>
+    <h1 data-id="527" class="fade-in-on-scroll hero-headline-glow" style="font-family:var(--font-display);font-size:clamp(32px,5vw,48px);font-weight:900;color:var(--text-0);margin-bottom:12px;">DIVISION COMMAND</h1>
+    <p data-id="528" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);">Specialized units operating across the full AI security spectrum.</p>
+  </div>
+</section>
+
+<div data-id="529" class="tron-divider"></div>
+
+<section data-id="530" class="section-pad" id="div-grid-d2" style="padding-top:40px;">
+  <div data-id="531" class="max-container">
+    <div data-id="532" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:28px;" id="divisions-grid-g3">
+    </div>
+  </div>
+</section>
+
+<div data-id="533" class="tron-divider"></div>
+
+<section data-id="534" class="section-pad" id="div-video-d3" style="background:var(--bg-1);">
+  <div data-id="535" class="max-container" style="text-align:center;">
+    <p data-id="536" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:12px;">DIVISION OPS // VIDEO OVERVIEW</p>
+    <h2 data-id="537" class="fade-in-on-scroll" style="font-family:var(--font-display);font-size:clamp(24px,4vw,32px);color:var(--text-0);margin-bottom:16px;">SEE THE DIVISIONS IN ACTION</h2>
+    <p data-id="538" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);max-width:640px;margin:0 auto 32px;line-height:1.6;">A comprehensive video overview of MatrixSecHub's active divisions, their mandates, and operational protocols. This briefing is cleared for enterprise stakeholders and executive review. [Video description placeholder — full production notes to be added by Ops Division communications team.]</p>
+    <div data-id="539" style="max-width:900px;margin:0 auto;">
+      <div data-id="540" class="video-container-k2 corner-bracket corner-bracket-lg vid-hover-scan" style="border:1px solid rgba(0,196,122,0.25);">
+        <div data-id="541" class="vid-inner">
+          <span data-id="542" style="font-size:40px;color:var(--green);opacity:0.6;">▶</span>
+          <p data-id="543" style="font-family:var(--font-mono);font-size:12px;color:var(--green);opacity:0.7;">EMBED READY // DIVISION OPS OVERVIEW</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page-divisions -->
+
+<!-- ═══════════════════════════ AGENTS ═══════════════════════════ -->
+<div data-id="544" class="page" id="page-agents" data-page="agents" style="padding-top:60px;">
+
+<section data-id="545" style="padding:120px 0 40px;text-align:center;" id="agents-hero-a1">
+  <div data-id="546" class="max-container">
+    <p data-id="547" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:16px;">AI OPERATORS // CLEARED PERSONNEL ONLY</p>
+    <h1 data-id="548" class="fade-in-on-scroll hero-headline-glow" style="font-family:var(--font-display);font-size:clamp(32px,5vw,48px);font-weight:900;color:var(--text-0);margin-bottom:12px;">ACTIVE OPERATORS</h1>
+    <p data-id="549" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);">Our AI operators are deployed across all divisions, executing security protocols with precision.</p>
+  </div>
+</section>
+
+<div data-id="550" class="tron-divider"></div>
+
+<section data-id="551" class="section-pad" id="agents-grid-a2" style="padding-top:40px;">
+  <div data-id="552" class="max-container">
+    <div data-id="553" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;" id="agents-grid-g4">
+    </div>
+  </div>
+</section>
+
+<div data-id="554" class="tron-divider"></div>
+
+<section data-id="555" class="section-pad" id="agents-video-a3" style="background:var(--bg-1);">
+  <div data-id="556" class="max-container" style="text-align:center;">
+    <p data-id="557" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--gold);letter-spacing:0.3em;margin-bottom:12px;">OPERATOR HSX // VIDEO BRIEFING</p>
+    <h2 data-id="558" class="fade-in-on-scroll" style="font-family:var(--font-display);font-size:clamp(24px,4vw,32px);color:var(--gold);text-shadow:0 0 20px rgba(201,148,26,0.2);margin-bottom:16px;">DIRECT FROM COMMAND</h2>
+    <p data-id="559" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);max-width:640px;margin:0 auto 32px;line-height:1.6;">A direct video briefing from Operator HSX, covering the origins of MatrixSecHub, the agent framework, and the operational mandate for sovereign AI security. [Video description placeholder — content to be finalized by Ops Division communications team.]</p>
+    <div data-id="560" style="max-width:900px;margin:0 auto;">
+      <div data-id="561" class="video-container-k2 gold-vid corner-bracket corner-bracket-gold corner-bracket-lg vid-hover-scan" style="border:var(--border-gold);">
+        <div data-id="562" class="vid-inner">
+          <span data-id="563" style="font-size:40px;color:var(--gold);opacity:0.6;">▶</span>
+          <p data-id="564" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);opacity:0.7;">EMBED READY // OPERATOR HSX BRIEFING</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page-agents -->
+
+<!-- ═══════════════════════════ MARKETPLACE ═══════════════════════════ -->
+<div data-id="565" class="page" id="page-marketplace" data-page="marketplace" style="padding-top:60px;">
+
+<section data-id="566" style="padding:120px 0 40px;text-align:center;" id="market-hero-m1">
+  <div data-id="567" class="max-container">
+    <p data-id="568" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:16px;">OPS DIVISION MARKETPLACE // CLEARED PRODUCTS</p>
+    <h1 data-id="569" class="fade-in-on-scroll hero-headline-glow" style="font-family:var(--font-display);font-size:clamp(28px,5vw,48px);font-weight:900;color:var(--text-0);margin-bottom:12px;">SECURE INTELLIGENCE MARKETPLACE</h1>
+    <p data-id="570" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);max-width:600px;margin:0 auto 20px;">Enterprise-grade AI security products, audit packages, and intelligence subscriptions. Stripe-ready checkout infrastructure.</p>
+    <div data-id="570a" class="fade-in-on-scroll" style="margin:0 auto 24px;">
+      <a data-id="570b" href="/marketplace" class="cta-pulse tron-btn marketplace-launch" style="display:inline-block;font-family:var(--font-display);font-size:12px;letter-spacing:0.15em;color:var(--green);border:1px solid var(--green);background:transparent;padding:14px 32px;cursor:pointer;text-decoration:none;transition:var(--transition);">ENTER SECURE MARKETPLACE →</a>
+      <p data-id="570c" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);letter-spacing:0.12em;margin-top:10px;">OPERATOR LOGIN REQUIRED // SECURE ROUTE: /marketplace</p>
+    </div>
+    <div data-id="571" style="width:120px;height:1px;background:var(--green);opacity:0.3;margin:0 auto;"></div>
+  </div>
+</section>
+
+<div data-id="572" class="tron-divider"></div>
+
+<section data-id="573" class="section-pad" id="market-grid-m2" style="padding-top:40px;">
+  <div data-id="574" class="max-container">
+    <div data-id="575" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:28px;" id="products-grid-p5">
+    </div>
+    <div data-id="576" style="text-align:center;margin-top:60px;" class="fade-in-on-scroll">
+      <h2 data-id="577" style="font-family:var(--font-display);font-size:clamp(20px,3vw,28px);color:var(--text-0);margin-bottom:12px;">NEED A CUSTOM ENGAGEMENT?</h2>
+      <p data-id="578" style="font-family:var(--font-body);font-size:15px;color:var(--text-1);margin-bottom:24px;max-width:500px;margin-left:auto;margin-right:auto;">Our operators design custom security programs for enterprise organizations with complex AI environments.</p>
+      <button data-id="579" class="cta-pulse-gold tron-btn-gold nav-route-btn" data-route="contact" style="font-family:var(--font-display);font-size:12px;letter-spacing:0.15em;color:var(--gold);border:1px solid var(--gold);background:transparent;padding:14px 32px;cursor:pointer;transition:var(--transition);">REQUEST CUSTOM QUOTE →</button>
+    </div>
+    <div data-id="580" class="tron-card fade-in-on-scroll" style="margin-top:40px;background:rgba(0,196,122,0.04);border:var(--border-tron);padding:20px;text-align:center;">
+      <div data-id="581" class="tron-holo"></div><div data-id="582" class="tron-sweep-line"></div><span data-id="583" class="tron-corner tl"></span><span data-id="584" class="tron-corner tr"></span><span data-id="585" class="tron-corner bl"></span><span data-id="586" class="tron-corner br"></span>
+      <p data-id="587" style="font-family:var(--font-mono);font-size:10px;color:var(--green);opacity:0.6;position:relative;z-index:1;">PAYMENT INFRASTRUCTURE: STRIPE INTEGRATION PENDING // CHECKOUT WILL BE ACTIVATED UPON OPERATOR AUTHORIZATION</p>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page-marketplace -->
+
+<!-- ═══════════════════════════ CONTACT ═══════════════════════════ -->
+<div data-id="588" class="page" id="page-contact" data-page="contact" style="padding-top:60px;">
+
+<section data-id="589" style="padding:120px 0 40px;text-align:center;" id="contact-hero-c1">
+  <div data-id="590" class="max-container">
+    <p data-id="591" class="fade-in-on-scroll" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.3em;margin-bottom:16px;">OPS CENTER // DIRECT LINE</p>
+    <h1 data-id="592" class="fade-in-on-scroll hero-headline-glow" style="font-family:var(--font-display);font-size:clamp(32px,5vw,48px);font-weight:900;color:var(--text-0);margin-bottom:12px;">INITIATE CONTACT</h1>
+    <p data-id="593" class="fade-in-on-scroll" style="font-family:var(--font-body);font-size:16px;color:var(--text-1);">Secure channels are open. All communications are encrypted end-to-end.</p>
+  </div>
+</section>
+
+<div data-id="594" class="tron-divider"></div>
+
+<section data-id="595" class="section-pad" id="contact-form-c2" style="padding-top:40px;">
+  <div data-id="596" class="max-container">
+    <div data-id="597" style="display:flex;flex-wrap:wrap;gap:48px;">
+      <div data-id="598" style="flex:1;min-width:320px;">
+        <p data-id="599" style="font-family:var(--font-mono);font-size:11px;color:var(--green);letter-spacing:0.2em;margin-bottom:24px;">SEND ENCRYPTED MESSAGE</p>
+        <form data-id="600" id="contact-form-z9" style="display:flex;flex-direction:column;gap:16px;">
+          <input data-id="601" type="text" class="form-input-z4" placeholder="Your name or company" aria-label="Designation" id="form-name-n1" />
+          <input data-id="602" type="email" class="form-input-z4" placeholder="your@email.com" aria-label="Secure Channel" id="form-email-e1" />
+          <select data-id="603" class="form-input-z4" aria-label="Clearance Level" id="form-subject-s1" style="appearance:none;">
+            <option data-id="604" value="">Select inquiry type...</option>
+            <option data-id="605">AI Red Team Assessment</option>
+            <option data-id="606">SOC 2 Compliance</option>
+            <option data-id="607">NIST AI RMF</option>
+            <option data-id="608">LLM Security Audit</option>
+            <option data-id="609">Executive Briefing</option>
+            <option data-id="610">Custom Engagement</option>
+            <option data-id="611">General Inquiry</option>
+          </select>
+          <textarea data-id="612" class="form-input-z4" rows="6" placeholder="Describe your security objectives, current AI environment, and timeline..." aria-label="Message Payload" id="form-msg-m1"></textarea>
+          <label data-id="613" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+            <input data-id="614" type="checkbox" id="form-consent-c1" style="margin-top:3px;accent-color:var(--green);" />
+            <span data-id="615" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);line-height:1.5;">I authorize MatrixSecHub Ops Division to contact me regarding AI security services.</span>
+          </label>
+          <button data-id="616" type="submit" id="form-submit-btn-b1" class="cta-pulse tron-btn" style="font-family:var(--font-display);font-size:12px;letter-spacing:0.1em;color:var(--green);border:1px solid var(--green);background:transparent;padding:16px;cursor:pointer;transition:var(--transition);width:100%;">TRANSMIT MESSAGE →</button>
+          <p data-id="617" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">All transmissions are encrypted. Your data remains sovereign.</p>
+        </form>
+        <div data-id="618" id="form-success-msg-s2" style="display:none;padding:32px;border:var(--border-tron);background:rgba(0,196,122,0.04);text-align:center;margin-top:16px;">
+          <p data-id="619" style="font-family:var(--font-display);font-size:16px;color:var(--green);margin-bottom:8px;">TRANSMISSION RECEIVED</p>
+          <p data-id="620" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);">Your message has been encrypted and forwarded to Ops Division command. Expected response time: &lt;24 hours.</p>
+        </div>
+      </div>
+      <div data-id="621" style="flex:0 0 340px;min-width:280px;display:flex;flex-direction:column;gap:16px;">
+        <div data-id="622" class="tron-card" style="background:var(--bg-card);border:var(--border-tron);padding:24px;">
+          <div data-id="623" class="tron-holo"></div><div data-id="624" class="tron-sweep-line"></div><span data-id="625" class="tron-corner tl"></span><span data-id="626" class="tron-corner tr"></span><span data-id="627" class="tron-corner bl"></span><span data-id="628" class="tron-corner br"></span>
+          <div data-id="629" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative;z-index:1;"><span data-id="630" style="width:8px;height:8px;border-radius:50%;background:var(--green);"></span><p data-id="631" style="font-family:var(--font-mono);font-size:12px;color:var(--green);">OPS CENTER</p></div>
+          <p data-id="632" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">Denver, CO, United States<br data-id="633">OPERATOR_HSX DIVISION HQ</p>
+        </div>
+        <div data-id="634" class="tron-card" style="background:var(--bg-card);border:var(--border-blue);padding:24px;">
+          <div data-id="635" class="tron-holo"></div><div data-id="636" class="tron-sweep-line"></div><span data-id="637" class="tron-corner tl"></span><span data-id="638" class="tron-corner tr"></span><span data-id="639" class="tron-corner bl"></span><span data-id="640" class="tron-corner br"></span>
+          <div data-id="641" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative;z-index:1;"><span data-id="642" style="width:8px;height:8px;border-radius:50%;background:var(--blue);"></span><p data-id="643" style="font-family:var(--font-mono);font-size:12px;color:var(--blue);">SECURE CHANNEL</p></div>
+          <p data-id="644" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">contact@matrixsechub.com [placeholder]</p>
+        </div>
+        <div data-id="645" class="tron-card" style="background:var(--bg-card);border:var(--border-gold);padding:24px;">
+          <div data-id="646" class="tron-holo"></div><div data-id="647" class="tron-sweep-line"></div><span data-id="648" class="tron-corner tl"></span><span data-id="649" class="tron-corner tr"></span><span data-id="650" class="tron-corner bl"></span><span data-id="651" class="tron-corner br"></span>
+          <div data-id="652" style="display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative;z-index:1;"><span data-id="653" style="width:8px;height:8px;border-radius:50%;background:var(--gold);"></span><p data-id="654" style="font-family:var(--font-mono);font-size:12px;color:var(--gold);">OPERATIONS HOURS</p></div>
+          <p data-id="655" style="font-family:var(--font-body);font-size:13px;color:var(--text-1);position:relative;z-index:1;">Active 24/7<br data-id="656">Threat monitoring never stops</p>
+        </div>
+        <div data-id="657" class="tron-card" style="background:var(--bg-card);border:var(--border-tron);padding:20px;margin-top:8px;">
+          <div data-id="658" class="tron-holo"></div><div data-id="659" class="tron-sweep-line"></div><span data-id="660" class="tron-corner tl"></span><span data-id="661" class="tron-corner tr"></span><span data-id="662" class="tron-corner bl"></span><span data-id="663" class="tron-corner br"></span>
+          <p data-id="664" style="font-family:var(--font-mono);font-size:11px;color:var(--green);position:relative;z-index:1;">● OPERATOR ONLINE</p>
+          <p data-id="665" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);margin-top:4px;position:relative;z-index:1;">RESPONSE TIME: &lt;24 HRS // CURRENT OPS: ACTIVE</p>
+        </div>
+
+        <!-- PLACEMENT 1 — EXTERNAL CHANNELS BLOCK -->
+        <div data-id="666" class="tron-card" style="background:var(--bg-card);border:var(--border-tron);padding:24px;">
+          <div data-id="667" class="tron-holo"></div><div data-id="668" class="tron-sweep-line"></div><span data-id="669" class="tron-corner tl"></span><span data-id="670" class="tron-corner tr"></span><span data-id="671" class="tron-corner bl"></span><span data-id="672" class="tron-corner br"></span>
+          <p data-id="673" style="font-family:var(--font-mono);font-size:10px;color:var(--green);letter-spacing:0.25em;margin-bottom:16px;position:relative;z-index:1;">EXTERNAL CHANNELS</p>
+          <div data-id="674" style="display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;">
+            <a data-id="675" href="https://matrixsechub.carrd.co/" target="_blank" rel="noopener" class="social-channel-link green-link">
+              <div data-id="676" class="social-icon-box green-icon">
+                <span data-id="677" style="font-size:12px;color:var(--green);line-height:1;">◈</span>
+              </div>
+              <div data-id="678" style="display:flex;flex-direction:column;gap:2px;">
+                <span data-id="679" style="font-family:var(--font-display);font-size:11px;color:var(--text-0);font-weight:600;letter-spacing:0.08em;">CARRD.CO</span>
+                <span data-id="680" style="font-family:var(--font-mono);font-size:10px;color:var(--green);opacity:0.7;">matrixsechub.carrd.co</span>
+              </div>
+              <span data-id="681" style="margin-left:auto;font-size:12px;color:var(--green);">↗</span>
+            </a>
+            <a data-id="682" href="#" id="linkedin-link" target="_blank" rel="noopener" class="social-channel-link blue-link">
+              <div data-id="683" class="social-icon-box blue-icon">
+                <span data-id="684" style="font-size:12px;color:var(--blue);font-weight:700;line-height:1;">in</span>
+              </div>
+              <div data-id="685" style="display:flex;flex-direction:column;gap:2px;">
+                <span data-id="686" style="font-family:var(--font-display);font-size:11px;color:var(--text-0);font-weight:600;letter-spacing:0.08em;">LINKEDIN</span>
+                <span data-id="687" style="font-family:var(--font-mono);font-size:10px;color:var(--blue);opacity:0.7;">linkedin.com/in/matrixsechub</span>
+              </div>
+              <span data-id="688" style="margin-left:auto;font-size:12px;color:var(--blue);">↗</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /page-contact -->
+
+<!-- ═══ FOOTER ═══ -->
+<footer data-id="689" id="footer-ft1" style="background:var(--bg-1);border-top:var(--border-tron);padding:48px 0 24px;">
+  <div data-id="690" class="max-container">
+    <!-- PLACEMENT 3 — FOOTER CENTERED PYRAMID LOGO -->
+    <div data-id="691" style="text-align:center; padding:32px 0 24px; border-bottom:1px solid rgba(0,196,122,0.08); margin-bottom:32px;">
+      <img data-id="692" src="assets/images/msh-pyramid-logo.png" alt="MatrixSecHub" style="max-width:340px; width:100%; height:auto; opacity:0.5; filter:drop-shadow(0 0 12px rgba(0,196,122,0.2)); display:inline-block;" />
+    </div>
+    <div data-id="693" style="display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;margin-bottom:32px;">
+      <div data-id="694" style="min-width:200px;">
+        <p data-id="695" style="font-family:var(--font-display);font-size:14px;color:var(--green);font-weight:800;margin-bottom:8px;">MSH</p>
+        <p data-id="696" style="font-family:var(--font-mono);font-size:11px;color:var(--text-2);">© 2026 MatrixSecHub — Ops Division.<br data-id="697">All rights reserved.</p>
+      </div>
+      <div data-id="698" style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;">
+        <a data-id="699" class="nav-route-btn" data-route="home" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);cursor:pointer;text-decoration:none;transition:var(--transition);">Home</a>
+        <a data-id="700" class="nav-route-btn" data-route="founder" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);cursor:pointer;text-decoration:none;transition:var(--transition);">Founder</a>
+        <a data-id="701" class="nav-route-btn" data-route="divisions" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);cursor:pointer;text-decoration:none;transition:var(--transition);">Divisions</a>
+        <a data-id="702" class="nav-route-btn" data-route="agents" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);cursor:pointer;text-decoration:none;transition:var(--transition);">Agents</a>
+        <a data-id="703" class="nav-route-btn" data-route="marketplace" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);cursor:pointer;text-decoration:none;transition:var(--transition);">Marketplace</a>
+        <a data-id="704" class="nav-route-btn" data-route="contact" style="font-family:var(--font-mono);font-size:11px;color:var(--text-1);cursor:pointer;text-decoration:none;transition:var(--transition);">Contact</a>
+      </div>
+      <div data-id="705" style="min-width:200px;text-align:right;">
+        <p data-id="706" style="font-family:var(--font-mono);font-size:11px;color:var(--text-2);">OPERATOR_HSX // DENVER, CO</p>
+        <p data-id="707" style="font-family:var(--font-mono);font-size:11px;color:var(--text-2);">matrixsechub.com</p>
+        <!-- PLACEMENT 2 — FOOTER SOCIAL ICONS -->
+        <div data-id="708" style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+          <a data-id="709" href="https://matrixsechub.carrd.co/" target="_blank" rel="noopener" class="footer-social-icon green-fs" title="MatrixSecHub on Carrd.co">
+            <span data-id="710" style="font-size:14px;color:var(--green);line-height:1;">◈</span>
+          </a>
+          <a data-id="711" href="#" id="footer-linkedin-link" target="_blank" rel="noopener" class="footer-social-icon blue-fs" title="MatrixSecHub on LinkedIn">
+            <span data-id="712" style="font-size:12px;color:var(--blue);font-weight:700;line-height:1;">in</span>
+          </a>
+        </div>
+        <p data-id="713" style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);margin-top:6px;text-align:right;">CARRD.CO · LINKEDIN</p>
+      </div>
+    </div>
+    <div data-id="714" style="border-top:1px solid rgba(0,196,122,0.08);padding-top:16px;text-align:center;">
+      <p data-id="715" style="font-family:var(--font-mono);font-size:10px;color:var(--green);opacity:0.4;">SYSTEM: ONLINE // THREAT FEED: ACTIVE // ENCRYPTION: AES-256 // CLEARANCE: ALPHA</p>
+      <p data-id="716" style="font-family:var(--font-body);font-size:11px;color:var(--text-2);margin-top:8px;">Made by Copilot</p>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /app -->
+
+<!-- ═══ AUDIO BTN ═══ -->
+<div data-id="717" id="audio-btn-f7" title="AMBIENT AUDIO: ON/OFF">
+  <i data-id="718" data-lucide="music" class="w-4 h-4"></i>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  /* ════════════════════════════════════════════
+     DATA
+  ════════════════════════════════════════════ */
+  const divisionsData = [
+    { code: 'DIV-01', name: 'SOVEREIGN AI DIVISION', desc: 'Governance frameworks and sovereignty architecture for enterprise AI deployments. Establishing policy-level controls for AI systems across regulated industries.', tags: ['Governance', 'Sovereignty', 'Policy'], color: 'green' },
+    { code: 'DIV-02', name: 'RED TEAM DIVISION', desc: 'Adversarial AI testing, jailbreak analysis, and automated LLM vulnerability assessment. Systematic offensive security for AI systems.', tags: ['Red Team', 'Adversarial', 'LLM'], color: 'green' },
+    { code: 'DIV-03', name: 'EXECUTIVE COMPLIANCE', desc: 'SOC 2 Type II, NIST AI RMF, and audit-ready executive positioning. Board-level compliance documentation and regulatory alignment.', tags: ['SOC 2', 'NIST', 'Audit'], color: 'gold' },
+    { code: 'DIV-04', name: 'INTEL DIVISION', desc: 'Threat intelligence, AI supply chain monitoring, and adversarial signal analysis. Real-time threat feeds and intelligence operations.', tags: ['Threat Intel', 'Signals', 'Monitoring'], color: 'blue' },
+    { code: 'DIV-05', name: 'ROBOTICS DIVISION', desc: 'Physical AI and robotics security, anthropomorphic drift analysis. Securing embodied AI systems and robotics platforms.', tags: ['Robotics', 'Physical AI', 'Drift'], color: 'blue' },
+    { code: 'DIV-06', name: 'ENTERPRISE FABRIC', desc: 'Enterprise AI agent fabric security, privilege drift detection, and agentic containment. Multi-agent orchestration security.', tags: ['Agents', 'Fabric', 'Containment'], color: 'green' },
+    { code: 'DIV-07', name: 'ZERO TRUST DIVISION', desc: 'Enterprise zero trust architecture design and AI access control frameworks. Identity-aware AI security at scale.', tags: ['Zero Trust', 'IAM', 'AI Access'], color: 'blue' },
+    { code: 'DIV-08', name: 'AGENTIC SECURITY', desc: 'Security protocols for autonomous AI agents, multi-agent systems, and agentic pipelines. Autonomous containment and oversight.', tags: ['Agents', 'Autonomy', 'Containment'], color: 'green' },
+    { code: 'DIV-09', name: 'SUPPLY CHAIN INTEL', desc: 'AI model supply chain security, dependency analysis, and upstream threat detection. SBOM generation and verification.', tags: ['Supply Chain', 'SBOM', 'Dependencies'], color: 'gold' },
+    { code: 'DIV-10', name: 'EXECUTIVE PROTECTION', desc: 'Board-level AI risk advisory, executive AI security briefings, and C-suite positioning. Strategic risk communication.', tags: ['Executive', 'Board', 'Advisory'], color: 'gold' },
+    { code: 'DIV-11', name: 'CLOUD AI SECURITY', desc: 'Securing cloud-based AI deployments, MLOps pipelines, and AI infrastructure. Cloud-native AI defense architecture.', tags: ['Cloud', 'MLOps', 'Infrastructure'], color: 'blue' },
+    { code: 'DIV-12', name: 'COMPLIANCE OPS', desc: 'Continuous compliance monitoring, policy enforcement, and regulatory alignment. Automated compliance verification systems.', tags: ['Compliance', 'Policy', 'Regulatory'], color: 'gold' }
+  ];
+
+  const agentsData = [
+    { name: 'OPERATOR_HSX', initials: 'OX', role: 'Primary Operations Lead & Founder', div: 'DIV-01', clearance: 'SOVEREIGN' },
+    { name: 'SENTINEL-7', initials: 'S7', role: 'Autonomous Threat Detection Agent', div: 'DIV-04', clearance: 'ALPHA' },
+    { name: 'CIPHER-9', initials: 'C9', role: 'Encryption & Data Sovereignty Specialist', div: 'DIV-01', clearance: 'ALPHA' },
+    { name: 'PHANTOM-X', initials: 'PX', role: 'Red Team Operations & Adversarial AI', div: 'DIV-02', clearance: 'ALPHA' },
+    { name: 'NEXUS-3', initials: 'N3', role: 'Network Intelligence & Signal Analysis', div: 'DIV-04', clearance: 'BETA' },
+    { name: 'GUARDIAN-1', initials: 'G1', role: 'Executive Protection & AI Risk Advisory', div: 'DIV-10', clearance: 'ALPHA' },
+    { name: 'VECTOR-5', initials: 'V5', role: 'Supply Chain Intelligence & SBOM Analysis', div: 'DIV-09', clearance: 'BETA' },
+    { name: 'ZERO-X', initials: 'ZX', role: 'Zero Trust Architecture & Access Control', div: 'DIV-07', clearance: 'ALPHA' }
+  ];
+
+  const productsData = [
+    { code: 'PROD-01', name: 'AI RED TEAM ASSESSMENT', price: '$4,500', desc: 'Comprehensive adversarial testing of your AI systems and LLM deployments.', features: ['Full LLM jailbreak analysis', 'Agentic pipeline testing', 'Vulnerability report', 'Remediation roadmap', 'Executive briefing'] },
+    { code: 'PROD-02', name: 'SOC 2 TYPE II PACKAGE', price: '$8,500', desc: 'Complete SOC 2 Type II audit readiness preparation and documentation.', features: ['Gap analysis', 'Control mapping', 'Evidence collection', 'Audit-ready documentation', 'Ongoing monitoring setup'] },
+    { code: 'PROD-03', name: 'NIST AI RMF IMPLEMENTATION', price: '$6,000', desc: 'Full NIST AI Risk Management Framework implementation for your organization.', features: ['Risk framework mapping', 'AI system inventory', 'Governance documentation', 'Executive reporting', 'Compliance dashboard'] },
+    { code: 'PROD-04', name: 'LLM SECURITY AUDIT', price: '$3,200', desc: 'Deep security analysis of your large language model deployments and APIs.', features: ['API surface analysis', 'Prompt injection testing', 'Data leakage assessment', 'Model security report', '30-day monitoring'] },
+    { code: 'PROD-05', name: 'EXECUTIVE AI BRIEFING', price: '$1,800', desc: 'Board-ready AI security briefing and executive compliance positioning.', features: ['Risk landscape overview', 'Regulatory briefing', 'AI governance roadmap', 'Board presentation', 'Quarterly updates'] },
+    { code: 'PROD-06', name: 'SOVEREIGN AI FRAMEWORK', price: '$12,000', desc: 'Complete sovereign AI architecture design and implementation guidance.', features: ['Architecture design', 'Sovereignty audit', 'Compliance alignment', 'Ongoing advisory', 'Dedicated operator access'] }
+  ];
+
+  /* ════════════════════════════════════════════
+     TRON CARD INNER HTML HELPER
+  ════════════════════════════════════════════ */
+  const tronCardInner = '<div class="tron-holo"></div><div class="tron-sweep-line"></div><span class="tron-corner tl"></span><span class="tron-corner tr"></span><span class="tron-corner bl"></span><span class="tron-corner br"></span>';
+
+  /* ════════════════════════════════════════════
+     RENDER DYNAMIC GRIDS
+  ════════════════════════════════════════════ */
+  function renderDivisions() {
+    const grid = document.getElementById('divisions-grid-g3');
+    if (!grid) return;
+    const colorMap = { green: 'var(--green)', blue: 'var(--blue)', gold: 'var(--gold)' };
+    grid.innerHTML = divisionsData.map((d, i) => `
+      <div class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);border-radius:2px;padding:32px;position:relative;transition:var(--transition);cursor:pointer;">
+        ${tronCardInner}
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${colorMap[d.color]};opacity:0.5;z-index:2;"></div>
+        <div style="position:absolute;top:12px;right:16px;display:flex;align-items:center;gap:4px;z-index:2;">
+          <span class="status-dot-anim"></span><span style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">ONLINE</span>
+        </div>
+        <p style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:10px;position:relative;z-index:1;">[${d.code}]</p>
+        <h3 style="font-family:var(--font-display);font-size:16px;color:var(--text-0);font-weight:700;margin-bottom:10px;position:relative;z-index:1;">${d.name}</h3>
+        <p style="font-family:var(--font-body);font-size:14px;color:var(--text-1);line-height:1.6;margin-bottom:14px;position:relative;z-index:1;">${d.desc}</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;position:relative;z-index:1;">
+          ${d.tags.map(t => `<span style="font-family:var(--font-mono);font-size:9px;border:var(--border-tron);padding:3px 8px;color:var(--text-2);">${t}</span>`).join('')}
+        </div>
+        <p style="font-family:var(--font-mono);font-size:11px;color:var(--green);cursor:pointer;position:relative;z-index:1;">ACCESS BRIEF →</p>
+      </div>
+    `).join('');
+  }
+
+  function renderAgents() {
+    const grid = document.getElementById('agents-grid-g4');
+    if (!grid) return;
+    grid.innerHTML = agentsData.map(a => `
+      <div class="tron-card fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:28px;text-align:center;position:relative;transition:var(--transition);cursor:pointer;">
+        ${tronCardInner}
+        <div class="hex-avatar-border" style="position:relative;z-index:1;"><div class="hex-avatar"><span style="font-family:var(--font-display);font-size:22px;color:var(--green);">${a.initials}</span></div></div>
+        <p style="font-family:var(--font-display);font-size:14px;color:var(--text-0);font-weight:700;letter-spacing:0.08em;margin-bottom:6px;position:relative;z-index:1;">${a.name}</p>
+        <p style="font-family:var(--font-body);font-size:13px;color:var(--text-1);margin-bottom:6px;position:relative;z-index:1;">${a.role}</p>
+        <p style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:8px;position:relative;z-index:1;">[${a.div}]</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;position:relative;z-index:1;">
+          <span class="status-dot-anim"></span><span style="font-family:var(--font-mono);font-size:10px;color:var(--text-2);">ACTIVE</span>
+        </div>
+        <span style="font-family:var(--font-mono);font-size:9px;border:var(--border-tron);padding:3px 10px;color:var(--text-2);position:relative;z-index:1;">[${a.clearance}]</span>
+      </div>
+    `).join('');
+  }
+
+  function renderProducts() {
+    const grid = document.getElementById('products-grid-p5');
+    if (!grid) return;
+    grid.innerHTML = productsData.map(p => `
+      <div class="tron-card corner-bracket fade-in-on-scroll" style="background:var(--bg-card);border:var(--border-tron);padding:32px;position:relative;transition:var(--transition);">
+        ${tronCardInner}
+        <div style="position:absolute;top:16px;right:20px;font-family:var(--font-display);font-size:20px;color:var(--text-0);z-index:1;">${p.price}</div>
+        <p style="font-family:var(--font-mono);font-size:10px;color:var(--green);margin-bottom:10px;position:relative;z-index:1;">[${p.code}]</p>
+        <h3 style="font-family:var(--font-display);font-size:16px;color:var(--text-0);font-weight:700;margin-bottom:10px;max-width:200px;position:relative;z-index:1;">${p.name}</h3>
+        <p style="font-family:var(--font-body);font-size:14px;color:var(--text-1);line-height:1.6;margin-bottom:16px;position:relative;z-index:1;">${p.desc}</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px;position:relative;z-index:1;">
+          ${p.features.map(f => `<span style="font-family:var(--font-mono);font-size:12px;color:var(--text-1);">→ ${f}</span>`).join('')}
+        </div>
+        <button class="cta-pulse tron-btn product-buy-btn" style="font-family:var(--font-display);font-size:11px;letter-spacing:0.1em;color:var(--green);border:1px solid var(--green);background:transparent;padding:12px;cursor:pointer;transition:var(--transition);width:100%;position:relative;z-index:1;">INITIATE PURCHASE →</button>
+        <p style="font-family:var(--font-mono);font-size:9px;color:var(--text-2);text-align:center;margin-top:8px;position:relative;z-index:1;">Powered by Stripe // Secure Checkout</p>
+      </div>
+    `).join('');
+  }
+
+  renderDivisions();
+  renderAgents();
+  renderProducts();
+
+  /* ════════════════════════════════════════════
+     LAUNCH SCREEN
+  ════════════════════════════════════════════ */
+  const launchScreen = document.getElementById('launch-screen-x1a0');
+  const enterBtn = document.getElementById('enter-btn-j8');
+  const appEl = document.getElementById('app');
+  const statusLines = document.querySelectorAll('.launch-status');
+
+  statusLines.forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), 600 + i * 400);
+  });
+  setTimeout(() => {
+    enterBtn.classList.remove('enter-btn-hidden');
+    enterBtn.style.opacity = '1';
+  }, 2500);
+
+  enterBtn.addEventListener('click', () => {
+    launchScreen.classList.add('exiting');
+    setTimeout(() => {
+      launchScreen.style.display = 'none';
+      appEl.style.display = 'block';
+      navigateTo(window.location.hash.slice(1) || 'home');
+      initAudioSystem();
+      document.getElementById('audio-btn-f7').style.display = 'flex';
+    }, 700);
+  });
+
+  /* ════════════════════════════════════════════
+     SPA ROUTING
+  ════════════════════════════════════════════ */
+  const pages = document.querySelectorAll('.page');
+  const navLinks = document.querySelectorAll('.nav-link-a9');
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+  function navigateTo(route) {
+    if (!route || route === '') route = 'home';
+    pages.forEach(p => {
+      if (p.classList.contains('active')) {
+        p.classList.remove('visible');
+        setTimeout(() => p.classList.remove('active'), 150);
+      }
+    });
+    setTimeout(() => {
+      pages.forEach(p => {
+        if (p.dataset.page === route) {
+          p.classList.add('active');
+          setTimeout(() => p.classList.add('visible'), 30);
+        }
+      });
+      navLinks.forEach(l => l.classList.toggle('active', l.dataset.route === route));
+      mobileNavLinks.forEach(l => l.classList.toggle('active', l.dataset.route === route));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(initScrollObserver, 100);
+    }, 160);
+    window.location.hash = route;
+  }
+
+  navLinks.forEach(l => l.addEventListener('click', () => navigateTo(l.dataset.route)));
+  mobileNavLinks.forEach(l => {
+    l.addEventListener('click', () => {
+      document.getElementById('mobile-menu-m3x1').classList.remove('open');
+      navigateTo(l.dataset.route);
+    });
+  });
+
+  document.querySelectorAll('.nav-route-btn').forEach(btn => {
+    btn.addEventListener('click', () => navigateTo(btn.dataset.route));
+  });
+
+  window.addEventListener('hashchange', () => {
+    const route = window.location.hash.slice(1) || 'home';
+    navigateTo(route);
+  });
+
+  /* ════════════════════════════════════════════
+     MOBILE MENU
+  ════════════════════════════════════════════ */
+  document.getElementById('hamburger-btn-n5').addEventListener('click', () => {
+    document.getElementById('mobile-menu-m3x1').classList.add('open');
+  });
+  document.getElementById('mobile-close-btn-c2').addEventListener('click', () => {
+    document.getElementById('mobile-menu-m3x1').classList.remove('open');
+  });
+
+  /* ════════════════════════════════════════════
+     SCROLL FADE-IN OBSERVER
+  ════════════════════════════════════════════ */
+  function initScrollObserver() {
+    const targets = document.querySelectorAll('.fade-in-on-scroll:not(.vis)');
+    if (!targets.length) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('vis'), i * 80);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    targets.forEach(t => obs.observe(t));
+  }
+  initScrollObserver();
+
+  /* ════════════════════════════════════════════
+     STAT COUNTER ANIMATION
+  ════════════════════════════════════════════ */
+  const statCounters = document.querySelectorAll('.stat-counter');
+  let statsAnimated = false;
+  const statsObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !statsAnimated) {
+        statsAnimated = true;
+        statCounters.forEach(counter => {
+          const target = parseInt(counter.dataset.target);
+          const duration = 1500;
+          const start = performance.now();
+          function update(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            counter.textContent = Math.round(target * eased);
+            if (progress < 1) requestAnimationFrame(update);
+          }
+          requestAnimationFrame(update);
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  if (statCounters.length) statsObs.observe(statCounters[0].parentElement);
+
+  /* ════════════════════════════════════════════
+     CURSOR GLOW (DESKTOP)
+  ════════════════════════════════════════════ */
+  const cursorGlow = document.getElementById('cursor-glow-e3');
+  if (window.matchMedia('(pointer: fine)').matches) {
+    cursorGlow.style.display = 'block';
+    document.addEventListener('mousemove', (e) => {
+      cursorGlow.style.left = e.clientX + 'px';
+      cursorGlow.style.top = e.clientY + 'px';
+    });
+  }
+
+  /* ════════════════════════════════════════════
+     VIDEO HOVER SCAN LINE
+  ════════════════════════════════════════════ */
+  document.querySelectorAll('.vid-hover-scan').forEach(v => {
+    v.addEventListener('mouseenter', () => {
+      v.classList.remove('scanning');
+      void v.offsetWidth;
+      v.classList.add('scanning');
+    });
+    v.addEventListener('mouseleave', () => v.classList.remove('scanning'));
+  });
+
+  /* ════════════════════════════════════════════
+     CARD HOVER EFFECTS — Enhanced for tron-card
+  ════════════════════════════════════════════ */
+  document.querySelectorAll('.tron-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.borderColor = 'rgba(0,196,122,0.4)';
+      card.style.boxShadow = 'var(--shadow-tron)';
+      card.style.transform = 'translateY(-2px)';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.borderColor = '';
+      card.style.boxShadow = '';
+      card.style.transform = '';
+    });
+  });
+
+  /* Also handle legacy corner-bracket cards */
+  document.querySelectorAll('.corner-bracket:not(.tron-card)').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.borderColor = 'rgba(0,196,122,0.4)';
+      card.style.boxShadow = 'var(--shadow-tron)';
+      card.style.transform = 'translateY(-2px)';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.borderColor = '';
+      card.style.boxShadow = '';
+      card.style.transform = '';
+    });
+  });
+
+  /* ════════════════════════════════════════════
+     CONTACT FORM
+  ════════════════════════════════════════════ */
+  document.getElementById('contact-form-z9').addEventListener('submit', (e) => {
+    e.preventDefault();
+    document.getElementById('contact-form-z9').style.display = 'none';
+    document.getElementById('form-success-msg-s2').style.display = 'block';
+  });
+
+  /* ════════════════════════════════════════════
+     AUDIO SYSTEM — Web Audio API
+  ════════════════════════════════════════════ */
+  let audioCtx = null;
+  let audioPlaying = false;
+  let masterGain = null;
+  let oscillators = [];
+
+  function initAudioSystem() {}
+
+  function startAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 3);
+
+    const compressor = audioCtx.createDynamicsCompressor();
+    masterGain.connect(compressor);
+    compressor.connect(audioCtx.destination);
+
+    const osc1 = audioCtx.createOscillator();
+    const g1 = audioCtx.createGain();
+    osc1.type = 'sine'; osc1.frequency.setValueAtTime(40, audioCtx.currentTime);
+    g1.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    osc1.connect(g1); g1.connect(masterGain); osc1.start();
+    oscillators.push({ osc: osc1, gain: g1 });
+
+    const osc2 = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    osc2.type = 'sine'; osc2.frequency.setValueAtTime(80, audioCtx.currentTime);
+    g2.gain.setValueAtTime(0.02, audioCtx.currentTime);
+    osc2.connect(g2); g2.connect(masterGain); osc2.start();
+    oscillators.push({ osc: osc2, gain: g2 });
+
+    const osc3 = audioCtx.createOscillator();
+    const g3 = audioCtx.createGain();
+    osc3.type = 'sine'; osc3.frequency.setValueAtTime(432, audioCtx.currentTime);
+    g3.gain.setValueAtTime(0.005, audioCtx.currentTime);
+    osc3.connect(g3); g3.connect(masterGain); osc3.start();
+    oscillators.push({ osc: osc3, gain: g3 });
+
+    audioPlaying = true;
+  }
+
+  function stopAudio() {
+    if (!audioCtx) return;
+    masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+    setTimeout(() => {
+      oscillators.forEach(o => { try { o.osc.stop(); } catch(e){} });
+      oscillators = [];
+      audioCtx.close();
+      audioCtx = null;
+    }, 600);
+    audioPlaying = false;
+  }
+
+  const audioBtn = document.getElementById('audio-btn-f7');
+  audioBtn.addEventListener('click', () => {
+    if (audioPlaying) {
+      stopAudio();
+      audioBtn.classList.remove('playing');
+    } else {
+      startAudio();
+      audioBtn.classList.add('playing');
+    }
+  });
+
+  /* ════════════════════════════════════════════
+     BUTTON HOVER EFFECTS
+  ════════════════════════════════════════════ */
+  document.querySelectorAll('button[style*="border:1px solid var(--green)"]').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      btn.style.background = 'rgba(0,196,122,0.08)';
+      btn.style.boxShadow = '0 0 20px rgba(0,196,122,0.25), 0 0 60px rgba(0,196,122,0.08), inset 0 0 20px rgba(0,196,122,0.04)';
+      btn.style.transform = 'scale(1.02)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.background = 'transparent';
+      btn.style.boxShadow = '';
+      btn.style.transform = '';
+    });
+  });
+  document.querySelectorAll('button[style*="border:1px solid var(--gold)"]').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      btn.style.background = 'rgba(201,148,26,0.08)';
+      btn.style.boxShadow = '0 0 20px rgba(201,148,26,0.25), 0 0 60px rgba(201,148,26,0.08), inset 0 0 20px rgba(201,148,26,0.04)';
+      btn.style.transform = 'scale(1.02)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.background = 'transparent';
+      btn.style.boxShadow = '';
+      btn.style.transform = '';
+    });
+  });
+
+  const secBtn = document.querySelectorAll('button[style*="border:1px solid var(--text-2)"]');
+  secBtn.forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      btn.style.borderColor = 'var(--blue)';
+      btn.style.color = 'var(--blue)';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.borderColor = 'var(--text-2)';
+      btn.style.color = 'var(--text-1)';
+    });
+  });
+
+  document.querySelectorAll('footer .nav-route-btn').forEach(l => {
+    l.addEventListener('mouseenter', () => l.style.color = 'var(--green)');
+    l.addEventListener('mouseleave', () => l.style.color = 'var(--text-1)');
+  });
+
+  /* ════════════════════════════════════════════
+     RESPONSIVE TIMELINE FIX
+  ════════════════════════════════════════════ */
+  function fixTimeline() {
+    if (window.innerWidth < 768) {
+      document.querySelectorAll('[id^="tl-"]').forEach(el => {
+        el.style.paddingLeft = '40px';
+        el.style.paddingRight = '0';
+        el.style.flexDirection = 'row';
+        el.style.textAlign = 'left';
+      });
+    }
+  }
+  fixTimeline();
+  window.addEventListener('resize', fixTimeline);
+</script>
+<script src="/scripts/flow-tracker.js" defer></script>
+</body>
+</html>

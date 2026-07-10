@@ -1,0 +1,217 @@
+﻿/**
+ * RGB+GOLD OPERATOR DESIGN SYSTEM — MOTION
+ * -----------------------------------------------------------------------
+ * .reveal, .glow-pulse, .shimmer, and .hue-travel do not exist anywhere in
+ * the app's current styles.css, so they are added here under their exact
+ * requested names with no collision risk. Pair with
+ * /rgbgold-motion.js for the .reveal scroll-trigger (IntersectionObserver
+ * that toggles .is-visible).
+ *
+ * Depends on: rgbgold-tokens.css.
+ * This file owns its OWN `prefers-reduced-motion` block, additive to (not
+ * replacing) the existing reduced-motion block at the bottom of
+ * /public/styles.css.
+ *
+ * MOTION SAFETY GUARDRAILS (operator surfaces & Accessibility Mode)
+ * -----------------------------------------------------------------------
+ * SAFE for operator cockpit/marketplace surfaces: `.reveal` (one-shot, not
+ * a loop), `.glow-pulse`, `.shimmer`, `.hue-travel`. Low amplitude, don't
+ * steal focus, safe defaults for new module/operator/marketplace cards
+ * (see rgbgold-components.css's `.module-card` / `.operator-panel`).
+ *
+ * USE SPARINGLY / avoid on this app's high-frequency operator screens: the
+ * app's own pre-existing `.fx-overlay` (tron-sweep + matrix-fall) and
+ * `.ticker-track` marquee are large-surface, high-cognitive-load effects -
+ * do not add more instances of them to new modules; prefer `.hue-travel`/
+ * `.shimmer` from this file instead for new UI.
+ *
+ * NEVER used in Accessibility Mode, regardless of surface: every animation
+ * in this file (plus the app's own `.fx-overlay`, ticker marquee, badge
+ * pulses, etc.) is force-disabled by `body.a11y-mode` in a11y.css (loaded
+ * last, wins the cascade via !important). Do not keep any animation "toned
+ * down but still moving" under `.a11y-mode` - the contract is zero
+ * non-essential motion.
+ *
+ * ADDING A NEW ANIMATION WITHOUT VIOLATING REDUCED-MOTION RULES:
+ *   1. Define the `@keyframes` here (prefixed `rgbgold*`), never in
+ *      rgbgold-components.css/rgbgold-hud.css.
+ *   2. Add a `--rgbgold-duration-*` token in rgbgold-tokens.css rather
+ *      than a bare number.
+ *   3. Add a "turn it off" rule to the `prefers-reduced-motion` media
+ *      query at the bottom of this file.
+ *   4. Add a matching `body.a11y-mode` override in a11y.css (ttx) if the
+ *      animated element also needs a static replacement, not just a stop.
+ *
+ * DRIFT-MARKER: layer=motion file=public/styles/rgbgold-motion.css version=1.0
+ *
+ * ECOSYSTEM SCAFFOLDING (rgbgold-module-shell, marketplace-entry,
+ * operator-surface, nav-ecosystem - see rgbgold-components.css): these
+ * forward-looking components intentionally ship with NO default looping
+ * animation.
+ * `.reveal` is safe and expected on all of them (one-shot, not a loop). If
+ * a future module wants a looping accent, use only the utilities in this
+ * file (`.glow-pulse`, `.shimmer`, `.hue-travel`) - never introduce a new
+ * loop directly inside a module's own page-specific script/CSS; add it
+ * here instead so it inherits reduced-motion + Accessibility Mode
+ * governance for free.
+ */
+
+/* =========================================================================
+   REVEAL  (fade-in + slide-up on scroll)
+   Usage: add class="reveal" (+ optional data-reveal="left|right") to hero
+   sections, feature/telemetry cards, marketplace cards, and operator queue
+   rows. Toggled via rgbgold-motion.js's IntersectionObserver.
+   ========================================================================= */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--rgbgold-duration-slow) ease, transform var(--rgbgold-duration-reveal) var(--rgbgold-ease-emphasized);
+}
+
+.reveal[data-reveal="left"] {
+  transform: translateX(-30px);
+}
+
+.reveal[data-reveal="right"] {
+  transform: translateX(30px);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* =========================================================================
+   GLOW-PULSE
+   Usage: add class="glow-pulse" to CTA headlines or premium inline
+   elements. Renders a breathing RGB+gold bloom behind the text via ::after.
+   ========================================================================= */
+
+.glow-pulse {
+  position: relative;
+}
+
+.glow-pulse::after {
+  content: "";
+  position: absolute;
+  left: -0.2em;
+  right: -0.2em;
+  top: 0.25em;
+  height: 0.75em;
+  z-index: var(--rgbgold-z-decoration);
+  background: radial-gradient(circle at center, rgba(245, 196, 81, 0.42), rgba(60, 242, 255, 0.34), rgba(211, 75, 255, 0.16), transparent 70%);
+  filter: blur(12px);
+  animation: rgbgoldHeadlinePulse var(--rgbgold-duration-glow-pulse) ease-in-out infinite;
+}
+
+@keyframes rgbgoldHeadlinePulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+/* =========================================================================
+   SHIMMER
+   Usage: add class="shimmer" to dividers/footer lines (e.g. <hr
+   class="codec-divider shimmer">) for a traveling RGB+gold highlight.
+   ========================================================================= */
+
+.shimmer {
+  background: var(--rgbgold-gradient-rgbgold);
+  background-size: 300% 100%;
+  animation: rgbgoldShimmer var(--rgbgold-duration-shimmer) linear infinite;
+}
+
+@keyframes rgbgoldShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
+}
+
+/* =========================================================================
+   HUE-TRAVEL
+   Usage: add class="hue-travel" to premium/animated-border elements. Draws
+   a slow-panning RGB+gold hairline border via ::before.
+
+   PSEUDO-ELEMENT WARNING: the app's existing .bracket and .hud-frame
+   classes both already use ::before (and .hud-frame also ::after) for
+   their corner-bracket effects. Do NOT put .hue-travel on the same element
+   as .bracket or .hud-frame - it will silently overwrite their ::before
+   and break the corner brackets. Apply .hue-travel only to elements that
+   don't already use .bracket/.hud-frame, or to a wrapping <div> instead.
+   ========================================================================= */
+
+.hue-travel {
+  position: relative;
+}
+
+.hue-travel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: var(--rgbgold-gradient-rgbgold);
+  background-size: 300% 300%;
+  animation: rgbgoldBorderFlow var(--rgbgold-duration-border-flow) linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes rgbgoldBorderFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 300% 50%;
+  }
+}
+
+/* =========================================================================
+   REDUCED MOTION (additive to the app's existing reduced-motion block)
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .glow-pulse::after,
+  .shimmer,
+  .hue-travel::before {
+    animation: none !important;
+  }
+}
+
+/* =========================================================================
+   MOTION-SCAN HOOK
+   Inert placeholder marker for the motion compliance scanner
+   (/public/scripts/motion-scan.js, see DESIGN_SYSTEM.md §29). Not a visual
+   component - `<div data-motion-scan hidden>` in hero sections just gives
+   the scanner a stable, known DOM location per page if a future version
+   wants to render inline (currently console-only, always hidden).
+   ========================================================================= */
+
+.motion-scan[hidden],
+.motion-scan:empty {
+  display: none;
+}
+
+.motion-scan {
+  display: block;
+}

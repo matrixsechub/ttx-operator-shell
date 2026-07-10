@@ -6,6 +6,7 @@ import { RelatedLinksRail } from "../../components/RelatedLinksRail";
 import { api } from "../../lib/apiClient";
 import { useApiResource } from "../../lib/useApiResource";
 import { getCategoryRelatedSystems } from "../../lib/ecosystem";
+import { recordUsageEvent } from "../../lib/usageBeacon";
 import type { CatalogItem } from "../../lib/types";
 import type { MarketplaceCategory } from "./categories";
 
@@ -67,7 +68,13 @@ export function CategoryPageBody({ category, showBreadcrumbs = true }: { categor
           Marketplace catalog unavailable — {result.error}
         </div>
       ) : (
-        <CatalogGrid items={matched} onSelect={setSelected} />
+        <CatalogGrid
+          items={matched}
+          onSelect={(item) => {
+            recordUsageEvent("marketplace_click");
+            setSelected(item);
+          }}
+        />
       )}
 
       {selected && <CatalogDetailModal item={selected} onClose={() => setSelected(null)} />}

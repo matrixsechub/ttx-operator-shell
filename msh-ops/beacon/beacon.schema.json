@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matrixsechub.dev/msh-ops/beacon/northstar.schema.json",
+  "title": "NorthstarBeacon",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "state", "axis", "priorities", "authority", "mandate"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "const": "BEACON::NORTHSTAR"
+    },
+    "state": {
+      "type": "string",
+      "const": "ACTIVE"
+    },
+    "axis": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "enum": [
+          "STABILITY",
+          "REVENUE_VALIDATION",
+          "TRUST",
+          "CONTROLLED_GROWTH",
+          "WILDCARD_INNOVATION"
+        ]
+      }
+    },
+    "priorities": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operator", "aiCouncil", "agents"],
+      "properties": {
+        "operator": { "type": "string", "minLength": 1 },
+        "aiCouncil": { "type": "string", "minLength": 1 },
+        "agents": { "type": "string", "minLength": 1 }
+      }
+    },
+    "mandate": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

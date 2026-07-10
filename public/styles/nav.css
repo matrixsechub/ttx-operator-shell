@@ -1,0 +1,82 @@
+﻿@keyframes register-cta-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(242, 193, 78, 0.28),
+      0 0 16px rgba(242, 193, 78, 0.28),
+      0 8px 20px rgba(0, 0, 0, 0.35);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(242, 193, 78, 0.5),
+      0 0 28px rgba(245, 196, 81, 0.55),
+      0 10px 24px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.register-cta-enterprise {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(242, 193, 78, 0.65);
+  background: linear-gradient(135deg, #f5c451 0%, #f2c14e 38%, #ffd87a 72%, #c9a03d 100%);
+  color: #0b0b0b;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow:
+    0 0 0 1px rgba(242, 193, 78, 0.28),
+    0 0 16px rgba(242, 193, 78, 0.28),
+    0 8px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.register-cta-enterprise.pulse {
+  animation: register-cta-pulse 3.5s ease-in-out infinite;
+}
+
+.register-cta-enterprise:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 0 1px rgba(242, 193, 78, 0.55),
+    0 0 24px rgba(245, 196, 81, 0.5),
+    0 10px 24px rgba(0, 0, 0, 0.42);
+}
+
+.register-cta-enterprise:active {
+  transform: scale(0.97);
+}
+
+button.register-cta-enterprise {
+  cursor: pointer;
+  font: inherit;
+}
+
+.nav-ecosystem .register-cta-enterprise,
+.marketplace-nav .register-cta-enterprise {
+  margin-left: 0.15rem;
+}
+
+.cta-row .register-cta-enterprise {
+  min-width: 12rem;
+}
+
+.register-cta-subtext {
+  margin-top: 0.55rem;
+  color: rgba(240, 238, 232, 0.78);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.register-cockpit-update-note {
+  margin-top: 0.65rem;
+  color: var(--gold, #f2c14e);
+  font-size: 0.85rem;
+}

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Security Remediation Planner</title>
+    <meta
+      name="description"
+      content="Convert AI security audit results, prompt injection scans, and risk diagnostics into structured remediation plans."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/scripts/route-canonicalize.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Security Remediation Planner</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#remediation-form">Planner</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: SECURITY_REMEDIATION_AGENT_V1 ]</p>
+            <h1>Security Remediation Planner</h1>
+            <p class="hero-sub">
+              Convert AI security audit results, prompt injection scans, and risk diagnostics into structured remediation
+              plans with prioritized fixes, compliance alignment, and validation steps.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#remediation-form">[ GENERATE REMEDIATION PLAN ]</a>
+              <a class="button secondary" href="/services">[ VIEW SECURITY SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="remediation-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ REMEDIATION_FORM ]</p>
+            <h2>Answer the security remediation questionnaire</h2>
+          </div>
+          <p class="mono" id="remediation-step-label">Step 1 of 3</p>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>Security remediation planner questionnaire</h3>
+              <p class="system-copy">
+                Advisory only. This planner produces a deterministic remediation roadmap — no patching, execution, API
+                calls, or autonomous remediation are performed.
+              </p>
+              <form class="contact-form" id="security-remediation-form">
+                <div class="quote-step is-active" data-remediation-step="0">
+                  <label>
+                    <span>1. Source Type</span>
+                    <select name="source_type" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="ai_security_audit">AI security audit</option>
+                      <option value="prompt_injection_scan">Prompt injection scan</option>
+                      <option value="security_fleet_event">Security fleet event</option>
+                      <option value="rag_risk_analyzer">RAG risk analyzer</option>
+                      <option value="cloudflare_audit_lite">Cloudflare audit lite</option>
+                      <option value="manual_remediation_request">Manual remediation request</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>2. Source Reference ID (optional)</span>
+                    <input name="source_reference_id" type="text" placeholder="audit-1001, scan-1001, sec-event-1001" />
+                  </label>
+                  <label>
+                    <span>3. Finding Title (optional)</span>
+                    <input name="finding_title" type="text" placeholder="Prompt injection exposure on public chat" />
+                  </label>
+                  <label>
+                    <span>4. Risk Description</span>
+                    <textarea name="risk_description" rows="4" placeholder="Describe the finding, exposure, and business impact."></textarea>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-remediation-step="1" hidden>
+                  <fieldset>
+                    <legend>5. Vulnerability Categories (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="vulnerability_categories" value="prompt_injection_exposure" checked /> Prompt injection exposure</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="weak_access_controls" /> Weak access controls</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="missing_logging" /> Missing logging</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="data_exposure" /> Data exposure</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="model_misuse" /> Model misuse</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="api_abuse" /> API abuse</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="policy_drift" /> Policy drift</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="secrets_handling" /> Secrets handling</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="rag_retrieval_risk" /> RAG retrieval risk</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="identity_gaps" /> Identity gaps</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="monitoring_gap" /> Monitoring gap</label>
+                      <label><input type="checkbox" name="vulnerability_categories" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>6. Affected Systems (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="affected_systems" value="public_web_app" checked /> Public web app</label>
+                      <label><input type="checkbox" name="affected_systems" value="operator_dashboard" /> Operator dashboard</label>
+                      <label><input type="checkbox" name="affected_systems" value="ai_agent" /> AI agent</label>
+                      <label><input type="checkbox" name="affected_systems" value="api_gateway" /> API gateway</label>
+                      <label><input type="checkbox" name="affected_systems" value="rag_pipeline" /> RAG pipeline</label>
+                      <label><input type="checkbox" name="affected_systems" value="cloudflare_edge" /> Cloudflare edge</label>
+                      <label><input type="checkbox" name="affected_systems" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>7. Severity Indicators (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="severity_indicators" value="confirmed_exploit_path" /> Confirmed exploit path</label>
+                      <label><input type="checkbox" name="severity_indicators" value="active_abuse_signal" /> Active abuse signal</label>
+                      <label><input type="checkbox" name="severity_indicators" value="credential_exposure" /> Credential exposure</label>
+                      <label><input type="checkbox" name="severity_indicators" value="regulated_data_involved" /> Regulated data involved</label>
+                      <label><input type="checkbox" name="severity_indicators" value="customer_facing" checked /> Customer facing</label>
+                      <label><input type="checkbox" name="severity_indicators" value="internet_facing" /> Internet facing</label>
+                      <label><input type="checkbox" name="severity_indicators" value="missing_audit_trail" /> Missing audit trail</label>
+                      <label><input type="checkbox" name="severity_indicators" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="quote-step" data-remediation-step="2" hidden>
+                  <fieldset>
+                    <legend>8. Compliance Targets (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="compliance_targets" value="nist_csf" checked /> NIST CSF</label>
+                      <label><input type="checkbox" name="compliance_targets" value="cisa" checked /> CISA</label>
+                      <label><input type="checkbox" name="compliance_targets" value="zero_trust" checked /> Zero Trust</label>
+                    </div>
+                  </fieldset>
+                  <label>
+                    <span>9. Business Impact</span>
+                    <select name="business_impact" required>
+                      <option value="moderate" selected>Moderate</option>
+                      <option value="low">Low</option>
+                      <option value="high">High</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>10. Exposure Level</span>
+                    <select name="exposure_level" required>
+                      <option value="authenticated" selected>Authenticated</option>
+                      <option value="internal">Internal</option>
+                      <option value="public">Public</option>
+                      <option value="internet_facing">Internet facing</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>11. Remediation Scope</span>
+                    <select name="remediation_scope" required>
+                      <option value="operator_review" selected>Operator review</option>
+                      <option value="advisory_only">Advisory only</option>
+                      <option value="phased_remediation">Phased remediation</option>
+                      <option value="urgent_containment_plan">Urgent containment plan</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>12. Timeline</span>
+                    <select name="timeline" required>
+                      <option value="this_month" selected>This month</option>
+                      <option value="this_week">This week</option>
+                      <option value="this_quarter">This quarter</option>
+                      <option value="flexible">Flexible</option>
+                      <option value="exploring">Exploring</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>13. Budget Band</span>
+                    <select name="budget_band" required>
+                      <option value="not_sure" selected>Not sure</option>
+                      <option value="under_1000">Under $1,000</option>
+                      <option value="1000_2500">$1,000 – $2,500</option>
+                      <option value="2500_7500">$2,500 – $7,500</option>
+                      <option value="7500_15000">$7,500 – $15,000</option>
+                      <option value="15000_30000">$15,000 – $30,000</option>
+                      <option value="30000_plus">$30,000+</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="cta-row">
+                  <button class="button secondary" type="button" id="remediation-prev" hidden>[ PREVIOUS ]</button>
+                  <button class="button primary" type="button" id="remediation-next">[ NEXT ]</button>
+                  <button class="button primary" type="submit" id="remediation-submit" hidden>[ GENERATE PLAN ]</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="security-remediation-status" role="status" aria-live="polite">
+                Remediation planner ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket" id="security-remediation-result">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Remediation plan findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive a prioritized fix plan, compliance alignment, validation steps, and
+                intake handoff. Advisory only — no systems are patched or executed.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-shell">
+      <p class="mono">MSHOPS.NET :: SECURITY_REMEDIATION_AGENT_V1 :: ADVISORY ONLY :: NO EXECUTION</p>
+    </footer>
+
+    <script src="/security-remediation-planner.js" defer></script>
+  </body>
+</html>

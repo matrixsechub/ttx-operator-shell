@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mshops-public",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-06-30",
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "vars": {
+    "MSHOPS_SURFACE": "public",
+    "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
+    "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev",
+    "OPERATOR_ROLE": "operator",
+    "OPERATOR_ACCESS_LEVEL": "internal",
+    "DEPLOY_ENV": "production",
+    "APP_VERSION": "0.1.0"
+  },
+  "kv_namespaces": [
+    { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },
+    { "binding": "WEBHOOK_EVENTS", "id": "c9b40c1ea3a74816aea05b42968c35d7" },
+    { "binding": "SECURITY_EVENTS", "id": "99bb74eceaaf404ebee703bf3665dfce" },
+    { "binding": "TTX_STATE", "id": "b86a60440f2a4b3db5f949eebf420e56" }
+  ]
+}

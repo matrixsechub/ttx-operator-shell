@@ -1,4 +1,8 @@
 import { getAccessTokenOperator } from "./auth";
+import { buildAdaptationFeedback, type AdaptationFeedback } from "./adaptation";
+import { buildExperimentationSnapshot, type ExperimentationSnapshot } from "./experimentation";
+import { resolveBehaviorDrivenUiMode } from "./experimentationBehavior";
+import { analyzeBehaviorIntelligence, type BehaviorIntelligence } from "./behaviorIntelligence";
 import {
   generateGovernanceProposals,
   type GovernanceProposal,
@@ -29,6 +33,7 @@ import {
   recordSubsystemFailure,
   type TelemetryEnv,
 } from "./telemetry";
+import { getUsageSummary } from "./usage";
 const COCKPIT_HTML_PREFIXES = ["/systems", "/ops", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about"] as const;
 const COCKPIT_API_PREFIXES = ["/api/ops"] as const;
 const WILDCARD_API_PATHS = [/^\/api\/ttx\/local-scenarios\/import$/];
@@ -73,6 +78,10 @@ export interface SystemState {
     approvalsRequireOperator: boolean;
     eventsLoggedPermanently: boolean;
   };
+  usage: Awaited<ReturnType<typeof getUsageSummary>>;
+  behaviorIntelligence: BehaviorIntelligence;
+  adaptation: AdaptationFeedback;
+  experimentation: ExperimentationSnapshot;
   health: {
     overall: "STABLE" | "DEGRADED" | "CRITICAL";
   };
@@ -177,10 +186,11 @@ export async function buildSystemState(
   const governanceResult = await fetchGovernanceStateSafe(env);
   const governance = governanceResult.state;
 
-  const [telemetry, marketplace, ghost] = await Promise.all([
+  const [telemetry, marketplace, ghost, usage] = await Promise.all([
     getTelemetrySummary(env),
     fetchMarketplaceStateSafe(env),
     fetchGhostSignals(env),
+    getUsageSummary(env),
   ]);
 
   const policyBaseline = buildGovernancePolicy(governance);
@@ -193,7 +203,14 @@ export async function buildSystemState(
   }
 
   const assembledAt = new Date().toISOString();
-  const proposals = generateGovernanceProposals({
+  const behaviorIntelligence = analyzeBehaviorIntelligence(usage);
+  const adaptation = await buildAdaptationFeedback(env);
+  const experimentation = buildExperimentationSnapshot(
+    adaptation,
+    resolveBehaviorDrivenUiMode(behaviorIntelligence),
+    assembledAt,
+  );
+  const signalProposals = generateGovernanceProposals({
     assembledAt,
     ghost,
     telemetry,
@@ -201,6 +218,17 @@ export async function buildSystemState(
     policy,
     policyAdjustments,
   });
+  const proposals: GovernanceProposal[] = [
+    ...signalProposals,
+    ...behaviorIntelligence.governanceProposals.map((proposal) => ({
+      id: `gprop-${proposal.id}-${assembledAt}`,
+      type: proposal.type,
+      reason: proposal.reason,
+      priority: proposal.priority,
+      advisory: true as const,
+    })),
+    ...experimentation.governanceProposals,
+  ];
 
   const operator = await getAccessTokenOperator(request, env);
   let sessionRecord: OperatorSession | null = null;
@@ -253,6 +281,10 @@ export async function buildSystemState(
       approvalsRequireOperator: true,
       eventsLoggedPermanently: true,
     },
+    usage,
+    behaviorIntelligence,
+    adaptation,
+    experimentation,
     health: {
       overall: deriveSystemHealthOverall({
         ghost,

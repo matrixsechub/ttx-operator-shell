@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it, before } from "node:test";
 import { generateGovernanceProposals } from "../worker/governanceAutomation.ts";
+import { ensureAgentGovernance } from "../msh-ops/agent/initAgentGovernance.ts";
+import { ensureBeaconLoaded } from "../msh-ops/beacon/loadBeacon.ts";
 import {
   SIGNAL_THRESHOLDS,
   applySignalPolicyOverlay,
@@ -46,6 +48,11 @@ function stateInput(overrides: {
 }
 
 describe("generateGovernanceProposals", () => {
+  before(async () => {
+    await ensureBeaconLoaded();
+    await ensureAgentGovernance();
+  });
+
   it("proposes restrict_wildcard_operations when volatility exceeds threshold", () => {
     const proposals = generateGovernanceProposals(
       stateInput({ volatility: SIGNAL_THRESHOLDS.volatilityHighRisk + 1 }),

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | AI Agent Builder Agent</title>
+    <meta
+      name="description"
+      content="Convert an AI agent opportunity into an implementation-ready agent specification with roles, tools, permissions, approval gates, and safety controls."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/scripts/route-canonicalize.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>AI Agent Builder Agent</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#builder-form">Builder</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: AI_AGENT_BUILDER_V1 ]</p>
+            <h1>AI Agent Builder Agent</h1>
+            <p class="hero-sub">
+              Convert an AI agent opportunity into an implementation-ready agent specification with roles, tools,
+              permissions, approval gates, and safety controls.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#builder-form">[ GENERATE AI AGENT BUILD SPEC ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="builder-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ BUILD_SPEC_FORM ]</p>
+            <h2>Answer the AI agent build questionnaire</h2>
+          </div>
+          <p class="mono" id="builder-step-label">Step 1 of 4</p>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>AI agent build spec questionnaire</h3>
+              <p class="system-copy">
+                This is a deterministic advisory build-spec generator only. It produces an implementation specification -
+                not a live agent. No credentials, tool execution, or autonomous agent deployment are created.
+              </p>
+              <form class="contact-form" id="ai-agent-builder-form">
+                <div class="quote-step is-active" data-builder-step="0">
+                  <label>
+                    <span>1. Source Type</span>
+                    <select name="source_type" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="microservice_package">Microservice package</option>
+                      <option value="service_quote">Service quote</option>
+                      <option value="agent_readiness_result">Agent readiness result</option>
+                      <option value="automation_build_spec">Automation build spec</option>
+                      <option value="rag_architecture_plan">RAG architecture plan</option>
+                      <option value="local_ai_deployment_plan">Local AI deployment plan</option>
+                      <option value="manual_agent_request">Manual agent request</option>
+                      <option value="existing_client_need">Existing client need</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>2. Source Reference ID (optional)</span>
+                    <input
+                      name="source_reference_id"
+                      type="text"
+                      placeholder="pkg-1001, quote-1001, agent-check-1001, agent-build-1001"
+                    />
+                  </label>
+                  <label>
+                    <span>3. Package Name (optional)</span>
+                    <input name="package_name" type="text" placeholder="AI Agent Build Sprint" />
+                  </label>
+                  <label>
+                    <span>4. Recommended Service</span>
+                    <select name="recommended_service" required>
+                      <option value="ai_agent_build" selected>AI agent build</option>
+                      <option value="ai_agent_security_review">AI agent security review</option>
+                      <option value="private_ai_architecture_review">Private AI architecture review</option>
+                      <option value="copilot_governance">Copilot governance</option>
+                      <option value="ai_automation_build">AI automation build</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-builder-step="1" hidden>
+                  <label>
+                    <span>5. Agent Goal</span>
+                    <select name="agent_goal" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="sales_assistant">Sales assistant</option>
+                      <option value="intake_assistant">Intake assistant</option>
+                      <option value="support_triage_agent">Support triage agent</option>
+                      <option value="research_assistant">Research assistant</option>
+                      <option value="proposal_assistant">Proposal assistant</option>
+                      <option value="document_analysis_agent">Document analysis agent</option>
+                      <option value="workflow_operator_agent">Workflow operator agent</option>
+                      <option value="security_triage_agent">Security triage agent</option>
+                      <option value="compliance_assistant">Compliance assistant</option>
+                      <option value="knowledge_assistant">Knowledge assistant</option>
+                      <option value="coding_assistant">Coding assistant</option>
+                      <option value="content_assistant">Content assistant</option>
+                      <option value="meeting_prep_agent">Meeting prep agent</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>6. Agent Autonomy Level</span>
+                    <select name="agent_autonomy_level" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="advisory_only">Advisory only</option>
+                      <option value="draft_only">Draft only</option>
+                      <option value="operator_approved_actions">Operator approved actions</option>
+                      <option value="limited_autonomous_actions">Limited autonomous actions</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>7. User Interaction Channel</span>
+                    <select name="user_interaction_channel" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="web_app">Web app</option>
+                      <option value="operator_dashboard">Operator dashboard</option>
+                      <option value="chat_interface">Chat interface</option>
+                      <option value="slack_or_teams">Slack or Teams</option>
+                      <option value="email_draft_interface">Email draft interface</option>
+                      <option value="internal_api">Internal API</option>
+                      <option value="browser_extension">Browser extension</option>
+                      <option value="local_desktop">Local desktop</option>
+                    </select>
+                  </label>
+                  <fieldset>
+                    <legend>8. Tools Needed (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="tools_needed" value="none" checked /> None</label>
+                      <label><input type="checkbox" name="tools_needed" value="operator_queue" /> Operator queue</label>
+                      <label><input type="checkbox" name="tools_needed" value="gmail" /> Gmail</label>
+                      <label><input type="checkbox" name="tools_needed" value="google_calendar" /> Google Calendar</label>
+                      <label><input type="checkbox" name="tools_needed" value="google_drive" /> Google Drive</label>
+                      <label><input type="checkbox" name="tools_needed" value="google_sheets" /> Google Sheets</label>
+                      <label><input type="checkbox" name="tools_needed" value="google_docs" /> Google Docs</label>
+                      <label><input type="checkbox" name="tools_needed" value="slack" /> Slack</label>
+                      <label><input type="checkbox" name="tools_needed" value="teams" /> Teams</label>
+                      <label><input type="checkbox" name="tools_needed" value="hubspot" /> HubSpot</label>
+                      <label><input type="checkbox" name="tools_needed" value="stripe" /> Stripe</label>
+                      <label><input type="checkbox" name="tools_needed" value="github" /> GitHub</label>
+                      <label><input type="checkbox" name="tools_needed" value="linear" /> Linear</label>
+                      <label><input type="checkbox" name="tools_needed" value="database" /> Database</label>
+                      <label><input type="checkbox" name="tools_needed" value="internal_api" /> Internal API</label>
+                      <label><input type="checkbox" name="tools_needed" value="browser_search" /> Browser search</label>
+                      <label><input type="checkbox" name="tools_needed" value="openai_api" /> OpenAI API</label>
+                      <label><input type="checkbox" name="tools_needed" value="vector_database" /> Vector database</label>
+                      <label><input type="checkbox" name="tools_needed" value="local_ai_runtime" /> Local AI runtime</label>
+                      <label><input type="checkbox" name="tools_needed" value="custom_api" /> Custom API</label>
+                      <label><input type="checkbox" name="tools_needed" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="quote-step" data-builder-step="2" hidden>
+                  <fieldset>
+                    <legend>9. Data Types (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="data_types" value="contact_info" checked /> Contact info</label>
+                      <label><input type="checkbox" name="data_types" value="business_info" checked /> Business info</label>
+                      <label><input type="checkbox" name="data_types" value="project_requirements" checked /> Project requirements</label>
+                      <label><input type="checkbox" name="data_types" value="internal_docs" /> Internal docs</label>
+                      <label><input type="checkbox" name="data_types" value="customer_data" /> Customer data</label>
+                      <label><input type="checkbox" name="data_types" value="financial_data" /> Financial data</label>
+                      <label><input type="checkbox" name="data_types" value="credentials_or_secrets" /> Credentials or secrets</label>
+                      <label><input type="checkbox" name="data_types" value="regulated_data" /> Regulated data</label>
+                      <label><input type="checkbox" name="data_types" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>10. Output Modes (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="output_modes" value="summary_report" checked /> Summary report</label>
+                      <label><input type="checkbox" name="output_modes" value="task_list" checked /> Task list</label>
+                      <label><input type="checkbox" name="output_modes" value="routing_recommendation" checked /> Routing recommendation</label>
+                      <label><input type="checkbox" name="output_modes" value="draft_message" /> Draft message</label>
+                      <label><input type="checkbox" name="output_modes" value="calendar_event_draft" /> Calendar event draft</label>
+                      <label><input type="checkbox" name="output_modes" value="crm_update_draft" /> CRM update draft</label>
+                      <label><input type="checkbox" name="output_modes" value="structured_json" /> Structured JSON</label>
+                      <label><input type="checkbox" name="output_modes" value="operator_queue" /> Operator queue</label>
+                      <label><input type="checkbox" name="output_modes" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <label>
+                    <span>11. Human Approval Required</span>
+                    <select name="human_approval_required" required>
+                      <option value="before_external_send" selected>Before external send</option>
+                      <option value="always">Always</option>
+                      <option value="high_risk_only">High risk only</option>
+                      <option value="before_data_write">Before data write</option>
+                      <option value="before_tool_action">Before tool action</option>
+                      <option value="not_required">Not required</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <fieldset>
+                    <legend>12. Risk Signals (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="risk_signals" value="customer_data" /> Customer data</label>
+                      <label><input type="checkbox" name="risk_signals" value="financial_data" /> Financial data</label>
+                      <label><input type="checkbox" name="risk_signals" value="regulated_data" /> Regulated data</label>
+                      <label><input type="checkbox" name="risk_signals" value="credentials_or_secrets" /> Credentials or secrets</label>
+                      <label><input type="checkbox" name="risk_signals" value="autonomous_send" /> Autonomous send</label>
+                      <label><input type="checkbox" name="risk_signals" value="autonomous_write" /> Autonomous write</label>
+                      <label><input type="checkbox" name="risk_signals" value="ai_generated_decisions" /> AI generated decisions</label>
+                      <label><input type="checkbox" name="risk_signals" value="tool_use" /> Tool use</label>
+                      <label><input type="checkbox" name="risk_signals" value="prompt_injection_exposure" /> Prompt injection exposure</label>
+                      <label><input type="checkbox" name="risk_signals" value="rag_data_exposure" /> RAG data exposure</label>
+                      <label><input type="checkbox" name="risk_signals" value="external_customer_facing" /> External customer facing</label>
+                      <label><input type="checkbox" name="risk_signals" value="no_logging" /> No logging</label>
+                      <label><input type="checkbox" name="risk_signals" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="quote-step" data-builder-step="3" hidden>
+                  <label>
+                    <span>13. Memory Requirement</span>
+                    <select name="memory_requirement" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="no_memory">No memory</option>
+                      <option value="session_memory_only" selected>Session memory only</option>
+                      <option value="user_preference_memory">User preference memory</option>
+                      <option value="project_memory">Project memory</option>
+                      <option value="long_term_business_memory">Long term business memory</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>14. Deployment Environment</span>
+                    <select name="deployment_environment" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="private_operator_dashboard" selected>Private operator dashboard</option>
+                      <option value="public_web_app">Public web app</option>
+                      <option value="internal_workspace">Internal workspace</option>
+                      <option value="slack_or_teams_workspace">Slack or Teams workspace</option>
+                      <option value="cloudflare_worker">Cloudflare Worker</option>
+                      <option value="local_ai_runtime">Local AI runtime</option>
+                      <option value="hybrid_cloud_local">Hybrid cloud local</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>15. Volume Level</span>
+                    <select name="volume_level" required>
+                      <option value="medium" selected>Medium</option>
+                      <option value="low">Low</option>
+                      <option value="high">High</option>
+                      <option value="bursty">Bursty</option>
+                      <option value="unknown">Unknown</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>16. Timeline</span>
+                    <select name="timeline" required>
+                      <option value="this_month" selected>This month</option>
+                      <option value="this_week">This week</option>
+                      <option value="this_quarter">This quarter</option>
+                      <option value="flexible">Flexible</option>
+                      <option value="exploring">Exploring</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>17. Budget Band</span>
+                    <select name="budget_band" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="under_1000">Under $1,000</option>
+                      <option value="1000_2500">$1,000 - $2,500</option>
+                      <option value="2500_7500">$2,500 - $7,500</option>
+                      <option value="7500_15000" selected>$7,500 - $15,000</option>
+                      <option value="15000_30000">$15,000 - $30,000</option>
+                      <option value="30000_plus">$30,000+</option>
+                    </select>
+                  </label>
+                </div>
+
+                <p class="form-status mono" id="ai-agent-builder-status" role="status" aria-live="polite">
+                  Builder ready.
+                </p>
+                <div class="cta-row">
+                  <button class="button secondary" type="button" id="builder-prev" disabled>[ PREVIOUS ]</button>
+                  <button class="button primary" type="button" id="builder-next">[ NEXT ]</button>
+                  <button class="button primary" type="submit" id="builder-submit" hidden>[ GENERATE AI AGENT BUILD SPEC ]</button>
+                  <button class="button secondary" type="reset">[ RESET ]</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket" id="ai-agent-builder-result">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Build spec findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive an agent role definition, tool boundaries, permission model, memory
+                policy, approval gates, and delivery phases. This is a build specification only - not a live agent.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET AI Agent Builder Agent</span>
+        <span>Build-spec only - no credentials, tool execution, or live agents</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/ai-agent-builder.js" defer></script>
+  </body>
+</html>

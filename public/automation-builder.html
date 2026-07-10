@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Automation Builder Agent</title>
+    <meta
+      name="description"
+      content="Turn a packaged automation service into a build-ready workflow specification with integrations, data handoffs, error handling, telemetry, and delivery phases."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/scripts/route-canonicalize.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Automation Builder Agent</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#builder-form">Builder</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: AUTOMATION_BUILDER_V1 ]</p>
+            <h1>Automation Builder Agent</h1>
+            <p class="hero-sub">
+              Turn a packaged automation service into a build-ready workflow specification with integrations, data handoffs,
+              error handling, telemetry, and delivery phases.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#builder-form">[ GENERATE AUTOMATION BUILD SPEC ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="builder-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ BUILD_SPEC_FORM ]</p>
+            <h2>Answer the automation build questionnaire</h2>
+          </div>
+          <p class="mono" id="builder-step-label">Step 1 of 4</p>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>Automation build spec questionnaire</h3>
+              <p class="system-copy">
+                This is a deterministic advisory build-spec generator only. It produces an implementation specification - not
+                an executable workflow. No credentials, webhooks, or live automation execution are created.
+              </p>
+              <form class="contact-form" id="automation-builder-form">
+                <div class="quote-step is-active" data-builder-step="0">
+                  <label>
+                    <span>1. Source Type</span>
+                    <select name="source_type" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="microservice_package">Microservice package</option>
+                      <option value="service_quote">Service quote</option>
+                      <option value="automation_roi_result">Automation ROI result</option>
+                      <option value="rag_architecture_plan">RAG architecture plan</option>
+                      <option value="manual_build_request">Manual build request</option>
+                      <option value="existing_client_need">Existing client need</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>2. Source Reference ID (optional)</span>
+                    <input name="source_reference_id" type="text" placeholder="pkg-1001, quote-1001, auto-roi-1001" />
+                  </label>
+                  <label>
+                    <span>3. Package Name (optional)</span>
+                    <input name="package_name" type="text" placeholder="AI Automation Build Sprint" />
+                  </label>
+                  <label>
+                    <span>4. Recommended Service</span>
+                    <select name="recommended_service" required>
+                      <option value="ai_automation_build" selected>AI automation build</option>
+                      <option value="automation_blueprint_session">Automation blueprint session</option>
+                      <option value="ai_agent_build">AI agent build</option>
+                      <option value="ai_security_audit">AI security audit</option>
+                      <option value="private_ai_architecture_review">Private AI architecture review</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-builder-step="1" hidden>
+                  <label>
+                    <span>5. Automation Goal</span>
+                    <select name="automation_goal" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="lead_capture_and_routing">Lead capture and routing</option>
+                      <option value="client_intake">Client intake</option>
+                      <option value="proposal_generation">Proposal generation</option>
+                      <option value="invoice_or_payment_handoff">Invoice or payment handoff</option>
+                      <option value="content_generation">Content generation</option>
+                      <option value="email_triage">Email triage</option>
+                      <option value="crm_update">CRM update</option>
+                      <option value="reporting_dashboard">Reporting dashboard</option>
+                      <option value="data_sync">Data sync</option>
+                      <option value="support_ticket_triage">Support ticket triage</option>
+                      <option value="security_alert_triage">Security alert triage</option>
+                      <option value="operator_dashboard_update">Operator dashboard update</option>
+                      <option value="recurring_digest">Recurring digest</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>6. Current Workflow State</span>
+                    <select name="current_workflow_state" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="manual_process">Manual process</option>
+                      <option value="spreadsheet_based">Spreadsheet based</option>
+                      <option value="email_based">Email based</option>
+                      <option value="form_based">Form based</option>
+                      <option value="partially_automated">Partially automated</option>
+                      <option value="broken_automation">Broken automation</option>
+                      <option value="no_existing_process">No existing process</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>7. Trigger Type</span>
+                    <select name="trigger_type" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="form_submit">Form submit</option>
+                      <option value="webhook">Webhook</option>
+                      <option value="scheduled">Scheduled</option>
+                      <option value="email_received">Email received</option>
+                      <option value="file_uploaded">File uploaded</option>
+                      <option value="crm_stage_change">CRM stage change</option>
+                      <option value="manual_operator_start">Manual operator start</option>
+                      <option value="api_event">API event</option>
+                    </select>
+                  </label>
+                  <fieldset>
+                    <legend>8. Tools Involved (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="tools_involved" value="website_form" checked /> Website form</label>
+                      <label><input type="checkbox" name="tools_involved" value="gmail" /> Gmail</label>
+                      <label><input type="checkbox" name="tools_involved" value="google_sheets" /> Google Sheets</label>
+                      <label><input type="checkbox" name="tools_involved" value="google_calendar" /> Google Calendar</label>
+                      <label><input type="checkbox" name="tools_involved" value="slack" /> Slack</label>
+                      <label><input type="checkbox" name="tools_involved" value="hubspot" /> HubSpot</label>
+                      <label><input type="checkbox" name="tools_involved" value="cloudflare_worker" checked /> Cloudflare Worker</label>
+                      <label><input type="checkbox" name="tools_involved" value="n8n" /> n8n</label>
+                      <label><input type="checkbox" name="tools_involved" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="quote-step" data-builder-step="2" hidden>
+                  <fieldset>
+                    <legend>9. Data Types (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="data_types" value="contact_info" checked /> Contact info</label>
+                      <label><input type="checkbox" name="data_types" value="business_info" checked /> Business info</label>
+                      <label><input type="checkbox" name="data_types" value="project_requirements" checked /> Project requirements</label>
+                      <label><input type="checkbox" name="data_types" value="customer_data" /> Customer data</label>
+                      <label><input type="checkbox" name="data_types" value="financial_data" /> Financial data</label>
+                      <label><input type="checkbox" name="data_types" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>10. Output Destination (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="output_destination" value="operator_queue" checked /> Operator queue</label>
+                      <label><input type="checkbox" name="output_destination" value="email_draft" /> Email draft</label>
+                      <label><input type="checkbox" name="output_destination" value="spreadsheet_row" /> Spreadsheet row</label>
+                      <label><input type="checkbox" name="output_destination" value="crm_record" /> CRM record</label>
+                      <label><input type="checkbox" name="output_destination" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                  <label>
+                    <span>11. Human Approval Required</span>
+                    <select name="human_approval_required" required>
+                      <option value="before_external_send" selected>Before external send</option>
+                      <option value="always">Always</option>
+                      <option value="high_risk_only">High risk only</option>
+                      <option value="before_data_write">Before data write</option>
+                      <option value="not_required">Not required</option>
+                      <option value="not_sure">Not sure</option>
+                    </select>
+                  </label>
+                  <fieldset>
+                    <legend>12. Risk Signals (multi-select)</legend>
+                    <div class="checkbox-grid">
+                      <label><input type="checkbox" name="risk_signals" value="customer_data" /> Customer data</label>
+                      <label><input type="checkbox" name="risk_signals" value="no_logging" /> No logging</label>
+                      <label><input type="checkbox" name="risk_signals" value="credentials_or_secrets" /> Credentials or secrets</label>
+                      <label><input type="checkbox" name="risk_signals" value="autonomous_send" /> Autonomous send</label>
+                      <label><input type="checkbox" name="risk_signals" value="not_sure" /> Not sure</label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="quote-step" data-builder-step="3" hidden>
+                  <label>
+                    <span>13. Volume Level</span>
+                    <select name="volume_level" required>
+                      <option value="medium" selected>Medium</option>
+                      <option value="low">Low</option>
+                      <option value="high">High</option>
+                      <option value="bursty">Bursty</option>
+                      <option value="unknown">Unknown</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>14. Timeline</span>
+                    <select name="timeline" required>
+                      <option value="this_month" selected>This month</option>
+                      <option value="this_week">This week</option>
+                      <option value="this_quarter">This quarter</option>
+                      <option value="flexible">Flexible</option>
+                      <option value="exploring">Exploring</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>15. Budget Band</span>
+                    <select name="budget_band" required>
+                      <option value="not_sure">Not sure</option>
+                      <option value="under_1000">Under $1,000</option>
+                      <option value="1000_2500">$1,000 - $2,500</option>
+                      <option value="2500_7500">$2,500 - $7,500</option>
+                      <option value="7500_15000" selected>$7,500 - $15,000</option>
+                      <option value="15000_30000">$15,000 - $30,000</option>
+                      <option value="30000_plus">$30,000+</option>
+                    </select>
+                  </label>
+                </div>
+
+                <p class="form-status mono" id="automation-builder-status" role="status" aria-live="polite">
+                  Builder ready.
+                </p>
+                <div class="cta-row">
+                  <button class="button secondary" type="button" id="builder-prev" disabled>[ PREVIOUS ]</button>
+                  <button class="button primary" type="button" id="builder-next">[ NEXT ]</button>
+                  <button class="button primary" type="submit" id="builder-submit" hidden>[ GENERATE AUTOMATION BUILD SPEC ]</button>
+                  <button class="button secondary" type="reset">[ RESET ]</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket" id="automation-builder-result">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Build spec findings will appear here.</h3>
+              <p class="system-copy">
+                Submit the questionnaire to receive a workflow map, integration plan, node plan, approval gates, and delivery
+                phases. This is a build specification only - not an executable workflow.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET Automation Builder Agent</span>
+        <span>Build-spec only - no credentials, webhooks, or workflow execution</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/automation-builder.js" defer></script>
+  </body>
+</html>

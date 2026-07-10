@@ -1,0 +1,417 @@
+﻿/**
+ * ACCESSIBILITY MODE (Section 508 / WCAG 2.1 AA)
+ * -----------------------------------------------------------------------
+ * Loads LAST on every page (after rgbgold-tokens/motion/components/hud and
+ * the page's own stylesheet), so its rules win the cascade. Everything is
+ * scoped under `body.a11y-mode` (toggled by /public/scripts/a11y.js), so
+ * with the class absent this file has ZERO effect on the app's default
+ * look - no regressions when accessibility mode is off.
+ *
+ * Covers BOTH the app's original animations (.fx-overlay tron-sweep/
+ * matrix-fall, .hud-frame corner brackets, .hud-ticker blink,
+ * .premium-ribbon shimmer, tactical badge pulses, the marquee ticker,
+ * body-level neon-drift/haze-shift) AND the additive rgbgold-* system
+ * (.reveal, .glow-pulse, .shimmer, .hue-travel, .hud-tag, .hud-card,
+ * .btn*, .pricing-tier/.pricing-premium). Nothing here renames or removes
+ * any existing class - it only overrides via the `body.a11y-mode` ancestor
+ * selector.
+ *
+ * DRIFT-MARKER: layer=a11y file=public/styles/a11y.css version=1.0
+ *
+ * Independent from `prefers-reduced-motion` (automatic, system-driven, see
+ * rgbgold-motion.css): this toggle is manual, user-driven, and always wins
+ * via !important regardless of system motion preference.
+ */
+
+:root {
+  --a11y-bg: #05060a;
+  --a11y-surface: #10121a;
+  --a11y-border: #7d8aa3;
+  --a11y-text: #ffffff;
+  --a11y-text-muted: #dde2ea;
+  --a11y-accent: #ffd54a;
+  --a11y-accent-text: #05060a;
+  --a11y-link: #8ec8ff;
+  --a11y-focus: #ffd54a;
+  --a11y-font-scale: 1.0625;
+}
+
+/* =========================================================================
+   TOGGLE BUTTON (always present, top-right, above everything - including
+   .alert-pulse-layer z-45 and .modal-shell z-60)
+   ========================================================================= */
+
+.a11y-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  font-size: 0.62rem;
+  white-space: nowrap;
+  animation: none !important;
+}
+
+.a11y-toggle:focus-visible {
+  outline: 3px solid var(--a11y-focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .a11y-toggle {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 10px 12px !important;
+  }
+}
+
+/* =========================================================================
+   GLOBAL MOTION KILL-SWITCH
+   ========================================================================= */
+
+body.a11y-mode,
+body.a11y-mode *,
+body.a11y-mode *::before,
+body.a11y-mode *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* =========================================================================
+   HIGH-CONTRAST SURFACE + TYPOGRAPHY
+   ========================================================================= */
+
+body.a11y-mode {
+  background: var(--a11y-bg) !important;
+  color: var(--a11y-text) !important;
+  font-size: calc(1em * var(--a11y-font-scale));
+  line-height: 1.75;
+}
+
+body.a11y-mode p,
+body.a11y-mode span,
+body.a11y-mode li {
+  color: var(--a11y-text-muted);
+}
+
+body.a11y-mode h1,
+body.a11y-mode h2,
+body.a11y-mode h3,
+body.a11y-mode h4 {
+  color: var(--a11y-text) !important;
+  letter-spacing: normal;
+}
+
+body.a11y-mode a {
+  color: var(--a11y-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+body.a11y-mode .section-label,
+body.a11y-mode .eyebrow,
+body.a11y-mode .stat-label {
+  color: var(--a11y-accent);
+}
+
+/* =========================================================================
+   VISIBLE FOCUS RINGS (keyboard-safe navigation)
+   ========================================================================= */
+
+body.a11y-mode :focus-visible {
+  outline: 3px solid var(--a11y-focus) !important;
+  outline-offset: 2px !important;
+}
+
+/* =========================================================================
+   REMOVE DECORATIVE / HIGH-MOTION / HIGH-COGNITIVE-LOAD LAYERS
+   Original app effects: .fx-overlay (tron-sweep + matrix-fall via
+   ::before/::after), body-level neon-drift background pan, body::after and
+   #selector::before haze-shift, the marquee ticker-track, .hud-ticker's
+   blinking dot, .premium-ribbon shimmer, tactical badge pulses.
+   New rgbgold-* effects: .matrix-rain, .tron-line/.tron-sweep,
+   .scanline-overlay, .glow-pulse, .hud-tag's blinking dot.
+   ========================================================================= */
+
+body.a11y-mode .fx-overlay,
+body.a11y-mode .matrix-rain,
+body.a11y-mode .tron-line,
+body.a11y-mode .tron-sweep,
+body.a11y-mode .scanline-overlay {
+  display: none !important;
+}
+
+body.a11y-mode .glow-pulse::after {
+  display: none !important;
+}
+
+body.a11y-mode .hud-frame::before,
+body.a11y-mode .hud-frame::after {
+  opacity: 0.6 !important;
+  filter: none !important;
+}
+
+body.a11y-mode .hud-ticker::before,
+body.a11y-mode .hud-tag::before {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+body.a11y-mode .premium-ribbon,
+body.a11y-mode .badge--tactical-critical,
+body.a11y-mode .badge--tactical-high,
+body.a11y-mode .audit-badge--running,
+body.a11y-mode .services-checkbox-grid label:has(input:checked),
+body.a11y-mode .service-selector-step.is-active,
+body.a11y-mode .service-selector-steps::before {
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+body.a11y-mode .ticker-track {
+  animation: none !important;
+  flex-wrap: wrap;
+  width: auto;
+}
+
+/* =========================================================================
+   STATIC BORDERS REPLACING ANIMATED ONES
+   (.gradient-outline / .hue-travel / .conic-ring naming from the shared
+   spec map onto this app's .hud-card::before and rgbgold .hue-travel::before)
+   ========================================================================= */
+
+body.a11y-mode .hud-card::before,
+body.a11y-mode .module-card::before,
+body.a11y-mode .operator-panel::before,
+body.a11y-mode .hue-travel::before,
+body.a11y-mode .gradient-outline::before,
+body.a11y-mode .conic-ring::before {
+  animation: none !important;
+  background: var(--a11y-border) !important;
+  opacity: 1 !important;
+}
+
+body.a11y-mode .shimmer,
+body.a11y-mode .codec-divider {
+  animation: none !important;
+  background: var(--a11y-border) !important;
+  box-shadow: none !important;
+}
+
+/* =========================================================================
+   CARDS / PANELS: flat, high-contrast surfaces
+   ========================================================================= */
+
+body.a11y-mode .hero-panel,
+body.a11y-mode .panel-card,
+body.a11y-mode .codec-panel,
+body.a11y-mode .stat-panel,
+body.a11y-mode .stat-tile,
+body.a11y-mode .split-copy,
+body.a11y-mode .credibility-card,
+body.a11y-mode .sample-panel,
+body.a11y-mode .calendly-card,
+body.a11y-mode .contact-form-shell,
+body.a11y-mode .marketplace-card,
+body.a11y-mode .summary-card,
+body.a11y-mode .module-card,
+body.a11y-mode .operator-panel,
+body.a11y-mode .package-card,
+body.a11y-mode .deliverable-card,
+body.a11y-mode .telemetry-card,
+body.a11y-mode .card,
+body.a11y-mode .hud-card,
+body.a11y-mode .pricing-tier {
+  background: var(--a11y-surface) !important;
+  border: 1px solid var(--a11y-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.a11y-mode .hero-panel:hover,
+body.a11y-mode .panel-card:hover,
+body.a11y-mode .marketplace-card:hover,
+body.a11y-mode .module-card:hover,
+body.a11y-mode .package-card:hover,
+body.a11y-mode .deliverable-card:hover,
+body.a11y-mode .pricing-tier:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+body.a11y-mode .hero-panel::after,
+body.a11y-mode .panel-card::after,
+body.a11y-mode .marketplace-card::after {
+  display: none !important;
+}
+
+body.a11y-mode .bracket::before,
+body.a11y-mode .bracket::after {
+  filter: none !important;
+}
+
+/* =========================================================================
+   BUTTONS: static, high-contrast, always-visible focus
+   ========================================================================= */
+
+body.a11y-mode .button,
+body.a11y-mode .btn,
+body.a11y-mode .btn-primary,
+body.a11y-mode .btn-gold,
+body.a11y-mode .btn-secondary {
+  background: var(--a11y-accent) !important;
+  color: var(--a11y-accent-text) !important;
+  border: 2px solid var(--a11y-text) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+
+body.a11y-mode .button:hover,
+body.a11y-mode .btn:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+body.a11y-mode .badge,
+body.a11y-mode .badge-status,
+body.a11y-mode .badge-critical,
+body.a11y-mode .status-chip--success,
+body.a11y-mode .status-chip--warning,
+body.a11y-mode .status-chip--critical,
+body.a11y-mode .hud-tag {
+  background: var(--a11y-surface) !important;
+  color: var(--a11y-text) !important;
+  border: 1px solid var(--a11y-border) !important;
+}
+
+/* =========================================================================
+   FORM FIELDS: readable, high-contrast, clear focus state
+   ========================================================================= */
+
+body.a11y-mode .contact-form input,
+body.a11y-mode .contact-form select,
+body.a11y-mode .contact-form textarea,
+body.a11y-mode .agent-form input,
+body.a11y-mode .agent-form select,
+body.a11y-mode .agent-form textarea,
+body.a11y-mode .marketplace-search-label input,
+body.a11y-mode .doctrine-broker-form__field input {
+  background: var(--a11y-surface) !important;
+  border: 1px solid var(--a11y-border) !important;
+  color: var(--a11y-text) !important;
+}
+
+body.a11y-mode .contact-form input:focus,
+body.a11y-mode .contact-form select:focus,
+body.a11y-mode .contact-form textarea:focus,
+body.a11y-mode .agent-form input:focus,
+body.a11y-mode .agent-form select:focus,
+body.a11y-mode .agent-form textarea:focus,
+body.a11y-mode .doctrine-broker-form__field input:focus {
+  outline: 3px solid var(--a11y-focus) !important;
+  outline-offset: 1px;
+  box-shadow: none !important;
+}
+
+/* =========================================================================
+   REVEAL: content must never be hidden while accessibility mode is on.
+   ========================================================================= */
+
+body.a11y-mode .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* =========================================================================
+   ACCESSIBILITY HOOKS FOR ECOSYSTEM SCAFFOLDING (module-shell,
+   marketplace-entry, operator-surface)
+   -----------------------------------------------------------------------
+   Mirrors the generic `.a11y-override-*` hooks below but named for the
+   specific ecosystem-scaffolding components introduced alongside them
+   (.rgbgold-module-shell, .marketplace-entry, .operator-surface - see
+   rgbgold-components.css §"MODULE SHELL"/"MARKETPLACE ENTRY"/"OPERATOR
+   SURFACE"). A future module built on these primitives does NOT need to
+   edit this file: the real component class names below are already
+   wired up. See /public/DESIGN_SYSTEM.md (marketing repo) §19 for the
+   full registration guide.
+
+   NOTE: this app's component is `.rgbgold-module-shell` (not
+   `.module-shell`, which already exists in /public/modules/module.css as
+   a different, live layout wrapper - see the naming note in
+   rgbgold-components.css). Both selectors are still listed here: the
+   `.rgbgold-module-shell` selector for the new ecosystem component, and
+   `.a11y-module-shell` as the generic opt-in marker for anything else.
+   ========================================================================= */
+
+body.a11y-mode .rgbgold-module-shell,
+body.a11y-mode .a11y-module-shell {
+  background: var(--a11y-surface) !important;
+  border: 1px solid var(--a11y-border) !important;
+  box-shadow: none !important;
+}
+
+body.a11y-mode .marketplace-entry,
+body.a11y-mode .a11y-marketplace-entry {
+  background: var(--a11y-surface) !important;
+  border: 1px solid var(--a11y-border) !important;
+  box-shadow: none !important;
+}
+
+body.a11y-mode .marketplace-entry:hover {
+  transform: none !important;
+}
+
+body.a11y-mode .operator-surface-section,
+body.a11y-mode .a11y-operator-surface {
+  background: transparent !important;
+}
+
+body.a11y-mode .nav-ecosystem a[aria-disabled="true"] {
+  color: var(--a11y-text-muted) !important;
+  opacity: 1 !important;
+}
+
+/* =========================================================================
+   EXPANSION HOOKS FOR FUTURE MODULES / OPERATOR SURFACES
+   -----------------------------------------------------------------------
+   Not consumed by any current component. Future modules or operator
+   surfaces that introduce a NEW card/badge/HUD element type not already
+   covered by the selector lists above should add that new class alongside
+   one of these marker classes (e.g. `<article class="operator-panel
+   a11y-override-card">`) rather than editing this file every time - then,
+   if the generic override below ever proves insufficient for that specific
+   component, extend the override under the SAME marker class here (never
+   invent a fourth marker; extend one of these three, or add a same-shaped
+   fourth one, documented here, if a genuinely new host-node category
+   emerges).
+
+   Registration checklist for a new module's accessibility override:
+     1. Does it look like a card/panel? -> add `.a11y-override-card`.
+     2. Does it look like a badge/pill/status chip? -> add
+        `.a11y-override-badge`.
+     3. Does it render a HUD-style decorative element (frame, tag, ticker,
+        scanline)? -> add `.a11y-override-hud`.
+     4. If it needs contrast/typography/motion behavior beyond the generic
+        rule below, add a dedicated `body.a11y-mode .your-class { ... }`
+        block near the matching section above instead of overloading the
+        generic hook rules.
+   ========================================================================= */
+
+body.a11y-mode .a11y-override-card {
+  background: var(--a11y-surface) !important;
+  border: 1px solid var(--a11y-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.a11y-mode .a11y-override-badge {
+  background: var(--a11y-surface) !important;
+  color: var(--a11y-text) !important;
+  border: 1px solid var(--a11y-border) !important;
+}
+
+body.a11y-mode .a11y-override-hud {
+  animation: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}

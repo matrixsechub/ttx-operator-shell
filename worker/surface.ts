@@ -1,3 +1,4 @@
+import { injectSecurityHeaders } from "./edge/headers";
 import { isPublicAssetRoute, servePublicAsset } from "./splash";
 import {
   isAuthAssetPath,
@@ -28,6 +29,10 @@ export async function routeStorefrontSurface(
   pathname: string,
   assets: Fetcher,
 ): Promise<Response | null> {
+  if (/\.[a-z0-9]+$/i.test(pathname)) {
+    return injectSecurityHeaders(await assets.fetch(request));
+  }
+
   if (isStorefrontAssetPath(pathname)) {
     return assets.fetch(request);
   }

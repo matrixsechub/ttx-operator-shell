@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Guided Intake</title>
+    <meta
+      name="description"
+      content="Public intake funnel for MSHOPS.NET with preserved routing context, lifecycle-aware audit handoff, and review-safe lead capture."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/enter.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Guided Intake</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="#lead-form-shell">Intake Form</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell reveal" data-reveal="up">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_FUNNEL :: /ENTER ]</p>
+            <p class="section-label mono" id="enter-context-badge">Service context pending.</p>
+            <h1 id="enter-context-heading">Start your guided intake</h1>
+            <p class="hero-sub">
+              This public-safe funnel preserves your selected route, captures project context, and keeps private
+              review surfaces isolated behind the existing engagement flow.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#lead-form-shell" data-scroll-target="lead-form-shell">[ START INTAKE ]</a>
+              <a class="button secondary" href="#calendly-shell" data-scroll-target="calendly-shell">[ BOOK CALENDLY ]</a>
+              <a class="button ghost" href="/services">[ RETURN TO SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="enter-security-panel" hidden>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <p class="section-label mono">[ SECURITY_PLANE ]</p>
+            <h2 id="enter-security-heading">Security-stage intake</h2>
+            <p class="form-status mono" id="enter-security-stage" role="status" aria-live="polite">Security stage pending.</p>
+            <p class="system-copy mono" id="enter-permission-profile">Permission profile pending.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="enter-lifecycle-panel">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ INTAKE_LIFECYCLE ]</p>
+            <h2 id="enter-lifecycle-heading">Intake lifecycle status</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket">
+          <div class="bracket-inner">
+            <p class="form-status mono" id="enter-lifecycle-status" role="status" aria-live="polite">
+              Lifecycle context loads when audit-lite routing metadata is present.
+            </p>
+            <div class="telemetry-list" id="enter-lifecycle-timeline">
+              <span>No lifecycle events loaded.</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="services-layout">
+          <article class="contact-form-shell bracket reveal" data-reveal="left" id="lead-form-shell">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ LEAD_CAPTURE ]</p>
+              <h2>Transmit project context</h2>
+              <p class="system-copy">
+                Send enough context to preserve routing, diagnostic scores, and your preferred intake path without
+                exposing private internal links on this page.
+              </p>
+              <form class="contact-form" id="enter-lead-form">
+                <label>
+                  <span>Operator Handle</span>
+                  <input name="operator_handle" type="text" required />
+                </label>
+                <label>
+                  <span>Contact Email</span>
+                  <input name="contact_email" type="email" required />
+                </label>
+                <label>
+                  <span>Organization</span>
+                  <input name="organization" type="text" />
+                </label>
+                <label>
+                  <span>Module Interest</span>
+                  <input id="module-interest" name="module_interest" type="text" />
+                </label>
+                <label>
+                  <span>Urgency</span>
+                  <select name="urgency">
+                    <option value="">Select urgency</option>
+                    <option value="this_week">This week</option>
+                    <option value="this_month">This month</option>
+                    <option value="planning_phase">Planning phase</option>
+                    <option value="research_only">Research only</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Mission Brief</span>
+                  <textarea id="transmission" name="transmission" rows="7" required></textarea>
+                </label>
+
+                <input id="hidden-service" name="service" type="hidden" />
+                <input id="hidden-priority" name="priority" type="hidden" />
+                <input id="hidden-source" name="source" type="hidden" />
+                <input id="hidden-selector-id" name="selector_id" type="hidden" />
+                <input id="hidden-source-reference-id" name="source_reference_id" type="hidden" />
+                <input id="hidden-audit-id" name="audit_id" type="hidden" />
+                <input id="hidden-register-id" name="register_id" type="hidden" />
+                <input id="hidden-scan-id" name="scan_id" type="hidden" />
+                <input id="hidden-agent-check-id" name="agent_check_id" type="hidden" />
+                <input id="hidden-automation-roi-id" name="automation_roi_id" type="hidden" />
+                <input id="hidden-rag-risk-id" name="rag_risk_id" type="hidden" />
+                <input id="hidden-risk-score" name="risk_score" type="hidden" />
+                <input id="hidden-injection-score" name="injection_score" type="hidden" />
+                <input id="hidden-risk-tier" name="risk_tier" type="hidden" />
+                <input id="hidden-readiness-score" name="readiness_score" type="hidden" />
+                <input id="hidden-readiness-tier" name="readiness_tier" type="hidden" />
+                <input id="hidden-roi-score" name="roi_score" type="hidden" />
+                <input id="hidden-roi-tier" name="roi_tier" type="hidden" />
+                <input id="hidden-rag-risk-score" name="rag_risk_score" type="hidden" />
+                <input id="hidden-rag-risk-tier" name="rag_risk_tier" type="hidden" />
+                <input id="hidden-estimated-monthly-savings" name="estimated_monthly_savings" type="hidden" />
+                <input id="hidden-estimated-annual-savings" name="estimated_annual_savings" type="hidden" />
+                <input id="hidden-hours-saved-per-month" name="hours_saved_per_month" type="hidden" />
+                <input id="hidden-retrieval-exposure-level" name="retrieval_exposure_level" type="hidden" />
+                <input id="hidden-access-control-level" name="access_control_level" type="hidden" />
+                <input id="hidden-governance-maturity" name="governance_maturity" type="hidden" />
+                <input id="hidden-build-complexity" name="build_complexity" type="hidden" />
+                <input id="hidden-automation-complexity" name="automation_complexity" type="hidden" />
+                <input id="hidden-safety-level" name="safety_level" type="hidden" />
+                <input id="hidden-quote-id" name="quote_id" type="hidden" />
+                <input id="hidden-estimated-project-value" name="estimated_project_value" type="hidden" />
+                <input id="hidden-price-range" name="price_range" type="hidden" />
+                <input id="hidden-package-tier" name="package_tier" type="hidden" />
+                <input id="hidden-complexity-level" name="complexity_level" type="hidden" />
+                <input id="hidden-risk-level" name="risk_level" type="hidden" />
+                <input id="hidden-urgency-level" name="urgency_level" type="hidden" />
+                <input id="hidden-ai-agent-build-id" name="ai_agent_build_id" type="hidden" />
+                <input id="hidden-agent-name" name="agent_name" type="hidden" />
+                <input id="hidden-agent-category" name="agent_category" type="hidden" />
+                <input id="hidden-estimated-effort" name="estimated_effort" type="hidden" />
+                <input id="hidden-delivery-timeline" name="delivery_timeline" type="hidden" />
+                <input id="hidden-remediation-plan-id" name="remediation_plan_id" type="hidden" />
+                <input id="hidden-compliance-alignment" name="compliance_alignment" type="hidden" />
+                <input id="hidden-rag-plan-id" name="rag_plan_id" type="hidden" />
+                <input id="hidden-deployment-plan-id" name="deployment_plan_id" type="hidden" />
+
+                <div class="cta-row">
+                  <button class="button primary" id="enter-submit" type="submit">[ CAPTURE LEAD ]</button>
+                  <a class="button secondary" href="/services">[ REVIEW SERVICES ]</a>
+                </div>
+              </form>
+              <p class="form-status mono" id="enter-form-status" role="status" aria-live="polite">
+                Intake form ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket reveal" data-reveal="up" id="calendly-shell">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ CALENDLY ]</p>
+              <h2>Optional calendar handoff</h2>
+              <p class="system-copy">
+                If you want a faster intake handoff, use the embedded booking widget. The lead form still preserves the
+                structured route and audit metadata.
+              </p>
+              <div
+                class="calendly-inline-widget"
+                data-url="https://calendly.com/matrixsechub/30min"
+                style="min-width: 320px; height: 700px"
+              ></div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET intake funnel</span>
+        <span>Public capture, lifecycle-aware routing, and review-safe escalation</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="mailto:matrixsechub@outlook.com?subject=MSHOPS%20Intake">Contact</a>
+      </nav>
+    </footer>
+
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <script src="/enter.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+    <script src="/scripts/flow-tracker.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Security Fleet Agent</title>
+    <meta
+      name="description"
+      content="Defensive security-event analyzer and incident packet generator for MSHOPS.NET operator review."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/scripts/route-canonicalize.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Security Fleet Agent</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#fleet-form">Analyze</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main id="main" class="page-shell">
+      <section class="hero-shell">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <p class="section-label mono">[ PUBLIC_APP :: SECURITY_FLEET_V1 ]</p>
+            <h1>Security Fleet Agent</h1>
+            <p class="hero-sub">
+              Submit a suspicious security event for deterministic threat classification, risk scoring, prompt-injection
+              detection, and defensive containment recommendations - with an operator-ready incident packet.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#fleet-form">[ ANALYZE SECURITY EVENT ]</a>
+              <a class="button secondary" href="/services">[ VIEW AI SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="fleet-form">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ SECURITY_EVENT_FORM ]</p>
+            <h2>Submit a security event for analysis</h2>
+          </div>
+          <p class="mono" id="fleet-step-label">Step 1 of 3</p>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket">
+            <div class="bracket-inner">
+              <h3>Security event intake</h3>
+              <p class="system-copy">
+                This tool generates a defensive security analysis and operator review packet only. It does not execute
+                offensive activity, deploy exploits, access third-party systems, store credentials, or perform autonomous
+                destructive actions.
+              </p>
+              <form class="contact-form" id="security-fleet-form">
+                <div class="quote-step is-active" data-fleet-step="0">
+                  <label>
+                    <span>1. Event Name</span>
+                    <input name="event_name" type="text" required placeholder="Suspicious API payload on /api/agent" />
+                  </label>
+                  <label>
+                    <span>2. Security Source</span>
+                    <select name="security_source" required>
+                      <option value="unknown">Unknown</option>
+                      <option value="cloudflare">Cloudflare</option>
+                      <option value="api">API</option>
+                      <option value="auth">Auth</option>
+                      <option value="agent">Agent</option>
+                      <option value="endpoint">Endpoint</option>
+                      <option value="manual">Manual</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>3. Event Type</span>
+                    <select name="event_type" required>
+                      <option value="unknown">Unknown</option>
+                      <option value="prompt_injection">Prompt injection</option>
+                      <option value="suspicious_payload">Suspicious payload</option>
+                      <option value="auth_failure">Auth failure</option>
+                      <option value="api_abuse">API abuse</option>
+                      <option value="waf_signal">WAF signal</option>
+                      <option value="rate_limit">Rate limit</option>
+                      <option value="policy_drift">Policy drift</option>
+                      <option value="malware_signal">Malware signal</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>4. Source Reference ID (optional)</span>
+                    <input name="source_reference_id" type="text" placeholder="cf-log-1001, audit-1001" />
+                  </label>
+                </div>
+
+                <div class="quote-step" data-fleet-step="1" hidden>
+                  <label>
+                    <span>5. Asset Type</span>
+                    <select name="asset_type" required>
+                      <option value="unknown">Unknown</option>
+                      <option value="route">Route</option>
+                      <option value="user">User</option>
+                      <option value="session">Session</option>
+                      <option value="service">Service</option>
+                      <option value="tenant">Tenant</option>
+                      <option value="agent">Agent</option>
+                      <option value="integration">Integration</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>6. Asset Name</span>
+                    <input name="asset_name" type="text" placeholder="/api/agent/chat, user-123, worker-prod" />
+                  </label>
+                  <label>
+                    <span>7. Event Description</span>
+                    <textarea name="event_description" rows="4" placeholder="Describe what happened and when."></textarea>
+                  </label>
+                  <label>
+                    <span>8. Suspicious Text or Payload</span>
+                    <textarea name="suspicious_text_or_payload" rows="4" placeholder="Paste redacted payload excerpt only - secrets will be redacted."></textarea>
+                  </label>
+                  <label>
+                    <span>9. Observed Behavior</span>
+                    <textarea name="observed_behavior" rows="3" placeholder="What did the system or user do?"></textarea>
+                  </label>
+                </div>
+
+                <div class="quote-step" data-fleet-step="2" hidden>
+                  <label>
+                    <span>10. Business Impact</span>
+                    <select name="business_impact" required>
+                      <option value="low">Low</option>
+                      <option value="moderate" selected>Moderate</option>
+                      <option value="high">High</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>11. Asset Criticality</span>
+                    <select name="asset_criticality" required>
+                      <option value="low">Low</option>
+                      <option value="moderate">Moderate</option>
+                      <option value="high" selected>High</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>12. Exposure Level</span>
+                    <select name="exposure_level" required>
+                      <option value="internal">Internal</option>
+                      <option value="authenticated">Authenticated</option>
+                      <option value="public">Public</option>
+                      <option value="internet_facing" selected>Internet facing</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>13. Requested Outcome</span>
+                    <select name="requested_outcome" required>
+                      <option value="create_incident_packet" selected>Create incident packet</option>
+                      <option value="analyze_only">Analyze only</option>
+                      <option value="recommend_containment">Recommend containment</option>
+                      <option value="operator_escalation">Operator escalation</option>
+                    </select>
+                  </label>
+                </div>
+
+                <p class="form-status mono" id="security-fleet-status" role="status" aria-live="polite">Fleet ready.</p>
+                <div class="cta-row">
+                  <button class="button secondary" type="button" id="fleet-prev" disabled>[ PREVIOUS ]</button>
+                  <button class="button primary" type="button" id="fleet-next">[ NEXT ]</button>
+                  <button class="button primary" type="submit" id="fleet-submit" hidden>[ ANALYZE SECURITY EVENT ]</button>
+                  <button class="button secondary" type="reset">[ RESET ]</button>
+                </div>
+              </form>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket" id="security-fleet-result">
+            <div class="bracket-inner">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Analysis results will appear here.</h3>
+              <p class="system-copy">
+                Submit the form to receive threat classification, risk score, containment recommendation, and incident packet.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET Security Fleet Agent</span>
+        <span>Defensive analysis only - no live enforcement or credential storage</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/security-fleet.js" defer></script>
+  </body>
+</html>

@@ -1,4 +1,7 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { AdaptiveEntryHero } from "../components/AdaptiveEntryHero";
+import { useAdaptiveEntryMode } from "../lib/useAdaptiveEntryMode";
+import { recordUsageEvent } from "../lib/usageBeacon";
 import { DIVISIONS } from "./divisions/data";
 import { OPERATOR_SYSTEMS } from "../operator/registry";
 import { MARKETPLACE_CATEGORIES } from "./marketplace/categories";
@@ -49,6 +52,16 @@ function PreviewCard({ title, body, meta }: { title: string; body: string; meta?
 }
 
 export function EcosystemSplash() {
+  const { uiMode } = useAdaptiveEntryMode();
+
+  useEffect(() => {
+    recordUsageEvent("visit");
+  }, []);
+
+  useEffect(() => {
+    recordUsageEvent("ui_mode_view", { uiMode });
+  }, [uiMode]);
+
   return (
     <div className="relative min-h-dvh w-full overflow-x-hidden bg-op-bg text-op-text">
       <div
@@ -60,28 +73,7 @@ export function EcosystemSplash() {
         }}
       />
 
-      <header className="relative border-b border-op-accent/15 px-6 py-10 text-center sm:px-10">
-        <span className="text-[11px] uppercase tracking-[0.4em] text-op-text-dim">MatrixSecHub // Operator OS</span>
-        <h1 className="mt-4 text-3xl font-semibold tracking-[0.14em] text-op-accent sm:text-5xl">Ecosystem Entry</h1>
-        <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-op-text-dim">
-          Unified operator surface — divisions, agents, systems, and marketplace modules wired into one
-          MatrixSecHub deployment graph.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            to="/enter"
-            className="rounded-sm border border-op-accent/60 px-8 py-3 text-sm uppercase tracking-[0.25em] text-op-accent transition-colors hover:bg-op-accent/10"
-          >
-            Enter System
-          </Link>
-          <Link
-            to="/marketplace"
-            className="rounded-sm border border-op-accent-2/40 px-8 py-3 text-sm uppercase tracking-[0.25em] text-op-accent-2 transition-colors hover:bg-op-accent-2/10"
-          >
-            Explore Marketplace
-          </Link>
-        </div>
-      </header>
+      <AdaptiveEntryHero uiMode={uiMode} />
 
       <main className="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12 sm:px-10">
         <section>

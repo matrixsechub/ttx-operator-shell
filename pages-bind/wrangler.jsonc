@@ -1,0 +1,6 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "mshops",
+  "pages_build_output_dir": "./static",
+  "compatibility_date": "2026-06-30"
+}

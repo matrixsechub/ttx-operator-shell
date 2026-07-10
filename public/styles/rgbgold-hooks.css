@@ -1,0 +1,189 @@
+﻿/**
+ * RGB+GOLD OPERATOR DESIGN SYSTEM — ECOSYSTEM EXPANSION HOOKS
+ * -----------------------------------------------------------------------
+ * These are ATTACHMENT POINTS, not components. They are distinct from the
+ * visual components in rgbgold-components.css (.module-card, .operator-
+ * panel, .marketplace-entry, .rgbgold-module-shell, .operator-surface):
+ * those are the things you build WITH; the hook classes below are inert,
+ * pre-wired placeholders already sitting in live page markup so a future
+ * pass can inject one of those components (or any new one) WITHOUT
+ * editing the page's HTML structure again.
+ *
+ * Every hook is empty and `hidden` by default (native `[hidden]` attribute
+ * -> `display: none`, skipped by assistive tech) so it has ZERO visual or
+ * layout footprint until a future module populates it. To activate a hook:
+ *   1. Remove the `hidden` attribute from the placeholder element.
+ *   2. Insert real content inside it (ideally built from the components in
+ *      rgbgold-components.css: .module-card, .operator-panel,
+ *      .marketplace-entry, .rgbgold-module-shell, etc).
+ *   3. Optionally add `.reveal` (+ `data-reveal`) for scroll-in motion, or
+ *      `.hud-frame`/`.hud-card`/`.hue-travel` for HUD framing - see the
+ *      pseudo-element budget table in rgbgold-hud.css before combining.
+ * No existing page markup, script, or class needs to change - the hooks
+ * already exist at the correct location in the DOM.
+ *
+ * Depends on: rgbgold-tokens.css. Loads after rgbgold-hud.css and before
+ * the page's own stylesheet (see load order in /DESIGN_SYSTEM.md).
+ */
+
+/* =========================================================================
+   GENERIC EMPTY-HOOK / HIDDEN-HOOK BEHAVIOR
+   -----------------------------------------------------------------------
+   `[hidden]` is only a UA-stylesheet default (`display: none`), and normal
+   author CSS always wins over normal UA CSS regardless of specificity - so
+   any hook class below that sets its own `display` would silently defeat
+   `[hidden]` the moment it has content (e.g. `.operator-surface-hook`
+   wrapping a non-empty `.operator-panel-hook`). The `[hidden]` rule here
+   re-asserts `display: none` at author level so the attribute always wins
+   while present, on every hook, regardless of nesting/children.
+
+   The `:empty` rule is a second, independent safety net: if a future
+   module ever forgets to remove `hidden` after inserting content, or
+   removes `hidden` but hasn't populated the hook yet, it still collapses
+   to zero footprint instead of rendering a stray empty box.
+   ========================================================================= */
+
+.module-expansion-hook[hidden],
+.operator-surface-hook[hidden],
+.operator-panel-hook[hidden],
+.marketplace-growth-hook[hidden],
+.cinematic-hook[hidden],
+.a11y-hook[hidden],
+.ds-enforce[hidden],
+.module-expansion-hook:empty,
+.operator-surface-hook:empty,
+.operator-panel-hook:empty,
+.marketplace-growth-hook:empty,
+.cinematic-hook:empty,
+.a11y-hook:empty,
+.ds-enforce:empty {
+  display: none;
+}
+
+/* =========================================================================
+   MODULE EXPANSION HOOK
+   Lives inside `.module-shell` on every module detail page
+   (/public/modules/*.html). A future module type (e.g. a new agent detail
+   layout) can render into this hook instead of a page rewrite.
+
+   Usage:
+     <div class="module-expansion-hook" data-module-hook hidden>
+       <!-- future: .rgbgold-module-shell / .module-card content -->
+     </div>
+   ========================================================================= */
+
+.module-expansion-hook {
+  display: grid;
+  gap: var(--rgbgold-space-4);
+  margin-top: var(--rgbgold-space-6);
+}
+
+/* =========================================================================
+   OPERATOR SURFACE HOOK / OPERATOR PANEL HOOK
+   `.operator-surface-hook` lives near the end of `<main>` on every operator
+   console page (operator.html, service-intake.html, operator-agents-*.html,
+   audit-lite-operator.html, prompt-injection-scans-operator.html,
+   agent-readiness-operator.html, automation-roi-operator.html). It is the
+   page-level attachment point for an entirely new operator section.
+   `.operator-panel-hook` is a nested, denser attachment point for a single
+   new panel inside an existing section, mirroring `.operator-panel`'s
+   sizing without its visual chrome (chrome is added by the future content,
+   e.g. `.operator-panel` itself, not by the hook).
+
+   Usage:
+     <section class="operator-surface-hook" data-operator-surface hidden>
+       <div class="operator-panel-hook">
+         <!-- future: .operator-panel / .rgbgold-module-shell content -->
+       </div>
+     </section>
+   ========================================================================= */
+
+.operator-surface-hook {
+  display: grid;
+  gap: var(--rgbgold-space-6);
+  margin-top: var(--rgbgold-space-6);
+}
+
+.operator-panel-hook {
+  display: grid;
+  gap: var(--rgbgold-space-4);
+  padding: var(--rgbgold-space-2) 0;
+}
+
+/* =========================================================================
+   MARKETPLACE GROWTH HOOK
+   Lives at the end of the marketplace registry sections in marketplace.html.
+   Future services/agents/modules can be appended here as they publish,
+   without touching the existing grid-rendering JS in marketplace.js.
+
+   Usage:
+     <div class="marketplace-growth-hook" data-marketplace-entry hidden>
+       <!-- future: .marketplace-entry rows -->
+     </div>
+   ========================================================================= */
+
+.marketplace-growth-hook {
+  display: grid;
+  gap: var(--rgbgold-space-3);
+  margin-top: var(--rgbgold-space-5);
+}
+
+/* =========================================================================
+   CINEMATIC HOOK
+   Lives inside hero/feature sections across public pages (index, services,
+   marketplace, mission, os, enter). Reserved for future RGB+Gold cinematic
+   components (e.g. a new hero visualization, a live status ribbon). Owns
+   ZERO pseudo-elements by design, so it never competes for the ::before/
+   ::after budget documented in rgbgold-hud.css - it composes cleanly with
+   `.reveal`, `.shimmer`, `.hue-travel`, and any `.hud-frame`/`.hud-card`
+   already on a sibling or parent element.
+
+   Usage:
+     <div class="cinematic-hook reveal" data-cinematic data-reveal="up" hidden>
+       <!-- future: cinematic RGB+Gold component -->
+     </div>
+   ========================================================================= */
+
+.cinematic-hook {
+  position: relative;
+  display: grid;
+  gap: var(--rgbgold-space-3);
+}
+
+/* =========================================================================
+   ACCESSIBILITY MODE GROWTH HOOK
+   `.a11y-hook` is a marker class (no visual styling of its own) that flags
+   an element as ecosystem-scaffolding to /public/scripts/a11y.js and to
+   anyone auditing a11y.css. It does NOT require editing a11y.css: any
+   future content dropped inside an `.a11y-hook` element should use the
+   existing generic override markers already defined there -
+   `.a11y-override-card`, `.a11y-override-badge`, `.a11y-override-hud` (see
+   the registration checklist in a11y.css) - which automatically inherit
+   high-contrast/reduced-motion treatment under `body.a11y-mode` with no
+   further CSS changes required.
+
+   Usage:
+     <div class="a11y-hook" data-a11y-override hidden>
+       <!-- future: content using .a11y-override-card/badge/hud markers -->
+     </div>
+   ========================================================================= */
+
+.a11y-hook {
+  display: block;
+}
+
+/* =========================================================================
+   DESIGN-SYSTEM ENFORCEMENT HOOK
+   `.ds-enforce` marks a location where drift.js's governance layer expects
+   to find (or eventually inject) a design-system compliance summary for
+   that surface. It is inert by default - see DESIGN_SYSTEM.md §27 for the
+   enforcement rules it represents and how a future build step or script
+   can read/populate it without editing this file or the pages it lives on.
+
+   Usage:
+     <div class="ds-enforce" data-ds-enforce hidden></div>
+   ========================================================================= */
+
+.ds-enforce {
+  display: block;
+}

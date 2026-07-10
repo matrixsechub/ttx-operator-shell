@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Security Remediation Queue</title>
+    <meta
+      name="description"
+      content="Private operator queue for security remediation plans generated from the public remediation planner funnel."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/operator">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Security Remediation Queue</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/operator">Operator</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell reveal" data-reveal="up">
+        <article class="hero-panel bracket hud-frame">
+          <div class="bracket-inner hero-copy">
+            <div class="hud-ticker" aria-hidden="true">TACTICAL_FEED :: LIVE</div>
+            <p class="section-label mono">[ PRIVATE_ROUTE :: /OPERATOR/SECURITY-REMEDIATION ]</p>
+            <h1 class="glow-pulse">Security Remediation Queue</h1>
+            <p class="hero-sub">
+              Operator-only queue for deterministic security remediation plans — prioritized fixes, compliance alignment,
+              validation steps, and intake handoffs routed from the public remediation planner surface.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="/operator">[ RETURN TO OPERATOR ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ QUEUE_VIEW ]</p>
+            <h2>Remediation plan handoff records</h2>
+          </div>
+        </div>
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner">
+            <div class="service-intake-toolbar">
+              <button class="button secondary" type="button" id="security-remediation-refresh">[ REFRESH QUEUE ]</button>
+            </div>
+            <p class="form-status mono" id="security-remediation-status" role="status" aria-live="polite">
+              Loading security remediation queue.
+            </p>
+            <div class="service-intake-table-wrap">
+              <table class="service-intake-table">
+                <thead>
+                  <tr>
+                    <th>remediation_plan_id</th>
+                    <th>engagement_id</th>
+                    <th>source_type</th>
+                    <th>source_reference_id</th>
+                    <th>risk_level</th>
+                    <th>priority</th>
+                    <th>estimated_effort</th>
+                    <th>timeline</th>
+                    <th>retainer_path</th>
+                    <th>status</th>
+                    <th>created_at</th>
+                    <th>details</th>
+                  </tr>
+                </thead>
+                <tbody id="security-remediation-rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET operator security remediation queue</span>
+        <span>Advisory remediation routing visibility</span>
+      </div>
+      <nav class="nav">
+        <a href="/operator">Operator</a>
+      </nav>
+    </footer>
+
+    <script src="/security-remediation-operator.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+  </body>
+</html>

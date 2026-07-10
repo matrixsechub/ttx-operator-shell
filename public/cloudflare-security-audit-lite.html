@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MSHOPS.NET | Cloudflare Security Audit Lite</title>
+    <meta
+      name="description"
+      content="Run a $299 instant Cloudflare and web security posture audit with score, findings, remediation plan, and JSON/PDF delivery."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-components.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
+    <link rel="stylesheet" href="/styles/rgbgold-hooks.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles/a11y.css" />
+  </head>
+  <body>
+    <div class="fx-overlay" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">MSH</span>
+        <span class="brand-copy">
+          <strong>MSHOPS.NET</strong>
+          <span>Cloudflare Security Audit Lite</span>
+        </span>
+      </a>
+      <nav class="nav mono">
+        <a href="/">Home</a>
+        <a href="#audit">Audit</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero-shell reveal" data-reveal="up">
+        <article class="hero-panel bracket">
+          <div class="bracket-inner hero-copy">
+            <span class="hud-tag">Instant // $299</span>
+            <p class="section-label mono">[ CF_SEC_AUDIT_LITE::INSTANT ]</p>
+            <h1 class="glow-pulse">Cloudflare Security Audit Lite</h1>
+            <p class="hero-sub">
+              Enter a public domain and receive an instant security posture score, top findings, Cloudflare signal
+              checks, and a paid full report with remediation guidance.
+            </p>
+            <div class="cta-row">
+              <a class="button primary" href="#audit">[ RUN AUDIT ]</a>
+              <a class="button secondary" href="/apps/ai-security-audit">[ AI SECURITY RISK CHECK ]</a>
+              <a class="button ghost" href="/services">[ VIEW SERVICES ]</a>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="audit">
+        <div class="section-heading">
+          <div>
+            <p class="section-label mono">[ AUDIT_INTAKE ]</p>
+            <h2>Public domain scan and report unlock</h2>
+          </div>
+        </div>
+        <div class="services-layout">
+          <article class="contact-form-shell bracket reveal" data-reveal="left">
+            <div class="bracket-inner">
+              <h3>Start audit</h3>
+              <p class="system-copy">
+                The scan checks HTTPS reachability, browser security headers, DNS/Cloudflare signals, and returns a
+                locked preview before payment.
+              </p>
+              <form class="contact-form" id="cf-audit-lite-form">
+                <label>
+                  <span>Public Domain</span>
+                  <input name="domain" type="text" inputmode="url" autocomplete="url" placeholder="example.com" required />
+                </label>
+                <label>
+                  <span>Email for receipt context</span>
+                  <input name="email" type="email" autocomplete="email" placeholder="operator@example.com" />
+                </label>
+                <div class="hero-actions">
+                  <button class="button primary" type="submit" id="cf-audit-lite-submit">[ RUN SECURITY AUDIT ]</button>
+                  <button class="button ghost" type="reset">[ RESET ]</button>
+                </div>
+              </form>
+              <p class="form-status mono" id="cf-audit-lite-status" role="status" aria-live="polite">
+                Audit Lite ready.
+              </p>
+            </div>
+          </article>
+
+          <article class="telemetry-card bracket reveal" data-reveal="up">
+            <div class="bracket-inner" id="cf-audit-lite-result">
+              <p class="section-label mono">[ RESULT_SCREEN ]</p>
+              <h3>Awaiting domain</h3>
+              <p class="system-copy">
+                Submit a public domain to generate a locked teaser, then complete checkout to unlock the full JSON/PDF
+                report.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <article class="telemetry-card bracket reveal" data-reveal="up">
+          <div class="bracket-inner footer-architecture">
+            <div class="section-heading">
+              <div>
+                <p class="section-label mono">[ DELIVERY ]</p>
+                <h2>What the full report includes</h2>
+              </div>
+            </div>
+            <div class="telemetry-grid">
+              <article class="stat-panel bracket">
+                <div class="bracket-inner">
+                  <p class="stat-label mono">[ SCORE ]</p>
+                  <p class="stat-num">0-100</p>
+                </div>
+              </article>
+              <article class="stat-panel bracket">
+                <div class="bracket-inner">
+                  <p class="stat-label mono">[ RISK ]</p>
+                  <p class="stat-num">LOW/MED/HIGH</p>
+                </div>
+              </article>
+              <article class="stat-panel bracket">
+                <div class="bracket-inner">
+                  <p class="stat-label mono">[ DELIVERY ]</p>
+                  <p class="stat-num">JSON/PDF</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="footer mono">
+      <div class="footer-copy">
+        <span>MSHOPS.NET Cloudflare Security Audit Lite</span>
+        <span>Instant paid report and implementation upsell path</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/services">Services</a>
+        <a href="/enter">Intake</a>
+      </nav>
+    </footer>
+
+    <script src="/cloudflare-security-audit-lite.js" defer></script>
+    <script src="/scripts/rgbgold-motion.js" defer></script>
+    <script src="/scripts/a11y.js" defer></script>
+    <script src="/scripts/drift.js" defer></script>
+    <script src="/scripts/a11y-scan.js" defer></script>
+    <script src="/scripts/motion-scan.js" defer></script>
+    <script src="/scripts/hud-scan.js" defer></script>
+    <script src="/scripts/ecosystem-health.js" defer></script>
+  </body>
+</html>
