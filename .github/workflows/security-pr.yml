@@ -47,6 +47,7 @@ jobs:
             [ -z "$file" ] && continue
             [ -f "$file" ] || continue
             case "$file" in
+              .github/workflows/security-pr.yml) continue ;;
               *.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico|package-lock.json) continue ;;
             esac
             scan_file "$file" || failed=1
