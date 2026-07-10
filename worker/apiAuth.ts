@@ -57,6 +57,8 @@ export function isPublicApiRoute(pathname: string, method: string): boolean {
   if (matchesPath(pathname, method, "/api/northstar-beacon/hash", "POST")) return true;
   if (matchesPath(pathname, method, "/api/northstar-beacon/generate", "POST")) return true;
   if (matchesPath(pathname, method, "/api/northstar-beacon/proposal", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/beacon", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/beacon/v2/draft", "GET")) return true;
   if (matchesPath(pathname, method, "/api/marketplace/service-modules", "GET")) return true;
   if (pathname === "/api/marketplace-lifecycle" || pathname.startsWith("/api/marketplace-lifecycle/")) {
     return true;

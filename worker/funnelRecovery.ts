@@ -850,7 +850,6 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
                 event: event as Parameters<typeof recordUsageEvent>[1]["event"],
                 sessionId,
                 trafficSource: typeof payload.trafficSource === "string" ? payload.trafficSource : undefined,
-                campaignId: typeof payload.campaignId === "string" ? payload.campaignId : undefined,
               });
             }
           }
@@ -1121,7 +1120,7 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
 
       if (env.TTX_STATE && isValidSessionId(payload.sessionId)) {
         void recordUsageEvent(env as WorkerEnv, {
-          event: "intake_started",
+          event: "intake_started" as Parameters<typeof recordUsageEvent>[1]["event"],
           sessionId: payload.sessionId as string,
           trafficSource: typeof payload.source === "string" ? payload.source : undefined,
         }).catch(() => {});

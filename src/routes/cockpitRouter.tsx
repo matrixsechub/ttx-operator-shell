@@ -1,6 +1,13 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RequireAuth } from "../lib/RequireAuth";
 import { Dashboard } from "../pages/Dashboard";
+import { BeaconDashboard } from "../pages/dashboard/BeaconDashboard";
+import { RuntimeDashboard } from "../pages/dashboard/RuntimeDashboard";
+import { MarketplaceDashboard } from "../pages/dashboard/MarketplaceDashboard";
+import { AgentsDashboard } from "../pages/dashboard/AgentsDashboard";
+import { GovernanceDashboard } from "../pages/dashboard/GovernanceDashboard";
+import { SubscriptionDashboard } from "../pages/dashboard/SubscriptionDashboard";
+import { AuditDashboard } from "../pages/dashboard/AuditDashboard";
 import { Status } from "../pages/Status";
 import { AboutPage } from "../pages/AboutPage";
 import { NotFound } from "../pages/NotFound";
@@ -30,6 +37,13 @@ export const cockpitRouter = createBrowserRouter([
     element: <RequireAuth />,
     children: [
       { path: "/dashboard", element: <Dashboard /> },
+      { path: "/dashboard/beacon", element: <BeaconDashboard /> },
+      { path: "/dashboard/runtime", element: <RuntimeDashboard /> },
+      { path: "/dashboard/marketplace", element: <MarketplaceDashboard /> },
+      { path: "/dashboard/agents", element: <AgentsDashboard /> },
+      { path: "/dashboard/governance", element: <GovernanceDashboard /> },
+      { path: "/dashboard/subscription", element: <SubscriptionDashboard /> },
+      { path: "/dashboard/audit", element: <AuditDashboard /> },
       { path: "/status", element: <Status /> },
       { path: "/about", element: <AboutPage /> },
       { path: "/divisions", element: <DivisionsIndex /> },

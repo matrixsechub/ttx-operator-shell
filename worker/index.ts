@@ -63,8 +63,6 @@ import { handleIntentCaptureRoute } from "./intentCaptureRoute";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
-import { handleActivationRoute } from "./activation/activationRoutes";
-import { handleTrafficInteractionRoute } from "./activation/interactionRoute";
 import { handleLiveTtxRoute } from "./liveTtxRoute";
 import { handleWildcardRoute } from "./wildcardAdvancement";
 import { handleAuditLiteRoute } from "./auditLite";
@@ -72,6 +70,9 @@ import { handleRecoveredFunnelApi, isRecoveredPublicRoute, redirectWelcomeToRoot
 import { handleAiGatewayRoute } from "./aiGatewayRoutes";
 import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
 import { handlePrismUiuxRoute } from "./prismUiuxRoutes";
+import { handleBeaconRoute } from "./beaconRoutes";
+import { handleGovernanceProposalRoute } from "./governanceRoutes";
+import { handleOperatorAgentsRoute } from "./operatorAgentsRoutes";
 export { LiveTtxSession } from "./liveSession";
 
 await assertBeaconOnStartup();
@@ -408,11 +409,32 @@ export default {
         return prismUiuxResponse;
       }
 
-      const activationResponse = await handleActivationRoute(request, url.pathname, env as WorkerEnv);
+      const beaconResponse = await handleBeaconRoute(request, url.pathname, request.method, env);
+      if (beaconResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, beaconResponse.status);
+        return beaconResponse;
+      }
 
-      if (activationResponse) {
-        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, activationResponse.status);
-        return activationResponse;
+      const governanceProposalResponse = await handleGovernanceProposalRoute(
+        request,
+        url.pathname,
+        request.method,
+        env as WorkerEnv,
+      );
+      if (governanceProposalResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, governanceProposalResponse.status);
+        return governanceProposalResponse;
+      }
+
+      const operatorAgentsResponse = await handleOperatorAgentsRoute(
+        request,
+        url.pathname,
+        request.method,
+        env as WorkerEnv,
+      );
+      if (operatorAgentsResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, operatorAgentsResponse.status);
+        return operatorAgentsResponse;
       }
 
 
@@ -557,13 +579,6 @@ export default {
       if (trafficActivationResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, trafficActivationResponse.status);
         return trafficActivationResponse;
-      }
-
-      const trafficInteractionResponse = await handleTrafficInteractionRoute(request, url.pathname, env as WorkerEnv);
-
-      if (trafficInteractionResponse) {
-        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, trafficInteractionResponse.status);
-        return trafficInteractionResponse;
       }
 
       const kernelResponse = await handleKernelRoute(request, url.pathname, env as WorkerEnv & BackboneEnv);
