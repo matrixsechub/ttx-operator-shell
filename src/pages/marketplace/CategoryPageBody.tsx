@@ -10,7 +10,17 @@ import { recordUsageEvent } from "../../lib/usageBeacon";
 import type { CatalogItem } from "../../lib/types";
 import type { MarketplaceCategory } from "./categories";
 
-export function CategoryPageBody({ category, showBreadcrumbs = true }: { category: MarketplaceCategory; showBreadcrumbs?: boolean }) {
+type BreadcrumbItem = { label: string; to?: string };
+
+export function CategoryPageBody({
+  category,
+  showBreadcrumbs = true,
+  breadcrumbTrail,
+}: {
+  category: MarketplaceCategory;
+  showBreadcrumbs?: boolean;
+  breadcrumbTrail?: BreadcrumbItem[];
+}) {
   const { result, loading, lastFetchedAt, refresh } = useApiResource(api.getCatalog);
   const [selected, setSelected] = useState<CatalogItem | null>(null);
 
@@ -27,11 +37,13 @@ export function CategoryPageBody({ category, showBreadcrumbs = true }: { categor
     <div className="flex flex-col gap-5">
       {showBreadcrumbs && (
         <Breadcrumbs
-          trail={[
-            { label: "Cockpit", to: "/dashboard" },
-            { label: "Marketplace", to: "/marketplace" },
-            { label: category.label },
-          ]}
+          trail={
+            breadcrumbTrail ?? [
+              { label: "Cockpit", to: "/dashboard" },
+              { label: "Marketplace", to: "/marketplace" },
+              { label: category.label },
+            ]
+          }
         />
       )}
 

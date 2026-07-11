@@ -18,9 +18,13 @@ Multi-surface operator storefront served by a Cloudflare Worker with static asse
 | Cockpit | `operator-shell.html` | `/dashboard`, `/ttx`, `/systems`, `/ops`, `/status`, … |
 | Auth | `auth-shell.html` | `/login` |
 | Council | `council-shell.html` | `/council` |
-| Storefront (optional) | `app/index.html` | `/marketplace`, `/enter` (requires MSHOPS bundle assembly) |
+| Storefront | `app/index.html` | `/marketplace`, `/storefront` (built by `vite.storefront.config.ts` in `npm run build`) |
 
-`npm run build` runs Vite and `scripts/assemble-operator-dist.mjs`, which renames shells and writes `dist/.build-manifest.json` for provenance.
+`npm run build` runs Vite (operator + storefront shells) and `scripts/assemble-operator-dist.mjs`, which renames shells, requires `dist/app/index.html`, and writes `dist/.build-manifest.json` for provenance.
+
+## CI and staging (Phase 1 + 2)
+
+GitHub-hosted CI on `ubuntu-latest` runs `pr-gate`, `build-test`, `wrangler-dry-run`, and `security-pr` on every push/PR to `main`. Manual staging deploy uses the **Staging Deploy** workflow — see [docs/STAGING-DEPLOYMENT.md](./docs/STAGING-DEPLOYMENT.md).
 
 ## Develop
 
