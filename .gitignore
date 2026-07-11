@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-app-tmp/
 .wrangler/
 worker-configuration.d.ts
 *.tsbuildinfo
@@ -13,3 +14,11 @@ worker-configuration.d.ts
 
 # Local machine config, not project config (e.g. Windows script-shell overrides)
 .npmrc
+
+# Local evidence, dry-runs, and operator artifacts — never commit
+artifacts/
+.artifacts/
+dist-dryrun/
+dist-staging-dryrun/
+*.log
+actions-runner-*.zip

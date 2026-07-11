@@ -1,45 +1,46 @@
-{
-  "name": "ttx-operator-shell",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "node scripts/build.mjs",
-    "preview": "vite preview",
-    "typecheck": "node scripts/typecheck.mjs",
-    "worker:dev": "node scripts/build.mjs && wrangler dev",
-    "deploy": "node scripts/deploy-production.mjs",
-    "deploy:staging": "node scripts/deploy-staging.mjs",
-    "verify:staging-config": "node scripts/ci/verify-staging-config.mjs",
-    "verify:ai-fulfillment-scope": "node scripts/ci/verify-ai-fulfillment-scope.mjs",
-    "test:staging-smoke": "node scripts/ci/staging-smoke.mjs",
-    "verify:ai-gateway": "node scripts/ci/verify-ai-gateway.mjs",
-    "deploy:mshops-public": "node scripts/deploy-mshops-public.mjs",
-    "deploy:mshops-operator": "node scripts/deploy-mshops-operator.mjs",
-    "verify:step5": "node scripts/verify-step5-gate.mjs",
-    "cf-typegen": "wrangler types",
-    "test": "node --import tsx --test tests/apiAuth.test.ts tests/auditLite.test.ts tests/aiAgentBuilderAgent.test.ts tests/securityRemediationAgent.test.ts tests/ragArchitectureAgent.test.ts tests/localAiDeploymentAgent.test.ts tests/buildManifest.test.ts tests/flowIntelligence.test.ts tests/flowExperiment.test.ts tests/intentCapture.test.ts tests/funnelRecovery.test.ts tests/stagingConfig.test.ts tests/statusRoute.test.ts tests/auditStore.test.ts tests/beaconRoutes.test.ts tests/governanceRoutes.test.ts tests/operatorAgentsRoutes.test.ts tests/runtimeHealth.test.ts tests/ttxSession.test.ts tests/northstarBeaconGovernanceAgent.test.ts tests/worker/aiModelRegistry.test.ts tests/worker/aiGateway.test.ts tests/msh-ops/beacon/loadBeacon.test.ts tests/msh-ops/beacon/agentInit.test.ts tests/msh-ops/governance/checkAutonomy.test.ts tests/msh-ops/mcp/ingestMcpPayload.test.ts tests/msh-ops/organizer/fileScanner.test.ts tests/msh-ops/organizer/importGraph.test.ts tests/msh-ops/organizer/structureAnalyzer.test.ts tests/msh-ops/organizer/approveRefactor.test.ts tests/msh-ops/organizer/refactorEngine.test.ts tests/msh-ops/organizer/organizerAgent.test.ts",
-    "test:operator-auth": "node --import tsx --test tests/operatorAuth.test.ts",
-    "organizer": "node --import tsx msh-ops/agents/runOrganizer.ts",
-    "organizer:scheduled": "node scripts/run-organizer-scheduled.mjs"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.0"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260101.0",
-    "@tailwindcss/vite": "^4.0.0",
-    "@types/node": "^22.10.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "tailwindcss": "^4.0.0",
-    "tsx": "^4.23.0",
-    "typescript": "^5.7.2",
-    "vite": "^6.0.0",
-    "wrangler": "^4.0.0"
-  }
-}
+{
+  "name": "ttx-operator-shell",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/build.mjs",
+    "preview": "vite preview",
+    "typecheck": "node scripts/typecheck.mjs",
+    "worker:dev": "node scripts/build.mjs && wrangler dev",
+    "deploy": "node scripts/deploy-production.mjs",
+    "deploy:staging": "node scripts/deploy-staging.mjs",
+    "verify:staging-config": "node scripts/ci/verify-staging-config.mjs",
+    "verify:ai-fulfillment-scope": "node scripts/verify-ai-fulfillment-scope.mjs",
+    "test:staging-smoke": "node scripts/ci/staging-smoke.mjs",
+    "verify:ai-gateway": "node scripts/verify-ai-gateway.mjs",
+    "deploy:mshops-public": "node scripts/deploy-mshops-public.mjs",
+    "deploy:mshops-operator": "node scripts/deploy-mshops-operator.mjs",
+    "verify:step5": "node scripts/verify-step5-gate.mjs",
+    "cf-typegen": "wrangler types",
+    "test": "node --import tsx --test tests/apiAuth.test.ts tests/auditLite.test.ts tests/aiAgentBuilderAgent.test.ts tests/securityRemediationAgent.test.ts tests/ragArchitectureAgent.test.ts tests/localAiDeploymentAgent.test.ts tests/buildManifest.test.ts tests/surfaceRegistry.test.ts tests/flowIntelligence.test.ts tests/flowExperiment.test.ts tests/intentCapture.test.ts tests/funnelRecovery.test.ts tests/stagingConfig.test.ts tests/statusRoute.test.ts tests/auditStore.test.ts tests/beaconRoutes.test.ts tests/governanceRoutes.test.ts tests/operatorAgentsRoutes.test.ts tests/runtimeHealth.test.ts tests/ttxSession.test.ts tests/northstarBeaconGovernanceAgent.test.ts tests/worker/aiModelRegistry.test.ts tests/worker/aiGateway.test.ts tests/msh-ops/beacon/loadBeacon.test.ts tests/msh-ops/beacon/agentInit.test.ts tests/msh-ops/governance/checkAutonomy.test.ts tests/msh-ops/mcp/ingestMcpPayload.test.ts tests/msh-ops/organizer/fileScanner.test.ts tests/msh-ops/organizer/importGraph.test.ts tests/msh-ops/organizer/structureAnalyzer.test.ts tests/msh-ops/organizer/approveRefactor.test.ts tests/msh-ops/organizer/refactorEngine.test.ts tests/msh-ops/organizer/organizerAgent.test.ts tests/ci/resolve-deploy-ref.test.mjs tests/ci/verify-staging-config.test.mjs tests/ci/staging-smoke.test.mjs tests/ci/generate-staging-evidence.test.mjs tests/ci/audit-action-pins.test.mjs tests/ci/storefront-shell.test.mjs",
+    "test:operator-auth": "node --import tsx --test tests/operatorAuth.test.ts",
+    "organizer": "node --import tsx msh-ops/agents/runOrganizer.ts",
+    "organizer:scheduled": "node scripts/run-organizer-scheduled.mjs"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260101.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.23.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0",
+    "wrangler": "^4.0.0"
+  }
+}
+

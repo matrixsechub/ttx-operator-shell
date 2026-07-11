@@ -1,0 +1,19 @@
+name: Setup Node and npm ci
+description: Pin setup-node to an immutable SHA and install dependencies with npm ci.
+
+inputs:
+  node-version:
+    description: Node.js version
+    required: false
+    default: "24"
+
+runs:
+  using: composite
+  steps:
+    # Immutable SHA — do not use @v4 (supply-chain hardening).
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+    - run: npm ci
+      shell: bash
