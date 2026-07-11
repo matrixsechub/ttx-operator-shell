@@ -42,6 +42,11 @@ function validateShellHtml(html: string, surface: HtmlSurface): boolean {
   return hasRequired && !hasForbidden;
 }
 
+/** Exported for build/runtime regression tests. */
+export function validateSurfaceShellHtml(html: string, surface: HtmlSurface): boolean {
+  return validateShellHtml(html, surface);
+}
+
 /** Serve an isolated SPA shell for the resolved architectural surface. */
 export async function serveSurfaceSpa(request: Request, assets: Fetcher, pathname: string): Promise<Response> {
   const surface = resolveHtmlSurface(pathname);
