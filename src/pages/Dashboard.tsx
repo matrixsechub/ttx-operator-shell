@@ -6,7 +6,6 @@ import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
 import { ApprovalQueuePanel } from "../components/ApprovalQueuePanel";
 import { CodexHealthPanel } from "../components/CodexHealthPanel";
 import { GovernanceHealthPanel } from "../components/GovernanceHealthPanel";
-import { ExecutiveOverviewGrid } from "../components/ExecutiveOverviewGrid";
 import { SecurityPanel } from "../components/SecurityPanel";
 import { TTXPanel } from "../components/TTXPanel";
 import { ScenarioAuthoringPanel } from "../components/ScenarioAuthoringPanel";
@@ -22,7 +21,6 @@ import { OperatorSignals } from "./dashboard/OperatorSignals";
 import { FlowIntelligencePanel } from "./dashboard/FlowIntelligencePanel";
 import { FlowExperimentPanel } from "./dashboard/FlowExperimentPanel";
 import { IntentCapturePanel } from "./dashboard/IntentCapturePanel";
-import { IntentQualificationPanel } from "./dashboard/IntentQualificationPanel";
 import { TTXStatusPanel } from "./dashboard/TTXStatusPanel";
 import { TelemetryFeed } from "./dashboard/TelemetryFeed";
 import { WebhookTriggerPanel } from "./dashboard/WebhookTriggerPanel";
@@ -44,8 +42,6 @@ export function Dashboard() {
           </div>
           <EngineStatusIndicator />
         </div>
-
-        <ExecutiveOverviewGrid state={state} />
 
         <ApprovalQueuePanel limit={3} />
 
@@ -95,7 +91,6 @@ export function Dashboard() {
                 <FlowIntelligencePanel />
                 <FlowExperimentPanel />
                 <IntentCapturePanel />
-                <IntentQualificationPanel />
                 <TTXStatusPanel />
                 <TelemetryFeed />
                 <WebhookTriggerPanel />

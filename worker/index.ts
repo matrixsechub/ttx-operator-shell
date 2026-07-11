@@ -60,7 +60,6 @@ import { handleFlowEventRoute } from "./flowRoute";
 import { handleFlowIntelligenceRoute } from "./flowIntelligenceRoute";
 import { handleFlowExperimentAssignmentRoute, handleFlowExperimentReportRoute } from "./flowExperimentRoute";
 import { handleIntentCaptureRoute } from "./intentCaptureRoute";
-import { handleIntentQualificationRoute } from "./intentQualificationRoute";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
@@ -551,17 +550,6 @@ export default {
       if (intentCaptureResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, intentCaptureResponse.status);
         return intentCaptureResponse;
-      }
-
-      const intentQualificationResponse = await handleIntentQualificationRoute(
-        request,
-        url.pathname,
-        env as WorkerEnv,
-      );
-
-      if (intentQualificationResponse) {
-        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, intentQualificationResponse.status);
-        return intentQualificationResponse;
       }
 
       const behaviorResponse = await handleBehaviorIntelligenceRoute(request, url.pathname, env as WorkerEnv);

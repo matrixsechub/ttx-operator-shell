@@ -253,6 +253,72 @@ export interface SystemStateResponse {
       gatewayHealth: "ok" | "degraded" | "unavailable";
       recentDenials: number;
     };
+    operatorOs?: {
+      beacon: {
+        id: string;
+        version: number;
+        hash: string;
+        safeMode: boolean;
+        runtimeStatus?: "verified_v2" | "legacy_v1" | "invalid";
+        v2?: {
+          verified: boolean;
+          version: string | null;
+          beaconHash: string | null;
+          publishedAt: string | null;
+          reason: string;
+        };
+      };
+      codex: {
+        manifestHash: string;
+        manifestVersion?: string;
+        lastValidatedAt: string | null;
+        driftCount: number;
+      };
+      queues: {
+        activation: {
+          date: string;
+          pending: number;
+          total: number;
+          maxPerDay: number;
+        };
+        registration: {
+          length: number;
+        };
+      };
+      approvals: {
+        pending: number;
+        expired: number;
+      };
+      governance?: {
+        status?: "healthy" | "degraded" | "blocked";
+        beaconVerified: boolean;
+        beaconStatus?: "verified_v2" | "legacy_v1" | "invalid";
+        codexValid?: boolean;
+        receiptAuthorityAvailable?: boolean;
+        proposalStoreAvailable?: boolean;
+        allowedActionClasses?: string[];
+        reasonCodes?: string[];
+        pendingApprovals: number;
+        expiredApprovals: number;
+        auditIncompleteExecutions: number;
+        mcpDeltasAwaitingReview: number;
+        legacyBypassBlocked: boolean;
+      };
+    };
+    runtimeHealth?: {
+      score: number;
+      state: "HEALTHY" | "WATCH" | "DEGRADED" | "CRITICAL" | "HALTED";
+      factors: {
+        workerSuccess: number;
+        latencyP95: number;
+        errorRate: number;
+        safeModeActive: boolean;
+      };
+      activationSafeMode: {
+        active: boolean;
+        blockers: string[];
+      };
+    };
   };
 }
 

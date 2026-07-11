@@ -20,7 +20,8 @@
     "OPERATOR_ROLE": "operator",
     "OPERATOR_ACCESS_LEVEL": "internal",
     "DEPLOY_ENV": "production",
-    "APP_VERSION": "0.1.0"
+    "APP_VERSION": "0.1.0",
+    "AI_FULFILLMENT_ENABLED": "false"
   },
   "kv_namespaces": [
     { "binding": "AUTH_REVOCATION", "id": "9a7f43b04fcb439999dd60f3bd9d71a2" },

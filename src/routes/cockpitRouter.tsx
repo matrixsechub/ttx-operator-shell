@@ -2,12 +2,9 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RequireAuth } from "../lib/RequireAuth";
 import { Dashboard } from "../pages/Dashboard";
 import { BeaconDashboard } from "../pages/dashboard/BeaconDashboard";
-import { RuntimeDashboard } from "../pages/dashboard/RuntimeDashboard";
-import { MarketplaceDashboard } from "../pages/dashboard/MarketplaceDashboard";
 import { AgentsDashboard } from "../pages/dashboard/AgentsDashboard";
 import { GovernanceDashboard } from "../pages/dashboard/GovernanceDashboard";
 import { GovernanceConsole } from "../pages/dashboard/GovernanceConsole";
-import { SubscriptionDashboard } from "../pages/dashboard/SubscriptionDashboard";
 import { AuditDashboard } from "../pages/dashboard/AuditDashboard";
 import { Status } from "../pages/Status";
 import { AboutPage } from "../pages/AboutPage";
@@ -30,7 +27,6 @@ import { SecurityOps } from "../pages/ops/SecurityOps";
 import { DeployOps } from "../pages/ops/DeployOps";
 import { UiUxExpertPage } from "../pages/ops/UiUxExpertPage";
 import { PrismTriagePage } from "../pages/ops/PrismTriagePage";
-import { TrafficActivationPage } from "../pages/ops/TrafficActivationPage";
 import LiveJoin from "../pages/LiveJoin";
 
 /** Operator cockpit surface — systems, ops, divisions, ttx (no storefront/auth routes). */
@@ -42,12 +38,12 @@ export const cockpitRouter = createBrowserRouter([
     children: [
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/dashboard/beacon", element: <BeaconDashboard /> },
-      { path: "/dashboard/runtime", element: <RuntimeDashboard /> },
-      { path: "/dashboard/marketplace", element: <MarketplaceDashboard /> },
+      { path: "/dashboard/runtime", element: <Navigate to="/dashboard" replace /> },
+      { path: "/dashboard/marketplace", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard/agents", element: <AgentsDashboard /> },
       { path: "/dashboard/governance", element: <GovernanceDashboard /> },
       { path: "/operator/governance", element: <GovernanceConsole /> },
-      { path: "/dashboard/subscription", element: <SubscriptionDashboard /> },
+      { path: "/dashboard/subscription", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard/audit", element: <AuditDashboard /> },
       { path: "/status", element: <Status /> },
       { path: "/about", element: <AboutPage /> },
@@ -75,7 +71,7 @@ export const cockpitRouter = createBrowserRouter([
       { path: "/ops/deploy", element: <DeployOps /> },
       { path: "/operator/uiux-expert", element: <UiUxExpertPage /> },
       { path: "/operator/uiux-expert/triage", element: <PrismTriagePage /> },
-      { path: "/operator/traffic-activation", element: <TrafficActivationPage /> },
+      { path: "/operator/traffic-activation", element: <Navigate to="/dashboard" replace /> },
     ],
   },
   { path: "*", element: <NotFound /> },
