@@ -149,60 +149,6 @@ export default {
 
     const mode = resolveSurfaceMode(env);
 
-
-
-    // #region agent log
-
-    if (
-
-      pathname === "/" ||
-
-      pathname === "/welcome" ||
-
-      pathname === "/login" ||
-
-      pathname === "/marketplace" ||
-
-      pathname.startsWith("/ops/")
-
-    ) {
-
-      console.log("TRACE: PATHNAME =", pathname);
-
-      console.log("TRACE: SURFACE =", mode);
-
-      fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-
-        method: "POST",
-
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-
-        body: JSON.stringify({
-
-          sessionId: "14ea90",
-
-          runId: "funnel-primary",
-
-          hypothesisId: "H-entry",
-
-          location: "worker/index.ts:fetch",
-
-          message: "html path entry",
-
-          data: { pathname, mode, method: request.method },
-
-          timestamp: Date.now(),
-
-        }),
-
-      }).catch(() => {});
-
-    }
-
-    // #endregion
-
-
-
     if (pathname.startsWith(API_PREFIX)) {
 
       const apiStarted = Date.now();

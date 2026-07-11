@@ -61,29 +61,6 @@ export async function serveSurfaceSpa(request: Request, assets: Fetcher, pathnam
   const markers = SURFACE_MARKERS[surface];
   const valid = validateShellHtml(html, surface);
 
-  // #region agent log
-  fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-    body: JSON.stringify({
-      sessionId: "14ea90",
-      runId: "multi-surface",
-      hypothesisId: "H-surface-routing",
-      location: "worker/surfaceSpa.ts:serveSurfaceSpa",
-      message: "surface shell resolved",
-      data: {
-        pathname,
-        surface,
-        shellPath,
-        status: response.status,
-        valid,
-        title: html.match(/<title>([^<]+)/)?.[1],
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
-
   if (!valid || !response.ok) {
     return Response.json(
       { error: `${surface} shell missing or misconfigured`, shellPath, pathname },
