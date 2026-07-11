@@ -56,6 +56,7 @@ let packet = {
   beaconDriftRejected: false,
   codexDriftRejected: false,
   safeModeBlockedMutation: false,
+  safeModeRestored: false,
   auditChainValid: false,
   telemetryValid: false,
   rollback: {
@@ -446,7 +447,7 @@ async function main() {
     record("safe_mode_blocks_mutation", packet.safeModeBlockedMutation, { code: safeExecute.json?.code });
   }
 
-  await fetchRaw(
+  const safeModeExit = await fetchRaw(
     baseUrl,
     "/api/operator/governance/safe-mode/exit",
     {
@@ -456,7 +457,10 @@ async function main() {
     },
     { token },
   );
-  record("safe_mode_restored", true);
+  record("safe_mode_restored", safeModeExit.response.status === 200 && safeModeExit.json?.safeMode?.active === false, {
+    active: safeModeExit.json?.safeMode?.active,
+  });
+  packet.safeModeRestored = safeModeExit.response.status === 200 && safeModeExit.json?.safeMode?.active === false;
 
   const auditRes = await fetchRaw(
     baseUrl,

@@ -8,6 +8,13 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to validate
+        required: false
+        default: feat/operator-governance-phase-2b
+        type: string
 
 permissions:
   contents: read
@@ -44,12 +51,16 @@ jobs:
 
   build-test:
     uses: ./.github/workflows/_reusable-build-test.yml
+    with:
+      ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
     permissions:
       contents: read
       actions: write
 
   wrangler-dry-run:
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    with:
+      ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
     permissions:
       contents: read
       actions: write
