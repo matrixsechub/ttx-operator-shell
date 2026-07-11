@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { describe, it, before } from "node:test";
 import { handleKernelRoute } from "../worker/kernel.ts";
+import { ensureBeaconLoaded } from "../msh-ops/beacon/loadBeacon.ts";
 import type { BackboneEnv } from "../worker/backboneEnv.ts";
 import type { GhostEnv } from "../worker/ghost.ts";
 import type { ModeEnv } from "../worker/mode.ts";
@@ -52,6 +53,10 @@ function mockEnv(): BackboneEnv & GhostEnv & ModeEnv & BuildInfoEnv {
 }
 
 describe("GET /api/system/status", () => {
+  before(async () => {
+    await ensureBeaconLoaded();
+  });
+
   it("returns a stable status payload", async () => {
     const request = new Request("https://example.com/api/system/status");
     const response = await handleKernelRoute(request, "/api/system/status", mockEnv());
@@ -60,9 +65,15 @@ describe("GET /api/system/status", () => {
     const body = (await response?.json()) as {
       harness?: { state?: string };
       api?: { available?: boolean };
+      beacon?: { hash?: string };
+      queues?: { activation?: { pending?: number } };
+      approvals?: { pending?: number };
     };
     assert.ok(body.harness?.state);
     assert.equal(typeof body.api?.available, "boolean");
+    assert.match(body.beacon?.hash ?? "", /^[a-f0-9]{64}$/);
+    assert.equal(typeof body.queues?.activation?.pending, "number");
+    assert.equal(typeof body.approvals?.pending, "number");
     assert.equal(response?.headers.get("X-Build-Commit"), "testsha");
   });
 });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { execSync } from "node:child_process";
+import { execSync, spawnSync } from "node:child_process";
 import { validateStagingKvConfig } from "./lib/stagingKvPlaceholders.mjs";
 
 const result = validateStagingKvConfig();
@@ -25,9 +25,34 @@ const buildTimestamp =
   process.env.BUILD_TIMESTAMP?.trim() || new Date().toISOString();
 
 process.env.GIT_COMMIT_SHA = commitSha;
+process.env.BUILD_COMMIT_SHA = commitSha;
 process.env.BUILD_TIMESTAMP = buildTimestamp;
 
 run("node scripts/build.mjs");
-run(
-  `wrangler deploy --env staging --var BUILD_COMMIT_SHA:${commitSha} --var BUILD_TIMESTAMP:${buildTimestamp}`,
+
+const deploy = spawnSync(
+  "npx",
+  [
+    "wrangler",
+    "deploy",
+    "--env",
+    "staging",
+    "--var",
+    `BUILD_COMMIT_SHA:${commitSha}`,
+    "--var",
+    `BUILD_TIMESTAMP:${buildTimestamp}`,
+  ],
+  { stdio: "inherit", env: process.env, shell: process.platform === "win32" },
+);
+
+if (deploy.status !== 0) {
+  process.exit(deploy.status ?? 1);
+}
+
+console.log(
+  JSON.stringify({
+    commitSha,
+    buildTimestamp,
+    deployEnv: "staging",
+  }),
 );

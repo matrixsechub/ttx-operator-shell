@@ -23,7 +23,6 @@ const DOCUMENTED_WRITE_ALLOWLIST = new Map([
   ["_reusable-build-test.yml", new Set(["actions: write"])],
   ["_reusable-wrangler-dry-run.yml", new Set(["actions: write"])],
   ["ci.yml", new Set(["actions: write"])],
-  ["staging-deploy.yml", new Set(["actions: write"])],
   ["security-pr.yml", new Set()],
 ]);
 

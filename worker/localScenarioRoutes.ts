@@ -28,8 +28,11 @@
 // builtin one) by id collision.
 
 import { SCENARIO_DEFINITIONS, validateScenarioDefinition, type ScenarioDefinition } from "./scenarioManifest";
+import { routeDisabledInGovernedEnvironment } from "./governance/routeDisabled";
+import type { ModeEnv } from "./mode";
+import type { BuildInfoEnv } from "./buildInfo";
 
-export interface LocalScenarioEnv {
+export interface LocalScenarioEnv extends ModeEnv, BuildInfoEnv {
   TTX_STATE: KVNamespace;
   TTX_EXPORT_SIGNING_KEY?: string;
 }
@@ -76,6 +79,16 @@ export async function handleLocalScenarioRoute(
   pathname: string,
   env: LocalScenarioEnv,
 ): Promise<Response | null> {
+  const mutationPaths = new Set([
+    "/api/ttx/local-scenarios/create",
+    "/api/ttx/local-scenarios/update",
+    "/api/ttx/local-scenarios/delete",
+    "/api/ttx/local-scenarios/import",
+  ]);
+  if (mutationPaths.has(pathname) && request.method === "POST") {
+    const disabled = routeDisabledInGovernedEnvironment(env);
+    if (disabled) return disabled;
+  }
   if (pathname === "/api/ttx/local-scenarios") return handleList(request, env);
   if (pathname === "/api/ttx/local-scenarios/create") return handleCreate(request, env);
   if (pathname === "/api/ttx/local-scenarios/update") return handleUpdate(request, env);

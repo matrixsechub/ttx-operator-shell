@@ -1,0 +1,239 @@
+{
+  "system": {
+    "id": "mshops-operator-os",
+    "name": "MSHOPS Operator OS",
+    "version": "0.1.0",
+    "codex_version": "1.0.0",
+    "last_validated_at": null,
+    "drift_count": 0,
+    "repository": "ttx-operator-shell",
+    "deploy_target": "cloudflare-workers"
+  },
+  "beacon": {
+    "active_version": 1,
+    "draft_version": 2,
+    "active_id": "BEACON::NORTHSTAR",
+    "hash_source": "msh-ops/beacon/beacon.hash",
+    "read_endpoint": "/api/beacon",
+    "v2_endpoint": "/api/beacon/v2",
+    "release_path": "msh-ops/beacon/releases/current.json"
+  },
+  "telemetry_events": [
+    "governance.proposal.created",
+    "governance.proposal.approved",
+    "governance.proposal.denied",
+    "governance.receipt.issued",
+    "governance.receipt.rejected",
+    "governance.receipt.consumed",
+    "governance.execution.attempted",
+    "governance.execution.started",
+    "governance.execution.succeeded",
+    "governance.execution.failed",
+    "governance.execution.replay_blocked",
+    "governance.execution.hash_drift_blocked",
+    "governance.audit.write_failed",
+    "governance.legacy_bypass_blocked",
+    "governance.mcp_delta.generated",
+    "governance.mcp_delta.quarantined",
+    "codex.validation.completed",
+    "codex.unknown_component.detected",
+    "organizer.scan.completed",
+    "refactor.proposal.created"
+  ],
+  "secret_scopes": [
+    { "name": "AUTH_SIGNING_KEY", "scope": "worker-secret", "purpose": "jwt-auth-only" },
+    { "name": "GOVERNANCE_RECEIPT_SIGNING_KEY", "scope": "worker-secret", "purpose": "governance-receipt-hmac" },
+    { "name": "BEACON_SIGNING_KEY", "scope": "worker-secret", "purpose": "beacon-v2-release-hmac" },
+    { "name": "OPERATOR_PASSWORD_HASH", "scope": "worker-secret", "purpose": "operator-auth" },
+    { "name": "OPERATOR_CALLSIGN", "scope": "worker-secret", "purpose": "operator-auth" }
+  ],
+  "mutation_routes": [
+    { "method": "POST", "path": "/api/operator/activation/campaigns", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "PATCH", "path": "/api/operator/activation/campaigns/{id}", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/operator/activation/campaigns/{id}/activate", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/northstar-beacon/generate", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/ai-agent-build-spec-generate", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/rag-architecture-plan-generate", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/local-ai-deployment-plan-generate", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/security-remediation-plan-generate", "action_class": "C5", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/ai/infer", "action_class": "C3", "owner": "operator", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true, "safe_mode": true, "audit_fail_closed": true, "enforcement": "governed" },
+    { "method": "POST", "path": "/api/governance/propose", "action_class": "C2", "owner": "operator", "governed": false, "enforcement": "disabled_staging_prod", "disabled_reason": "legacy GovernanceDO" },
+    { "method": "POST", "path": "/api/governance/approve", "action_class": "C2", "owner": "operator", "governed": false, "enforcement": "disabled_staging_prod", "disabled_reason": "legacy GovernanceDO" },
+    { "method": "POST", "path": "/api/ttx/local-scenarios/create", "action_class": "C3", "owner": "operator", "governed": false, "enforcement": "disabled_staging_prod", "disabled_reason": "pending governance wave 3" },
+    { "method": "POST", "path": "/api/register", "action_class": "C4", "owner": "operator", "governed": false, "enforcement": "disabled_staging_prod", "disabled_reason": "public intake pending governance" }
+  ],
+  "api_routes": {
+    "governance": [
+      { "path": "/api/governance/proposals", "method": "GET", "action_class": "C0" },
+      { "path": "/api/governance/proposals", "method": "POST", "action_class": "C2", "approval_path": "/api/governance/proposals/{id}/approve" },
+      { "path": "/api/governance/proposals/{id}/approve", "method": "POST", "action_class": "C2" },
+      { "path": "/api/governance/mcp/delta", "method": "POST", "action_class": "C1" }
+    ],
+    "activation": [
+      { "path": "/api/operator/activation/campaigns", "method": "POST", "action_class": "C3", "approval_path": "/api/governance/proposals/{id}/approve", "governed": true }
+    ]
+  },
+  "components": [
+    {
+      "id": "governance-spine",
+      "type": "worker-module",
+      "owner": "operator",
+      "sourcePaths": ["worker/governance/", "worker/governanceRoutes.ts"],
+      "actionClasses": ["C2", "C3", "C4", "C5", "C6"],
+      "approvalPath": "/api/governance/proposals/{id}/approve",
+      "telemetryEvents": ["governance.proposal.created", "governance.execution.succeeded"],
+      "runbook": "docs/operator-os/governance-flow.md",
+      "tests": ["tests/governanceRoutes.test.ts", "tests/governanceEnforcement.test.ts"],
+      "environments": ["development", "staging", "production"],
+      "knownRisks": ["KV audit loss on namespace wipe"]
+    },
+    {
+      "id": "activation-pilot",
+      "type": "worker-module",
+      "owner": "operator",
+      "sourcePaths": ["worker/activation/activationRoutes.ts"],
+      "actionClasses": ["C3"],
+      "approvalPath": "/api/governance/proposals/{id}/approve",
+      "telemetryEvents": ["governance.execution.attempted"],
+      "runbook": "docs/operator-os/approval-and-execution.md",
+      "tests": ["tests/activationCampaign.test.ts"],
+      "environments": ["development", "staging", "production"],
+      "knownRisks": ["Partial route migration to governed fabric"]
+    }
+  ],
+  "services": [
+    {
+      "id": "worker-primary",
+      "name": "ttx-operator-shell",
+      "type": "cloudflare-worker",
+      "config": "wrangler.jsonc",
+      "environment": "production"
+    },
+    {
+      "id": "worker-staging",
+      "name": "ttx-operator-shell-staging",
+      "type": "cloudflare-worker",
+      "config": "wrangler.jsonc",
+      "environment": "staging"
+    },
+    {
+      "id": "service-harness",
+      "name": "msh-ops-os-harness",
+      "type": "cloudflare-worker-service",
+      "binding": "HARNESS"
+    }
+  ],
+  "durable_objects": [
+    { "id": "governance-do", "binding": "GOVERNANCE", "class": "GovernanceDO" },
+    { "id": "session-do", "binding": "SESSION", "class": "SessionDO" },
+    { "id": "marketplace-do", "binding": "MARKETPLACE", "class": "MarketplaceDO" },
+    { "id": "live-ttx-do", "binding": "LIVE_TTX_SESSIONS", "class": "LiveTtxSession" },
+    { "id": "receipt-authority-do", "binding": "RECEIPT_AUTHORITY", "class": "ReceiptAuthority" }
+  ],
+  "kv_namespaces": [
+    { "binding": "AUTH_REVOCATION", "purpose": "refresh-token-revocation" },
+    { "binding": "WEBHOOK_EVENTS", "purpose": "webhook-event-log" },
+    { "binding": "SECURITY_EVENTS", "purpose": "security-events" },
+    { "binding": "TTX_STATE", "purpose": "ttx-state-governance-proposals-audit" }
+  ],
+  "workflows": [
+    {
+      "workflow_id": "WF-ACTIVATION-QUEUE",
+      "name": "Organic Traffic Activation Queue",
+      "environment": "prod",
+      "owner": "operator",
+      "trigger_type": "manual",
+      "action_class": "C3",
+      "approval_required": true,
+      "implementation": "worker/activation/activationQueue.ts"
+    },
+    {
+      "workflow_id": "WF-REGISTER-INTAKE",
+      "name": "Public Registration Intake",
+      "environment": "prod",
+      "owner": "operator",
+      "trigger_type": "webhook",
+      "action_class": "C4",
+      "approval_required": true,
+      "implementation": "worker/funnelRecovery.ts"
+    },
+    {
+      "workflow_id": "WF-ORGANIZER-SCHEDULED",
+      "name": "Organizer Scheduled Scan",
+      "environment": "dev",
+      "owner": "operator",
+      "trigger_type": "schedule",
+      "action_class": "C1",
+      "approval_required": false,
+      "implementation": ".github/workflows/organizer-schedule.yml"
+    }
+  ],
+  "agents": [
+    {
+      "agent_id": "NorthstarBeaconGovernanceAgent",
+      "name": "Northstar Beacon Governance Agent",
+      "role": "governance",
+      "autonomy_level": "A3",
+      "implementation": "worker/data/northstarBeaconGovernanceAgent.ts"
+    },
+    {
+      "agent_id": "AiAgentBuilderAgent",
+      "name": "AI Agent Builder Agent",
+      "role": "developer-experience",
+      "autonomy_level": "A3",
+      "implementation": "worker/data/aiAgentBuilderAgent.ts"
+    },
+    {
+      "agent_id": "SecurityRemediationAgent",
+      "name": "Security Remediation Agent",
+      "role": "runtime",
+      "autonomy_level": "A3",
+      "implementation": "worker/data/securityRemediationAgent.ts"
+    },
+    {
+      "agent_id": "RagArchitectureAgent",
+      "name": "RAG Architecture Agent",
+      "role": "developer-experience",
+      "autonomy_level": "A3",
+      "implementation": "worker/data/ragArchitectureAgent.ts"
+    },
+    {
+      "agent_id": "LocalAiDeploymentAgent",
+      "name": "Local AI Deployment Agent",
+      "role": "developer-experience",
+      "autonomy_level": "A3",
+      "implementation": "worker/data/localAiDeploymentAgent.ts"
+    },
+    {
+      "agent_id": "organic-traffic-activation",
+      "name": "Organic Traffic Activation Agent",
+      "role": "revenue",
+      "autonomy_level": "A4",
+      "implementation": "worker/activation/activationRoutes.ts"
+    },
+    {
+      "agent_id": "OrganizerAgent",
+      "name": "Organizer Agent",
+      "role": "developer-experience",
+      "autonomy_level": "A3",
+      "implementation": "msh-ops/agents/OrganizerAgent.ts"
+    },
+    {
+      "agent_id": "RefactorAgent",
+      "name": "Refactor Agent",
+      "role": "developer-experience",
+      "autonomy_level": "A3",
+      "implementation": "msh-ops/agents/refactorEngine.ts"
+    }
+  ],
+  "environments": {
+    "dev": { "worker": "wrangler dev", "surface": "local" },
+    "staging": { "worker": "ttx-operator-shell-staging", "surface": "storefront" },
+    "prod": { "worker": "ttx-operator-shell", "surface": "storefront" }
+  },
+  "approvals": {
+    "classes": ["C0", "C1", "C2", "C3", "C4", "C5", "C6"],
+    "required_for": ["C2", "C3", "C4", "C5", "C6"],
+    "api_prefix": "/api/governance/proposals"
+  }
+}

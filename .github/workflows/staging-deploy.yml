@@ -63,9 +63,12 @@ jobs:
 
       - run: node scripts/ci/verify-staging-config.mjs
 
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
   build-test:
     needs: [authorize, preflight]
     uses: ./.github/workflows/_reusable-build-test.yml
+    secrets: inherit
     with:
       ref: ${{ needs.authorize.outputs.commit_sha }}
       git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
@@ -76,6 +79,7 @@ jobs:
   staging-dry-run:
     needs: [authorize, preflight]
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    secrets: inherit
     with:
       ref: ${{ needs.authorize.outputs.commit_sha }}
       git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
@@ -92,16 +96,26 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
       BUILD_TIMESTAMP: ${{ github.run_started_at }}
+      MSHOPS_ROOT: ${{ github.workspace }}/MSHOPS
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - name: Checkout MSHOPS storefront source
+        uses: ./.github/actions/checkout-mshops
+        with:
+          repository: ${{ vars.MSHOPS_REPOSITORY || 'matrixsechub/MSHOPS' }}
+          path: MSHOPS
+          mshops-checkout-token: ${{ secrets.MSHOPS_CHECKOUT_TOKEN }}
 
       - uses: ./.github/actions/setup-node-npm
         with:
           node-version: "24"
 
       - run: node scripts/ci/verify-staging-config.mjs
+
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
 
       - run: npm run typecheck
 
@@ -150,6 +164,7 @@ jobs:
             artifacts/wrangler-version.txt
             artifacts/node-version.txt
             artifacts/npm-version.txt
+            artifacts/storefront-assembly-report.json
             dist/.build-manifest.json
           retention-days: 14
           if-no-files-found: error
@@ -177,8 +192,73 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  staging-ai-gateway:
+    needs: [authorize, deploy-staging]
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
+      - name: Run AI Gateway staging smoke
+        env:
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+          OPERATOR_BEARER_TOKEN: ${{ secrets.OPERATOR_BEARER_TOKEN }}
+          REQUIRE_OPERATOR_TOKEN: "1"
+        run: node scripts/ci/verify-ai-gateway.mjs "$STAGING_BASE_URL" "$COMMIT_SHA"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-ai-gateway-report
+          path: |
+            artifacts/ai-gateway-smoke-report.json
+            artifacts/ai-fulfillment-scope-report.json
+          retention-days: 14
+          if-no-files-found: error
+
+  staging-phase-2b-governance-proof:
+    needs: [authorize, deploy-staging, staging-smoke, staging-ai-gateway]
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
+
+      - uses: ./.github/actions/setup-node-npm
+        with:
+          node-version: "24"
+
+      - name: Run Phase 2B governance lifecycle proof
+        env:
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+          EXPECTED_BEACON_HASH: ${{ vars.EXPECTED_BEACON_HASH }}
+          EXPECTED_CODEX_HASH: ${{ vars.EXPECTED_CODEX_HASH }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          OPERATOR_BEARER_TOKEN: ${{ secrets.OPERATOR_BEARER_TOKEN }}
+        run: node scripts/ci/staging-phase-2b-governance-proof.mjs
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-phase-2b-governance-proof
+          path: |
+            artifacts/staging-phase-2b-governance-proof.json
+            artifacts/staging-phase-2b-governance-proof.sha256
+          retention-days: 14
+          if-no-files-found: error
+
   evidence:
-    needs: [authorize, deploy-staging, staging-smoke]
+    needs: [authorize, deploy-staging, staging-smoke, staging-ai-gateway, staging-phase-2b-governance-proof]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -195,14 +275,27 @@ jobs:
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
+          name: staging-ai-gateway-report
+          path: artifacts
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: staging-phase-2b-governance-proof
+          path: artifacts
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
           name: staging-deploy-metadata
           path: staging-deploy-metadata
 
       - name: Prepare evidence inputs
         run: |
-          mkdir -p dist
+          mkdir -p dist artifacts
           if [ -f staging-deploy-metadata/dist/.build-manifest.json ]; then
             cp staging-deploy-metadata/dist/.build-manifest.json dist/.build-manifest.json
+          fi
+          if [ -f staging-deploy-metadata/artifacts/storefront-assembly-report.json ]; then
+            cp staging-deploy-metadata/artifacts/storefront-assembly-report.json artifacts/storefront-assembly-report.json
           fi
 
       - id: versions

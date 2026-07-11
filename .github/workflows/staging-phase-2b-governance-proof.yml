@@ -1,0 +1,86 @@
+# Manual Phase 2B staging governance proof — workflow_dispatch only.
+
+name: Staging Phase 2B Governance Proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: Git ref to validate (branch, tag, or SHA)
+        required: true
+        default: feat/operator-governance-phase-2b
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-phase-2b-governance-proof
+  cancel-in-progress: false
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ inputs.target_ref }}
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-node-npm
+        with:
+          node-version: "24"
+
+      - run: npm ci
+
+      - run: npm run verify:ai-fulfillment-scope
+
+      - run: npm run typecheck
+
+      - run: npm run test:phase2b-governance
+
+      - run: node --import tsx --test tests/governanceConsoleLogic.test.ts
+
+      - run: node --test tests/ci/staging-phase-2b-proof.test.mjs
+
+      - run: npm test
+
+      - run: npm run build
+
+      - run: npm run codex:validate
+
+      - name: Run Phase 2B staging governance proof
+        env:
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+          COMMIT_SHA: ${{ github.sha }}
+          EXPECTED_BEACON_HASH: ${{ vars.EXPECTED_BEACON_HASH }}
+          EXPECTED_CODEX_HASH: ${{ vars.EXPECTED_CODEX_HASH }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          OPERATOR_BEARER_TOKEN: ${{ secrets.OPERATOR_BEARER_TOKEN }}
+        run: node scripts/ci/staging-phase-2b-governance-proof.mjs
+
+      - name: Validate proof schema
+        run: |
+          node --input-type=module -e "
+            import { readFileSync } from 'node:fs';
+            const packet = JSON.parse(readFileSync('artifacts/staging-phase-2b-governance-proof.json', 'utf8'));
+            if (packet.status === 'PENDING') throw new Error('PENDING status forbidden');
+            const required = ['phase','commitSha','proposalId','rollback','telemetryValid'];
+            for (const key of required) {
+              if (!(key in packet)) throw new Error('missing ' + key);
+            }
+          "
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-phase-2b-governance-proof
+          path: |
+            artifacts/staging-phase-2b-governance-proof.json
+            artifacts/staging-phase-2b-governance-proof.sha256
+          retention-days: 7
+          if-no-files-found: error

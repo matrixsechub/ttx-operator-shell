@@ -24,20 +24,40 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
+      MSHOPS_ROOT: ${{ github.workspace }}/MSHOPS
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - name: Checkout MSHOPS storefront source
+        uses: ./.github/actions/checkout-mshops
+        with:
+          repository: ${{ vars.MSHOPS_REPOSITORY || 'matrixsechub/MSHOPS' }}
+          path: MSHOPS
+          mshops-checkout-token: ${{ secrets.MSHOPS_CHECKOUT_TOKEN }}
 
       - uses: ./.github/actions/setup-node-npm
         with:
           node-version: "24"
 
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
+      - run: npm run verify:cron-triggers
+
       - run: npm run typecheck
 
       - run: npm test
 
+      - run: npm run codex:validate
+
       - run: npm run build
+
+      - name: Validate MSHOPS build output
+        env:
+          MSHOPS_ROOT: ${{ github.workspace }}/MSHOPS
+        run: node scripts/ci/preflight-mshops-checkout.mjs build-output
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -45,5 +65,7 @@ jobs:
           path: |
             dist/**
             dist/.build-manifest.json
+            artifacts/storefront-assembly-report.json
+            artifacts/mshops-checkout-report.json
           retention-days: 7
           if-no-files-found: error

@@ -15,7 +15,7 @@ const SURFACE_MARKERS: Record<HtmlSurface, SurfaceMarkers> = {
   },
   storefront: {
     required: ["MSH OPS Storefront", 'id="root"'],
-    forbidden: ["Operator Terminal"],
+    forbidden: ["Operator Terminal", "Ecosystem Entry"],
     headerValue: "mshops-storefront",
   },
   cockpit: {

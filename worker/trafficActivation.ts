@@ -4,6 +4,7 @@ import { analyzeBehaviorIntelligence } from "./behaviorIntelligence";
 import { buildAdaptationFeedback } from "./adaptation";
 import { getUsageSummary, type UsageContextEnv } from "./usage";
 import { getTrafficSourceSummary, listActiveTrafficSources } from "./trafficSources";
+import { buildOrganicActivationProgress } from "./activation/organicProgress";
 import type { ModeEnv } from "./mode";
 
 export type TrafficNextAction = "scale" | "adjust" | "fix";
@@ -20,6 +21,9 @@ export interface TrafficActivationSnapshot {
   confidenceLevel: string;
   signalIntegrity: string;
   nextAction: TrafficNextAction;
+  qualifiedOrganicSessions: number;
+  confidenceBlockers: string[];
+  promotionEligibleWinner: string | null;
 }
 
 function resolveNextAction(input: {
@@ -49,6 +53,7 @@ export async function buildTrafficActivationSnapshot(env: UsageContextEnv): Prom
     (mode) => experimentation.performanceByMode[mode as keyof typeof experimentation.performanceByMode].views,
   );
   const minModeViews = Math.min(...modeViews);
+  const organicProgress = await buildOrganicActivationProgress(env);
 
   return {
     sessionsGenerated: usage.visits,
@@ -66,6 +71,9 @@ export async function buildTrafficActivationSnapshot(env: UsageContextEnv): Prom
       signalIntegrity: usage.signalIntegrity,
       minModeViews,
     }),
+    qualifiedOrganicSessions: organicProgress.qualifiedOrganicSessions,
+    confidenceBlockers: organicProgress.blockers,
+    promotionEligibleWinner: organicProgress.promotionEligibleWinner,
   };
 }
 
@@ -106,6 +114,12 @@ export function formatTrafficActivationReport(snapshot: TrafficActivationSnapsho
     snapshot.confidenceLevel,
     "## signal_integrity",
     snapshot.signalIntegrity,
+    "## qualified_organic_sessions",
+    String(snapshot.qualifiedOrganicSessions),
+    "## confidence_blockers",
+    snapshot.confidenceBlockers.length > 0 ? snapshot.confidenceBlockers.join(", ") : "(none)",
+    "## promotion_eligible_winner",
+    snapshot.promotionEligibleWinner ?? "BLOCKED",
     "## next_action",
     snapshot.nextAction,
   ].join("\n");

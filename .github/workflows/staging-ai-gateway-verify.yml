@@ -1,0 +1,54 @@
+# Manual AI Gateway staging verification — uses GitHub Environment secrets only.
+# Does not deploy. Fork PRs cannot access staging environment secrets.
+
+name: Staging AI Gateway Verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: Git ref to verify against (branch, tag, or SHA)
+        required: true
+        default: main
+        type: string
+      staging_base_url:
+        description: Override staging base URL (optional)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-ai-gateway-verify
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ inputs.target_ref }}
+
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
+      - name: Run AI Gateway staging smoke
+        env:
+          STAGING_BASE_URL: ${{ inputs.staging_base_url != '' && inputs.staging_base_url || vars.STAGING_BASE_URL }}
+          COMMIT_SHA: ${{ github.sha }}
+          OPERATOR_BEARER_TOKEN: ${{ secrets.OPERATOR_BEARER_TOKEN }}
+          REQUIRE_OPERATOR_TOKEN: "1"
+        run: node scripts/ci/verify-ai-gateway.mjs "$STAGING_BASE_URL" "$COMMIT_SHA"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: staging-ai-gateway-report
+          path: |
+            artifacts/ai-gateway-smoke-report.json
+            artifacts/ai-fulfillment-scope-report.json
+          retention-days: 14
+          if-no-files-found: error

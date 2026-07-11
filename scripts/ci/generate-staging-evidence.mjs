@@ -15,18 +15,51 @@ function main() {
   mkdirSync(artifactsDir, { recursive: true });
 
   const smokeReport = readJson(join(process.cwd(), "artifacts", "staging-smoke-report.json"));
+  const aiGatewayReport = readJson(join(process.cwd(), "artifacts", "ai-gateway-smoke-report.json"));
+  const fulfillmentScopeReport = readJson(join(process.cwd(), "artifacts", "ai-fulfillment-scope-report.json"));
+  const storefrontAssemblyReport = readJson(join(process.cwd(), "artifacts", "storefront-assembly-report.json"));
+  const phase1GovernanceProof = readJson(join(process.cwd(), "artifacts", "staging-governance-proof.json"));
+  const phase2bGovernanceProof = readJson(join(process.cwd(), "artifacts", "staging-phase-2b-governance-proof.json"));
   const buildManifest = readJson(join(process.cwd(), "dist", ".build-manifest.json"));
 
   const validation = {
     permissions_lint: process.env.VALIDATION_PERMISSIONS_LINT ?? "PASS",
     action_pin_audit: process.env.VALIDATION_ACTION_PIN_AUDIT ?? "PASS",
     staging_config: process.env.VALIDATION_STAGING_CONFIG ?? "PASS",
+    ai_fulfillment_scope: fulfillmentScopeReport?.ok === false
+      ? "FAIL"
+      : fulfillmentScopeReport?.ok === true
+        ? "PASS"
+        : process.env.VALIDATION_AI_FULFILLMENT_SCOPE ?? "NOT_RUN",
     typecheck: process.env.VALIDATION_TYPECHECK ?? "PASS",
     tests: process.env.VALIDATION_TESTS ?? "PASS",
     build: process.env.VALIDATION_BUILD ?? "PASS",
     wrangler_dry_run: process.env.VALIDATION_WRANGLER_DRY_RUN ?? "PASS",
     deployment: process.env.VALIDATION_DEPLOYMENT ?? "PASS",
     smoke: smokeReport?.summary?.failed ? "FAIL" : smokeReport ? "PASS" : "NOT_RUN",
+    ai_gateway_smoke: aiGatewayReport?.ok === false
+      ? "FAIL"
+      : aiGatewayReport?.ok === true
+        ? "PASS"
+        : process.env.VALIDATION_AI_GATEWAY_SMOKE ?? "NOT_RUN",
+    storefront_assembly:
+      storefrontAssemblyReport?.ok === false || storefrontAssemblyReport?.status === "fail"
+        ? "FAIL"
+        : storefrontAssemblyReport?.ok === true || storefrontAssemblyReport?.status === "pass"
+          ? "PASS"
+          : process.env.VALIDATION_STOREFRONT_ASSEMBLY ?? "NOT_RUN",
+    phase_1_governance_proof:
+      phase1GovernanceProof?.status === "PASS"
+        ? "PASS"
+        : phase1GovernanceProof?.status === "FAIL"
+          ? "FAIL"
+          : process.env.VALIDATION_PHASE_1_GOVERNANCE_PROOF ?? "NOT_RUN",
+    phase_2b_governance_proof:
+      phase2bGovernanceProof?.status === "PASS"
+        ? "PASS"
+        : phase2bGovernanceProof?.status === "FAIL"
+          ? "FAIL"
+          : process.env.VALIDATION_PHASE_2B_GOVERNANCE_PROOF ?? "NOT_RUN",
   };
 
   const releaseMetadata = {
@@ -44,6 +77,18 @@ function main() {
     wrangler_version: process.env.WRANGLER_VERSION ?? "unknown",
     deployed_at: process.env.DEPLOYED_AT ?? new Date().toISOString(),
     build_hash: buildManifest ? createHash("sha256").update(JSON.stringify(buildManifest)).digest("hex") : null,
+    operator_shell_commit_sha: process.env.COMMIT_SHA ?? phase2bGovernanceProof?.commitSha ?? null,
+    deployment_id: phase2bGovernanceProof?.deploymentId ?? null,
+    beacon_hash: phase2bGovernanceProof?.beaconHash ?? null,
+    codex_hash: phase2bGovernanceProof?.codexHash ?? null,
+    proposal_id: phase2bGovernanceProof?.proposalId ?? null,
+    approval_id: phase2bGovernanceProof?.approvalId ?? null,
+    receipt_id: phase2bGovernanceProof?.receiptId ?? null,
+    execution_id: phase2bGovernanceProof?.executionId ?? null,
+    audit_bundle_id: phase2bGovernanceProof?.auditBundleId ?? null,
+    proof_sha256: existsSync(join(process.cwd(), "artifacts", "staging-phase-2b-governance-proof.sha256"))
+      ? readFileSync(join(process.cwd(), "artifacts", "staging-phase-2b-governance-proof.sha256"), "utf8").trim()
+      : null,
     validation,
   };
 
@@ -53,6 +98,25 @@ function main() {
     generated_at: new Date().toISOString(),
     validation,
     smoke_summary: smokeReport?.summary ?? null,
+    ai_gateway_summary: aiGatewayReport?.summary ?? null,
+    ai_fulfillment_scope_summary: fulfillmentScopeReport?.summary ?? null,
+    storefront_assembly_summary: storefrontAssemblyReport
+      ? {
+          status: storefrontAssemblyReport.status,
+          assetCount: storefrontAssemblyReport.assetCount,
+          placeholderDetected: storefrontAssemblyReport.placeholderDetected,
+        }
+      : null,
+    phase_1_governance_proof_summary: phase1GovernanceProof
+      ? { status: phase1GovernanceProof.status, passed: phase1GovernanceProof.summary?.passed ?? null }
+      : null,
+    phase_2b_governance_proof_summary: phase2bGovernanceProof
+      ? {
+          status: phase2bGovernanceProof.status,
+          mutationCount: phase2bGovernanceProof.mutationCount,
+          rollback: phase2bGovernanceProof.rollback?.result ?? null,
+        }
+      : null,
   };
 
   writeFileSync(join(artifactsDir, "release-metadata.json"), JSON.stringify(releaseMetadata, null, 2));
@@ -62,15 +126,52 @@ function main() {
     writeFileSync(join(artifactsDir, "staging-smoke-report.json"), JSON.stringify(smokeReport, null, 2));
   }
 
+  if (aiGatewayReport) {
+    writeFileSync(join(artifactsDir, "ai-gateway-smoke-report.json"), JSON.stringify(aiGatewayReport, null, 2));
+  }
+
+  if (fulfillmentScopeReport) {
+    writeFileSync(
+      join(artifactsDir, "ai-fulfillment-scope-report.json"),
+      JSON.stringify(fulfillmentScopeReport, null, 2),
+    );
+  }
+
   if (buildManifest) {
     writeFileSync(join(artifactsDir, "build-manifest.json"), JSON.stringify(buildManifest, null, 2));
+  }
+
+  if (storefrontAssemblyReport) {
+    writeFileSync(
+      join(artifactsDir, "storefront-assembly-report.json"),
+      JSON.stringify(storefrontAssemblyReport, null, 2),
+    );
+  }
+
+  if (phase1GovernanceProof) {
+    writeFileSync(
+      join(artifactsDir, "staging-governance-proof.json"),
+      JSON.stringify(phase1GovernanceProof, null, 2),
+    );
+  }
+
+  if (phase2bGovernanceProof) {
+    writeFileSync(
+      join(artifactsDir, "staging-phase-2b-governance-proof.json"),
+      JSON.stringify(phase2bGovernanceProof, null, 2),
+    );
   }
 
   const checksumTargets = [
     "release-metadata.json",
     "validation-summary.json",
     "staging-smoke-report.json",
+    "ai-gateway-smoke-report.json",
+    "ai-fulfillment-scope-report.json",
     "build-manifest.json",
+    "storefront-assembly-report.json",
+    "staging-governance-proof.json",
+    "staging-phase-2b-governance-proof.json",
   ];
   const checksumLines = [];
   for (const name of checksumTargets) {

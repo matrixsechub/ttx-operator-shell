@@ -1,9 +1,9 @@
 /** Architectural HTML surfaces — each maps to a distinct SPA shell. */
 export type HtmlSurface = "ecosystem" | "storefront" | "cockpit" | "auth" | "governance";
 
-const COCKPIT_PREFIXES = ["/ops", "/systems", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about", "/join"] as const;
+const COCKPIT_PREFIXES = ["/ops", "/operator", "/systems", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about", "/join"] as const;
 
-const STOREFRONT_PATHS = ["/marketplace", "/enter", "/storefront"] as const;
+const STOREFRONT_PATHS = ["/marketplace", "/storefront"] as const;
 
 export function resolveHtmlSurface(pathname: string): HtmlSurface {
   const normalized = pathname.replace(/\/$/, "") || "/";

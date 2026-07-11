@@ -7,8 +7,11 @@ import {
 import type { TelemetryRollup } from "./do/types";
 import { signToken } from "./edge/crypto";
 import type { EdgeSecretsEnv } from "./env";
+import type { AiGatewayEnv } from "./aiGateway";
+import type { BackboneEnv } from "./backboneEnv";
+import { summarizeGhostSignals } from "./ghostAiSummary";
 
-export interface GhostEnv extends TelemetryEnv, EdgeSecretsEnv {
+export interface GhostEnv extends TelemetryEnv, EdgeSecretsEnv, Partial<Omit<AiGatewayEnv, keyof TelemetryEnv>> {
   ENGINE_API_URL?: string;
   HARNESS?: Fetcher;
 }
@@ -385,7 +388,7 @@ export async function fetchGhostSignals(env: GhostEnv): Promise<GhostSignals> {
 export async function handleGhostRoute(
   request: Request,
   pathname: string,
-  env: GhostEnv,
+  env: GhostEnv & BackboneEnv,
 ): Promise<Response | null> {
   if (pathname !== "/api/ghost/telemetry") return null;
   if (request.method !== "GET") {
@@ -393,6 +396,18 @@ export async function handleGhostRoute(
   }
 
   const signals = await fetchGhostSignals(env);
+  const url = new URL(request.url);
+  const includeAiSummary = url.searchParams.get("aiSummary") === "1";
+
+  let aiSummary: string | null = null;
+  if (includeAiSummary) {
+    try {
+      aiSummary = await summarizeGhostSignals(env, signals);
+    } catch {
+      // Ghost summary is optional — never fail the telemetry endpoint.
+    }
+  }
+
   return Response.json({
     ok: true,
     connected: signals.connected,
@@ -407,5 +422,6 @@ export async function handleGhostRoute(
     local: signals.local,
     engineSignals: signals.engineSignals,
     adaptedAt: signals.adaptedAt,
+    aiSummary,
   });
 }

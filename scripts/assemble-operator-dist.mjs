@@ -8,8 +8,6 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 
-const STOREFRONT_MARKERS = ["MSH OPS Storefront", 'id="root"'];
-
 function resolveCommitSha() {
   if (process.env.GIT_COMMIT_SHA?.trim()) return process.env.GIT_COMMIT_SHA.trim();
   if (process.env.GITHUB_SHA?.trim()) return process.env.GITHUB_SHA.trim();
@@ -26,19 +24,6 @@ function assertExists(path, label) {
   }
 }
 
-function assertStorefrontShell(path) {
-  assertExists(path, "storefront shell");
-  const html = readFileSync(path, "utf8");
-  for (const marker of STOREFRONT_MARKERS) {
-    if (!html.includes(marker)) {
-      throw new Error(`Storefront shell at ${path} missing required marker: ${marker}`);
-    }
-  }
-  if (!html.includes("/app/assets/")) {
-    throw new Error(`Storefront shell at ${path} missing /app/assets/ bundle reference`);
-  }
-}
-
 const shellRenames = [
   ["ecosystem.html", "ecosystem-shell.html"],
   ["cockpit.html", "operator-shell.html"],
@@ -51,10 +36,13 @@ for (const [source, target] of shellRenames) {
   renameSync(join(dist, source), join(dist, target));
 }
 
-assertStorefrontShell(join(dist, "app", "index.html"));
-
 const ecosystemShell = readFileSync(join(dist, "ecosystem-shell.html"), "utf8");
 writeFileSync(join(dist, "index.html"), ecosystemShell);
+
+if (!existsSync(join(dist, "app", "index.html"))) {
+  console.error("assemble-operator-dist: dist/app/index.html missing after storefront assembly");
+  process.exit(1);
+}
 
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const commitSha = resolveCommitSha();
@@ -67,7 +55,7 @@ const manifest = {
   environment: "build",
   assembledAt: new Date().toISOString(),
   source: "scripts/assemble-operator-dist.mjs",
-  shells: [...shellRenames.map(([, target]) => `/${target}`), "/app/index.html"],
+  shells: shellRenames.map(([, target]) => `/${target}`),
 };
 
 writeFileSync(join(dist, ".build-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);

@@ -28,13 +28,17 @@ import {
 } from "./sessionBridge";
 import {
   getTelemetrySummary,
+  getAiUsageRollup,
   recordGovernanceEvent,
   recordSessionEvent,
   recordSubsystemFailure,
+  type AiUsageRollup,
   type TelemetryEnv,
 } from "./telemetry";
 import { getUsageSummary } from "./usage";
-const COCKPIT_HTML_PREFIXES = ["/systems", "/ops", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about"] as const;
+import { buildOperatorOsStatusSnapshot, type OperatorOsStatusSnapshot } from "./operatorStatus";
+import { buildRuntimeHealth, type RuntimeHealth } from "./runtimeHealth";
+const COCKPIT_HTML_PREFIXES = ["/systems", "/ops", "/operator", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about"] as const;
 const COCKPIT_API_PREFIXES = ["/api/ops"] as const;
 const WILDCARD_API_PATHS = [/^\/api\/ttx\/local-scenarios\/import$/];
 
@@ -85,6 +89,14 @@ export interface SystemState {
   health: {
     overall: "STABLE" | "DEGRADED" | "CRITICAL";
   };
+  aiGateway: {
+    usageRollup: AiUsageRollup;
+    policyMode: PolicyMode;
+    gatewayHealth: "ok" | "degraded" | "unavailable";
+    recentDenials: number;
+  };
+  operatorOs: OperatorOsStatusSnapshot;
+  runtimeHealth: RuntimeHealth;
 }
 
 function doRequest(stub: DurableObjectStub, path: string, init?: RequestInit): Promise<Response> {
@@ -186,12 +198,20 @@ export async function buildSystemState(
   const governanceResult = await fetchGovernanceStateSafe(env);
   const governance = governanceResult.state;
 
-  const [telemetry, marketplace, ghost, usage] = await Promise.all([
+  const [telemetry, marketplace, ghost, usage, aiUsageRollup, operatorOs] = await Promise.all([
     getTelemetrySummary(env),
     fetchMarketplaceStateSafe(env),
     fetchGhostSignals(env),
     getUsageSummary(env),
+    getAiUsageRollup(env),
+    buildOperatorOsStatusSnapshot(env),
   ]);
+
+  const runtimeHealth = await buildRuntimeHealth(env, {
+    telemetry,
+    beaconSafeMode: operatorOs.beacon.safeMode,
+    ghostConnected: ghost.connected,
+  });
 
   const policyBaseline = buildGovernancePolicy(governance);
   const signalStates = evaluateSignalStates(ghost, telemetry);
@@ -292,6 +312,19 @@ export async function buildSystemState(
         telemetry,
       }),
     },
+    aiGateway: {
+      usageRollup: aiUsageRollup,
+      policyMode: policy.mode,
+      gatewayHealth:
+        aiUsageRollup.requestCount === 0 && aiUsageRollup.denialCount === 0
+          ? "ok"
+          : aiUsageRollup.denialCount > aiUsageRollup.requestCount
+            ? "degraded"
+            : "ok",
+      recentDenials: aiUsageRollup.denialCount,
+    },
+    operatorOs,
+    runtimeHealth,
   };
 }
 
@@ -459,6 +492,10 @@ async function handleSystemStatus(
       governanceMode: state.policy.mode,
       lastSuccessfulCall: state.assembledAt,
       errors: state.telemetry.errorCount > 0 ? [`telemetry errors: ${state.telemetry.errorCount}`] : [],
+      beacon: state.operatorOs.beacon,
+      codex: state.operatorOs.codex,
+      queues: state.operatorOs.queues,
+      approvals: state.operatorOs.approvals,
     }),
     env,
   );

@@ -1,0 +1,126 @@
+{
+  "version": "2.0.0",
+  "beacon": {
+    "id": "BEACON::NORTHSTAR",
+    "version": 2,
+    "state": "ACTIVE",
+    "axis": [
+      "STABILITY",
+      "REVENUE_VALIDATION",
+      "TRUST",
+      "CONTROLLED_GROWTH",
+      "WILDCARD_INNOVATION"
+    ],
+    "priorities": [
+      "Stability is mandatory before expansion.",
+      "Revenue conversion must be validated before new modules are authorized.",
+      "Trust and auditability are core differentiators.",
+      "Autonomy is bounded by containment, telemetry, and operator review.",
+      "Marketplace expansion requires measurable demand or strategic necessity.",
+      "Recursive systems require depth limits, termination conditions, and escalation controls."
+    ],
+    "authority": {
+      "operator": "Operator retains full execution authority.",
+      "aiCouncil": "AI Council is advisory only.",
+      "agents": "Agents may recommend actions but must not execute without operator approval."
+    },
+    "mandate": "All agents must align decisions, suggestions, and reasoning to this Northstar. All deviations require escalation. All actions must be justified against the strategic axis.",
+    "action_classes": {
+      "C0": {
+        "description": "Read-only observation",
+        "approval_required": false
+      },
+      "C1": {
+        "description": "Analysis or draft only",
+        "approval_required": false
+      },
+      "C2": {
+        "description": "Internal persistent change",
+        "approval_required": true
+      },
+      "C3": {
+        "description": "Production config or workflow change",
+        "approval_required": true
+      },
+      "C4": {
+        "description": "Customer-facing change",
+        "approval_required": true
+      },
+      "C5": {
+        "description": "Financial, security, or legal-sensitive change",
+        "approval_required": true
+      },
+      "C6": {
+        "description": "Destructive or high-risk change",
+        "approval_required": true
+      }
+    },
+    "autonomy_levels": {
+      "A0": {
+        "name": "Dormant",
+        "description": "Agent unavailable except inspection"
+      },
+      "A1": {
+        "name": "Observe",
+        "description": "Read permitted context and summarize"
+      },
+      "A2": {
+        "name": "Analyze",
+        "description": "Reason, compare, detect issues"
+      },
+      "A3": {
+        "description": "Create drafts; approval needed to persist official changes",
+        "name": "Draft"
+      },
+      "A4": {
+        "name": "Propose",
+        "description": "Create formal action proposal"
+      },
+      "A5": {
+        "name": "Execute With Receipt",
+        "description": "Execute exact approved action with receipt"
+      },
+      "A6": {
+        "name": "Policy Safety Interlock",
+        "description": "Deterministic containment under pre-approved policy"
+      }
+    },
+    "recursion_limits": {
+      "max_reasoning_depth": 3,
+      "max_scenario_branches": 5,
+      "max_agent_debate_rounds": 3,
+      "max_tool_call_chain_length": 5,
+      "max_unresolved_loop_retries": 1
+    },
+    "operator_modes": [
+      "normal",
+      "cautious",
+      "incident",
+      "revenue_validation",
+      "ghost_lab",
+      "audit"
+    ],
+    "approval_policy": {
+      "human_only_actions": [
+        "beacon_changes",
+        "production_deployments",
+        "workflow_activation_changes",
+        "customer_facing_messages",
+        "pricing_or_offer_changes",
+        "spend_changes",
+        "agent_permission_increases",
+        "data_export",
+        "destructive_operations",
+        "trust_sensitive_policy_changes"
+      ],
+      "beacon_hash_required": true
+    }
+  },
+  "beaconHash": "50a56303603f6fb65653764dca13ae1d7100197f48d4b7c055fbd68da4fac65c",
+  "publishedAt": "2026-07-10T14:04:53.109Z",
+  "signature": {
+    "algorithm": "HMAC-SHA-256",
+    "keyId": "beacon-signing-key-v1",
+    "value": "3cc3642bc4b85fd8dcc08e4cb782705579f44ab4533bf67520b7d4beddd5d704"
+  }
+}

@@ -1,3 +1,7 @@
+import type { BackboneEnv } from "./backboneEnv";
+import type { WorkerEnv } from "./env";
+import type { AiGatewayEnv } from "./aiGateway";
+import { recordUsageEvent, isValidSessionId } from "./usage";
 import { injectSecurityHeaders } from "./edge/headers";
 import {
   handleFulfillmentAgentApi,
@@ -12,10 +16,14 @@ import {
   resolveRagPlanId,
   resolveRemediationPlanId,
 } from "./fulfillmentAgentRoutes";
+import { routeDisabledInGovernedEnvironment } from "./governance/routeDisabled";
+import type { ModeEnv } from "./mode";
+import type { BuildInfoEnv } from "./buildInfo";
 
-type FunnelRecoveryEnv = {
-  TTX_STATE?: KVNamespace;
-};
+type FunnelRecoveryEnv = ModeEnv &
+  BuildInfoEnv & {
+    TTX_STATE?: KVNamespace;
+  };
 
 type ServiceCatalogItem = {
   slug: string;
@@ -137,7 +145,6 @@ const AGGREGATE_LIMIT: RateLimitRule = { max: 10, windowMs: 60_000 };
 const fieldRateLimitBuckets = new Map<string, { count: number; windowStart: number }>();
 
 const RECOVERED_ROUTE_MAP: Record<string, string> = {
-  "/": "/root-funnel.html",
   "/about": "/about.html",
   "/apps/ai-agent-readiness-checker": "/ai-agent-readiness-checker.html",
   "/apps/ai-security-audit": "/ai-security-audit.html",
@@ -375,6 +382,7 @@ const ENGAGEMENT_KEYS = [
   "rag_plan_id",
   "deployment_plan_id",
   "beacon_order_id",
+  "sessionId",
 ] as const;
 
 class ApiError extends Error {
@@ -784,6 +792,14 @@ async function registerQueuePreview(kv: KVNamespace) {
   };
 }
 
+export function redirectWelcomeToRoot(request: Request, pathname: string): Response | null {
+  if (normalizePath(pathname) !== "/welcome") return null;
+  if (request.method === "GET" || request.method === "HEAD") {
+    return Response.redirect(new URL("/", request.url).toString(), 302);
+  }
+  return jsonResponse({ error: "Method not allowed" }, 405, { Allow: "GET, HEAD" });
+}
+
 export function isRecoveredPublicRoute(pathname: string): boolean {
   return resolveRecoveredHtml(pathname) !== null;
 }
@@ -816,6 +832,35 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
 
   try {
     if (method === "POST" && pathname === "/api/growth/track") {
+      if (env.TTX_STATE) {
+        try {
+          const payload = await readJsonBody(request, ["event", "sessionId", "trafficSource", "campaignId"], 4096);
+          const event = typeof payload.event === "string" ? payload.event : "";
+          const sessionId = payload.sessionId;
+          if (isValidSessionId(sessionId) && event) {
+            const allowed = [
+              "visit",
+              "entry_click",
+              "marketplace_click",
+              "service_view",
+              "intake_started",
+              "intake_completed",
+              "checkout_started",
+              "purchase_completed",
+            ];
+            if (allowed.includes(event)) {
+              await recordUsageEvent(env as WorkerEnv, {
+                event: event as Parameters<typeof recordUsageEvent>[1]["event"],
+                sessionId,
+                trafficSource: typeof payload.trafficSource === "string" ? payload.trafficSource : undefined,
+                campaignId: typeof payload.campaignId === "string" ? payload.campaignId : undefined,
+              });
+            }
+          }
+        } catch {
+          // backward-compatible no-op on malformed payloads
+        }
+      }
       return new Response(null, { status: 202 });
     }
 
@@ -874,6 +919,9 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
     }
 
     if (method === "POST" && pathname === "/api/register") {
+      const disabled = routeDisabledInGovernedEnvironment(env, "Public registration pending governance migration");
+      if (disabled) return disabled;
+
       const limited = checkRateLimit(request, "register:write", WRITE_LIMIT);
       if (limited) return limited;
 
@@ -1077,6 +1125,14 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
       processLocalAiDeploymentEngagement(payload, record);
       processNorthstarBeaconEngagement(payload, record);
 
+      if (env.TTX_STATE && isValidSessionId(payload.sessionId)) {
+        void recordUsageEvent(env as WorkerEnv, {
+          event: "intake_started",
+          sessionId: payload.sessionId as string,
+          trafficSource: typeof payload.source === "string" ? payload.source : undefined,
+        }).catch(() => {});
+      }
+
       return jsonResponse(
         {
           engagement_id,
@@ -1145,7 +1201,12 @@ export async function handleRecoveredFunnelApi(request: Request, url: URL, env: 
       );
     }
 
-    const fulfillmentResponse = await handleFulfillmentAgentApi(request, pathname, method);
+    const fulfillmentResponse = await handleFulfillmentAgentApi(
+      request,
+      pathname,
+      method,
+      env as WorkerEnv & BackboneEnv & AiGatewayEnv,
+    );
     if (fulfillmentResponse) {
       return fulfillmentResponse;
     }

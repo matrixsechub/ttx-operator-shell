@@ -1,5 +1,7 @@
 export type RepoLayer = "src" | "worker" | "msh-ops" | "scripts" | "tests" | "other";
 
+export type AgentActionClass = "C0" | "C1" | "C2" | "C3" | "C4" | "C5" | "C6";
+
 export type IssueSeverity = "error" | "warn" | "info";
 
 export type RefactorActionKind =

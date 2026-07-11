@@ -8,6 +8,13 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to validate
+        required: false
+        default: feat/operator-governance-phase-2b
+        type: string
 
 permissions:
   contents: read
@@ -27,10 +34,17 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - run: node scripts/ci/workflow-permissions-lint.mjs
 
       - run: node scripts/ci/audit-action-pins.mjs
+
+      - run: node scripts/ci/verify-mshops-workflow-contract.mjs
+
+      - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
+
+      - run: npm run verify:cron-triggers
 
       - name: Sensitive path advisory
         if: github.event_name == 'pull_request'
@@ -39,13 +53,33 @@ jobs:
         run: node scripts/ci/workflow-permissions-lint.mjs --advisory "$BASE_SHA"
 
   build-test:
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/_reusable-build-test.yml
+    secrets: inherit
+    with:
+      ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
     permissions:
       contents: read
       actions: write
 
   wrangler-dry-run:
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    secrets: inherit
+    with:
+      ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
     permissions:
       contents: read
       actions: write
+
+  fork-pr-storefront-blocked:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::warning::Private MSHOPS checkout skipped for fork PR — secret-free pr-gate controls still run."
+          echo "MSHOPS_CHECKOUT::SKIPPED_FORK_PR"

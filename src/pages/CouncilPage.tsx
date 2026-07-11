@@ -1,4 +1,5 @@
 import { GovernanceStatePanel } from "../components/GovernanceStatePanel";
+import { PrismCouncilAdvisoryPanel } from "../components/PrismCouncilAdvisoryPanel";
 import { Link } from "react-router-dom";
 
 /** Governance / council surface — FedGrade and policy oversight entry. */
@@ -16,6 +17,10 @@ export function CouncilPage() {
 
         <div className="mt-8">
           <GovernanceStatePanel />
+        </div>
+
+        <div className="mt-8">
+          <PrismCouncilAdvisoryPanel />
         </div>
 
         <div className="mt-8 flex flex-wrap gap-4">

@@ -3,6 +3,11 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  PLACEHOLDER_DESCRIPTION,
+  extractAssetReferences,
+  isPlaceholderHtml,
+} from "../lib/storefrontBundle.mjs";
 import { STAGING_WORKER } from "./verify-staging-config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -14,7 +19,7 @@ export const SMOKE_ROUTE_CONTRACTS = [
     path: "/",
     expectStatus: 200,
     contentTypeIncludes: "text/html",
-    htmlIncludes: ["MSHOPS.NET", "Service Selection Funnel"],
+    htmlIncludes: ["Ecosystem Entry", "Operator Terminal"],
     securityHeaders: true,
   },
   {
@@ -23,7 +28,29 @@ export const SMOKE_ROUTE_CONTRACTS = [
     path: "/marketplace",
     expectStatus: 200,
     contentTypeIncludes: "text/html",
-    htmlIncludes: ["MSH OPS Storefront"],
+    htmlIncludes: ["MSH OPS Storefront", 'name="mshops-surface"', 'id="root"'],
+    htmlForbidden: [PLACEHOLDER_DESCRIPTION, "Ecosystem Entry", "Service Selection Funnel"],
+    validateStorefrontAssets: true,
+    securityHeaders: true,
+  },
+  {
+    name: "marketplace_operator_view",
+    method: "GET",
+    path: "/marketplace?view=operator",
+    expectStatus: 200,
+    contentTypeIncludes: "text/html",
+    htmlIncludes: ["MSH OPS Storefront", 'name="mshops-surface"', 'id="root"'],
+    htmlForbidden: [PLACEHOLDER_DESCRIPTION, "Ecosystem Entry", "Service Selection Funnel"],
+    validateStorefrontAssets: true,
+    securityHeaders: true,
+  },
+  {
+    method: "GET",
+    path: "/marketplace/",
+    expectStatus: 200,
+    contentTypeIncludes: "text/html",
+    htmlIncludes: ["MSH OPS Storefront", 'name="mshops-surface"'],
+    htmlForbidden: [PLACEHOLDER_DESCRIPTION],
     securityHeaders: true,
   },
   {
@@ -175,6 +202,43 @@ async function probe(baseUrl, contract) {
     }
   }
 
+  if (contract.htmlForbidden?.length) {
+    for (const marker of contract.htmlForbidden) {
+      if (text.includes(marker)) {
+        result = "FAIL";
+        notes.push(`forbidden HTML marker present: ${marker}`);
+      }
+    }
+  }
+
+  if (contract.validateStorefrontAssets && text) {
+    if (isPlaceholderHtml(text)) {
+      result = "FAIL";
+      notes.push("placeholder-only storefront HTML detected");
+    }
+    if (text.includes("storefront shell missing")) {
+      result = "FAIL";
+      notes.push("storefront shell failure body detected");
+    }
+    const assetRefs = extractAssetReferences(text);
+    if (assetRefs.length === 0) {
+      result = "FAIL";
+      notes.push("missing generated /app/assets references");
+    }
+    for (const assetPath of assetRefs) {
+      const assetUrl = new URL(assetPath, baseUrl).toString();
+      const assetResponse = await fetch(assetUrl, {
+        method: "GET",
+        redirect: "manual",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      if (assetResponse.status !== 200) {
+        result = "FAIL";
+        notes.push(`asset ${assetPath} returned ${assetResponse.status}`);
+      }
+    }
+  }
+
   if (contract.redirectIncludes && (!location || !location.includes(contract.redirectIncludes))) {
     result = "FAIL";
     notes.push(`redirect location ${location ?? "(none)"} missing ${contract.redirectIncludes}`);
@@ -228,6 +292,8 @@ async function probe(baseUrl, contract) {
     notes.push("response appears to expose secret material");
   }
 
+  const assetRefs = contract.validateStorefrontAssets ? extractAssetReferences(text) : [];
+
   return {
     name: contract.name,
     method: contract.method,
@@ -237,6 +303,13 @@ async function probe(baseUrl, contract) {
     result,
     duration_ms: durationMs,
     notes,
+    asset_validation: contract.validateStorefrontAssets
+      ? {
+          references: assetRefs,
+          js_assets: assetRefs.filter((ref) => ref.endsWith(".js")),
+          css_assets: assetRefs.filter((ref) => ref.endsWith(".css")),
+        }
+      : undefined,
   };
 }
 
