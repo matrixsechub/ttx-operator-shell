@@ -56,6 +56,7 @@ export function useTelemetry() {
   // Phase 32 — same reasoning as every other resource above: one more
   // useApiResource call feeding average/last score, no new hook needed.
   const ttxScores = useApiResource(() => ttxScoringService.listScores(), { pollIntervalMs: POLL_INTERVAL_MS });
+  const aiUsage = useApiResource(api.getAiUsage, { pollIntervalMs: POLL_INTERVAL_MS });
   const { operator } = useAuth();
 
   return {
@@ -67,6 +68,7 @@ export function useTelemetry() {
     securityEvents,
     ttxState,
     ttxScores,
+    aiUsage,
     operator,
   };
 }

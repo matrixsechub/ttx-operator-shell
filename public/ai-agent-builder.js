@@ -105,11 +105,24 @@ function prefillFromQueryParams() {
       goalField.value = agentGoal;
     }
   }
+
+  const intentText = params.get("intent");
+  if (intentText) {
+    const nameField = form.elements.namedItem("package_name");
+    if (nameField instanceof HTMLInputElement && !nameField.value) {
+      nameField.value = intentText.slice(0, 240);
+    }
+  }
 }
 
 function collectAnswers(form) {
   const formData = new FormData(form);
   const params = new URLSearchParams(window.location.search);
+  const diagnostic = buildDiagnosticContext(params);
+  const intentParam = params.get("intent");
+  if (intentParam) {
+    diagnostic.captured_intent = intentParam;
+  }
   return {
     source_type: String(formData.get("source_type") || "not_sure"),
     source_reference_id: String(formData.get("source_reference_id") || "").trim() || undefined,
@@ -128,8 +141,8 @@ function collectAnswers(form) {
     volume_level: String(formData.get("volume_level") || "unknown"),
     timeline: String(formData.get("timeline") || "exploring"),
     budget_band: String(formData.get("budget_band") || "not_sure"),
-    diagnostic_context: buildDiagnosticContext(params),
-    source_route: "/apps/ai-agent-builder",
+    diagnostic_context: diagnostic,
+    source_route: params.get("source_route") || "/apps/ai-agent-builder",
   };
 }
 

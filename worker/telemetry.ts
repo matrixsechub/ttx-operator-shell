@@ -9,6 +9,9 @@ const SESSION_EVENTS_KEY = "telemetry:session-events";
 const GOVERNANCE_EVENTS_KEY = "telemetry:governance-events";
 const FAILURE_LOG_KEY = "health:failures";
 const GHOST_FRESHNESS_KEY = "telemetry:ghost-freshness";
+const AI_USAGE_KEY = "telemetry:ai-usage";
+const MARKETPLACE_AI_KEY = "telemetry:marketplace-ai";
+const AI_FRAUD_SIGNALS_KEY = "telemetry:ai-fraud-signals";
 const MAX_LATENCY_SAMPLES = 200;
 const MAX_SESSION_EVENTS = 100;
 const MAX_GOVERNANCE_EVENTS = 50;
@@ -284,6 +287,117 @@ export async function getExtendedTelemetry(env: TelemetryContextEnv): Promise<Ex
   }
 
   return { ...summary, routeLatency, sessionEventLog, governanceEvents };
+}
+
+export interface AiUsageRollup {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  costEstimateUsd: number;
+  requestCount: number;
+  denialCount: number;
+  byAgent: Record<string, number>;
+  byProfile: Record<string, number>;
+  updatedAt: string;
+  environment: string;
+}
+
+function defaultAiUsageRollup(environment: string): AiUsageRollup {
+  return {
+    promptTokens: 0,
+    completionTokens: 0,
+    totalTokens: 0,
+    costEstimateUsd: 0,
+    requestCount: 0,
+    denialCount: 0,
+    byAgent: {},
+    byProfile: {},
+    updatedAt: new Date().toISOString(),
+    environment,
+  };
+}
+
+export async function getAiUsageRollup(env: TelemetryContextEnv): Promise<AiUsageRollup> {
+  const environment = resolveTelemetryEnvironment(env);
+  try {
+    const raw = await env.TTX_STATE.get(AI_USAGE_KEY);
+    if (raw) {
+      return { ...defaultAiUsageRollup(environment), ...(JSON.parse(raw) as AiUsageRollup), environment };
+    }
+  } catch {
+    await recordSubsystemFailure(env, "kv", "ai usage rollup read failed");
+  }
+  return defaultAiUsageRollup(environment);
+}
+
+async function writeAiUsageRollup(env: TelemetryContextEnv, rollup: AiUsageRollup): Promise<void> {
+  await env.TTX_STATE.put(AI_USAGE_KEY, JSON.stringify(rollup), { expirationTtl: 7 * 24 * 60 * 60 });
+}
+
+export async function recordAiGatewayUsage(
+  env: TelemetryContextEnv,
+  sample: {
+    agentId: string;
+    profile: string;
+    model: string;
+    promptTokens: number;
+    completionTokens: number;
+    surface: string;
+  },
+): Promise<void> {
+  const environment = resolveTelemetryEnvironment(env);
+  const rollup = await getAiUsageRollup(env);
+  rollup.promptTokens += sample.promptTokens;
+  rollup.completionTokens += sample.completionTokens;
+  rollup.totalTokens += sample.promptTokens + sample.completionTokens;
+  rollup.requestCount += 1;
+  rollup.costEstimateUsd = Math.round((rollup.costEstimateUsd + 0.0001 * (sample.promptTokens + sample.completionTokens)) * 10000) / 10000;
+  rollup.byAgent[sample.agentId] = (rollup.byAgent[sample.agentId] ?? 0) + 1;
+  rollup.byProfile[sample.profile] = (rollup.byProfile[sample.profile] ?? 0) + 1;
+  rollup.updatedAt = new Date().toISOString();
+  rollup.environment = environment;
+  await writeAiUsageRollup(env, rollup);
+  void sample.model;
+  void sample.surface;
+}
+
+export async function recordAiGatewayDenial(
+  env: TelemetryContextEnv,
+  agentId: string,
+  reason: string,
+): Promise<void> {
+  const rollup = await getAiUsageRollup(env);
+  rollup.denialCount += 1;
+  rollup.byAgent[agentId] = (rollup.byAgent[agentId] ?? 0) + 1;
+  rollup.updatedAt = new Date().toISOString();
+  await writeAiUsageRollup(env, rollup);
+  void reason;
+}
+
+export async function recordMarketplaceAiEvent(
+  env: TelemetryContextEnv,
+  routeKey: string,
+  success: boolean,
+): Promise<void> {
+  try {
+    const raw = await env.TTX_STATE.get(MARKETPLACE_AI_KEY);
+    const events: { routeKey: string; success: boolean; ts: string }[] = raw
+      ? (JSON.parse(raw) as { routeKey: string; success: boolean; ts: string }[])
+      : [];
+    events.push({ routeKey, success, ts: new Date().toISOString() });
+    await env.TTX_STATE.put(MARKETPLACE_AI_KEY, JSON.stringify(events.slice(-100)), {
+      expirationTtl: 7 * 24 * 60 * 60,
+    });
+    if (routeKey === "fraud-score") {
+      await env.TTX_STATE.put(
+        AI_FRAUD_SIGNALS_KEY,
+        JSON.stringify({ routeKey, success, ts: new Date().toISOString() }),
+        { expirationTtl: 7 * 24 * 60 * 60 },
+      );
+    }
+  } catch {
+    await recordSubsystemFailure(env, "kv", "marketplace ai event write failed");
+  }
 }
 
 export async function handleTelemetryRoute(

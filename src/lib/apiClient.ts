@@ -10,6 +10,7 @@ import type {
   Operator,
   SystemStateResponse,
   SystemStatus,
+  AiUsageResponse,
 } from "./types";
 import { getToken, getStoredIdentity } from "./authToken";
 
@@ -137,4 +138,5 @@ export const api = {
     request<ExperimentationAssignmentResponse>(
       `/api/experimentation/assignment?sessionId=${encodeURIComponent(sessionId)}`,
     ),
+  getAiUsage: () => request<AiUsageResponse>("/api/ai/usage"),
 };

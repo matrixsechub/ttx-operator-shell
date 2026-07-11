@@ -80,6 +80,26 @@ export function FlowTracker() {
   }, [location.pathname]);
 
   useEffect(() => {
+    const page = location.pathname || "/";
+    void fetch(
+      `/api/flow/experiment/assignment?sessionId=${encodeURIComponent(getOrCreateSessionId())}&page=${encodeURIComponent(page)}`,
+    )
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (payload?.variant === "B" && payload.experiment) {
+          document.body.dataset.flowExperimentVariant = "B";
+          document.body.dataset.flowExperimentId = payload.experiment.id;
+        } else {
+          delete document.body.dataset.flowExperimentVariant;
+          delete document.body.dataset.flowExperimentId;
+        }
+      })
+      .catch(() => {
+        // Assignment is optional for rendering.
+      });
+  }, [location.pathname]);
+
+  useEffect(() => {
     function onClick() {
       clickCount.current += 1;
     }

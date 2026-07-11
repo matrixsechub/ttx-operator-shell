@@ -18,6 +18,7 @@ export function TelemetryPanel() {
     securityEvents,
     ttxState,
     ttxScores,
+    aiUsage,
     operator,
   } = useTelemetry();
 
@@ -64,6 +65,9 @@ export function TelemetryPanel() {
   const ttxAverageScore =
     ttxScoreList.length > 0 ? Math.round(ttxScoreList.reduce((sum, s) => sum + s.score, 0) / ttxScoreList.length) : null;
   const ttxLastScore = [...ttxScoreList].sort((a, b) => b.computedAt.localeCompare(a.computedAt))[0];
+
+  const aiGatewayState = systemState.result?.ok ? systemState.result.data.state.aiGateway : null;
+  const aiUsageRollup = aiUsage.result?.ok ? aiUsage.result.data.rollup : aiGatewayState?.usageRollup ?? null;
 
   return (
     <div id="telemetry-panel" className="op-panel rounded-sm p-4">
@@ -174,6 +178,24 @@ export function TelemetryPanel() {
                 {ttxCurrentPhase.scenarioTitle} ({ttxCurrentPhase.scenarioSource}) — {ttxCurrentPhase.title}
               </span>
               {ttxLastInject && <span className="text-op-text-dim">{ttxLastInject}</span>}
+            </div>
+          )}
+        </InfoCard>
+
+        <InfoCard label="AI Gateway">
+          {!aiUsage.result && !aiGatewayState ? (
+            <span className="text-xs italic text-op-text-dim">checking…</span>
+          ) : !aiUsageRollup ? (
+            <span className="text-xs italic text-op-text-dim">unavailable</span>
+          ) : (
+            <div className="flex flex-col gap-0.5 text-xs">
+              <span className="text-op-text">
+                {aiUsageRollup.requestCount} inferences · {aiUsageRollup.totalTokens} tokens
+              </span>
+              <span className="text-op-text-dim">
+                denials {aiUsageRollup.denialCount}
+                {aiGatewayState?.gatewayHealth && ` · ${aiGatewayState.gatewayHealth}`}
+              </span>
             </div>
           )}
         </InfoCard>
