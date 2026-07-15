@@ -16,6 +16,7 @@ import { handleMarketplaceEdgeRoute } from "./marketplaceEdge";
 import { handleHsxEdgeRoute } from "./hsxEdge";
 import type { WorkerEnv } from "./env";
 import { proxyLabel, resolveSurfaceMode, routeStorefrontSurface } from "./surface";
+import { proxySurfaceApiToOrigin } from "./surfaceApiProxy";
 import { redirectToCanonicalEntry } from "./canonical";
 import type { BackboneEnv } from "./backboneEnv";
 import {
@@ -136,6 +137,26 @@ export default {
         return apiAuthBlocked;
       }
 
+      const fedgradeResponse = handleFedGradeRoute(request, pathname, env);
+      if (fedgradeResponse) return fedgradeResponse;
+
+      const marketplaceProtected = await handleMarketplaceEdgeRoute(request, pathname, edgeEnv);
+      if (marketplaceProtected) return marketplaceProtected;
+
+      const hsxProtected = await handleHsxEdgeRoute(request, pathname, edgeEnv);
+      if (hsxProtected) return hsxProtected;
+
+      if (pathname === CATALOG_PATH) return serveCatalog(request);
+
+      // MSHOPS workers are edge/security surfaces. Any API not fully handled
+      // above is forwarded to the canonical Worker before code can touch
+      // Durable Object or HARNESS bindings that those manifests do not own.
+      const surfaceProxy = await proxySurfaceApiToOrigin(request, url, edgeEnv, mode);
+      if (surfaceProxy) {
+        await recordTelemetrySample(env, pathname, Date.now() - apiStarted, surfaceProxy.status);
+        return surfaceProxy;
+      }
+
       const cockpitBlocked = await enforceCockpitSession(request, env as WorkerEnv & BackboneEnv, pathname);
       if (cockpitBlocked) {
         await recordTelemetrySample(env, pathname, Date.now() - apiStarted, cockpitBlocked.status);
@@ -169,17 +190,6 @@ export default {
           return unavailable;
         }
       }
-
-      const fedgradeResponse = handleFedGradeRoute(request, pathname, env);
-      if (fedgradeResponse) return fedgradeResponse;
-
-      const marketplaceProtected = await handleMarketplaceEdgeRoute(request, pathname, edgeEnv);
-      if (marketplaceProtected) return marketplaceProtected;
-
-      const hsxProtected = await handleHsxEdgeRoute(request, pathname, edgeEnv);
-      if (hsxProtected) return hsxProtected;
-
-      if (pathname === CATALOG_PATH) return serveCatalog(request);
 
       if (pathname.startsWith(ENGINE_PREFIX)) {
         const engineResponse = handleEngineRoute(request, pathname, env);
