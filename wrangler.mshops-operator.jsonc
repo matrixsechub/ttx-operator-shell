@@ -16,7 +16,7 @@
   "vars": {
     "MSHOPS_SURFACE": "operator",
     "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
-    "ORIGIN_URL": "https://mshops-operator.sogellagepul.workers.dev",
+    "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev",
     "OPERATOR_ROLE": "operator",
     "OPERATOR_ACCESS_LEVEL": "internal",
     "DEPLOY_ENV": "production",
