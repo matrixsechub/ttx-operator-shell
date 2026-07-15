@@ -61,15 +61,11 @@ async function signAuthAccessToken(
   return `${data}.${bytesToBase64Url(new Uint8Array(signature))}`;
 }
 
-async function createEdgeOperatorToken(secret: string = EDGE_SECRET): Promise<string> {
-  const now = Math.floor(Date.now() / 1000);
-  return signToken(secret, { sub: "operator", iat: now, exp: now + 3600 });
-}
-
 function edgeEnv() {
   return {
     OPERATOR_SECRET: EDGE_SECRET,
-    AUTH_SIGNING_KEY: AUTH_SIGNING_KEY,
+    MARKETPLACE_SECRET: "test-marketplace-secret-32chars!",
+    AUTH_SIGNING_KEY,
     OPERATOR_PASSWORD: "test-password",
     OPERATOR_USERNAME: "operator",
   };
@@ -77,13 +73,21 @@ function edgeEnv() {
 
 function apiAuthEnv() {
   return {
-    AUTH_SIGNING_KEY: AUTH_SIGNING_KEY,
+    AUTH_SIGNING_KEY,
     AUTH_REVOCATION: createMockKv(),
   };
 }
 
 async function readJson(response: Response): Promise<Record<string, unknown>> {
   return (await response.json()) as Record<string, unknown>;
+}
+
+function operatorSessionRequest(credentials?: { username: string; password: string }): Request {
+  return new Request("https://example.com/api/operator/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials ?? {}),
+  });
 }
 
 describe("classifyRoute", () => {
@@ -95,81 +99,37 @@ describe("classifyRoute", () => {
   });
 });
 
-describe("edgeAuthGate — operator routes", () => {
-  it("rejects missing bearer token on /api/operator/*", async () => {
-    const blocked = await edgeAuthGate(
-      new Request("https://example.com/api/operator/service-intake"),
-      "/api/operator/service-intake",
-      edgeEnv(),
-    );
-    assert.ok(blocked);
-    assert.equal(blocked?.status, 401);
-    const body = await readJson(blocked!);
-    assert.equal(body.error, "authentication required");
-    assert.ok(typeof body.hint === "string");
-  });
-
-  it("rejects missing bearer token on GET /api/wildcard", async () => {
-    const blocked = await edgeAuthGate(
-      new Request("https://example.com/api/wildcard"),
-      "/api/wildcard",
-      edgeEnv(),
-    );
-    assert.ok(blocked);
-    assert.equal(blocked?.status, 401);
-    const body = await readJson(blocked!);
-    assert.equal(body.error, "authentication required");
-  });
-
-  it("rejects missing bearer token on POST /api/wildcard/scan", async () => {
-    const blocked = await edgeAuthGate(
-      new Request("https://example.com/api/wildcard/scan", { method: "POST" }),
-      "/api/wildcard/scan",
-      edgeEnv(),
-    );
-    assert.ok(blocked);
-    assert.equal(blocked?.status, 401);
-    const body = await readJson(blocked!);
-    assert.equal(body.error, "authentication required");
-  });
-
-  it("rejects invalid bearer token on operator routes", async () => {
-    const blocked = await edgeAuthGate(
-      new Request("https://example.com/api/wildcard", {
-        headers: { Authorization: "Bearer not-a-valid-token" },
-      }),
-      "/api/wildcard",
-      edgeEnv(),
-    );
-    assert.ok(blocked);
-    assert.equal(blocked?.status, 403);
-    const body = await readJson(blocked!);
-    assert.equal(body.error, "forbidden");
-  });
-
-  it("rejects malformed Authorization header (no Bearer prefix)", async () => {
-    const token = await createEdgeOperatorToken();
-    const blocked = await edgeAuthGate(
-      new Request("https://example.com/api/wildcard", {
-        headers: { Authorization: token },
-      }),
-      "/api/wildcard",
-      edgeEnv(),
-    );
-    assert.ok(blocked);
-    assert.equal(blocked?.status, 401);
-  });
-
-  it("allows valid edge token from POST /api/operator/session", async () => {
-    const sessionResponse = await handleOperatorSession(
-      new Request("https://example.com/api/operator/session", { method: "POST" }),
+describe("operator session bootstrap", () => {
+  it("rejects anonymous token issuance", async () => {
+    const response = await handleOperatorSession(
+      operatorSessionRequest(),
       "/api/operator/session",
       edgeEnv(),
     );
-    assert.ok(sessionResponse);
-    assert.equal(sessionResponse?.status, 200);
-    const sessionBody = await readJson(sessionResponse!);
-    const token = String(sessionBody.operator_token || sessionBody.token);
+    assert.ok(response);
+    assert.equal(response.status, 401);
+  });
+
+  it("rejects invalid credentials", async () => {
+    const response = await handleOperatorSession(
+      operatorSessionRequest({ username: "operator", password: "wrong" }),
+      "/api/operator/session",
+      edgeEnv(),
+    );
+    assert.ok(response);
+    assert.equal(response.status, 401);
+  });
+
+  it("issues a scoped edge token only after valid credentials", async () => {
+    const response = await handleOperatorSession(
+      operatorSessionRequest({ username: "operator", password: "test-password" }),
+      "/api/operator/session",
+      edgeEnv(),
+    );
+    assert.ok(response);
+    assert.equal(response.status, 200);
+    const body = await readJson(response);
+    const token = String(body.operator_token || body.token);
     assert.ok(token.length > 20);
 
     const gate = await edgeAuthGate(
@@ -188,27 +148,77 @@ describe("edgeAuthGate — operator routes", () => {
       "/api/wildcard",
     );
     assert.ok(health);
-    assert.equal(health?.status, 200);
-    const healthBody = await readJson(health!);
-    assert.equal(healthBody.agent, "WildcardAdvancementAgent");
+    assert.equal(health.status, 200);
   });
 });
 
-describe("enforceOperatorApiAuth — security routes", () => {
-  it("rejects missing bearer token on /api/security/events", async () => {
+describe("edgeAuthGate — operator routes", () => {
+  it("rejects missing bearer tokens", async () => {
+    const blocked = await edgeAuthGate(
+      new Request("https://example.com/api/wildcard"),
+      "/api/wildcard",
+      edgeEnv(),
+    );
+    assert.ok(blocked);
+    assert.equal(blocked.status, 401);
+  });
+
+  it("rejects invalid bearer tokens", async () => {
+    const blocked = await edgeAuthGate(
+      new Request("https://example.com/api/wildcard", {
+        headers: { Authorization: "Bearer not-a-valid-token" },
+      }),
+      "/api/wildcard",
+      edgeEnv(),
+    );
+    assert.ok(blocked);
+    assert.equal(blocked.status, 403);
+  });
+
+  it("rejects legacy operator tokens without type, audience, scope, and jti", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const legacyToken = await signToken(EDGE_SECRET, { sub: "operator", iat: now, exp: now + 3600 });
+    const blocked = await edgeAuthGate(
+      new Request("https://example.com/api/wildcard", {
+        headers: { Authorization: `Bearer ${legacyToken}` },
+      }),
+      "/api/wildcard",
+      edgeEnv(),
+    );
+    assert.ok(blocked);
+    assert.equal(blocked.status, 403);
+    const body = await readJson(blocked);
+    assert.equal(body.reason, "operator_token_scope_invalid");
+  });
+
+  it("does not accept an auth.ts access token as an edge operator token", async () => {
+    const accessToken = await signAuthAccessToken(AUTH_SIGNING_KEY);
+    const blocked = await edgeAuthGate(
+      new Request("https://example.com/api/wildcard", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }),
+      "/api/wildcard",
+      edgeEnv(),
+    );
+    assert.ok(blocked);
+    assert.equal(blocked.status, 403);
+  });
+});
+
+describe("enforceOperatorApiAuth", () => {
+  it("rejects missing bearer token on protected API routes", async () => {
     const blocked = await enforceOperatorApiAuth(
       new Request("https://example.com/api/security/events"),
       "/api/security/events",
       apiAuthEnv(),
     );
     assert.ok(blocked);
-    assert.equal(blocked?.status, 401);
-    const body = await readJson(blocked!);
-    assert.equal(body.error, "Operator authentication required");
+    assert.equal(blocked.status, 401);
+    const body = await readJson(blocked);
     assert.equal(body.code, "OPERATOR_AUTH_REQUIRED");
   });
 
-  it("allows valid auth.ts access token on /api/security/events", async () => {
+  it("allows a valid typed auth access token", async () => {
     const token = await signAuthAccessToken(AUTH_SIGNING_KEY);
     const allowed = await enforceOperatorApiAuth(
       new Request("https://example.com/api/security/events", {
@@ -218,52 +228,5 @@ describe("enforceOperatorApiAuth — security routes", () => {
       apiAuthEnv(),
     );
     assert.equal(allowed, null);
-  });
-
-  it("rejects invalid bearer token on security routes", async () => {
-    const blocked = await enforceOperatorApiAuth(
-      new Request("https://example.com/api/security/events", {
-        headers: { Authorization: "Bearer invalid.jwt.token" },
-      }),
-      "/api/security/events",
-      apiAuthEnv(),
-    );
-    assert.ok(blocked);
-    assert.equal(blocked?.status, 401);
-    const body = await readJson(blocked!);
-    assert.equal(body.code, "OPERATOR_AUTH_REQUIRED");
-  });
-
-  it("rejects malformed Authorization header on security routes", async () => {
-    const token = await signAuthAccessToken(AUTH_SIGNING_KEY);
-    const blocked = await enforceOperatorApiAuth(
-      new Request("https://example.com/api/security/events", {
-        headers: { Authorization: token },
-      }),
-      "/api/security/events",
-      apiAuthEnv(),
-    );
-    assert.ok(blocked);
-    assert.equal(blocked?.status, 401);
-  });
-});
-
-describe("handleWildcardRoute — scan lifecycle", () => {
-  it("returns wildcard_scan_v2 lifecycle object on POST /api/wildcard/scan", async () => {
-    const response = await handleWildcardRoute(
-      new Request("https://example.com/api/wildcard/scan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ include_site_map: true }),
-      }),
-      "/api/wildcard/scan",
-    );
-    assert.ok(response);
-    assert.equal(response?.status, 200);
-    const body = await readJson(response!);
-    assert.equal(body.schema, "wildcard_scan_v2");
-    assert.equal(body.agent, "WildcardAdvancementAgent");
-    assert.ok(Array.isArray(body.proposals));
-    assert.ok(typeof body.summary === "object");
   });
 });

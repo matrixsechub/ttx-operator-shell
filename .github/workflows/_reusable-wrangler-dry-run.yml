@@ -37,7 +37,12 @@ jobs:
 
       - run: npm run build
 
-      - run: mkdir -p .artifacts/wrangler-production .artifacts/wrangler-staging
+      - run: >-
+          mkdir -p
+          .artifacts/wrangler-production
+          .artifacts/wrangler-staging
+          .artifacts/wrangler-mshops-public
+          .artifacts/wrangler-mshops-operator
 
       - name: Wrangler production dry run
         run: npx wrangler deploy --dry-run --outdir .artifacts/wrangler-production
@@ -45,11 +50,27 @@ jobs:
       - name: Wrangler staging dry run
         run: npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging
 
+      - name: Wrangler MSHOPS public dry run
+        run: >-
+          npx wrangler deploy
+          --config wrangler.mshops-public.jsonc
+          --dry-run
+          --outdir .artifacts/wrangler-mshops-public
+
+      - name: Wrangler MSHOPS operator dry run
+        run: >-
+          npx wrangler deploy
+          --config wrangler.mshops-operator.jsonc
+          --dry-run
+          --outdir .artifacts/wrangler-mshops-operator
+
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: wrangler-dry-run-metadata
           path: |
             .artifacts/wrangler-production
             .artifacts/wrangler-staging
+            .artifacts/wrangler-mshops-public
+            .artifacts/wrangler-mshops-operator
           retention-days: 7
           if-no-files-found: error

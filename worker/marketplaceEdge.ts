@@ -2,12 +2,6 @@ import { signToken, makeCtxHash } from "./edge/crypto";
 
 export interface MarketplaceEdgeEnv {
   MARKETPLACE_SECRET?: string;
-  OPERATOR_SECRET?: string;
-  AUTH_SIGNING_KEY?: string;
-}
-
-function marketplaceSecret(env: MarketplaceEdgeEnv): string | undefined {
-  return env.MARKETPLACE_SECRET || env.OPERATOR_SECRET || env.AUTH_SIGNING_KEY;
 }
 
 export async function handleMarketplaceEdgeRoute(
@@ -16,7 +10,7 @@ export async function handleMarketplaceEdgeRoute(
   env: MarketplaceEdgeEnv,
 ): Promise<Response | null> {
   if (pathname === "/api/marketplace/session" && request.method === "POST") {
-    const secret = marketplaceSecret(env);
+    const secret = env.MARKETPLACE_SECRET;
     if (!secret) {
       return Response.json({ error: "MARKETPLACE_SECRET not configured" }, { status: 503 });
     }
@@ -25,6 +19,8 @@ export async function handleMarketplaceEdgeRoute(
     const token = await signToken(secret, {
       sub: "marketplace-session",
       ctx: ctxHash,
+      jti: crypto.randomUUID(),
+      iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 600,
     });
     return Response.json({ token, expires_in: 600 }, { status: 200 });
