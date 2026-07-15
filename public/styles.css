@@ -8,11 +8,15 @@
   --muted: #97a0a8;
   --gold: #f2c14e;
   --blue: #52b8ff;
+  /* Warning is amber, not gold: it previously shared #f2c14e with --gold,
+     letting warnings impersonate the authority color (Pearl Spectral
+     doctrine violation). This divergence is the one deliberate global
+     visual change of the token migration. */
   --color-success: #7dffb0;
-  --color-warning: #f2c14e;
+  --color-warning: #ffb02e;
   --color-critical: #ff8b8b;
   --color-success-bg: rgba(125, 255, 176, 0.12);
-  --color-warning-bg: rgba(242, 193, 78, 0.14);
+  --color-warning-bg: rgba(255, 176, 46, 0.14);
   --color-critical-bg: rgba(255, 139, 139, 0.13);
   --neon-blue: #52b8ff;
   --neon-cyan: #4dfcf0;
@@ -89,6 +93,38 @@
   --status-warning-rgb: 251, 191, 36;
   --status-high-rgb: 251, 146, 60;
   --status-critical-rgb: 248, 113, 113;
+
+  /* Pearl Spectral surface-role tokens. Defaults restate the exact dark
+     literals previously inlined in the rules below, so pages that never
+     opt into a zone resolve pixel-identically. Zone scopes in
+     styles/msh-spectral-tokens.css re-value these by semantic role.
+     (--line-soft normalizes the former 0.04/0.05/0.06 white hairlines to
+     one 0.05 token — same semantic role, imperceptible delta.) */
+  --line-soft: rgba(255, 255, 255, 0.05);
+  --surface-panel: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  --surface-panel-solid: linear-gradient(180deg, rgba(16, 20, 26, 0.98), rgba(8, 11, 15, 0.98));
+  --surface-panel-tint: radial-gradient(circle at top right, rgba(82, 184, 255, 0.09), transparent 30%);
+  --panel-halo: radial-gradient(circle, rgba(242, 193, 78, 0.08), transparent 70%);
+  --topbar-veil: linear-gradient(180deg, rgba(4, 5, 8, 0.94), rgba(4, 5, 8, 0.84));
+  --topbar-edge: linear-gradient(90deg, transparent, rgba(82, 184, 255, 0.34), transparent);
+  --scrim-page:
+    radial-gradient(circle at 14% 18%, rgba(82, 184, 255, 0.14), transparent 24%),
+    radial-gradient(circle at 82% 24%, rgba(242, 193, 78, 0.11), transparent 24%),
+    radial-gradient(circle at 28% 84%, rgba(177, 140, 255, 0.1), transparent 26%),
+    radial-gradient(circle at 88% 88%, rgba(77, 252, 240, 0.09), transparent 24%),
+    linear-gradient(180deg, #040507 0%, #07090d 34%, #040507 100%);
+  --scrim-haze:
+    radial-gradient(circle at 20% 28%, rgba(82, 184, 255, 0.08), transparent 22%),
+    radial-gradient(circle at 78% 76%, rgba(242, 193, 78, 0.08), transparent 20%);
+  --scrim-lines-opacity: 0.14;
+  --surface-input: rgba(0, 0, 0, 0.35);
+  --surface-overlay: rgba(5, 7, 10, 0.96);
+  --surface-glass-dim: rgba(11, 11, 11, 0.72);
+  --text-soft: rgba(240, 238, 232, 0.78);
+  --line-gold-strong: rgba(242, 193, 78, 0.45);
+  --brand-mark-fill:
+    linear-gradient(145deg, rgba(242, 193, 78, 0.14), rgba(242, 193, 78, 0.03)),
+    rgba(8, 10, 12, 0.94);
 }
 
 * {
@@ -103,12 +139,7 @@ body {
   margin: 0;
   color: var(--text);
   font: 400 16px/1.65 var(--font-body);
-  background:
-    radial-gradient(circle at 14% 18%, rgba(82, 184, 255, 0.14), transparent 24%),
-    radial-gradient(circle at 82% 24%, rgba(242, 193, 78, 0.11), transparent 24%),
-    radial-gradient(circle at 28% 84%, rgba(177, 140, 255, 0.1), transparent 26%),
-    radial-gradient(circle at 88% 88%, rgba(77, 252, 240, 0.09), transparent 24%),
-    linear-gradient(180deg, #040507 0%, #07090d 34%, #040507 100%);
+  background: var(--scrim-page);
   background-size: 140% 140%, 140% 140%, 160% 160%, 160% 160%, 100% 100%;
   animation:
     page-fade-in var(--duration-page-fade) var(--ease-standard) both,
@@ -135,13 +166,11 @@ body::before {
     linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
   background-size: 100% 3px, 100% 48px, 48px 100%;
-  opacity: 0.14;
+  opacity: var(--scrim-lines-opacity);
 }
 
 body::after {
-  background:
-    radial-gradient(circle at 20% 28%, rgba(82, 184, 255, 0.08), transparent 22%),
-    radial-gradient(circle at 78% 76%, rgba(242, 193, 78, 0.08), transparent 20%);
+  background: var(--scrim-haze);
   animation: haze-shift var(--duration-ambient-haze) var(--ease-standard) infinite alternate;
 }
 
@@ -374,14 +403,14 @@ textarea {
 }
 
 .topbar::before {
-  background: linear-gradient(180deg, rgba(4, 5, 8, 0.94), rgba(4, 5, 8, 0.84));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--topbar-veil);
+  border-bottom: 1px solid var(--line-soft);
 }
 
 .topbar::after {
   inset: auto -1rem -1px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(82, 184, 255, 0.34), transparent);
+  background: var(--topbar-edge);
 }
 
 .brand {
@@ -404,9 +433,7 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   color: var(--gold);
-  background:
-    linear-gradient(145deg, rgba(242, 193, 78, 0.14), rgba(242, 193, 78, 0.03)),
-    rgba(8, 10, 12, 0.94);
+  background: var(--brand-mark-fill);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
   letter-spacing: 0.12em;
 }
@@ -637,11 +664,9 @@ textarea {
 .deliverable-card {
   position: relative;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-soft);
   overflow: clip;
-  background:
-    radial-gradient(circle at top right, rgba(82, 184, 255, 0.09), transparent 30%),
-    linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  background: var(--surface-panel-tint), var(--surface-panel);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: var(--shadow-mid);
@@ -693,7 +718,7 @@ textarea {
   width: 13rem;
   height: 13rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(242, 193, 78, 0.08), transparent 70%);
+  background: var(--panel-halo);
   opacity: 0.36;
   pointer-events: none;
   transition:
@@ -722,7 +747,7 @@ textarea {
 
 .bracket {
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-soft);
   border-radius: var(--radius-lg);
 }
 
@@ -967,7 +992,7 @@ textarea {
   justify-content: center;
   min-height: 40px;
   padding: 14px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.015);
   color: var(--text);
@@ -2047,9 +2072,7 @@ textarea {
 .console-badge,
 .architecture-card,
 .modal-panel {
-  background:
-    radial-gradient(circle at top right, rgba(82, 184, 255, 0.08), transparent 30%),
-    linear-gradient(180deg, rgba(16, 20, 26, 0.98), rgba(8, 11, 15, 0.98));
+  background: var(--surface-panel-tint), var(--surface-panel-solid);
   box-shadow: var(--shadow-mid);
 }
 
@@ -2146,9 +2169,7 @@ textarea {
 }
 
 .telemetry-card {
-  background:
-    radial-gradient(circle at top right, rgba(82, 184, 255, 0.08), transparent 30%),
-    linear-gradient(180deg, rgba(16, 20, 26, 0.98), rgba(8, 11, 15, 0.98));
+  background: var(--surface-panel-tint), var(--surface-panel-solid);
   box-shadow: var(--shadow-mid);
 }
 

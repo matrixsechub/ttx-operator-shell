@@ -26,9 +26,11 @@ import { WebhookTriggerPanel } from "./dashboard/WebhookTriggerPanel";
 
 export function Dashboard() {
   return (
-    <OperatorShell telemetry={<SystemTelemetryPanel />}>
+    <OperatorShell zone="pearl" telemetry={<SystemTelemetryPanel />}>
       <div className="flex flex-col gap-6">
-        <SystemHUD />
+        <div className="msh-dense">
+          <SystemHUD />
+        </div>
 
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -38,7 +40,9 @@ export function Dashboard() {
           <EngineStatusIndicator />
         </div>
 
-        <TelemetryPanel />
+        <div className="msh-dense">
+          <TelemetryPanel />
+        </div>
 
         <GovernanceStatePanel />
 
@@ -68,7 +72,7 @@ export function Dashboard() {
           </Link>
         </div>
 
-        <div className="op-panel rounded-sm p-4 xl:hidden">
+        <div className="msh-dense op-panel rounded-sm p-4 xl:hidden">
           <SystemTelemetryPanel compact />
         </div>
 
@@ -76,7 +80,7 @@ export function Dashboard() {
 
         <div>
           <h2 className="mb-3 text-xs uppercase tracking-widest text-op-text-dim">Systems</h2>
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="msh-dense grid grid-cols-1 gap-4 lg:grid-cols-2">
             <OperatorTimeline />
             <MissionBoard />
             <TelemetryRails />

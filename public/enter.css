@@ -49,9 +49,9 @@
   gap: var(--space-3);
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, rgba(16, 20, 26, 0.95), rgba(9, 12, 16, 0.97));
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+  background: var(--surface-panel);
+  border: 1px solid var(--line-soft);
+  box-shadow: var(--shadow-mid);
 }
 
 .path-summary {

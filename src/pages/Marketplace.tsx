@@ -29,7 +29,7 @@ export function Marketplace() {
   }, [items, query]);
 
   return (
-    <OperatorShell telemetry={<SystemTelemetryPanel />}>
+    <OperatorShell zone="pearl" telemetry={<SystemTelemetryPanel />}>
       <div className="flex flex-col gap-5">
         <Breadcrumbs trail={[{ label: "Cockpit", to: "/dashboard" }, { label: "Marketplace" }]} />
 

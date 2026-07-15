@@ -12,7 +12,7 @@ export function MarketplaceCategoryPage() {
   }
 
   return (
-    <OperatorShell>
+    <OperatorShell zone="pearl">
       <CategoryPageBody category={category} />
     </OperatorShell>
   );

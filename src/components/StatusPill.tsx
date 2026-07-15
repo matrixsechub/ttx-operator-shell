@@ -1,10 +1,16 @@
-type Tone = "ok" | "warn" | "danger" | "neutral";
+/* Tones resolve through the Pearl Spectral state tokens (--color-state-*),
+   re-inked per zone. Doctrine: "verified" (green) is for validated evidence
+   only; "ok" means active/engaged, not success; "blocked" is impedance,
+   distinct from real failure ("danger"). */
+type Tone = "ok" | "verified" | "warn" | "danger" | "blocked" | "neutral";
 
 const TONE_CLASSES: Record<Tone, string> = {
-  ok: "border-op-accent/50 text-op-accent bg-op-accent/10",
-  warn: "border-op-amber/50 text-op-amber bg-op-amber/10",
-  danger: "border-op-danger/50 text-op-danger bg-op-danger/10",
-  neutral: "border-op-border-bright text-op-text-dim bg-white/5",
+  ok: "border-state-active/50 text-state-active bg-state-active/10",
+  verified: "border-state-verified/50 text-state-verified bg-state-verified/10",
+  warn: "border-state-warning/50 text-state-warning bg-state-warning/10",
+  danger: "border-state-critical/50 text-state-critical bg-state-critical/10",
+  blocked: "border-state-blocked/50 text-state-blocked bg-state-blocked/10",
+  neutral: "border-op-border-bright text-state-neutral bg-white/5",
 };
 
 export function StatusPill({ tone = "neutral", children }: { tone?: Tone; children: React.ReactNode }) {

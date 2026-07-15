@@ -5,11 +5,11 @@
   z-index: 60;
   width: min(100%, 24rem);
   padding: 1rem;
-  border: 1px solid rgba(242, 193, 78, 0.35);
-  background: rgba(5, 7, 10, 0.96);
-  color: #e8edf2;
+  border: 1px solid var(--line, rgba(242, 193, 78, 0.35));
+  background: var(--surface-overlay, rgba(5, 7, 10, 0.96));
+  color: var(--text, #e8edf2);
   font-family: "IBM Plex Mono", "Share Tech Mono", monospace;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow-mid, 0 12px 40px rgba(0, 0, 0, 0.45));
 }
 
 .intent-capture-header {
@@ -24,7 +24,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #f2c14e;
+  color: var(--gold, #f2c14e);
 }
 
 .intent-capture-block textarea,
@@ -32,8 +32,8 @@
   width: 100%;
   margin-top: 0.75rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid rgba(242, 193, 78, 0.2);
-  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line, rgba(242, 193, 78, 0.2));
+  background: var(--surface-input, rgba(0, 0, 0, 0.35));
   color: inherit;
 }
 
@@ -41,9 +41,9 @@
 .intent-capture-block [data-intent-submit] {
   margin-top: 0.75rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid rgba(242, 193, 78, 0.45);
+  border: 1px solid var(--line-gold-strong, rgba(242, 193, 78, 0.45));
   background: transparent;
-  color: #f2c14e;
+  color: var(--gold, #f2c14e);
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -58,7 +58,7 @@
 }
 
 .intent-capture-handoff a {
-  color: #f2c14e;
+  color: var(--gold, #f2c14e);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;

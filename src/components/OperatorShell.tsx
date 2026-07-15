@@ -26,10 +26,14 @@ export function OperatorShell({
   children,
   telemetry,
   hud,
+  zone = "atlas",
 }: {
   children: ReactNode;
   telemetry?: ReactNode;
   hud?: ReactNode;
+  /** Pearl Spectral OS trust zone: "pearl" = light customer/workspace
+      surface, "atlas" = obsidian operator surface (default). */
+  zone?: "pearl" | "atlas";
 }) {
   const { operator, logout } = useAuth();
   const navigate = useNavigate();
@@ -40,7 +44,7 @@ export function OperatorShell({
   }
 
   return (
-    <div className="flex h-dvh w-full flex-col overflow-hidden bg-op-bg text-op-text">
+    <div className={`msh-zone-${zone} flex h-dvh w-full flex-col overflow-hidden bg-op-bg text-op-text`}>
       <header className="flex shrink-0 items-center justify-between border-b border-op-border px-4 py-2.5 sm:px-6">
         <NavLink to="/" className="flex items-center gap-2 text-sm tracking-[0.25em] text-op-accent">
           <span className="text-base">&#9650;</span>
@@ -68,7 +72,11 @@ export function OperatorShell({
 
       <GlobalCommandHeader />
 
-      {hud ? <div className="shrink-0 border-b border-op-border px-4 py-2 sm:px-6">{hud}</div> : null}
+      {hud ? (
+        <div className={`shrink-0 border-b border-op-border px-4 py-2 sm:px-6${zone === "pearl" ? " msh-dense bg-op-bg" : ""}`}>
+          {hud}
+        </div>
+      ) : null}
 
       <CommandPalette />
 
@@ -95,7 +103,9 @@ export function OperatorShell({
         <main className="op-scrollbar min-w-0 overflow-y-auto p-4 sm:p-6">{children}</main>
 
         {telemetry ? (
-          <aside className="op-scrollbar hidden overflow-y-auto border-l border-op-border p-4 xl:block">
+          <aside
+            className={`op-scrollbar hidden overflow-y-auto border-l border-op-border p-4 xl:block${zone === "pearl" ? " msh-dense bg-op-bg" : ""}`}
+          >
             {telemetry}
           </aside>
         ) : null}

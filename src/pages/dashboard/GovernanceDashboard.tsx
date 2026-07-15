@@ -6,13 +6,15 @@ import { TelemetryFeed } from "./TelemetryFeed";
 
 export function GovernanceDashboard() {
   return (
-    <OperatorShell>
+    <OperatorShell zone="pearl">
       <div className="flex flex-col gap-5">
         <Breadcrumbs trail={[{ label: "Cockpit", to: "/dashboard" }, { label: "Governance" }]} />
         <h1 className="text-lg uppercase tracking-widest text-op-accent">Governance Panel</h1>
         <ApprovalQueuePanel />
         <GovernanceStatePanel />
-        <TelemetryFeed />
+        <div className="msh-dense">
+          <TelemetryFeed />
+        </div>
       </div>
     </OperatorShell>
   );

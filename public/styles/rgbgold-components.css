@@ -65,7 +65,7 @@
 .btn-secondary {
   color: inherit;
   border: 1px solid rgba(137, 168, 230, 0.35);
-  background: rgba(19, 34, 60, 0.65);
+  background: var(--rgbgold-surface-glass);
 }
 
 .btn-secondary:hover {
@@ -119,8 +119,8 @@
 .card {
   position: relative;
   border-radius: var(--rgbgold-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  border: 1px solid var(--rgbgold-line-soft);
+  background: var(--rgbgold-surface-panel);
   box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
   padding: var(--rgbgold-space-5);
 }
@@ -152,8 +152,8 @@
 .pricing-tier {
   position: relative;
   border-radius: var(--rgbgold-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  border: 1px solid var(--rgbgold-line-soft);
+  background: var(--rgbgold-surface-panel);
   box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
   padding: var(--rgbgold-space-5);
   transition: transform var(--rgbgold-ease-standard), box-shadow var(--rgbgold-ease-standard);
@@ -216,8 +216,8 @@
 .module-card {
   position: relative;
   border-radius: var(--rgbgold-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  border: 1px solid var(--rgbgold-line-soft);
+  background: var(--rgbgold-surface-panel);
   box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
   padding: var(--rgbgold-space-5);
   transition: transform var(--rgbgold-ease-standard), box-shadow var(--rgbgold-ease-standard);
@@ -247,8 +247,8 @@
 .operator-panel {
   position: relative;
   border-radius: var(--rgbgold-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(180deg, rgba(16, 20, 26, 0.95), rgba(9, 12, 16, 0.97));
+  border: 1px solid var(--rgbgold-line-soft);
+  background: var(--rgbgold-surface-panel);
   box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
   padding: var(--rgbgold-space-6);
 }
@@ -307,8 +307,8 @@
   position: relative;
   padding: var(--rgbgold-space-6);
   border-radius: var(--rgbgold-radius-lg);
-  background: linear-gradient(180deg, rgba(16, 20, 26, 0.95), rgba(9, 12, 16, 0.97));
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--rgbgold-surface-panel);
+  border: 1px solid var(--rgbgold-line-soft);
   box-shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
 }
 
@@ -356,8 +356,8 @@
   gap: var(--rgbgold-space-4);
   padding: var(--rgbgold-space-3) var(--rgbgold-space-5);
   border-radius: var(--rgbgold-radius-md);
-  background: rgba(16, 20, 26, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--rgbgold-surface-flat-soft);
+  border: 1px solid var(--rgbgold-line-soft);
   transition: transform var(--rgbgold-ease-standard), border-color var(--rgbgold-ease-standard), box-shadow var(--rgbgold-ease-standard);
 }
 
@@ -441,7 +441,7 @@
 }
 
 .nav-ecosystem a[aria-disabled="true"] {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--rgbgold-text-dim);
   cursor: default;
   pointer-events: none;
   opacity: 0.6;
@@ -493,8 +493,8 @@
 .expansion-safe {
   animation: none !important;
   transition: none !important;
-  background: rgba(16, 20, 26, 0.93);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--rgbgold-surface-flat);
+  border: 1px solid var(--rgbgold-line);
   color: #ffffff;
   box-shadow: none !important;
 }

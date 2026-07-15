@@ -14,6 +14,48 @@
   --color-op-amber: #ffb02e;
   --color-op-danger: #ff4d4d;
 
+  /* MSHOPS Pearl Spectral OS — canonical palette (L1). Chromatic tokens
+     pair an ink value (AA as text on pearl #f4f1ea) with a -bright variant
+     (display value on graphite/obsidian). See public/styles/
+     msh-spectral-tokens.css for the static-page twin of this layer. */
+  --color-msh-pearl: #f4f1ea;
+  --color-msh-pearl-raised: #fbfaf6;
+  --color-msh-platinum: #e4e1d8;
+  --color-msh-gold: #f2c14e;
+  --color-msh-gold-deep: #8a6210;
+  --color-msh-gold-bright: #f5c451;
+  --color-msh-cyan-active: #0b7285;
+  --color-msh-cyan-active-bright: #3ddbf0;
+  --color-msh-violet-intelligence: #5f3dc4;
+  --color-msh-violet-intelligence-bright: #b18cff;
+  --color-msh-magenta-simulation: #a61e7a;
+  --color-msh-magenta-simulation-bright: #ff6ec7;
+  --color-msh-green-verified: #1e7a44;
+  --color-msh-green-verified-bright: #7dffb0;
+  --color-msh-amber-attention: #9a5b00;
+  --color-msh-amber-attention-bright: #ffb02e;
+  --color-msh-red-critical: #b3261e;
+  --color-msh-red-critical-bright: #ff8b8b;
+  --color-msh-graphite: #262b33;
+  --color-msh-obsidian: #0b0e13;
+  --color-msh-ink: #2a2f36;
+  --color-msh-ink-muted: #5b636d;
+
+  /* State semantics (L2) — what a color MEANS. Defaults resolve for dark
+     surfaces (bright variants); zone classes below re-resolve them.
+     Doctrine: green only for validated evidence, red only for real
+     failure; nominal is quiet neutral, never green. */
+  --color-state-nominal: #97a0a8;
+  --color-state-active: var(--color-msh-cyan-active-bright);
+  --color-state-reasoning: var(--color-msh-violet-intelligence-bright);
+  --color-state-pending: #d0a965;
+  --color-state-warning: var(--color-msh-amber-attention-bright);
+  --color-state-verified: var(--color-msh-green-verified-bright);
+  --color-state-critical: var(--color-msh-red-critical-bright);
+  --color-state-blocked: #cf7a6b;
+  --color-state-governance: var(--color-msh-gold);
+  --color-state-neutral: #8a9099;
+
   --font-mono-op: "Share Tech Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
 
   --animate-scan: scan 6s linear infinite;
@@ -88,4 +130,120 @@ body {
 .op-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--color-op-border-bright) transparent;
+}
+
+/* ---------------------------------------------------------------------- */
+/* MSHOPS Pearl Spectral OS — zone classes (L3 role re-resolution)         */
+/* Tailwind v4 utilities compile to var(--color-op-*) references, so       */
+/* re-valuing the op tokens on a zone wrapper re-themes every descendant   */
+/* utility without touching components.                                    */
+/* ---------------------------------------------------------------------- */
+
+/* Pearl zone — light Pearl Spectral surface (funnel, auth, marketplace,
+   customer workspace). Gold is authority: fills/borders via
+   msh-gold / op-border-bright; never body text on pearl. */
+.msh-zone-pearl {
+  color-scheme: light;
+  --color-op-bg: var(--color-msh-pearl);
+  --color-op-panel: #faf8f2;
+  --color-op-panel-raised: var(--color-msh-pearl-raised);
+  --color-op-border: rgba(42, 47, 54, 0.14);
+  --color-op-border-bright: rgba(138, 98, 16, 0.38);
+  --color-op-text: var(--color-msh-ink);
+  --color-op-text-dim: var(--color-msh-ink-muted);
+  --color-op-accent: var(--color-msh-cyan-active);
+  --color-op-accent-2: #1d6fa5;
+  --color-op-magenta: var(--color-msh-magenta-simulation);
+  --color-op-amber: var(--color-msh-amber-attention);
+  --color-op-danger: var(--color-msh-red-critical);
+  --color-state-nominal: var(--color-msh-ink-muted);
+  --color-state-active: var(--color-msh-cyan-active);
+  --color-state-reasoning: var(--color-msh-violet-intelligence);
+  --color-state-pending: #7d6034;
+  --color-state-warning: var(--color-msh-amber-attention);
+  --color-state-verified: var(--color-msh-green-verified);
+  --color-state-critical: var(--color-msh-red-critical);
+  --color-state-blocked: #7a332b;
+  --color-state-governance: var(--color-msh-gold-deep);
+  --color-state-neutral: #6b7280;
+}
+
+body.msh-zone-pearl {
+  background-image:
+    linear-gradient(rgba(11, 114, 133, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 114, 133, 0.05) 1px, transparent 1px);
+}
+
+/* Ambient grid overlay used by full-viewport pages (Login, EcosystemSplash).
+   Line color re-resolves per zone: teal on dark defaults, cyan-ink on pearl. */
+:root {
+  --msh-grid-line: rgba(57, 255, 199, 0.05);
+}
+
+.msh-zone-pearl {
+  --msh-grid-line: rgba(11, 114, 133, 0.06);
+}
+
+.msh-grid-overlay {
+  background-image:
+    linear-gradient(var(--msh-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--msh-grid-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.msh-zone-pearl ::selection {
+  background: var(--color-msh-gold);
+  color: var(--color-msh-ink);
+}
+
+/* Atlas zone — obsidian operator surface, migrated into Pearl Spectral OS:
+   obsidian depth scale, teal → cyan-active accent (active intelligence),
+   neutral pearl-leaning text ink, and the canonical bright state palette.
+   Graphite/obsidian density is intentional here — ATLAS is the highest
+   cognitive-workload zone. */
+.msh-zone-atlas {
+  color-scheme: dark;
+  --color-op-bg: var(--color-msh-obsidian);
+  --color-op-panel: #10141b;
+  --color-op-panel-raised: #161b24;
+  --color-op-border: #232c38;
+  --color-op-border-bright: #33414f;
+  --color-op-text: #e8ecf1;
+  --color-op-text-dim: #8a97a3;
+  --color-op-accent: var(--color-msh-cyan-active-bright);
+  --color-op-accent-2: #52b8ff;
+  --color-op-magenta: var(--color-msh-magenta-simulation-bright);
+  --color-op-amber: var(--color-msh-amber-attention-bright);
+  --color-op-danger: var(--color-msh-red-critical-bright);
+  --color-state-governance: var(--color-msh-gold);
+}
+
+/* Dense escape hatch — re-darkens a technical subtree (consoles,
+   telemetry, evidence views) inside a pearl zone. Token-only: no layout
+   side effects; the panel paints itself via op-* utilities. */
+.msh-dense {
+  color-scheme: dark;
+  color: var(--color-op-text);
+  --color-op-bg: var(--color-msh-graphite);
+  --color-op-panel: #1a1f27;
+  --color-op-panel-raised: #232a34;
+  --color-op-border: #333b46;
+  --color-op-border-bright: #46505d;
+  --color-op-text: #e8e6df;
+  --color-op-text-dim: #9aa2ab;
+  --color-op-accent: var(--color-msh-cyan-active-bright);
+  --color-op-accent-2: #52b8ff;
+  --color-op-magenta: var(--color-msh-magenta-simulation-bright);
+  --color-op-amber: var(--color-msh-amber-attention-bright);
+  --color-op-danger: var(--color-msh-red-critical-bright);
+  --color-state-nominal: #97a0a8;
+  --color-state-active: var(--color-msh-cyan-active-bright);
+  --color-state-reasoning: var(--color-msh-violet-intelligence-bright);
+  --color-state-pending: #d0a965;
+  --color-state-warning: var(--color-msh-amber-attention-bright);
+  --color-state-verified: var(--color-msh-green-verified-bright);
+  --color-state-critical: var(--color-msh-red-critical-bright);
+  --color-state-blocked: #cf7a6b;
+  --color-state-governance: var(--color-msh-gold);
+  --color-state-neutral: #8a9099;
 }

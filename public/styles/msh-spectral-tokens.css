@@ -1,0 +1,319 @@
+/**
+ * MSHOPS PEARL SPECTRAL OS — SEMANTIC GOVERNANCE TOKENS
+ * -----------------------------------------------------------------------
+ * Canonical semantic token layer for the MSHOPS.NET funnel, per the
+ * Pearl Spectral OS visual system directive.
+ *
+ * THREE-LAYER MODEL:
+ *   L1 palette   --msh-*    canonical identities. Chromatic tokens ship as
+ *                           an ink value (WCAG AA as text on pearl #f4f1ea)
+ *                           plus a `-bright` variant (display value on
+ *                           graphite/obsidian surfaces).
+ *   L2 states    --state-*  what a color MEANS. Resolved per zone: ink on
+ *                           pearl, bright on dark. Components communicating
+ *                           state consume these, never raw palette.
+ *   L3 roles     --bg, --surface-*, --text, --muted, --line*, --shadow-*,
+ *                           --glow-* (defined in styles.css :root with dark
+ *                           defaults). Zones re-value the roles here.
+ *
+ * GOVERNANCE DOCTRINE:
+ *   - Green only when evidence is validated. Red only when failure is real.
+ *     Neither is ever decorative.
+ *   - Champagne gold is authority/governance chrome. Raw --msh-gold fails
+ *     contrast as text on pearl (1.7:1) — use --msh-gold-deep for text,
+ *     borders, and focus rings on light surfaces; gold itself is for fills,
+ *     badges, and gradients only.
+ *   - Cyan / violet / magenta communicate active intelligence (activity,
+ *     reasoning, simulation). Nominal is quiet neutral, NOT green.
+ *
+ * ZONE OPT-IN (static pages):
+ *   <html data-msh-zone="pearl">  light Pearl Spectral surface
+ *   <html data-msh-zone="atlas">  obsidian operator surface
+ *   class="msh-dense"             re-darkens a subtree inside a pearl zone
+ *                                 (technical panels, consoles, telemetry,
+ *                                 evidence views) for operational contrast.
+ * Pages that do not link this file resolve every role token from the dark
+ * defaults in styles.css :root and are pixel-identical to before this layer
+ * existed. Load this file FIRST in the stylesheet stack.
+ *
+ * NAMESPACING: additive only — this file never redeclares styles.css or
+ * rgbgold token defaults at :root; it re-values role tokens exclusively
+ * inside zone scopes, which win by attribute-selector specificity.
+ *
+ * DRIFT-MARKER: layer=tokens file=public/styles/msh-spectral-tokens.css version=1.0
+ */
+
+:root {
+  /* ------------------------------------------------------------------ */
+  /* L1 — CANONICAL PALETTE                                             */
+  /* ------------------------------------------------------------------ */
+  --msh-pearl: #f4f1ea;
+  --msh-pearl-raised: #fbfaf6;
+  --msh-platinum: #e4e1d8;
+
+  --msh-gold: #f2c14e;
+  --msh-gold-deep: #8a6210;
+  --msh-gold-bright: #f5c451;
+
+  --msh-cyan-active: #0b7285;
+  --msh-cyan-active-bright: #3ddbf0;
+
+  --msh-violet-intelligence: #5f3dc4;
+  --msh-violet-intelligence-bright: #b18cff;
+
+  --msh-magenta-simulation: #a61e7a;
+  --msh-magenta-simulation-bright: #ff6ec7;
+
+  --msh-green-verified: #1e7a44;
+  --msh-green-verified-bright: #7dffb0;
+
+  --msh-amber-attention: #9a5b00;
+  --msh-amber-attention-bright: #ffb02e;
+
+  --msh-red-critical: #b3261e;
+  --msh-red-critical-bright: #ff8b8b;
+
+  --msh-graphite: #262b33;
+  --msh-obsidian: #0b0e13;
+
+  /* Companions (neutral ink + hairlines for pearl surfaces) */
+  --msh-ink: #2a2f36;
+  --msh-ink-muted: #5b636d;
+  --msh-line-pearl: rgba(42, 47, 54, 0.14);
+  --msh-line-pearl-strong: rgba(138, 98, 16, 0.38);
+
+  /* ------------------------------------------------------------------ */
+  /* L2 — STATE SEMANTICS (defaults resolve for dark surfaces)          */
+  /* pending/blocked use precomputed mixes (amber×neutral, red×graphite) */
+  /* so no runtime color-mix() support is required.                     */
+  /* ------------------------------------------------------------------ */
+  --state-nominal: #97a0a8;
+  --state-active: var(--msh-cyan-active-bright);
+  --state-reasoning: var(--msh-violet-intelligence-bright);
+  --state-pending: #d0a965;
+  --state-warning: var(--msh-amber-attention-bright);
+  --state-verified: var(--msh-green-verified-bright);
+  --state-critical: var(--msh-red-critical-bright);
+  --state-blocked: #cf7a6b;
+  --state-governance: var(--msh-gold);
+  --state-neutral: #8a9099;
+}
+
+/* -------------------------------------------------------------------- */
+/* PEARL ZONE — light Pearl Spectral surface                             */
+/* -------------------------------------------------------------------- */
+html[data-msh-zone="pearl"] {
+  color-scheme: light;
+
+  /* States re-resolve to ink variants */
+  --state-nominal: var(--msh-ink-muted);
+  --state-active: var(--msh-cyan-active);
+  --state-reasoning: var(--msh-violet-intelligence);
+  --state-pending: #7d6034;
+  --state-warning: var(--msh-amber-attention);
+  --state-verified: var(--msh-green-verified);
+  --state-critical: var(--msh-red-critical);
+  --state-blocked: #7a332b;
+  --state-governance: var(--msh-gold-deep);
+  --state-neutral: #6b7280;
+
+  /* Core roles */
+  --bg: var(--msh-pearl);
+  --bg-soft: #ece9e1;
+  --surface-1: rgba(255, 255, 255, 0.72);
+  --surface-2: rgba(255, 255, 255, 0.85);
+  --surface-3: rgba(251, 250, 246, 0.95);
+  --text: var(--msh-ink);
+  --muted: var(--msh-ink-muted);
+
+  /* Accents by semantic role. --gold is consumed as TEXT/hairlines across
+     the shared stack (champagne fills are literal rgba compositions), so on
+     pearl it resolves to gold-deep for AA contrast — authority stays gold,
+     ink gets deep. */
+  --gold: var(--msh-gold-deep);
+  --blue: var(--msh-cyan-active);
+  --neon-blue: var(--msh-cyan-active);
+  --neon-cyan: var(--msh-cyan-active);
+  --neon-purple: var(--msh-violet-intelligence);
+  --neon-magenta: var(--msh-magenta-simulation);
+
+  /* Evidence-backed status roles */
+  --color-success: var(--state-verified);
+  --color-warning: var(--state-warning);
+  --color-critical: var(--state-critical);
+  --color-success-bg: rgba(30, 122, 68, 0.1);
+  --color-warning-bg: rgba(154, 91, 0, 0.1);
+  --color-critical-bg: rgba(179, 38, 30, 0.08);
+
+  /* Lines, shadows, glows — soft neutral depth, no neon */
+  --line: rgba(138, 98, 16, 0.3);
+  --line-strong: rgba(11, 114, 133, 0.3);
+  --shadow-low: 0 12px 32px rgba(31, 35, 40, 0.1);
+  --shadow-mid: 0 24px 72px rgba(31, 35, 40, 0.14);
+  --shadow-high: 0 34px 120px rgba(31, 35, 40, 0.18);
+  --glow-ring: 0 0 0 1px rgba(11, 114, 133, 0.18), 0 0 22px rgba(95, 61, 196, 0.08);
+  --glow-ring-gold: 0 0 0 1px rgba(138, 98, 16, 0.28), 0 0 24px rgba(242, 193, 78, 0.14);
+
+  /* Systems-surface status scale (+ rgb triplets for composed rgba()) */
+  --status-accent: var(--msh-cyan-active);
+  --status-success: var(--msh-green-verified);
+  --status-warning: var(--msh-amber-attention);
+  --status-high: #b45309;
+  --status-critical: var(--msh-red-critical);
+  --border-subtle: var(--msh-line-pearl);
+  --status-accent-rgb: 11, 114, 133;
+  --status-success-rgb: 30, 122, 68;
+  --status-warning-rgb: 154, 91, 0;
+  --status-high-rgb: 180, 83, 9;
+  --status-critical-rgb: 179, 38, 30;
+
+  /* Surface-role tokens (dark defaults live in styles.css :root) */
+  --surface-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(251, 250, 246, 0.92));
+  --surface-panel-tint: radial-gradient(circle at top right, rgba(11, 114, 133, 0.06), transparent 30%);
+  --panel-halo: radial-gradient(circle, rgba(242, 193, 78, 0.16), transparent 70%);
+  --line-soft: rgba(42, 47, 54, 0.1);
+  --topbar-veil: linear-gradient(180deg, rgba(251, 250, 246, 0.94), rgba(244, 241, 234, 0.86));
+  --topbar-edge: linear-gradient(90deg, transparent, rgba(11, 114, 133, 0.3), transparent);
+  --scrim-page:
+    radial-gradient(circle at 14% 18%, rgba(11, 114, 133, 0.05), transparent 24%),
+    radial-gradient(circle at 82% 24%, rgba(242, 193, 78, 0.09), transparent 24%),
+    radial-gradient(circle at 28% 84%, rgba(95, 61, 196, 0.05), transparent 26%),
+    radial-gradient(circle at 88% 88%, rgba(11, 114, 133, 0.04), transparent 24%),
+    linear-gradient(180deg, #f6f4ee 0%, #f4f1ea 34%, #f1eee6 100%);
+  --scrim-haze:
+    radial-gradient(circle at 20% 28%, rgba(11, 114, 133, 0.05), transparent 22%),
+    radial-gradient(circle at 78% 76%, rgba(242, 193, 78, 0.06), transparent 20%);
+  --scrim-lines-opacity: 0;
+  --surface-input: rgba(255, 255, 255, 0.75);
+  --surface-overlay: rgba(251, 250, 246, 0.96);
+  --surface-glass-dim: rgba(255, 255, 255, 0.6);
+  --text-soft: rgba(42, 47, 54, 0.8);
+  --line-gold-strong: rgba(138, 98, 16, 0.5);
+  --brand-mark-fill:
+    linear-gradient(145deg, rgba(242, 193, 78, 0.22), rgba(242, 193, 78, 0.06)),
+    #fbfaf6;
+
+  /* rgbgold layer aliases (defaults live in rgbgold-tokens.css) */
+  --rgbgold-surface-glass: rgba(255, 255, 255, 0.66);
+  --rgbgold-surface-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(251, 250, 246, 0.92));
+  --rgbgold-surface-flat: rgba(251, 250, 246, 0.93);
+  --rgbgold-surface-flat-soft: rgba(255, 255, 255, 0.6);
+  --rgbgold-line-soft: rgba(42, 47, 54, 0.12);
+  --rgbgold-line: rgba(42, 47, 54, 0.18);
+  --rgbgold-text-dim: rgba(42, 47, 54, 0.55);
+  /* rgbgold accents consumed as text re-ink for AA on pearl */
+  --rgbgold-gold-soft: var(--msh-gold-deep);
+  --rgbgold-cyan: var(--msh-cyan-active);
+}
+
+/* Pearl ambience: the Matrix/Tron screen-blend sweeps read as noise on a
+   light surface (and their green rain would be decorative green). Fade the
+   overlay to a faint sheen; screen blending over pearl self-neutralizes. */
+html[data-msh-zone="pearl"] .fx-overlay {
+  opacity: 0.35;
+}
+
+/* Zone-scoped component fix-ups: rules whose dark styling can't be
+   expressed as a token swap without shifting the dark pages. Dark
+   rendering stays byte-identical; pearl gets evidence-correct values. */
+html[data-msh-zone="pearl"] .surface-form input,
+html[data-msh-zone="pearl"] .surface-form select,
+html[data-msh-zone="pearl"] .surface-form textarea {
+  border-color: var(--msh-line-pearl);
+  background: var(--surface-input);
+}
+
+html[data-msh-zone="pearl"] .surface-confirmation {
+  border-color: rgba(30, 122, 68, 0.35);
+  background: rgba(30, 122, 68, 0.08);
+}
+
+/* -------------------------------------------------------------------- */
+/* ATLAS ZONE — obsidian operator surface (static-page variant)          */
+/* Restates the operator dark theme through the canonical palette.       */
+/* -------------------------------------------------------------------- */
+html[data-msh-zone="atlas"] {
+  color-scheme: dark;
+  --bg: var(--msh-obsidian);
+  --bg-soft: #10141b;
+  --text: #f0eee8;
+  --muted: #97a0a8;
+  --gold: var(--msh-gold);
+  --state-governance: var(--msh-gold);
+}
+
+/* -------------------------------------------------------------------- */
+/* DENSE ESCAPE HATCH — technical panels inside pearl zones              */
+/* Token-only re-darkening: consoles, telemetry, evidence views keep     */
+/* graphite contrast while living on a pearl page. No layout effects.    */
+/* -------------------------------------------------------------------- */
+.msh-dense {
+  color-scheme: dark;
+  color: var(--text);
+
+  /* States back to bright variants */
+  --state-nominal: #97a0a8;
+  --state-active: var(--msh-cyan-active-bright);
+  --state-reasoning: var(--msh-violet-intelligence-bright);
+  --state-pending: #d0a965;
+  --state-warning: var(--msh-amber-attention-bright);
+  --state-verified: var(--msh-green-verified-bright);
+  --state-critical: var(--msh-red-critical-bright);
+  --state-blocked: #cf7a6b;
+  --state-governance: var(--msh-gold);
+  --state-neutral: #8a9099;
+
+  /* Roles back to graphite */
+  --bg: var(--msh-graphite);
+  --bg-soft: #2c323b;
+  --surface-1: rgba(20, 24, 30, 0.9);
+  --surface-2: rgba(26, 31, 38, 0.96);
+  --surface-3: rgba(15, 18, 23, 0.98);
+  --text: #e8e6df;
+  --muted: #9aa2ab;
+  --gold: var(--msh-gold);
+  --blue: #52b8ff;
+  --neon-blue: #52b8ff;
+  --neon-cyan: #4dfcf0;
+  --neon-purple: #b18cff;
+  --neon-magenta: #ff6ec7;
+  --color-success: var(--state-verified);
+  --color-warning: var(--state-warning);
+  --color-critical: var(--state-critical);
+  --color-success-bg: rgba(125, 255, 176, 0.12);
+  --color-warning-bg: rgba(255, 176, 46, 0.14);
+  --color-critical-bg: rgba(255, 139, 139, 0.13);
+  --line: rgba(242, 193, 78, 0.28);
+  --line-strong: rgba(82, 184, 255, 0.3);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --shadow-low: 0 12px 32px rgba(0, 0, 0, 0.18);
+  --shadow-mid: 0 24px 72px rgba(0, 0, 0, 0.34);
+  --shadow-high: 0 34px 120px rgba(0, 0, 0, 0.5);
+  --glow-ring: 0 0 0 1px rgba(82, 184, 255, 0.22), 0 0 26px rgba(177, 140, 255, 0.16), 0 0 46px rgba(77, 252, 240, 0.1);
+  --glow-ring-gold: 0 0 0 1px rgba(242, 193, 78, 0.3), 0 0 32px rgba(242, 193, 78, 0.18);
+  --status-accent: #7dd3fc;
+  --status-success: #34d399;
+  --status-warning: #fbbf24;
+  --status-high: #fb923c;
+  --status-critical: #f87171;
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --status-accent-rgb: 125, 211, 252;
+  --status-success-rgb: 52, 211, 153;
+  --status-warning-rgb: 251, 191, 36;
+  --status-high-rgb: 251, 146, 60;
+  --status-critical-rgb: 248, 113, 113;
+  --surface-panel: linear-gradient(180deg, rgba(28, 33, 40, 0.95), rgba(20, 24, 30, 0.97));
+  --surface-panel-tint: radial-gradient(circle at top right, rgba(61, 219, 240, 0.08), transparent 30%);
+  --panel-halo: radial-gradient(circle, rgba(242, 193, 78, 0.08), transparent 70%);
+  --surface-input: rgba(0, 0, 0, 0.35);
+  --surface-overlay: rgba(5, 7, 10, 0.96);
+  --rgbgold-surface-glass: rgba(19, 34, 60, 0.65);
+  --rgbgold-surface-panel: linear-gradient(180deg, rgba(28, 33, 40, 0.95), rgba(20, 24, 30, 0.97));
+  --rgbgold-surface-flat: rgba(20, 24, 30, 0.93);
+  --rgbgold-surface-flat-soft: rgba(20, 24, 30, 0.72);
+  --rgbgold-line-soft: rgba(255, 255, 255, 0.08);
+  --rgbgold-line: rgba(255, 255, 255, 0.12);
+  --rgbgold-text-dim: rgba(255, 255, 255, 0.45);
+  --rgbgold-gold-soft: #ffe6a3;
+  --rgbgold-cyan: #3cf2ff;
+}

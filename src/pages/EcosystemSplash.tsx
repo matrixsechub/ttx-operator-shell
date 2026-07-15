@@ -64,14 +64,7 @@ export function EcosystemSplash() {
 
   return (
     <div className="relative min-h-dvh w-full overflow-x-hidden bg-op-bg text-op-text">
-      <div
-        className="pointer-events-none fixed inset-0 opacity-50"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(57,255,199,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,199,0.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+      <div className="msh-grid-overlay pointer-events-none fixed inset-0 opacity-50" />
 
       <AdaptiveEntryHero uiMode={uiMode} />
 

@@ -14,7 +14,7 @@ export function GovernanceStatePanel({ compact = false }: { compact?: boolean })
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-xs uppercase tracking-widest text-op-text-dim">Governance</h2>
+        <h2 className="text-xs uppercase tracking-widest text-state-governance">Governance</h2>
         <button
           type="button"
           onClick={() => refresh()}

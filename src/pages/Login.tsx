@@ -29,14 +29,7 @@ export function Login() {
 
   return (
     <div className="relative flex h-dvh w-full items-center justify-center overflow-hidden bg-op-bg text-op-text">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(57,255,199,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,199,0.05) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
-        }}
-      />
+      <div className="msh-grid-overlay pointer-events-none absolute inset-0 opacity-60" />
 
       <form
         onSubmit={handleSubmit}

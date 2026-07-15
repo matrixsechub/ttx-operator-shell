@@ -81,6 +81,20 @@
   /* Z-index (kept out of the app's stacking scale entirely to avoid clashes) */
   --rgbgold-z-decoration: -1;
 
+  /* Surface/line aliases for the MSHOPS Pearl Spectral OS governance layer
+     (see msh-spectral-tokens.css). Defaults restate the exact literals that
+     were previously inlined in rgbgold-components.css, so nothing shifts on
+     pages outside a msh zone; zone scopes re-value ONLY these aliases —
+     the tokens above are never redeclared, preserving this file's
+     namespacing policy. */
+  --rgbgold-surface-glass: rgba(19, 34, 60, 0.65);
+  --rgbgold-surface-panel: linear-gradient(180deg, rgba(16, 20, 26, 0.93), rgba(9, 12, 16, 0.95));
+  --rgbgold-surface-flat: rgba(16, 20, 26, 0.93);
+  --rgbgold-surface-flat-soft: rgba(16, 20, 26, 0.72);
+  --rgbgold-line-soft: rgba(255, 255, 255, 0.06);
+  --rgbgold-line: rgba(255, 255, 255, 0.12);
+  --rgbgold-text-dim: rgba(255, 255, 255, 0.45);
+
   /* ---------------------------------------------------------------------
    * RESERVED NAMESPACES — FUTURE MODULE / OPERATOR SURFACE EXPANSION
    * `--rgbgold-future-*` is reserved for new cinematic tokens introduced by

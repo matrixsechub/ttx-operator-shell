@@ -2,8 +2,8 @@ import { StatusPill } from "./StatusPill";
 import { useApiResource } from "../lib/useApiResource";
 import { operatorDashboardService, type AuditEvent } from "../lib/operatorDashboardService";
 
-function toneForResult(result: AuditEvent["result"]): "ok" | "warn" | "danger" | "neutral" {
-  if (result === "success") return "ok";
+function toneForResult(result: AuditEvent["result"]): "verified" | "warn" | "danger" | "neutral" {
+  if (result === "success") return "verified";
   if (result === "denied" || result === "escalated") return "warn";
   if (result === "failure") return "danger";
   return "neutral";
