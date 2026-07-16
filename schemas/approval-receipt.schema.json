@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mshops.net/schemas/approval-receipt.schema.json",
+  "title": "ApprovalReceipt",
+  "schemaVersion": "1.0.0",
+  "type": "object",
+  "required": [
+    "approvalId",
+    "proposalId",
+    "proposalRevision",
+    "actionClass",
+    "actionDigest",
+    "beaconHash",
+    "codexHash",
+    "targetEnvironment",
+    "approvedBy",
+    "approvedAt",
+    "expiresAt",
+    "nonce",
+    "signature"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "approvalId": { "type": "string", "minLength": 8 },
+    "proposalId": { "type": "string", "minLength": 8 },
+    "proposalRevision": { "type": "integer", "minimum": 1 },
+    "actionClass": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5", "C6"] },
+    "actionDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "beaconHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "codexHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "targetEnvironment": { "type": "string", "enum": ["development", "staging", "production"] },
+    "approvedBy": { "type": "string", "minLength": 1 },
+    "approvedAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "nonce": { "type": "string", "minLength": 8 },
+    "signature": { "type": "string", "minLength": 16 }
+  }
+}

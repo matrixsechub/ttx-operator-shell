@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mshops.net/schemas/hsx-scope-gate-v1.schema.json",
+  "title": "HSX Scope Gate V1 Pre-Execution Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "packet_id", "correlation_id", "issued_at", "actor", "target", "action", "engagement", "evidence"],
+  "properties": {
+    "version": { "const": "hsx.scope-gate.v1" },
+    "packet_id": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "correlation_id": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "roles"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "type": { "enum": ["agent", "operator", "system"] },
+        "roles": { "$ref": "#/$defs/stringList" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "resource", "environment"],
+      "properties": {
+        "system": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "resource": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "environment": { "enum": ["development", "staging", "production"] },
+        "tenant_id": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "class", "operation", "permissions", "payload"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "class": { "enum": ["C0", "C1", "C2", "C3", "C4", "C5", "C6"] },
+        "operation": { "enum": ["read", "create", "update", "delete", "execute", "deploy"] },
+        "permissions": { "$ref": "#/$defs/stringList" },
+        "payload": { "type": "object" }
+      }
+    },
+    "engagement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scope_id", "authorized_targets", "allowed_actions", "allowed_permissions", "expires_at"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "scope_id": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "authorized_targets": { "$ref": "#/$defs/stringList" },
+        "allowed_actions": { "$ref": "#/$defs/stringList" },
+        "allowed_permissions": { "$ref": "#/$defs/stringList" },
+        "expires_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "ref", "observed_at"],
+        "properties": {
+          "type": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "ref": { "type": "string", "minLength": 1, "maxLength": 512 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "observed_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposal_id", "approval_id"],
+      "properties": {
+        "proposal_id": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "approval_id": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    }
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "maxItems": 100,
+      "items": { "type": "string", "minLength": 1, "maxLength": 512 }
+    }
+  }
+}

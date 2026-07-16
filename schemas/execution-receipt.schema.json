@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://matrixsechub.local/schemas/execution-receipt.schema.json",
+  "title": "ExecutionReceipt",
+  "type": "object",
+  "required": [
+    "executionId",
+    "proposalId",
+    "approvalId",
+    "actionDigest",
+    "beaconHash",
+    "codexHash",
+    "environment",
+    "idempotencyKey",
+    "status",
+    "startedAt",
+    "completedAt",
+    "rollbackReference",
+    "auditBundleId"
+  ],
+  "properties": {
+    "executionId": { "type": "string" },
+    "proposalId": { "type": "string" },
+    "approvalId": { "type": "string" },
+    "actionDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "beaconHash": { "type": "string" },
+    "codexHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "environment": { "type": "string", "enum": ["development", "staging", "production"] },
+    "idempotencyKey": { "type": "string" },
+    "status": { "type": "string", "enum": ["succeeded", "failed", "rolled_back", "audit_incomplete"] },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "completedAt": { "type": "string", "format": "date-time" },
+    "resultDigest": { "type": "string" },
+    "errorCode": { "type": "string" },
+    "rollbackReference": { "type": "string" },
+    "auditBundleId": { "type": "string" }
+  },
+  "additionalProperties": false
+}
