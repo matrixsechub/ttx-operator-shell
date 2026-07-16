@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mshops.net/schemas/action-proposal.schema.json",
+  "title": "ActionProposal",
+  "type": "object",
+  "required": [
+    "proposal_id",
+    "created_by",
+    "created_at",
+    "target_system",
+    "action_class",
+    "summary",
+    "intended_outcome",
+    "northstar_impact",
+    "evidence_refs",
+    "risk_score",
+    "rollback_plan",
+    "affected_data",
+    "affected_users",
+    "required_approver",
+    "beacon_hash",
+    "codex_hash",
+    "expiration",
+    "status"
+  ],
+  "properties": {
+    "proposal_id": { "type": "string", "minLength": 8 },
+    "created_by": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "target_system": { "type": "string", "minLength": 1 },
+    "action_class": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5", "C6"] },
+    "summary": { "type": "string", "minLength": 1 },
+    "intended_outcome": { "type": "string", "minLength": 1 },
+    "northstar_impact": {
+      "type": "object",
+      "required": ["stability", "revenue_validation", "trust", "controlled_growth", "wildcard_innovation"],
+      "properties": {
+        "stability": { "type": "string" },
+        "revenue_validation": { "type": "string" },
+        "trust": { "type": "string" },
+        "controlled_growth": { "type": "string" },
+        "wildcard_innovation": { "type": "string" }
+      }
+    },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "risk_score": {
+      "type": "object",
+      "required": ["numeric", "qualitative"],
+      "properties": {
+        "numeric": { "type": "number", "minimum": 0, "maximum": 100 },
+        "qualitative": { "type": "string", "enum": ["low", "medium", "high", "critical"] }
+      }
+    },
+    "rollback_plan": { "type": "string", "minLength": 1 },
+    "affected_data": { "type": "array", "items": { "type": "string" } },
+    "affected_users": { "type": "string", "enum": ["internal", "customer", "system", "mixed"] },
+    "required_approver": { "type": "string", "const": "operator" },
+    "beacon_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "codex_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "expiration": { "type": "string", "format": "date-time" },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "pending", "approved", "denied", "executed", "expired"]
+    },
+    "action_payload": { "type": "object" }
+  },
+  "additionalProperties": false
+}

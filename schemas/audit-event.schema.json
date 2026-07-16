@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mshops.net/schemas/audit-event.schema.json",
+  "title": "AuditEvent",
+  "type": "object",
+  "required": [
+    "event_id",
+    "timestamp",
+    "actor_type",
+    "actor_id",
+    "action_class",
+    "system_target",
+    "beacon_hash",
+    "codex_hash",
+    "trace_id",
+    "risk_score",
+    "result"
+  ],
+  "properties": {
+    "event_id": { "type": "string", "minLength": 8 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "actor_type": { "type": "string", "enum": ["operator", "agent", "system"] },
+    "actor_id": { "type": "string", "minLength": 1 },
+    "operator_id": { "type": "string" },
+    "action_class": { "type": "string", "enum": ["C0", "C1", "C2", "C3", "C4", "C5", "C6"] },
+    "system_target": { "type": "string", "minLength": 1 },
+    "beacon_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "codex_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "trace_id": { "type": "string", "minLength": 8 },
+    "proposal_id": { "type": "string" },
+    "approval_id": { "type": "string" },
+    "input_refs": { "type": "array", "items": { "type": "string" } },
+    "output_refs": { "type": "array", "items": { "type": "string" } },
+    "risk_score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "result": { "type": "string", "enum": ["success", "failure", "denied", "escalated"] },
+    "rollback_ref": { "type": "string" }
+  },
+  "additionalProperties": false
+}

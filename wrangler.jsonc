@@ -44,7 +44,8 @@
       { "name": "GOVERNANCE", "class_name": "GovernanceDO" },
       { "name": "SESSION", "class_name": "SessionDO" },
       { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
-      { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" }
+      { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
+      { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
     ]
   },
   "migrations": [
@@ -55,6 +56,10 @@
     {
       "tag": "v36-live-ttx-sessions",
       "new_sqlite_classes": ["LiveTtxSession"]
+    },
+    {
+      "tag": "v37-receipt-authority",
+      "new_sqlite_classes": ["ReceiptAuthority"]
     }
   ],
   "services": [
@@ -90,7 +95,8 @@
           { "name": "GOVERNANCE", "class_name": "GovernanceDO" },
           { "name": "SESSION", "class_name": "SessionDO" },
           { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
-          { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" }
+          { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
+          { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
         ]
       },
       "migrations": [
@@ -101,6 +107,10 @@
         {
           "tag": "v36-live-ttx-sessions",
           "new_sqlite_classes": ["LiveTtxSession"]
+        },
+        {
+          "tag": "v37-receipt-authority",
+          "new_sqlite_classes": ["ReceiptAuthority"]
         }
       ],
       "services": [

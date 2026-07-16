@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mshops.net/schemas/beacon-v2.schema.json",
+  "title": "BeaconV2",
+  "type": "object",
+  "required": [
+    "id",
+    "version",
+    "state",
+    "axis",
+    "priorities",
+    "authority",
+    "mandate",
+    "action_classes",
+    "autonomy_levels",
+    "recursion_limits",
+    "operator_modes",
+    "approval_policy"
+  ],
+  "properties": {
+    "id": { "type": "string", "const": "BEACON::NORTHSTAR" },
+    "version": { "type": "integer", "const": 2 },
+    "state": { "type": "string", "const": "ACTIVE" },
+    "axis": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "STABILITY",
+          "REVENUE_VALIDATION",
+          "TRUST",
+          "CONTROLLED_GROWTH",
+          "WILDCARD_INNOVATION"
+        ]
+      },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "priorities": { "type": "array", "items": { "type": "string" }, "minItems": 6 },
+    "authority": {
+      "type": "object",
+      "required": ["operator", "aiCouncil", "agents"],
+      "properties": {
+        "operator": { "type": "string" },
+        "aiCouncil": { "type": "string" },
+        "agents": { "type": "string" }
+      }
+    },
+    "mandate": { "type": "string" },
+    "action_classes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description", "approval_required"],
+        "properties": {
+          "description": { "type": "string" },
+          "approval_required": { "type": "boolean" }
+        }
+      }
+    },
+    "autonomy_levels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "recursion_limits": {
+      "type": "object",
+      "required": [
+        "max_reasoning_depth",
+        "max_scenario_branches",
+        "max_agent_debate_rounds",
+        "max_tool_call_chain_length",
+        "max_unresolved_loop_retries"
+      ],
+      "properties": {
+        "max_reasoning_depth": { "type": "integer", "maximum": 3 },
+        "max_scenario_branches": { "type": "integer", "maximum": 5 },
+        "max_agent_debate_rounds": { "type": "integer", "maximum": 3 },
+        "max_tool_call_chain_length": { "type": "integer", "maximum": 5 },
+        "max_unresolved_loop_retries": { "type": "integer", "maximum": 1 }
+      }
+    },
+    "operator_modes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "normal",
+          "cautious",
+          "incident",
+          "revenue_validation",
+          "ghost_lab",
+          "audit"
+        ]
+      }
+    },
+    "approval_policy": {
+      "type": "object",
+      "required": ["human_only_actions", "beacon_hash_required"],
+      "properties": {
+        "human_only_actions": { "type": "array", "items": { "type": "string" } },
+        "beacon_hash_required": { "type": "boolean", "const": true }
+      }
+    }
+  },
+  "additionalProperties": false
+}

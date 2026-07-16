@@ -66,7 +66,9 @@ import { handleWildcardRoute } from "./wildcardAdvancement";
 import { handleAuditLiteRoute } from "./auditLite";
 import { handleRecoveredFunnelApi, isRecoveredPublicRoute, serveRecoveredPublicRoute } from "./funnelRecovery";
 import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
+import { handleHsxScopeGateRoute } from "./hsxScopeGate/route";
 export { LiveTtxSession } from "./liveSession";
+export { ReceiptAuthority } from "./do/receiptAuthority";
 
 await assertBeaconOnStartup();
 await ensureAgentGovernance();
@@ -239,6 +241,13 @@ export default {
       const operatorSession = await handleOperatorSession(request, url.pathname, edgeEnv);
 
       if (operatorSession) return operatorSession;
+
+      const hsxScopeGateResponse = await handleHsxScopeGateRoute(request, url.pathname, edgeEnv);
+
+      if (hsxScopeGateResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, hsxScopeGateResponse.status);
+        return hsxScopeGateResponse;
+      }
 
 
 

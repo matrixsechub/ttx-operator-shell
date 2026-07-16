@@ -1,5 +1,9 @@
 import { hasValidAccessToken } from "./auth";
 import type { BackboneEnv } from "./backboneEnv";
+import { routeDisabledInGovernedEnvironment } from "./governance/routeDisabled";
+import type { RuntimeEnvSource } from "./governance/runtimeEnv";
+import type { ModeEnv } from "./mode";
+import type { BuildInfoEnv } from "./buildInfo";
 import { GovernanceDO } from "./do/governance";
 import { MarketplaceDO } from "./do/marketplace";
 import { SessionDO } from "./do/session";
@@ -33,6 +37,8 @@ export async function handleGovernanceRoute(
   }
 
   if (pathname === "/api/governance/propose" && request.method === "POST") {
+    const disabled = routeDisabledInGovernedEnvironment(env as RuntimeEnvSource & ModeEnv & BuildInfoEnv, "Legacy GovernanceDO propose disabled");
+    if (disabled) return disabled;
     const blocked = await requireOperator(request, env);
     if (blocked) return blocked;
 
@@ -65,6 +71,8 @@ export async function handleGovernanceRoute(
   }
 
   if (pathname === "/api/governance/approve" && request.method === "POST") {
+    const disabled = routeDisabledInGovernedEnvironment(env as RuntimeEnvSource & ModeEnv & BuildInfoEnv, "Legacy GovernanceDO approve disabled");
+    if (disabled) return disabled;
     const blocked = await requireOperator(request, env);
     if (blocked) return blocked;
 
