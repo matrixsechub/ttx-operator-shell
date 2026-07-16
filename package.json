@@ -8,6 +8,7 @@
     "build": "node scripts/build.mjs",
     "preview": "vite preview",
     "typecheck": "node scripts/typecheck.mjs",
+    "lint:brand": "node scripts/ci/brand-conformance-lint.mjs",
     "worker:dev": "node scripts/build.mjs && wrangler dev",
     "deploy": "node scripts/deploy-production.mjs",
     "deploy:staging": "node scripts/deploy-staging.mjs",

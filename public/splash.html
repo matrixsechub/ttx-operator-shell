@@ -13,6 +13,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 :root {
   --bg-0: #03040a;
+  --bg-0-green: #030a07;
+  --bg-0-blue: #03060a;
   --bg-1: #060810;
   --bg-2: #080b15;
   --bg-card: #0b0e1a;
@@ -273,10 +275,10 @@ body {
 
 /* ─── 11. STATUS DOT — RGB cycle ─── */
 @keyframes dotRGB {
-  0%   { background: #00c47a; box-shadow: 0 0 6px rgba(0,196,122,0.8); }
-  33%  { background: #0ea5e9; box-shadow: 0 0 6px rgba(14,165,233,0.8); }
-  66%  { background: #c9941a; box-shadow: 0 0 6px rgba(201,148,26,0.8); }
-  100% { background: #00c47a; box-shadow: 0 0 6px rgba(0,196,122,0.8); }
+  0%   { background: var(--green); box-shadow: 0 0 6px rgba(0,196,122,0.8); }
+  33%  { background: var(--blue); box-shadow: 0 0 6px rgba(14,165,233,0.8); }
+  66%  { background: var(--gold); box-shadow: 0 0 6px rgba(201,148,26,0.8); }
+  100% { background: var(--green); box-shadow: 0 0 6px rgba(0,196,122,0.8); }
 }
 .status-dot-anim {
   width: 6px; height: 6px; border-radius: 50%;
@@ -355,10 +357,10 @@ body {
 
 /* ─── 15. LAUNCH SCREEN — RGB enhancement ─── */
 @keyframes launchBg {
-  0%   { background-color: #03040a; }
-  33%  { background-color: #030a07; }
-  66%  { background-color: #03060a; }
-  100% { background-color: #03040a; }
+  0%   { background-color: var(--bg-0); }
+  33%  { background-color: var(--bg-0-green); }
+  66%  { background-color: var(--bg-0-blue); }
+  100% { background-color: var(--bg-0); }
 }
 #launch-screen-x1a0 {
   position: fixed; inset: 0; z-index: 9999;
@@ -675,6 +677,62 @@ body {
 /* ─── HERO PYRAMID RESPONSIVE ─── */
 @media (max-width: 768px) {
   .hero-pyramid-col { display: none !important; }
+}
+
+/* ─── DOCTRINE: FOCUS-VISIBLE (Track 1 conformance) ───
+   Every interactive element keeps a visible keyboard-focus affordance. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ─── DOCTRINE: REDUCED MOTION (Track 1 conformance) ───
+   All decorative motion on this surface (grid shift, scanlines, glow
+   pulses, marquees, tickers, pyramid float) is disabled when the system
+   requests reduced motion. Opacity/functional transitions are kept. */
+@media (prefers-reduced-motion: reduce) {
+  body,
+  #tron-scanlines,
+  .tron-card > .tron-corner,
+  .tron-card:hover .tron-sweep-line::after,
+  .page h2, .page h1,
+  .hero-headline-glow,
+  .tron-divider,
+  .nav-link-a9.active::after,
+  .tron-btn:hover::before,
+  .tron-btn-gold:hover::before,
+  #enter-btn-j8,
+  .enter-ring,
+  .hero-tron-line-diag-tl,
+  .hero-tron-line-diag-br,
+  .hero-tron-line-v-left,
+  .hero-tron-line-v-right,
+  .status-dot-anim,
+  .video-container-k2,
+  .video-container-k2.gold-vid,
+  .marquee-glow,
+  .threat-glow,
+  #launch-screen-x1a0,
+  .blink-dots::after,
+  .pyramid-launch-img,
+  .pyramid-hero-img,
+  .marquee-left,
+  .marquee-right,
+  .threat-ticker,
+  .cta-pulse,
+  .cta-pulse-gold,
+  #audio-btn-f7.playing i {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }
 </style>
 </head>

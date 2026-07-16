@@ -1,0 +1,119 @@
+/**
+ * OPERATOR ONBOARDING — SURFACE STYLES (Track 1: Conformance)
+ * -----------------------------------------------------------------------
+ * onboarding.html has linked /styles/onboarding.css since the surface
+ * shipped, but the file never existed (a silent 404). The stage engine in
+ * /scripts/onboarding.js toggles `.is-active` / progress-dot state that
+ * had no styling, so every stage rendered stacked and the progress rail
+ * was invisible. This file restores the behavior the existing markup and
+ * script already implement — it introduces no new wizard logic.
+ *
+ * Token discipline: consumes only existing app tokens (--gold, --muted,
+ * --space-*, --radius-*) and the entity layer (--entity-*). No raw hex.
+ *
+ * DRIFT-MARKER: layer=page file=public/styles/onboarding.css version=1.0
+ */
+
+.onboarding-shell {
+  display: grid;
+  gap: var(--space-5, 24px);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.onboarding-hero {
+  padding: var(--space-6, 32px);
+}
+
+/* ── Progress rail (dots created by onboarding.js) ───────────────────── */
+.onboarding-progress {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+}
+
+.onboarding-progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--muted, #97a0a8);
+  background: transparent;
+  transition: background var(--duration-fast, 160ms) var(--ease-standard, ease),
+    border-color var(--duration-fast, 160ms) var(--ease-standard, ease);
+}
+
+.onboarding-progress-dot.is-active {
+  border-color: var(--entity-ghost, #4dfcf0);
+  background: var(--entity-ghost, #4dfcf0);
+  box-shadow: 0 0 8px var(--entity-ghost-glow, rgba(77, 252, 240, 0.5));
+}
+
+.onboarding-progress-dot.is-complete {
+  border-color: var(--gold, #f2c14e);
+  background: var(--gold, #f2c14e);
+}
+
+/* ── Stage viewport — only the active stage is visible ───────────────── */
+.onboarding-stage {
+  display: none;
+  padding: var(--space-6, 32px);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-md, 18px);
+  background: rgba(5, 6, 8, 0.72);
+}
+
+.onboarding-stage.is-active {
+  display: block;
+}
+
+.onboarding-hud-overlay {
+  display: inline-block;
+  margin-bottom: var(--space-2, 8px);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--entity-ghost, #4dfcf0);
+}
+
+.onboarding-benefit-list {
+  margin: var(--space-3, 12px) 0 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: var(--space-2, 8px);
+  color: var(--text, #f0eee8);
+}
+
+.onboarding-cockpit-preview {
+  margin-top: var(--space-4, 16px);
+  height: 120px;
+  border: 1px dashed var(--entity-ghost-line, rgba(77, 252, 240, 0.32));
+  border-radius: var(--radius-md, 18px);
+  background: linear-gradient(120deg, var(--entity-ghost-veil, rgba(77, 252, 240, 0.07)), transparent 70%);
+}
+
+.onboarding-coming-online {
+  margin-top: var(--space-4, 16px);
+  padding: var(--space-3, 12px);
+  border: 1px solid var(--entity-hsx-line, rgba(255, 143, 107, 0.35));
+  border-radius: var(--radius-sm, 12px);
+  color: var(--entity-hsx, #ff8f6b);
+  background: var(--entity-hsx-veil, rgba(255, 143, 107, 0.08));
+}
+
+/* ── Controls ────────────────────────────────────────────────────────── */
+.onboarding-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4, 16px);
+}
+
+@media (max-width: 640px) {
+  .onboarding-stage {
+    padding: var(--space-4, 16px);
+  }
+
+  .onboarding-controls {
+    flex-direction: column;
+  }
+}

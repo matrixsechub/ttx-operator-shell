@@ -89,6 +89,14 @@
   --status-warning-rgb: 251, 191, 36;
   --status-high-rgb: 251, 146, 60;
   --status-critical-rgb: 248, 113, 113;
+
+  /* Deep-background + console surface tokens (Track 1 token-discipline
+     pass: values previously hardcoded at their call sites below). */
+  --bg-abyss: #040507;
+  --bg-depth: #07090d;
+  --surface-white: #fff;
+  --text-console: #dfe8ef;
+  --critical-soft: #ff7d7d;
 }
 
 * {
@@ -108,7 +116,7 @@ body {
     radial-gradient(circle at 82% 24%, rgba(242, 193, 78, 0.11), transparent 24%),
     radial-gradient(circle at 28% 84%, rgba(177, 140, 255, 0.1), transparent 26%),
     radial-gradient(circle at 88% 88%, rgba(77, 252, 240, 0.09), transparent 24%),
-    linear-gradient(180deg, #040507 0%, #07090d 34%, #040507 100%);
+    linear-gradient(180deg, var(--bg-abyss) 0%, var(--bg-depth) 34%, var(--bg-abyss) 100%);
   background-size: 140% 140%, 140% 140%, 160% 160%, 160% 160%, 100% 100%;
   animation:
     page-fade-in var(--duration-page-fade) var(--ease-standard) both,
@@ -1560,7 +1568,7 @@ textarea {
   min-height: 39rem;
   border: 0;
   border-radius: var(--radius-sm);
-  background: #fff;
+  background: var(--surface-white);
 }
 
 .contact-note {
@@ -2197,7 +2205,7 @@ textarea {
   border: 1px solid rgba(82, 184, 255, 0.14);
   border-radius: var(--radius-md);
   background: rgba(3, 5, 8, 0.84);
-  color: #dfe8ef;
+  color: var(--text-console);
   font: 400 0.86rem/1.65 var(--font-mono);
   overflow: auto;
 }
@@ -2207,7 +2215,7 @@ textarea {
 }
 
 .payload-json[data-state="error"] {
-  color: #ff7d7d;
+  color: var(--critical-soft);
 }
 
 .console-badge-inner {
@@ -2641,7 +2649,7 @@ textarea {
   border: 1px solid rgba(82, 184, 255, 0.18);
   border-radius: var(--radius-sm);
   background: rgba(3, 5, 8, 0.82);
-  color: #dfe8ef;
+  color: var(--text-console);
   overflow: auto;
 }
 
