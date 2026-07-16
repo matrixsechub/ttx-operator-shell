@@ -52,6 +52,13 @@
  *  R13  Surface voice — key OS surface components render <EntityVoice.
  *  R14  OS-wide capture — every non-operator public/*.html page loads
  *       flow-tracker.js (operator consoles are policy-excluded).
+ *
+ * TRACK 4 — WORKER SUBSTRATE (R0 restoration)
+ *  R15  Capture policy, worker + client — the only sanctioned capture
+ *       route is flow-tracker → /api/flow/event. Debug-ingest remnants
+ *       (127.0.0.1:7654 posts, X-Debug-Session-Id headers, "#region
+ *       agent log" blocks, TRACE: console noise) are forbidden in
+ *       worker/ and src/. These shipped once; this rule keeps them out.
  */
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
@@ -429,6 +436,27 @@ for (const name of readdirSync(PUBLIC)) {
   if (!name.endsWith(".html") || name.endsWith("-operator.html")) continue;
   if (!readFileSync(path.join(PUBLIC, name), "utf8").includes("/scripts/flow-tracker.js")) {
     fail(name, "R14", "public page missing capture layer (/scripts/flow-tracker.js)");
+  }
+}
+
+/* ── TRACK 4: R15 — no rogue debug capture in worker/ or src/ ─────────── */
+
+const DEBUG_CAPTURE_PATTERNS = [
+  ["127.0.0.1:7654", "debug-ingest endpoint"],
+  ["X-Debug-Session-Id", "debug session header"],
+  ["#region agent log", "agent-log debug block"],
+  ['"TRACE:', "TRACE console noise"],
+];
+
+for (const dir of [path.join(ROOT, "worker"), SRC]) {
+  for (const file of walk(dir, [".ts", ".tsx", ".js", ".mjs"])) {
+    const rel = path.relative(ROOT, file);
+    const text = readFileSync(file, "utf8");
+    for (const [needle, label] of DEBUG_CAPTURE_PATTERNS) {
+      if (text.includes(needle)) {
+        fail(rel, "R15", `${label} ("${needle}") — only flow-tracker → /api/flow/event is sanctioned capture`);
+      }
+    }
   }
 }
 

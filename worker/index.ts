@@ -126,6 +126,30 @@ function isRateLimited(clientId: string): boolean {
 export default {
 
   async fetch(request, env): Promise<Response> {
+    // R0 restoration: every request path is guaranteed the standard
+    // { error } envelope — an unhandled exception may never escape as a
+    // raw platform 500. The structured log line carries no payload data
+    // and no secrets; per-route latency/status telemetry stays with
+    // recordTelemetrySample.
+    try {
+      return await handleFetch(request, env);
+    } catch (err) {
+      console.error(
+        JSON.stringify({
+          level: "error",
+          scope: "worker",
+          method: request.method,
+          pathname: new URL(request.url).pathname,
+          message: err instanceof Error ? err.message : String(err),
+        }),
+      );
+      return Response.json({ error: "Internal error" }, { status: 500 });
+    }
+  },
+
+} satisfies ExportedHandler<Env>;
+
+async function handleFetch(request: Request, env: Env): Promise<Response> {
 
     const edgeEnv = env as WorkerEnv;
 
@@ -134,58 +158,6 @@ export default {
     const pathname = url.pathname;
 
     const mode = resolveSurfaceMode(env);
-
-
-
-    // #region agent log
-
-    if (
-
-      pathname === "/" ||
-
-      pathname === "/welcome" ||
-
-      pathname === "/login" ||
-
-      pathname === "/marketplace" ||
-
-      pathname.startsWith("/ops/")
-
-    ) {
-
-      console.log("TRACE: PATHNAME =", pathname);
-
-      console.log("TRACE: SURFACE =", mode);
-
-      fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-
-        method: "POST",
-
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-
-        body: JSON.stringify({
-
-          sessionId: "14ea90",
-
-          runId: "funnel-primary",
-
-          hypothesisId: "H-entry",
-
-          location: "worker/index.ts:fetch",
-
-          message: "html path entry",
-
-          data: { pathname, mode, method: request.method },
-
-          timestamp: Date.now(),
-
-        }),
-
-      }).catch(() => {});
-
-    }
-
-    // #endregion
 
 
 
@@ -548,9 +520,7 @@ export default {
 
     return injectSecurityHeaders(assetResponse);
 
-  },
-
-} satisfies ExportedHandler<Env>;
+}
 
 
 
