@@ -9,6 +9,7 @@ import {
   type LiveWsStatus,
 } from "../lib/liveSessionService";
 import { LiveSessionLog } from "../components/LiveSessionLog";
+import { EntityVoice } from "../components/EntityVoice";
 
 type JoinState = "connecting" | "lobby" | "running" | "complete" | "error";
 
@@ -83,20 +84,20 @@ export default function LiveJoin() {
   const alreadyVoted = !!myVote && sessionState?.currentNodeId != null;
 
   return (
-    <div className="min-h-screen bg-[#0e0e10] text-gray-200 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-op-bg text-op-text flex items-center justify-center p-4">
       <div className="w-full max-w-lg flex flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <span className="text-[10px] uppercase tracking-widest text-[#888]">
+          <span className="text-[10px] uppercase tracking-widest text-op-text-dim">
             matrixsechub · live ttx
           </span>
           <span
             className={`text-[10px] ${
               wsStatus === "open"
-                ? "text-emerald-400"
+                ? "text-op-accent"
                 : wsStatus === "reconnecting"
-                ? "text-yellow-400"
-                : "text-[#666]"
+                ? "text-op-amber"
+                : "text-op-text-dim"
             }`}
           >
             ●{" "}
@@ -109,22 +110,23 @@ export default function LiveJoin() {
               : "disconnected"}
           </span>
         </div>
+        <EntityVoice entity="ghost">the exercise adapts as the group votes.</EntityVoice>
 
         {/* Error */}
         {joinState === "error" && (
-          <div className="rounded border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-400">
+          <div className="rounded border border-op-danger/40 bg-op-danger/10 p-4 text-sm text-op-danger">
             {errorMsg ?? "Connection failed. Your link may have expired — request a new one from the session host."}
           </div>
         )}
 
         {/* Lobby waiting */}
         {joinState === "lobby" && (
-          <div className="rounded border border-[#2a2a2e] bg-[#141416] p-6 text-center">
-            <p className="text-xs uppercase tracking-widest text-[#888] mb-2">Waiting for host to start</p>
-            <p className="text-2xl font-mono text-emerald-400">{sessionState?.code ?? "…"}</p>
+          <div className="rounded border border-op-border bg-op-panel p-6 text-center">
+            <p className="text-xs uppercase tracking-widest text-op-text-dim mb-2">Waiting for host to start</p>
+            <p className="text-2xl font-mono text-op-accent">{sessionState?.code ?? "…"}</p>
             {me && (
-              <p className="mt-3 text-sm text-gray-400">
-                Joined as <span className="text-gray-200">{me.name}</span>{" "}
+              <p className="mt-3 text-sm text-op-text-dim">
+                Joined as <span className="text-op-text">{me.name}</span>{" "}
                 {me.isObserver ? "(Observer)" : `· ${me.role}`}
               </p>
             )}
@@ -134,24 +136,24 @@ export default function LiveJoin() {
         {/* Running — inject + vote */}
         {joinState === "running" && sessionState && (
           <>
-            <div className="rounded border border-[#2a2a2e] bg-[#141416] p-4">
-              <p className="text-[10px] uppercase tracking-widest text-[#888] mb-1">
+            <div className="rounded border border-op-border bg-op-panel p-4">
+              <p className="text-[10px] uppercase tracking-widest text-op-text-dim mb-1">
                 {currentTitle ?? "Current Inject"}
               </p>
               {currentRole && (
-                <span className="inline-block rounded border border-emerald-900/40 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="inline-block rounded border border-op-accent/40 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-op-accent mb-2">
                   {currentRole}
                 </span>
               )}
-              <p className="text-sm text-gray-300 leading-relaxed">{currentInject ?? "—"}</p>
+              <p className="text-sm text-op-text leading-relaxed">{currentInject ?? "—"}</p>
             </div>
 
             {/* Vote buttons */}
             {!me?.isObserver && (
               <div className="flex flex-col gap-2">
-                <p className="text-[10px] uppercase tracking-widest text-[#888]">Your Vote</p>
+                <p className="text-[10px] uppercase tracking-widest text-op-text-dim">Your Vote</p>
                 {currentChoices.length === 0 ? (
-                  <p className="text-xs text-gray-500 italic">No choices — waiting for host to advance.</p>
+                  <p className="text-xs text-op-text-dim italic">No choices — waiting for host to advance.</p>
                 ) : (
                   currentChoices.map((c) => (
                     <button
@@ -161,10 +163,10 @@ export default function LiveJoin() {
                       onClick={() => castVote(c.choice)}
                       className={`rounded border px-4 py-3 text-sm text-left transition-colors ${
                         myVote === c.choice
-                          ? "border-emerald-500/60 bg-emerald-950/30 text-emerald-300"
+                          ? "border-op-accent/60 bg-op-accent/10 text-op-accent"
                           : canVote && !alreadyVoted
-                          ? "border-[#2a2a2e] hover:border-emerald-800/60 hover:bg-emerald-950/10 text-gray-200"
-                          : "border-[#1e1e22] text-gray-500 cursor-default"
+                          ? "border-op-border hover:border-op-accent/50 hover:bg-op-accent/5 text-op-text"
+                          : "border-op-border text-op-text-dim cursor-default"
                       }`}
                     >
                       {c.label}
@@ -172,15 +174,15 @@ export default function LiveJoin() {
                   ))
                 )}
                 {alreadyVoted && (
-                  <p className="text-xs text-emerald-400 mt-1">Vote cast — waiting for host to advance.</p>
+                  <p className="text-xs text-op-accent mt-1">Vote cast — waiting for host to advance.</p>
                 )}
                 {sessionState.status === "node_locked" && !alreadyVoted && (
-                  <p className="text-xs text-yellow-400 mt-1">Voting closed by host.</p>
+                  <p className="text-xs text-op-amber mt-1">Voting closed by host.</p>
                 )}
               </div>
             )}
             {me?.isObserver && (
-              <p className="text-xs text-[#666] italic">Observer mode — you can watch but not vote.</p>
+              <p className="text-xs text-op-text-dim italic">Observer mode — you can watch but not vote.</p>
             )}
 
             <LiveSessionLog events={sessionState.eventLog} />
@@ -189,9 +191,9 @@ export default function LiveJoin() {
 
         {/* Complete */}
         {joinState === "complete" && sessionState && (
-          <div className="rounded border border-[#2a2a2e] bg-[#141416] p-6 text-center">
-            <p className="text-xs uppercase tracking-widest text-emerald-400 mb-3">Exercise Complete</p>
-            <p className="text-sm text-gray-400">
+          <div className="rounded border border-op-border bg-op-panel p-6 text-center">
+            <p className="text-xs uppercase tracking-widest text-op-accent mb-3">Exercise Complete</p>
+            <p className="text-sm text-op-text-dim">
               Thanks for participating. The host will share results from the session.
             </p>
             <LiveSessionLog events={sessionState.eventLog} />
@@ -200,7 +202,7 @@ export default function LiveJoin() {
 
         {/* Connecting spinner */}
         {joinState === "connecting" && (
-          <p className="text-xs text-[#888] italic text-center">Connecting to session…</p>
+          <p className="text-xs text-op-text-dim italic text-center">Connecting to session…</p>
         )}
       </div>
     </div>

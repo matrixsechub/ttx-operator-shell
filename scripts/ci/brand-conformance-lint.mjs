@@ -37,9 +37,24 @@
  *      tag at least one CTA with data-flow-cta.
  *  R8  Asset integrity — every local stylesheet/script a governed page
  *      references must exist (no dead includes).
+ *
+ * TRACK 3 — OS-WIDE RULES (cockpit / dashboard / marketplace / src)
+ *  R9   No raw hex in src/ — the React OS surfaces may declare hex only
+ *       in src/styles/index.css custom-property (@theme) declarations.
+ *  R10  No named Tailwind palettes — utilities like text-zinc-400 or
+ *       bg-emerald-950 are rogue palettes; only op-* / entity-* token
+ *       utilities are governed.
+ *  R11  No arbitrary hex utilities — class fragments like bg-[#141416].
+ *  R12  Shell conformance — every Vite shell links the entity substrate
+ *       (entity-tokens.css + entity-cues.css); PUBLIC shells (ecosystem,
+ *       storefront, app index) load the capture layer; OPERATOR shells
+ *       (cockpit, auth, council) must NOT load growth capture.
+ *  R13  Surface voice — key OS surface components render <EntityVoice.
+ *  R14  OS-wide capture — every non-operator public/*.html page loads
+ *       flow-tracker.js (operator consoles are policy-excluded).
  */
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -314,6 +329,109 @@ for (const page of GOVERNED_HTML) {
   }
 }
 
+/* ── TRACK 3: OS-wide rules (src/, shells, capture policy) ────────────── */
+
+const SRC = path.join(ROOT, "src");
+
+function walk(dir, exts, out = []) {
+  for (const name of readdirSync(dir)) {
+    const full = path.join(dir, name);
+    if (statSync(full).isDirectory()) walk(full, exts, out);
+    else if (exts.some((ext) => name.endsWith(ext))) out.push(full);
+  }
+  return out;
+}
+
+const SRC_TOKEN_SOURCE = path.join(SRC, "styles", "index.css");
+const NAMED_PALETTE_RE =
+  /\b(?:text|bg|border|ring|from|to|via|outline|fill|stroke|decoration|divide|accent|caret|shadow)-(?:gray|slate|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b/;
+const ARBITRARY_HEX_UTILITY_RE = /-\[#[0-9a-fA-F]{3,8}\]/;
+
+for (const file of walk(SRC, [".tsx", ".ts", ".css"])) {
+  const rel = path.relative(ROOT, file);
+  const text = readFileSync(file, "utf8");
+  const isTokenSource = file === SRC_TOKEN_SOURCE;
+
+  text.split("\n").forEach((line, index) => {
+    const lineNo = index + 1;
+
+    if (isTokenSource) {
+      // @theme token source: hex only in custom-property declarations.
+      if (HEX_RE.test(line) && !/^\s*--[a-zA-Z0-9-]+\s*:/.test(line)) {
+        fail(rel, "R9", `line ${lineNo}: raw hex outside a custom-property declaration`);
+      }
+      return;
+    }
+
+    // HTML numeric character references (&#9650;) are not colors.
+    const deEntitied = line.replace(/&#\d+;/g, "");
+    if (HEX_RE.test(deEntitied) && !/color-scheme|href=|glyph|#root/.test(line)) {
+      fail(rel, "R9", `line ${lineNo}: raw hex in OS surface code (use op-*/entity-* tokens)`);
+    }
+    const named = line.match(NAMED_PALETTE_RE);
+    if (named) {
+      fail(rel, "R10", `line ${lineNo}: rogue named palette utility "${named[0]}"`);
+    }
+    if (ARBITRARY_HEX_UTILITY_RE.test(line)) {
+      fail(rel, "R11", `line ${lineNo}: arbitrary hex utility (use op-*/entity-* tokens)`);
+    }
+  });
+}
+
+const PUBLIC_SHELLS = ["ecosystem.html", "storefront.html", "index.html"];
+const OPERATOR_SHELLS = ["cockpit.html", "auth.html", "council.html"];
+
+for (const shell of [...PUBLIC_SHELLS, ...OPERATOR_SHELLS]) {
+  const full = path.join(ROOT, shell);
+  if (!existsSync(full)) {
+    fail(shell, "R12", "Vite shell missing from repo root");
+    continue;
+  }
+  const html = readFileSync(full, "utf8");
+  for (const sheet of ["/styles/entity-tokens.css", "/styles/entity-cues.css"]) {
+    if (!html.includes(sheet)) fail(shell, "R12", `shell missing entity substrate ${sheet}`);
+  }
+  const hasCapture = html.includes("/scripts/flow-tracker.js");
+  if (PUBLIC_SHELLS.includes(shell) && !hasCapture) {
+    fail(shell, "R12", "public shell missing capture layer (/scripts/flow-tracker.js)");
+  }
+  if (OPERATOR_SHELLS.includes(shell) && hasCapture) {
+    fail(shell, "R12", "operator shell must not load growth capture (policy exclusion)");
+  }
+}
+
+const VOICE_SURFACES = [
+  "src/pages/Dashboard.tsx",
+  "src/pages/Marketplace.tsx",
+  "src/pages/StorefrontMarketplace.tsx",
+  "src/pages/Status.tsx",
+  "src/pages/Login.tsx",
+  "src/pages/EcosystemSplash.tsx",
+  "src/pages/LiveJoin.tsx",
+  "src/pages/ops/DeployOps.tsx",
+  "src/pages/ops/FedGradeOps.tsx",
+  "src/pages/ops/SecurityOps.tsx",
+  "src/operator/ttx/index.tsx",
+];
+
+for (const rel of VOICE_SURFACES) {
+  const full = path.join(ROOT, rel);
+  if (!existsSync(full)) {
+    fail(rel, "R13", "voice-governed surface missing");
+    continue;
+  }
+  if (!readFileSync(full, "utf8").includes("<EntityVoice")) {
+    fail(rel, "R13", "surface does not render an <EntityVoice> cue");
+  }
+}
+
+for (const name of readdirSync(PUBLIC)) {
+  if (!name.endsWith(".html") || name.endsWith("-operator.html")) continue;
+  if (!readFileSync(path.join(PUBLIC, name), "utf8").includes("/scripts/flow-tracker.js")) {
+    fail(name, "R14", "public page missing capture layer (/scripts/flow-tracker.js)");
+  }
+}
+
 /* ── Report ───────────────────────────────────────────────────────────── */
 
 if (failures.length > 0) {
@@ -323,6 +441,7 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Brand conformance lint passed: ${GOVERNED_CSS.length} stylesheets, ${GOVERNED_HTML.length} pages, ` +
+  `Brand conformance lint passed: ${GOVERNED_CSS.length} stylesheets, ${GOVERNED_HTML.length} funnel/legacy pages, ` +
+    `src/ OS surfaces + 6 shells + ${VOICE_SURFACES.length} voice surfaces, ` +
     `${Object.keys(registry).length} tokens in registry, entity contrast verified against --bg.`,
 );
