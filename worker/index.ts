@@ -58,6 +58,10 @@ import { handleTelemetryRoute, recordTelemetrySample } from "./telemetry";
 import { handleUsageRoute } from "./usage";
 import { handleFlowEventRoute } from "./flowRoute";
 import { handleFlowIntelligenceRoute } from "./flowIntelligenceRoute";
+import { handleQualificationRoute } from "./qualificationRuntime";
+import { handleEntitlementsRoute } from "./entitlementsWorker";
+import { handleTierRoute } from "./tierWorker";
+import { handleBillingRoute } from "./marketplaceBillingWorker";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
@@ -448,6 +452,32 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
       if (flowIntelligenceResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, flowIntelligenceResponse.status);
         return flowIntelligenceResponse;
+      }
+
+      // Pearl-Spectral structural runtimes (Track 5): qualification,
+      // entitlements, tier, marketplace billing.
+      const qualificationResponse = await handleQualificationRoute(request, url.pathname, env as WorkerEnv);
+      if (qualificationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, qualificationResponse.status);
+        return qualificationResponse;
+      }
+
+      const entitlementsResponse = await handleEntitlementsRoute(request, url.pathname, env as WorkerEnv);
+      if (entitlementsResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, entitlementsResponse.status);
+        return entitlementsResponse;
+      }
+
+      const tierResponse = await handleTierRoute(request, url.pathname, env as WorkerEnv);
+      if (tierResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, tierResponse.status);
+        return tierResponse;
+      }
+
+      const billingResponse = await handleBillingRoute(request, url.pathname, env as WorkerEnv);
+      if (billingResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, billingResponse.status);
+        return billingResponse;
       }
 
       const behaviorResponse = await handleBehaviorIntelligenceRoute(request, url.pathname, env as WorkerEnv);

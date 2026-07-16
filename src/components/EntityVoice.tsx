@@ -12,7 +12,9 @@ import type { ReactNode } from "react";
  * Surface → entity assignments are documented in SURFACE-IDENTITY-MAP.md;
  * the brand-conformance lint checks key surfaces render a cue.
  */
-export type EntityName = "beacon" | "aurelius" | "hsx" | "ghost" | "operator";
+import type { EntityName } from "../pearl/entityNames";
+
+export type { EntityName };
 
 const ENTITY_ROLE: Record<EntityName, string> = {
   beacon: "Governs",

@@ -1,12 +1,11 @@
 /**
- * PEARL-SPECTRAL — ONBOARDING CHECKLIST PRIMITIVES (Track 3 scaffold)
+ * PEARL-SPECTRAL — ONBOARDING CHECKLIST PRIMITIVES (live since Track 5)
  * ---------------------------------------------------------------------------
- * Presentational primitives for the future activation checklist
- * (ONBOARDING-SCAFFOLD.md; reference board frame ⑤ — Account Created →
- * Profile Setup → Mission Diagnostic → System Blueprint → Access Granted).
- * Non-production: nothing imports these from a live surface, and item
- * status is caller-supplied — no checklist logic, derivation, or
- * persistence ships here.
+ * Presentational primitives for the activation checklist (reference
+ * board frame ⑤ — Account Created → Profile Setup → Mission Diagnostic →
+ * System Blueprint → Access Granted), live in the onboarding wizard
+ * since Track 5. Item status stays caller-supplied — derivation belongs
+ * to the qualification runtime, not the rendering layer.
  *
  * Token discipline: op-* / entity-* utilities only (brand lint R9–R11).
  */

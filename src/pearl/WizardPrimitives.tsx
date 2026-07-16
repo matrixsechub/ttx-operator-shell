@@ -1,11 +1,10 @@
 /**
- * PEARL-SPECTRAL — WIZARD PRIMITIVES (Track 3 scaffold, non-production)
+ * PEARL-SPECTRAL — WIZARD PRIMITIVES (live since Track 5)
  * ---------------------------------------------------------------------------
- * Presentational primitives extracted ahead of the Track 2 structural
- * rebuild (WIZARD-SCAFFOLD.md). Nothing routes to these components and no
- * live surface imports them. They are deliberately CONTROLLED components:
- * all state lives in the caller, so no wizard *logic* ships here — only
- * the rendering vocabulary the future wizard will use.
+ * Presentational primitives consumed by the live onboarding wizard
+ * (src/pearl/onboardingWizard.tsx) since Track 5 lifted the structural
+ * boundary. They remain CONTROLLED components: all state lives in the
+ * caller; flow decisions belong to the mounting surface.
  *
  * Token discipline: op-* / entity-* utilities only (brand lint R9–R11).
  * The reference design is board frame ③ ("Let's understand your mission",

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { getOrCreateSessionId, readTrafficSourceFromUrl } from "./usageBeacon";
+import { mountPrismTracker, type PrismTrackerHandle } from "./prismTracker";
 
 export type FlowTrackerEvent =
   | "page_view"
@@ -60,7 +61,7 @@ export function FlowTracker() {
   const pageEnteredAt = useRef(Date.now());
   const clickCount = useRef(0);
   const previousPage = useRef<string | null>(null);
-  const impressedCtas = useRef(new Set<string>());
+  const prism = useRef<PrismTrackerHandle | null>(null);
 
   useEffect(() => {
     const page = location.pathname || "/";
@@ -76,7 +77,7 @@ export function FlowTracker() {
     previousPage.current = page;
     pageEnteredAt.current = Date.now();
     clickCount.current = 0;
-    impressedCtas.current.clear();
+    prism.current?.reset();
   }, [location.pathname]);
 
   useEffect(() => {
@@ -119,29 +120,19 @@ export function FlowTracker() {
     });
     window.addEventListener("pagehide", flushDwell);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const element = entry.target;
-          if (!(element instanceof HTMLElement)) continue;
-          const ctaId = element.dataset.flowCta;
-          if (!ctaId || impressedCtas.current.has(ctaId)) continue;
-          impressedCtas.current.add(ctaId);
-          recordFlowEvent("cta_impression", { ctaId });
-        }
-      },
-      { threshold: 0.5 },
-    );
-
-    document.querySelectorAll("[data-flow-cta]").forEach((element) => observer.observe(element));
+    // Track 5 SPA capture upgrade: impressions are handled by the
+    // mutation-aware PRISM tracker so CTAs mounted after this effect
+    // (route changes, modals, async lists) still impress exactly once
+    // per page view.
+    prism.current = mountPrismTracker((ctaId) => recordFlowEvent("cta_impression", { ctaId }));
 
     return () => {
       document.removeEventListener("click", onClick, { capture: true });
       document.removeEventListener("click", onCtaClick, { capture: true });
       document.removeEventListener("focusin", onFormFocus, { capture: true });
       window.removeEventListener("pagehide", flushDwell);
-      observer.disconnect();
+      prism.current?.disconnect();
+      prism.current = null;
     };
   }, []);
 

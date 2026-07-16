@@ -1,12 +1,11 @@
 /**
- * PEARL-SPECTRAL — QUALIFICATION LIFECYCLE CONTRACT (Track 3 scaffold)
+ * PEARL-SPECTRAL — QUALIFICATION LIFECYCLE CONTRACT (live since Track 5)
  * ---------------------------------------------------------------------------
- * CONTRACT ONLY. This file defines the type-level contract for the future
- * qualification lifecycle. It is deliberately NOT a state machine: there is
- * no executor, no persistence, no route wiring, and nothing imports this
- * module from any live surface. Implementing the machine is blocked until
- * R0 worker restoration lands and Council review approves the structural
- * rebuild (see REBUILD-PLAN.md and WIZARD-SCAFFOLD.md).
+ * The type-level contract for the qualification lifecycle. Since Track 5
+ * (structural rebuild) this contract is EXECUTED by the pure fold in
+ * src/pearl/qualificationMachine.ts and persisted by
+ * worker/qualificationRuntime.ts — the contract itself stays type-only so
+ * every implementation remains checkable against it.
  *
  * Doctrine encoded here:
  *  - Option B (capture-first → qualification-after) is the default: the
@@ -18,7 +17,7 @@
  *    it, keeping the emotional arc (EMOTIONAL-ARC.md) type-checked.
  */
 
-import type { EntityName } from "../../components/EntityVoice";
+import type { EntityName } from "./entityNames";
 
 /** Lifecycle stages, in order. Option B: capture is stage zero. */
 export const QUALIFICATION_STAGES = [
