@@ -19,6 +19,9 @@
   },
   "include": [
     "worker",
+    "src/pearl/entityNames.ts",
+    "src/pearl/qualificationContract.ts",
+    "src/pearl/qualificationMachine.ts",
     "msh-ops/beacon",
     "msh-ops/agent",
     "msh-ops/governance/checkAutonomy.ts",

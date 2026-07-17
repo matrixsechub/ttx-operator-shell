@@ -1,0 +1,151 @@
+/**
+ * PEARL-SPECTRAL OS — ENTITY VOICE CUES (Track 1: Conformance)
+ * -----------------------------------------------------------------------
+ * Presentational entity voice cues for governed funnel surfaces. A voice
+ * cue tells the visitor WHICH governing entity is speaking on a surface
+ * (BEACON governs, AURELIUS interprets, HSX protects, GHOST evolves)
+ * without changing funnel structure, flow, or logic.
+ *
+ * Usage (additive markup only — never replaces existing elements):
+ *   <p class="entity-voice mono" data-entity="aurelius">
+ *     <span class="entity-voice-orb" aria-hidden="true"></span>
+ *     <strong>AURELIUS</strong>
+ *     <span>Interprets intent — your selections shape the guided path.</span>
+ *   </p>
+ *
+ * Rules:
+ *   1. Consumes ONLY --entity-* tokens (entity-tokens.css). No raw hex.
+ *   2. Class names are prefixed `entity-` and collide with nothing in
+ *      styles.css or the rgbgold layers.
+ *   3. Motion is decorative-only and fully disabled under
+ *      prefers-reduced-motion.
+ *   4. Any interactive element inside a cue keeps a visible
+ *      :focus-visible affordance in the entity's own accent.
+ *
+ * DRIFT-MARKER: layer=components file=public/styles/entity-cues.css version=1.0
+ */
+
+/* Entity accent binding — the only place the data-entity attribute is
+   mapped to a concrete token family. */
+[data-entity="beacon"] {
+  --entity-accent: var(--entity-beacon);
+  --entity-accent-dim: var(--entity-beacon-dim);
+  --entity-accent-glow: var(--entity-beacon-glow);
+  --entity-accent-veil: var(--entity-beacon-veil);
+  --entity-accent-line: var(--entity-beacon-line);
+}
+
+[data-entity="aurelius"] {
+  --entity-accent: var(--entity-aurelius);
+  --entity-accent-dim: var(--entity-aurelius-dim);
+  --entity-accent-glow: var(--entity-aurelius-glow);
+  --entity-accent-veil: var(--entity-aurelius-veil);
+  --entity-accent-line: var(--entity-aurelius-line);
+}
+
+[data-entity="hsx"] {
+  --entity-accent: var(--entity-hsx);
+  --entity-accent-dim: var(--entity-hsx-dim);
+  --entity-accent-glow: var(--entity-hsx-glow);
+  --entity-accent-veil: var(--entity-hsx-veil);
+  --entity-accent-line: var(--entity-hsx-line);
+}
+
+[data-entity="ghost"] {
+  --entity-accent: var(--entity-ghost);
+  --entity-accent-dim: var(--entity-ghost-dim);
+  --entity-accent-glow: var(--entity-ghost-glow);
+  --entity-accent-veil: var(--entity-ghost-veil);
+  --entity-accent-line: var(--entity-ghost-line);
+}
+
+[data-entity="operator"] {
+  --entity-accent: var(--entity-operator);
+  --entity-accent-dim: var(--entity-operator-dim);
+  --entity-accent-glow: var(--entity-operator-glow);
+  --entity-accent-veil: var(--entity-operator-veil);
+  --entity-accent-line: var(--entity-operator-line);
+}
+
+/* ── Voice strip ─────────────────────────────────────────────────────── */
+.entity-voice {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.35rem 0 0;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--entity-accent-line);
+  border-left: 3px solid var(--entity-accent);
+  border-radius: var(--entity-voice-radius);
+  background:
+    linear-gradient(90deg, var(--entity-accent-veil), transparent 70%),
+    var(--entity-voice-surface);
+  color: var(--entity-voice-text);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+.entity-voice strong {
+  color: var(--entity-accent);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.entity-voice a {
+  color: var(--entity-accent);
+}
+
+.entity-voice a:focus-visible {
+  outline: 2px solid var(--entity-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Entity orb (decorative pulse) ───────────────────────────────────── */
+.entity-voice-orb {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--entity-accent);
+  box-shadow: 0 0 8px var(--entity-accent-glow);
+  animation: entity-orb-pulse 2.8s var(--rgbgold-ease-standard, ease-in-out) infinite;
+}
+
+@keyframes entity-orb-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 4px var(--entity-accent-glow);
+    opacity: 0.85;
+  }
+  50% {
+    box-shadow: 0 0 12px var(--entity-accent-glow);
+    opacity: 1;
+  }
+}
+
+/* ── Motion doctrine — decorative motion off when the system asks ────── */
+@media (prefers-reduced-motion: reduce) {
+  .entity-voice-orb {
+    animation: none;
+  }
+}
+
+/* ── High-contrast (a11y mode) doctrine — cues stay legible, never rely
+      on glow alone ─────────────────────────────────────────────────── */
+body.a11y-mode .entity-voice {
+  background: var(--a11y-surface, #10121a);
+  border-color: var(--a11y-border, #7d8aa3);
+  color: var(--a11y-text, #ffffff);
+}
+
+body.a11y-mode .entity-voice strong {
+  color: var(--a11y-accent, #ffd54a);
+}
+
+body.a11y-mode .entity-voice-orb {
+  animation: none;
+  box-shadow: none;
+}

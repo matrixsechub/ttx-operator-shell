@@ -4,6 +4,7 @@ import { StorefrontShell } from "../components/StorefrontShell";
 import { CatalogDetailModal } from "../components/CatalogDetailModal";
 import { CatalogGrid } from "../components/CatalogGrid";
 import { Breadcrumbs } from "../components/Breadcrumbs";
+import { EntityVoice } from "../components/EntityVoice";
 import { api } from "../lib/apiClient";
 import { useApiResource } from "../lib/useApiResource";
 import type { CatalogItem } from "../lib/types";
@@ -36,6 +37,7 @@ export function StorefrontMarketplace() {
           <div>
             <h1 className="text-lg uppercase tracking-widest text-op-accent">Marketplace</h1>
             <p className="mt-1 text-xs text-op-text-dim">Public catalog of items and services.</p>
+            <EntityVoice entity="aurelius">browse the governed catalog; nothing here requires an account.</EntityVoice>
           </div>
           <button
             type="button"

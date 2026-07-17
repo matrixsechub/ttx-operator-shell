@@ -13,6 +13,7 @@ export function CatalogGrid({ items, onSelect }: { items: CatalogItem[]; onSelec
           key={item.id}
           type="button"
           onClick={() => onSelect(item)}
+          data-flow-cta={`catalog-item-${item.id}`}
           className="op-panel flex flex-col items-start gap-2 rounded-sm p-4 text-left transition-colors hover:border-op-accent/50 hover:bg-op-accent/5"
         >
           <div className="flex w-full items-start justify-between gap-2">

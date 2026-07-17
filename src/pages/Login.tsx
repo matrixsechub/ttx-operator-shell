@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate, type Location } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
 import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
+import { EntityVoice } from "../components/EntityVoice";
 
 type LoginMode = "password" | "token";
 
@@ -46,6 +47,7 @@ export function Login() {
           <span className="text-[11px] uppercase tracking-[0.4em] text-op-text-dim">MatrixSecHub // Ops Division</span>
           <h1 className="mt-2 text-lg uppercase tracking-widest text-op-accent">Operator Login</h1>
           <p className="mt-1 text-xs text-op-text-dim">Authenticate the link to enter the system.</p>
+          <EntityVoice entity="hsx">authentication routes through the security plane.</EntityVoice>
         </div>
 
         {sessionEndedReason && (

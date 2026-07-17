@@ -28,6 +28,16 @@ export function classifyRoute(pathname: string, method: string): RouteClass {
   if (pathname === "/api/engagements/status" && method === "GET") return "public";
   if (pathname === "/api/public/demo-mode" && method === "GET") return "public";
   if (pathname === "/api/register" && method === "POST") return "public";
+  if (pathname === "/api/qualification/evidence" && method === "POST") return "public";
+  if (pathname === "/api/qualification/state" && method === "GET") return "public";
+  if (pathname === "/api/entitlements/resolve" && method === "GET") return "public";
+  if (pathname === "/api/tier/get" && method === "GET") return "public";
+  if (pathname === "/api/billing/checkout-session" && method === "POST") return "public";
+  if (pathname === "/api/billing/acquisition" && method === "GET") return "public";
+  if (pathname === "/api/webhooks/billing" && method === "POST") return "public";
+  if (pathname === "/api/recommendation/evaluate" && method === "POST") return "public";
+  if (pathname === "/api/marketplace/intent" && method === "POST") return "public";
+  if (pathname === "/api/blueprint" && method === "GET") return "public";
   if (pathname === "/api/register-lifecycle" && method === "GET") return "public";
   if (pathname === "/api/register-security" && method === "GET") return "public";
   if (pathname === "/api/register-queue" && method === "GET") return "public";

@@ -55,38 +55,8 @@ export async function serveOperatorSpa(
   });
   const response = await assets.fetch(shellRequest);
   const html = await response.text();
-  const title = html.match(/<title>([^<]+)/)?.[1] ?? "missing";
   const operatorOk = isOperatorShellHtml(html);
   const storefrontLeak = isStorefrontShellLeak(html);
-
-  // #region agent log
-  console.log("TRACE: OPERATOR_SHELL =", shellUrl.pathname);
-  console.log("TRACE: OPERATOR_STATUS =", response.status);
-  console.log("TRACE: OPERATOR_TITLE =", title);
-  console.log("TRACE: OPERATOR_VALID =", operatorOk);
-  console.log("TRACE: STOREFRONT_LEAK =", storefrontLeak);
-  fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-    body: JSON.stringify({
-      sessionId: "14ea90",
-      runId: "operator-surface",
-      hypothesisId: "H-operator-shell",
-      location: "worker/operator.ts:serveOperatorSpa",
-      message: "operator shell resolved",
-      data: {
-        shellPath: shellUrl.pathname,
-        status: response.status,
-        title,
-        operatorOk,
-        storefrontLeak,
-        htmlLen: html.length,
-        bundleRef: html.match(/\/assets\/[^"']+/)?.[0] ?? null,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
 
   if (!operatorOk || storefrontLeak || !response.ok) {
     return Response.json(

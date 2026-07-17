@@ -43,7 +43,7 @@
 }
 
 .btn-primary {
-  color: #03111f;
+  color: var(--rgbgold-ink-cyan, #03111f);
   background: var(--rgbgold-gradient-main);
   box-shadow: var(--rgbgold-shadow-glow);
 }
@@ -53,7 +53,7 @@
 }
 
 .btn-gold {
-  color: #241505;
+  color: var(--rgbgold-ink-gold, #241505);
   background: var(--rgbgold-gradient-gold);
   box-shadow: var(--rgbgold-shadow-gold);
 }
@@ -495,7 +495,7 @@
   transition: none !important;
   background: rgba(16, 20, 26, 0.93);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  color: var(--rgbgold-white, #ffffff);
   box-shadow: none !important;
 }
 
