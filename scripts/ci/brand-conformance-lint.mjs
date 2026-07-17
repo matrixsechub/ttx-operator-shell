@@ -421,6 +421,7 @@ const VOICE_SURFACES = [
   "src/operator/ttx/index.tsx",
   "src/pearl/onboardingWizard.tsx",
   "src/pearl/marketplacePurchase.tsx",
+  "src/pearl/upgradeAdvisor.tsx",
 ];
 
 for (const rel of VOICE_SURFACES) {

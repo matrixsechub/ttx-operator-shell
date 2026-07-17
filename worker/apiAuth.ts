@@ -43,6 +43,11 @@ export function isPublicApiRoute(pathname: string, method: string): boolean {
   if (matchesPath(pathname, method, "/api/billing/checkout-session", "POST")) return true;
   if (matchesPath(pathname, method, "/api/billing/acquisition", "GET")) return true;
   if (matchesPath(pathname, method, "/api/webhooks/billing", "POST")) return true;
+  // Autonomy layer (Track 6). /api/notifications/recent is NOT listed —
+  // it stays default-deny (operator JWT).
+  if (matchesPath(pathname, method, "/api/recommendation/evaluate", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/marketplace/intent", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/blueprint", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register-lifecycle", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register-security", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register-queue", "GET")) return true;

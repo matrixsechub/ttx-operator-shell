@@ -30,8 +30,9 @@ import { STAGE_VOICE } from "../src/pearl/qualificationContract";
 import type { SubscriptionTier, UpgradePackKind } from "../src/pearl/qualificationContract";
 import { findRegisterCapture } from "./funnelRecovery";
 import { isValidSessionId } from "./usage";
+import { notifyOperator, type NotificationsEnv } from "./operatorNotifications";
 
-export interface QualificationEnv {
+export interface QualificationEnv extends NotificationsEnv {
   TTX_STATE?: KVNamespace;
 }
 
@@ -112,6 +113,24 @@ async function writeRecord(kv: KVNamespace, record: QualificationRecord): Promis
   await kv.put(keyFor(record.registerId), JSON.stringify(record), { expirationTtl: RETENTION_SECONDS });
 }
 
+/**
+ * Snapshot reader for the autonomy layer (Track 6): resolves a captureId
+ * to its evidence list and folded state. Returns null when the capture
+ * does not exist (Option B: no capture, no lifecycle).
+ */
+export async function readQualificationSnapshot(
+  env: QualificationEnv,
+  captureId: string,
+): Promise<{ registerId: string; evidence: EvidenceItem[]; state: ReturnType<typeof resolveStage> } | null> {
+  const kv = env.TTX_STATE;
+  if (!kv || !CAPTURE_ID_RE.test(captureId)) return null;
+  const capture = await findRegisterCapture(kv, captureId);
+  if (!capture) return null;
+  const record = await readRecord(kv, capture.registerId);
+  const evidence = record?.evidence ?? [];
+  return { registerId: capture.registerId, evidence, state: resolveStage(evidence) };
+}
+
 function stateResponse(record: QualificationRecord | null): Response {
   const state = record ? resolveStage(record.evidence) : null;
   if (!state) {
@@ -177,6 +196,11 @@ export async function handleQualificationRoute(
 
   const capture = await findRegisterCapture(kv, captureId);
   if (!capture) {
+    await notifyOperator(env, {
+      kind: "qualification-anomaly",
+      captureId,
+      data: { reason: "capture-not-found", evidenceKind: kind },
+    });
     return Response.json({ error: "capture not found" }, { status: 404 });
   }
 
@@ -205,8 +229,15 @@ export async function handleQualificationRoute(
     });
   }
 
+  const preStage = resolveStage(record.evidence)?.stage ?? null;
+
   if (kind !== "capture_confirmed") {
     if (record.evidence.length >= MAX_EVIDENCE_ITEMS) {
+      await notifyOperator(env, {
+        kind: "qualification-anomaly",
+        captureId,
+        data: { reason: "evidence-limit-reached", evidenceKind: kind },
+      });
       return Response.json({ error: "evidence limit reached for this capture" }, { status: 409 });
     }
     record.evidence.push({ kind, at: now, data });
@@ -216,6 +247,14 @@ export async function handleQualificationRoute(
   await writeRecord(kv, record);
 
   const state = resolveStage(record.evidence);
+
+  if (state?.stage === "QUALIFY" && preStage !== "QUALIFY") {
+    await notifyOperator(env, {
+      kind: "qualify-reached",
+      captureId: capture.registerId,
+      data: { evidenceKind: kind },
+    });
+  }
   return Response.json(
     {
       ok: true,

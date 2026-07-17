@@ -62,6 +62,10 @@ import { handleQualificationRoute } from "./qualificationRuntime";
 import { handleEntitlementsRoute } from "./entitlementsWorker";
 import { handleTierRoute } from "./tierWorker";
 import { handleBillingRoute } from "./marketplaceBillingWorker";
+import { handleRecommendationRoute } from "./recommendationEngine";
+import { handleMarketplaceIntentRoute } from "./marketplaceIntentRouter";
+import { handleBlueprintRoute } from "./blueprintGenerator";
+import { handleNotificationsRoute } from "./operatorNotifications";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
@@ -478,6 +482,32 @@ async function handleFetch(request: Request, env: Env): Promise<Response> {
       if (billingResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, billingResponse.status);
         return billingResponse;
+      }
+
+      // Autonomy layer (Track 6): recommendation, intent routing,
+      // blueprint, operator notifications.
+      const recommendationResponse = await handleRecommendationRoute(request, url.pathname, env as WorkerEnv);
+      if (recommendationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, recommendationResponse.status);
+        return recommendationResponse;
+      }
+
+      const intentResponse = await handleMarketplaceIntentRoute(request, url.pathname, env as WorkerEnv);
+      if (intentResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, intentResponse.status);
+        return intentResponse;
+      }
+
+      const blueprintResponse = await handleBlueprintRoute(request, url.pathname, env as WorkerEnv);
+      if (blueprintResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, blueprintResponse.status);
+        return blueprintResponse;
+      }
+
+      const notificationsResponse = await handleNotificationsRoute(request, url.pathname, env as WorkerEnv);
+      if (notificationsResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, notificationsResponse.status);
+        return notificationsResponse;
       }
 
       const behaviorResponse = await handleBehaviorIntelligenceRoute(request, url.pathname, env as WorkerEnv);

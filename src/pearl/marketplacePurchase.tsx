@@ -18,6 +18,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CatalogItem } from "../lib/types";
 import { EntityVoice } from "../components/EntityVoice";
+import { AdvisorHint } from "./upgradeAdvisor";
 import { recordFlowEvent } from "../lib/flowTracker";
 import { getOrCreateSessionId } from "../lib/usageBeacon";
 
@@ -181,6 +182,7 @@ export function MarketplacePurchase({ item }: { item: CatalogItem }) {
             acquire nothing.
           </EntityVoice>
           <p className="text-xs text-op-amber">{state.reason}</p>
+          <AdvisorHint itemName={item.name} requiresTier={state.requiresTier ?? "operator"} />
         </>
       )}
 

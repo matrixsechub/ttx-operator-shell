@@ -15,9 +15,10 @@
  */
 
 import { getAccessTokenOperator, type AuthEnv } from "./auth";
+import { notifyOperator, type NotificationsEnv } from "./operatorNotifications";
 import type { SubscriptionTier } from "../src/pearl/qualificationContract";
 
-export interface TierEnv {
+export interface TierEnv extends NotificationsEnv {
   TTX_STATE?: KVNamespace;
 }
 
@@ -88,5 +89,12 @@ export async function handleTierRoute(
 
   const previous = await readTier(env, subject);
   await writeTier(env, subject, tier);
+  if (tier !== previous) {
+    await notifyOperator(env, {
+      kind: "tier-upgrade",
+      subject,
+      data: { previous, tier, by: operator.handle },
+    });
+  }
   return Response.json({ ok: true, subject, tier, previous });
 }

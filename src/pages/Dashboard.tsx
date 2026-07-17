@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { GovernanceStatePanel } from "../components/GovernanceStatePanel";
 import { EntityVoice } from "../components/EntityVoice";
+import { AdvisorPanel } from "../pearl/upgradeAdvisor";
 import { OperatorShell } from "../components/OperatorShell";
 import { SystemHUD } from "../components/SystemHUD";
 import { SystemTelemetryPanel } from "../components/SystemTelemetryPanel";
@@ -37,6 +38,8 @@ export function Dashboard() {
           </div>
           <EngineStatusIndicator />
         </div>
+
+        <AdvisorPanel />
 
         <TelemetryPanel />
 

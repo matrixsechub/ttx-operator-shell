@@ -34,9 +34,10 @@ import {
 } from "./entitlementsWorker";
 import { readTier } from "./tierWorker";
 import { timingSafeEqual } from "./edge/crypto";
+import { notifyOperator, type NotificationsEnv } from "./operatorNotifications";
 import type { UpgradePackKind } from "../src/pearl/qualificationContract";
 
-export interface BillingEnv extends EntitlementsEnv {
+export interface BillingEnv extends EntitlementsEnv, NotificationsEnv {
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   BILLING_SANDBOX?: string;
@@ -87,7 +88,7 @@ async function writeAcquisition(kv: KVNamespace, record: AcquisitionRecord): Pro
 }
 
 /** M3-4: idempotent grant from a confirmed acquisition (single writer). */
-async function settleGrant(kv: KVNamespace, record: AcquisitionRecord): Promise<AcquisitionRecord> {
+async function settleGrant(kv: KVNamespace, record: AcquisitionRecord, env: BillingEnv): Promise<AcquisitionRecord> {
   if (record.status === "granted") return record;
   await grantPack(kv, record.subject, {
     kind: record.packKind,
@@ -97,6 +98,11 @@ async function settleGrant(kv: KVNamespace, record: AcquisitionRecord): Promise<
   });
   const settled: AcquisitionRecord = { ...record, status: "granted", updatedAt: new Date().toISOString() };
   await writeAcquisition(kv, settled);
+  await notifyOperator(env, {
+    kind: "entitlement-grant",
+    subject: record.subject,
+    data: { itemId: record.itemId, packKind: record.packKind, acquisitionId: record.id, sandbox: record.sandbox },
+  });
   return settled;
 }
 
@@ -226,6 +232,10 @@ export async function handleBillingRoute(
       return Response.json({ error: "Invalid JSON" }, { status: 400 });
     }
     const acquisitionId = event.data?.object?.metadata?.acquisition_id ?? "";
+    await notifyOperator(env, {
+      kind: "billing-webhook",
+      data: { type: event.type ?? "unknown", acquisitionId: acquisitionId || null },
+    });
     if (!UUID_RE.test(acquisitionId)) {
       return Response.json({ ok: true, ignored: "no acquisition metadata" });
     }
@@ -233,7 +243,7 @@ export async function handleBillingRoute(
     if (!record) return Response.json({ error: "acquisition not found" }, { status: 404 });
 
     if (event.type === "checkout.session.completed") {
-      const settled = await settleGrant(kv, record);
+      const settled = await settleGrant(kv, record, env);
       return Response.json({ ok: true, status: settled.status });
     }
     if (event.type === "checkout.session.expired") {
@@ -308,7 +318,7 @@ export async function handleBillingRoute(
   await writeAcquisition(kv, record);
 
   if (provider === "sandbox") {
-    const settled = await settleGrant(kv, record);
+    const settled = await settleGrant(kv, record, env);
     return Response.json(
       { acquisitionId: settled.id, provider, status: settled.status, sandbox: true },
       { status: 201 },
