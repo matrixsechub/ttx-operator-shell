@@ -2,13 +2,20 @@ import type { FlywheelCommand, FlywheelRun, FlywheelRunDetail } from "../../shar
 import { isRecord, validateFlywheelApproval, validateRunCreate } from "../../shared/flywheel/contracts";
 import { FLYWHEEL_STAGE_REGISTRY } from "../../shared/flywheel/stages";
 import { getAccessTokenOperator } from "../auth";
-import { getBeaconHashForReads, resolveBeaconRuntimeState } from "../governance/beaconRuntime";
-import { buildReceiptFromProposal, finalizeApprovalReceipt } from "../governance/approvalReceipt";
-import { computeProposalActionDigest } from "../governance/proposalActionDigest";
-import { getProposal, saveApprovalReceipt, saveProposal, updateProposalStatus } from "../governance/proposalStore";
-import { resolveExecutionSigning } from "../governance/approvalVerifier";
-import { runGovernedMutation } from "../governance/governedMutation";
-import { resolveRuntimeEnvironment } from "../governance/runtimeEnv";
+import {
+  buildReceiptFromProposal,
+  computeProposalActionDigest,
+  finalizeApprovalReceipt,
+  getBeaconHashForReads,
+  getProposal,
+  resolveBeaconRuntimeState,
+  resolveExecutionSigning,
+  resolveRuntimeEnvironment,
+  runGovernedMutation,
+  saveApprovalReceipt,
+  saveProposal,
+  updateProposalStatus,
+} from "./mainCompat";
 import { parseFlywheelCommand } from "./commandParser";
 import { buildFlywheelProposal, evaluateFlywheelGovernance } from "./governance";
 import type { FlywheelDO } from "./do";

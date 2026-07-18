@@ -1,10 +1,7 @@
 import type { FlywheelCommand, FlywheelRun } from "../../shared/flywheel/contracts";
 import { stageFromTarget } from "../../shared/flywheel/stages";
-import type { ActionProposal } from "../governance/types";
-import { defaultNorthstarImpact } from "../governance/types";
-import { getCodexManifestSnapshot } from "../codex/manifestHash";
-import { resolveBeaconRuntimeState } from "../governance/beaconRuntime";
-import type { BeaconReleaseEnv } from "../beacon/beaconRelease";
+import type { ActionProposal, BeaconReleaseEnv } from "./mainCompat";
+import { defaultNorthstarImpact, getCodexManifestSnapshot, resolveBeaconRuntimeState } from "./mainCompat";
 
 export const FLYWHEEL_DENIAL_CODES = [
   "GOVERNANCE_MISSING_BEACON", "GOVERNANCE_HASH_INVALID", "GOVERNANCE_APPROVAL_REQUIRED",
