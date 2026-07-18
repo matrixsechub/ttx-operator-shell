@@ -5,6 +5,7 @@ import { useAuth } from "../lib/AuthContext";
 
 export const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", glyph: "01" },
+  { to: "/dashboard/flywheel", label: "Flywheel", glyph: "F1" },
   { to: "/marketplace", label: "Marketplace", glyph: "02" },
   { to: "/status", label: "Status", glyph: "03" },
   { to: "/about", label: "About", glyph: "04" },
