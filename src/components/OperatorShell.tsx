@@ -6,6 +6,7 @@ import { useAuth } from "../lib/AuthContext";
 
 export const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", glyph: "01" },
+  { to: "/dashboard/flywheel", label: "Flywheel", glyph: "F1" },
   { to: "/dashboard/beacon", label: "Beacon", glyph: "B1" },
   { to: "/dashboard/runtime", label: "Runtime", glyph: "R1" },
   { to: "/dashboard/governance", label: "Governance", glyph: "G1" },

@@ -41,7 +41,8 @@
     "BUILD_COMMIT_SHA": "unknown",
     "BUILD_TIMESTAMP": "",
     "SYSTEM_MODE": "PRODUCTION",
-    "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev"
+    "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev",
+    "FLYWHEEL_TENANT_ID": "mshops"
   },
   // Revoked-refresh-token denylist (Phase 16). Production namespace —
   // staging uses dedicated namespaces in env.staging (see docs/RELEASE.md).
@@ -57,7 +58,8 @@
       { "name": "SESSION", "class_name": "SessionDO" },
       { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
       { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
-      { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
+      { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" },
+      { "name": "FLYWHEEL", "class_name": "FlywheelDO" }
     ]
   },
   "migrations": [
@@ -72,6 +74,10 @@
     {
       "tag": "v37-receipt-authority",
       "new_sqlite_classes": ["ReceiptAuthority"]
+    },
+    {
+      "tag": "v38-flywheel-engine",
+      "new_sqlite_classes": ["FlywheelDO"]
     }
   ],
   "services": [
@@ -100,7 +106,8 @@
         "BUILD_TIMESTAMP": "",
         "SYSTEM_MODE": "OPERATOR_BETA",
         "ORIGIN_URL": "https://ttx-operator-shell-staging.sogellagepul.workers.dev",
-        "PUBLIC_CALENDLY_URL": "https://calendly.com/matrixsechub/30min"
+        "PUBLIC_CALENDLY_URL": "https://calendly.com/matrixsechub/30min",
+        "FLYWHEEL_TENANT_ID": "mshops-staging"
       },
       "kv_namespaces": [
         // Replace each id with the output of the corresponding create command (run once before first staging deploy):
@@ -119,7 +126,8 @@
           { "name": "SESSION", "class_name": "SessionDO" },
           { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
           { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
-          { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
+          { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" },
+          { "name": "FLYWHEEL", "class_name": "FlywheelDO" }
         ]
       },
       "migrations": [
@@ -134,6 +142,10 @@
         {
           "tag": "v37-receipt-authority",
           "new_sqlite_classes": ["ReceiptAuthority"]
+        },
+        {
+          "tag": "v38-flywheel-engine",
+          "new_sqlite_classes": ["FlywheelDO"]
         }
       ],
       "services": [

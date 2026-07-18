@@ -79,8 +79,10 @@ import { handleOperatorGovernanceRoute } from "./operatorGovernanceRoutes";
 import { handleGovernanceProposalRoute } from "./governanceRoutes";
 import { handleMcpGovernanceRoute } from "./governance/mcp/routes";
 import { handleOperatorAgentsRoute } from "./operatorAgentsRoutes";
+import { handleFlywheelRoute } from "./flywheel/routes";
 export { LiveTtxSession } from "./liveSession";
 export { ReceiptAuthority } from "./do/receiptAuthority";
+export { FlywheelDO } from "./flywheel/do";
 
 await assertBeaconOnStartup();
 await ensureAgentGovernance();
@@ -416,6 +418,12 @@ export default {
       if (governanceResponse) {
         await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, governanceResponse.status);
         return governanceResponse;
+      }
+
+      const flywheelResponse = await handleFlywheelRoute(request, url.pathname, env);
+      if (flywheelResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, flywheelResponse.status);
+        return flywheelResponse;
       }
 
 

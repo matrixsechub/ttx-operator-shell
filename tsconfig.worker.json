@@ -19,6 +19,7 @@
   },
   "include": [
     "worker",
+    "shared/flywheel",
     "msh-ops/beacon",
     "msh-ops/beacon/releases",
     "msh-ops/agent",
