@@ -5,7 +5,9 @@ Generated: `2026-07-19T07:40:00Z`
 Operator worktree: `C:\Users\wevrw\Dev\ttx-flywheel-pr-clean`  
 Branch: `release/flywheel-engine-v1-clean`  
 Start SHA: `dfed6c426cf37619ba94d42c181e79e4917efeba`  
-PR: https://github.com/matrixsechub/ttx-operator-shell/pull/9
+Restore commit: `0a7229dfb7b397fc76a33e1c020712cbdd0384a4`  
+PR: https://github.com/matrixsechub/ttx-operator-shell/pull/9  
+PR HEAD after restore: `0a7229dfb7b397fc76a33e1c020712cbdd0384a4`
 
 ## Objective
 
