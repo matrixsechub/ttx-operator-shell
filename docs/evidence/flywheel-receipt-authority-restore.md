@@ -5,9 +5,10 @@ Generated: `2026-07-19T07:40:00Z`
 Operator worktree: `C:\Users\wevrw\Dev\ttx-flywheel-pr-clean`  
 Branch: `release/flywheel-engine-v1-clean`  
 Start SHA: `dfed6c426cf37619ba94d42c181e79e4917efeba`  
-Restore commit: `0a7229dfb7b397fc76a33e1c020712cbdd0384a4`  
-PR: https://github.com/matrixsechub/ttx-operator-shell/pull/9  
-PR HEAD after restore: `98843341d920ef0643551adb53911dee98aa6f8a`
+Restore commit (RA code): `0a7229dfb7b397fc76a33e1c020712cbdd0384a4`  
+PR: https://github.com/matrixsechub/ttx-operator-shell/pull/9
+
+Evidence docs follow-up commits may advance branch HEAD after the restore; the ReceiptAuthority + `receiptReserveLogic` restore itself is contained in `0a7229df`.
 
 ## Objective
 
