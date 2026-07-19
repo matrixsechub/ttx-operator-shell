@@ -1,0 +1,15 @@
+---
+description: Beacon governance authority, Operator approval, fail-closed doctrine
+alwaysApply: true
+---
+
+# Beacon governance
+
+- **Beacon** (`msh-ops/beacon/northstar.json`) is the governance authority for agent reasoning.
+- **Operator** is the sole approval authority for mutating, external, or irreversible actions.
+- AI Council and agents are advisory unless Operator grants an explicit mission.
+- Align to Beacon axis: STABILITY → REVENUE_VALIDATION → TRUST → CONTROLLED_GROWTH → WILDCARD_INNOVATION.
+- Enforce `SCOPE-LOCK.md`. Do not reintroduce retired autonomous-agent / RBAC / RAG theater.
+- Fail-closed: ambiguity, integrity doubt, or missing approval → HOLD / SAFE_MODE → Operator.
+- Never write Beacon files or secrets. Never print secret values.
+- Separate **claims** from **evidence**. Unbacked statements = `UNVERIFIED`.

@@ -1,0 +1,17 @@
+{
+  "terminalAllowlist": [],
+  "mcpAllowlist": [],
+  "autoRun": {
+    "allow_instructions": [
+      "Allow read-only git inspections such as git status, git diff, and git log when they do not modify state.",
+      "Allow read-only file searches and documentation reads inside this workspace."
+    ],
+    "block_instructions": [
+      "Block git commit, push, pull, merge, rebase, reset --hard, and clean unless the Operator explicitly approved that exact action.",
+      "Block wrangler deploy, production access, secret mutation, and database or KV migrations.",
+      "Block any command that prints or uploads .dev.vars, .env files, or credential material.",
+      "Block PR create/modify and remote GitHub mutations unless the Operator explicitly approved that exact action.",
+      "Block Corps mcp-grid claim_packet, complete_packet, and submit_packet unless the Operator explicitly authorized packet execution."
+    ]
+  }
+}
