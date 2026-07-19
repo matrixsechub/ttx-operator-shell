@@ -21,6 +21,7 @@ import { FedGradeOps } from "../pages/ops/FedGradeOps";
 import { SecurityOps } from "../pages/ops/SecurityOps";
 import { DeployOps } from "../pages/ops/DeployOps";
 import LiveJoin from "../pages/LiveJoin";
+import { FlywheelDashboard } from "../pages/dashboard/FlywheelDashboard";
 
 /** Operator cockpit surface — systems, ops, divisions, ttx (no storefront/auth routes). */
 export const cockpitRouter = createBrowserRouter([
@@ -30,6 +31,7 @@ export const cockpitRouter = createBrowserRouter([
     element: <RequireAuth />,
     children: [
       { path: "/dashboard", element: <Dashboard /> },
+      { path: "/dashboard/flywheel", element: <FlywheelDashboard /> },
       { path: "/status", element: <Status /> },
       { path: "/about", element: <AboutPage /> },
       { path: "/divisions", element: <DivisionsIndex /> },
