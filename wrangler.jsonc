@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "ttx-operator-shell",
+  "name": "ttx-operator-shell-staging",
   "main": "worker/index.ts",
   "compatibility_date": "2026-06-30",
   "observability": {
