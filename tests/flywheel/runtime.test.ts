@@ -15,8 +15,25 @@ describe("Flywheel deterministic runtime", () => {
   });
   it("distinguishes replay from conflicting idempotency digests", () => {
     assert.equal(resolveIdempotency(null, "a").kind, "new");
-    assert.equal(resolveIdempotency({ digest: "a", response: { ok: true } }, "a").kind, "replay");
+    assert.equal(resolveIdempotency({ digest: "a", response: { ok: true }, state: "completed" }, "a").kind, "replay");
     assert.equal(resolveIdempotency({ digest: "a", response: {} }, "b").kind, "conflict");
+  });
+  it("does not treat accepted or awaiting_approval as completed replays", () => {
+    const accepted = resolveIdempotency({ digest: "a", response: { commandId: "c1", state: "accepted" }, state: "accepted" }, "a");
+    assert.equal(accepted.kind, "in_progress");
+    if (accepted.kind === "in_progress") assert.equal(accepted.state, "accepted");
+
+    const awaiting = resolveIdempotency({ digest: "a", response: { state: "awaiting_approval" }, state: "awaiting_approval" }, "a");
+    assert.equal(awaiting.kind, "in_progress");
+    if (awaiting.kind === "in_progress") assert.equal(awaiting.state, "awaiting_approval");
+
+    const denied = resolveIdempotency({ digest: "a", response: { ok: false, code: "RUN_NOT_FOUND" }, state: "denied" }, "a");
+    assert.equal(denied.kind, "replay");
+    if (denied.kind === "replay") assert.equal(denied.response.code, "RUN_NOT_FOUND");
+  });
+  it("defaults legacy records without state to completed replay", () => {
+    const legacy = resolveIdempotency({ digest: "a", response: { ok: true } }, "a");
+    assert.equal(legacy.kind, "replay");
   });
   it("exhausts three retries and classifies integrity failures", async () => {
     let attempts = 0; let retries = 0;

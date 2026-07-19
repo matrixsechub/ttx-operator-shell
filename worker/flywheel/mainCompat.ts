@@ -105,6 +105,7 @@ export interface GovernedMutationInput<TInput> {
   environment: RuntimeEnvironment;
   proposalId: string;
   approvalId: string;
+  actionDigest: string;
   idempotencyKey: string;
   input: TInput;
   rollbackReference: string;
@@ -324,7 +325,7 @@ export async function runGovernedMutation<TInput, TResult>(
         executionId: crypto.randomUUID(),
         proposalId: mutation.proposalId,
         approvalId: mutation.approvalId,
-        actionDigest: await sha256Hex(JSON.stringify(mutation.input)),
+        actionDigest: mutation.actionDigest,
         beaconHash: beacon.hash,
         codexHash: codex.manifestHash,
         environment: mutation.environment,

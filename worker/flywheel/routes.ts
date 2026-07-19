@@ -130,6 +130,7 @@ export async function handleFlywheelRoute(request: Request, pathname: string, en
       environment,
       proposalId,
       approvalId,
+      actionDigest,
       idempotencyKey: `flywheel:${tenantId}:${commandId}`,
       input: mutationPayload,
       rollbackReference: `flywheel:${tenantId}:${approveMatch[1]}:pre-command`,

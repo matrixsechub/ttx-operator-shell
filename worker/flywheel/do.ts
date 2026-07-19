@@ -8,7 +8,14 @@ import { buildQueuedNextCycle } from "./cycle";
 import { resolveIdempotency } from "./idempotency";
 
 interface FlywheelDoEnv { TTX_STATE: KVNamespace; FLYWHEEL_TENANT_ID?: string }
-interface StoredCommand { command: FlywheelCommand; runId: string; digest: string; state: "awaiting_approval" | "completed" | "denied"; proposalId?: string; response: Record<string, unknown> }
+interface StoredCommand {
+  command: FlywheelCommand;
+  runId: string;
+  digest: string;
+  state: "accepted" | "awaiting_approval" | "completed" | "denied";
+  proposalId?: string;
+  response: Record<string, unknown>;
+}
 
 function rowValue<T>(cursor: { toArray(): Record<string, unknown>[] }, field = "payload"): T | null {
   const row = cursor.toArray()[0];
@@ -46,9 +53,23 @@ export class FlywheelDO extends DurableObject<FlywheelDoEnv> {
   private detail(run: FlywheelRun): FlywheelRunDetail {
     return { run, executions: this.listPayloads<FlywheelStageExecution>("executions", run.id), metrics: this.listPayloads<FlywheelMetric>("metrics", run.id), evidence: this.listPayloads<FlywheelEvidence>("evidence", run.id), events: this.listPayloads<FlywheelEvent>("events", run.id), governance: { beaconActive: true, approvalState: run.state === "awaiting_approval" ? "required" : run.approvalReceiptId ? "approved" : "not_required", safeMode: run.state === "safe_mode" } };
   }
+  private saveCommand(stored: StoredCommand): void {
+    this.ctx.storage.sql.exec(
+      "UPDATE commands SET state = ?, payload = ? WHERE command_id = ?",
+      stored.state,
+      JSON.stringify(stored),
+      stored.command.commandId,
+    );
+  }
+  private denyCommand(stored: StoredCommand, code: string): Record<string, unknown> {
+    const response = { ok: false, code };
+    const denied: StoredCommand = { ...stored, state: "denied", response };
+    this.saveCommand(denied);
+    return response;
+  }
   private async execute(stored: StoredCommand, approvalId?: string): Promise<Record<string, unknown>> {
     const run = this.getRun(stored.runId);
-    if (!run) return { ok: false, code: "RUN_NOT_FOUND" };
+    if (!run) return this.denyCommand(stored, "RUN_NOT_FOUND");
     const command = stored.command;
     const now = new Date().toISOString();
     if (command.category === "PAUSE") {
@@ -62,7 +83,7 @@ export class FlywheelDO extends DurableObject<FlywheelDoEnv> {
       run.state = run.state === "awaiting_approval" ? "queued" : run.state;
     } else {
       const target = expectedStageTarget(run.currentStage);
-      if (command.target !== target) return { ok: false, code: "GOVERNANCE_INVALID_TRANSITION" };
+      if (command.target !== target) return this.denyCommand(stored, "GOVERNANCE_INVALID_TRANSITION");
       const started = Date.now();
       const adapter = new DeterministicMockAdapter(run.currentStage);
       const output = await adapter.execute({ runId: run.id, missionId: run.missionId, tenantId: run.tenantId, stageId: run.currentStage, traceId: command.traceId, idempotencyKey: command.idempotencyKey, input: command.payload });
@@ -93,7 +114,7 @@ export class FlywheelDO extends DurableObject<FlywheelDoEnv> {
     await this.emit(buildFlywheelEvent({ eventType, tenantId: run.tenantId, missionId: run.missionId, runId: run.id, stageId: run.currentStage, traceId: command.traceId, actorType: "operator", actorId: command.requestedBy, governanceDecision: approvalId ? "approved" : "allowed", metadata: { commandId: command.commandId, category: command.category } }));
     const response = { commandId: command.commandId, state: "completed", run: this.detail(run) };
     const updated: StoredCommand = { ...stored, state: "completed", response };
-    this.ctx.storage.sql.exec("UPDATE commands SET state = ?, payload = ? WHERE command_id = ?", updated.state, JSON.stringify(updated), command.commandId);
+    this.saveCommand(updated);
     return response;
   }
   async fetch(request: Request): Promise<Response> {
@@ -118,9 +139,20 @@ export class FlywheelDO extends DurableObject<FlywheelDoEnv> {
       const existing = rowValue<StoredCommand>(this.ctx.storage.sql.exec("SELECT payload FROM commands WHERE idempotency_key = ?", command.idempotencyKey));
       const idempotency = resolveIdempotency(existing, commandDigest);
       if (idempotency.kind === "replay") return Response.json({ ...idempotency.response, replay: true });
+      if (idempotency.kind === "in_progress") {
+        const status = idempotency.state === "awaiting_approval" ? 202 : 200;
+        return Response.json({ ...idempotency.response, replay: true, state: idempotency.state }, { status });
+      }
       if (idempotency.kind === "conflict") return Response.json({ code: idempotency.code }, { status: 409 });
       const awaiting = Boolean(body.approvalRequired);
-      const stored: StoredCommand = { command, runId: String(body.runId), digest: commandDigest, state: awaiting ? "awaiting_approval" : "completed", proposalId: typeof body.proposalId === "string" ? body.proposalId : undefined, response: awaiting ? { commandId: command.commandId, proposalId: body.proposalId, state: "awaiting_approval" } : {} };
+      const stored: StoredCommand = {
+        command,
+        runId: String(body.runId),
+        digest: commandDigest,
+        state: awaiting ? "awaiting_approval" : "accepted",
+        proposalId: typeof body.proposalId === "string" ? body.proposalId : undefined,
+        response: awaiting ? { commandId: command.commandId, proposalId: body.proposalId, state: "awaiting_approval" } : { commandId: command.commandId, state: "accepted" },
+      };
       this.ctx.storage.sql.exec("INSERT INTO commands (command_id, idempotency_key, digest, run_id, state, payload) VALUES (?, ?, ?, ?, ?, ?)", command.commandId, command.idempotencyKey, commandDigest, stored.runId, stored.state, JSON.stringify(stored));
       if (awaiting) { const run = this.getRun(stored.runId); if (run) { run.state = "awaiting_approval"; run.updatedAt = new Date().toISOString(); this.saveRun(run); } return Response.json(stored.response, { status: 202 }); }
       return Response.json(await this.execute(stored));
