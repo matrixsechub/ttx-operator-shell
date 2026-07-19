@@ -46,6 +46,7 @@
       { "name": "SESSION", "class_name": "SessionDO" },
       { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
       { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
+      { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" },
       { "name": "FLYWHEEL", "class_name": "FlywheelDO" }
     ]
   },
@@ -57,6 +58,10 @@
     {
       "tag": "v36-live-ttx-sessions",
       "new_sqlite_classes": ["LiveTtxSession"]
+    },
+    {
+      "tag": "v37-receipt-authority",
+      "new_sqlite_classes": ["ReceiptAuthority"]
     },
     {
       "tag": "v38-flywheel-engine",
@@ -98,6 +103,7 @@
           { "name": "SESSION", "class_name": "SessionDO" },
           { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
           { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
+          { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" },
           { "name": "FLYWHEEL", "class_name": "FlywheelDO" }
         ]
       },
@@ -109,6 +115,10 @@
         {
           "tag": "v36-live-ttx-sessions",
           "new_sqlite_classes": ["LiveTtxSession"]
+        },
+        {
+          "tag": "v37-receipt-authority",
+          "new_sqlite_classes": ["ReceiptAuthority"]
         },
         {
           "tag": "v38-flywheel-engine",

@@ -68,6 +68,7 @@ import { handleRecoveredFunnelApi, isRecoveredPublicRoute, serveRecoveredPublicR
 import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
 import { handleFlywheelRoute } from "./flywheel/routes";
 export { LiveTtxSession } from "./liveSession";
+export { ReceiptAuthority } from "./do/receiptAuthority";
 export { FlywheelDO } from "./flywheel/do";
 
 await assertBeaconOnStartup();
