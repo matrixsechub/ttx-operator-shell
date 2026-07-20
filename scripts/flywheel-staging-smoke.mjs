@@ -1,16 +1,81 @@
 #!/usr/bin/env node
 /**
- * Authenticated Flywheel staging smoke for FW-V38-STAGING-DEPLOY-20260719-001.
- * Requires OPERATOR_CALLSIGN + OPERATOR_PASSWORD in env. Never logs secret values.
+ * Authenticated Flywheel staging smoke.
+ *
+ * Required environment variables:
+ * - STAGING_BASE_URL
+ * - SMOKE_MISSION_ID
+ * - FLYWHEEL_C2_EXPECTATION: await-approval | beacon-deny
+ * - OPERATOR_CALLSIGN
+ * - OPERATOR_PASSWORD
+ *
+ * Optional environment variables:
+ * - SMOKE_REPORT_PATH
+ * - DEPLOY_VERSION_ID
+ * - GIT_COMMIT_SHA
+ * - CF_ACCESS_CLIENT_ID
+ * - CF_ACCESS_CLIENT_SECRET
+ *
+ * Secret values are never logged.
  */
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 
-const base = process.env.STAGING_BASE_URL?.trim() || "https://ttx-operator-shell-staging.sogellagepul.workers.dev";
+const outPath = process.env.SMOKE_REPORT_PATH?.trim() || "docs/evidence/_flywheel-staging-smoke-raw.json";
+const rawBase = process.env.STAGING_BASE_URL?.trim();
+const missionId = process.env.SMOKE_MISSION_ID?.trim();
+const c2Expectation = process.env.FLYWHEEL_C2_EXPECTATION?.trim();
 const callsign = process.env.OPERATOR_CALLSIGN?.trim();
 const password = process.env.OPERATOR_PASSWORD;
-const outPath = process.env.SMOKE_REPORT_PATH?.trim() || "docs/evidence/_flywheel-staging-smoke-raw.json";
+const allowedC2Expectations = new Set(["await-approval", "beacon-deny"]);
 
+let base = rawBase || null;
 const steps = [];
+
+function writeReport(report) {
+  mkdirSync(dirname(outPath), { recursive: true });
+  writeFileSync(outPath, JSON.stringify(report, null, 2));
+}
+
+function failClosed(message) {
+  writeReport({
+    ok: false,
+    missionId: missionId || null,
+    base,
+    c2Expectation: c2Expectation || null,
+    message,
+    steps,
+    generatedAt: new Date().toISOString(),
+  });
+  console.error(message);
+  process.exit(1);
+}
+
+const configErrors = [];
+if (!rawBase) configErrors.push("STAGING_BASE_URL");
+if (!missionId) configErrors.push("SMOKE_MISSION_ID");
+if (!c2Expectation) configErrors.push("FLYWHEEL_C2_EXPECTATION");
+if (!callsign) configErrors.push("OPERATOR_CALLSIGN");
+if (!password) configErrors.push("OPERATOR_PASSWORD");
+
+if (configErrors.length > 0) {
+  failClosed(`Missing required environment variables: ${configErrors.join(", ")}`);
+}
+
+if (!allowedC2Expectations.has(c2Expectation)) {
+  failClosed("FLYWHEEL_C2_EXPECTATION must be either 'await-approval' or 'beacon-deny'.");
+}
+
+try {
+  const parsedBase = new URL(rawBase);
+  if (!new Set(["http:", "https:"]).has(parsedBase.protocol)) {
+    throw new Error("unsupported protocol");
+  }
+  base = parsedBase.toString().replace(/\/$/, "");
+} catch {
+  failClosed("STAGING_BASE_URL must be a valid HTTP(S) URL.");
+}
+
 function record(step, ok, detail = {}) {
   steps.push({ step, ok, ...detail, at: new Date().toISOString() });
   const mark = ok ? "PASS" : "FAIL";
@@ -43,16 +108,6 @@ async function req(path, { method = "GET", token, body } = {}) {
   return { status: response.status, json };
 }
 
-function failClosed(message) {
-  writeFileSync(outPath, JSON.stringify({ ok: false, base, message, steps }, null, 2));
-  console.error(message);
-  process.exit(1);
-}
-
-if (!callsign || !password) {
-  failClosed("OPERATOR_CALLSIGN and OPERATOR_PASSWORD are required for authenticated smoke.");
-}
-
 const login = await req("/api/auth/login", {
   method: "POST",
   body: { username: callsign, password },
@@ -76,12 +131,13 @@ record("flywheel.stages", stages.status === 200 && stages.json?.ok === true, {
   stageCount: Array.isArray(stages.json?.data?.stages) ? stages.json.data.stages.length : 0,
 });
 
+const smokeRunMissionId = `${missionId}-RUN-${Date.now()}`;
 const create = await req("/api/flywheel/runs", {
   method: "POST",
   token,
   body: {
-    missionId: `fw-v38-smoke-${Date.now()}`,
-    idempotencyKey: `fw-v38-smoke-${crypto.randomUUID()}`,
+    missionId: smokeRunMissionId,
+    idempotencyKey: `${missionId}-${crypto.randomUUID()}`,
     autonomyLevel: 1,
   },
 });
@@ -141,36 +197,50 @@ const synth = await req(`/api/flywheel/runs/${run.id}/commands`, {
 });
 const proposalId = synth.json?.data?.proposalId;
 const commandId = synth.json?.data?.commandId;
-record("flywheel.command.synth_c2_awaits_approval", synth.status === 202 && Boolean(proposalId) && Boolean(commandId), {
-  status: synth.status,
-  code: synth.json?.error?.code,
-  state: synth.json?.data?.state,
-  hasProposalId: Boolean(proposalId),
-  hasCommandId: Boolean(commandId),
-  optionalUntilBeaconV2: true,
-});
 
-let approveOk = false;
-if (proposalId && commandId) {
-  const approve = await req(`/api/flywheel/runs/${run.id}/approve`, {
-    method: "POST",
-    token,
-    body: { commandId, proposalId },
+if (c2Expectation === "await-approval") {
+  const synthAwaitingApproval = synth.status === 202 && Boolean(proposalId) && Boolean(commandId);
+  record("flywheel.command.synth_c2_awaits_approval", synthAwaitingApproval, {
+    status: synth.status,
+    code: synth.json?.error?.code,
+    state: synth.json?.data?.state,
+    hasProposalId: Boolean(proposalId),
+    hasCommandId: Boolean(commandId),
   });
-  approveOk = approve.status === 200 && approve.json?.ok === true;
-  record("flywheel.command.approve", approveOk, {
-    status: approve.status,
-    code: approve.json?.error?.code,
-    hasExecutionReceipt: Boolean(approve.json?.data?.executionReceipt),
-  });
+
+  if (synthAwaitingApproval) {
+    const approve = await req(`/api/flywheel/runs/${run.id}/approve`, {
+      method: "POST",
+      token,
+      body: { commandId, proposalId },
+    });
+    record("flywheel.command.approve", approve.status === 200 && approve.json?.ok === true, {
+      status: approve.status,
+      code: approve.json?.error?.code,
+      hasExecutionReceipt: Boolean(approve.json?.data?.executionReceipt),
+    });
+  } else {
+    record("flywheel.command.approve", false, {
+      skipped: true,
+      reason: "SYNTH did not return an approval proposal and command ID",
+    });
+  }
 } else {
-  record("flywheel.command.approve", false, { skipped: true, reason: "missing proposal/command id" });
+  record(
+    "flywheel.command.synth_c2_beacon_v2_gate_observed",
+    synth.status === 409 && synth.json?.error?.code === "GOVERNANCE_MISSING_BEACON",
+    {
+      status: synth.status,
+      code: synth.json?.error?.code,
+      note: "Expected fail-closed Beacon denial for this smoke mode",
+    },
+  );
 }
 
 const safeMode = await req(`/api/flywheel/runs/${run.id}/safe-mode`, {
   method: "POST",
   token,
-  body: { reason: "fw-v38-staging-smoke" },
+  body: { reason: `smoke:${missionId}` },
 });
 const safeRunState =
   safeMode.json?.data?.run?.run?.state ??
@@ -195,13 +265,6 @@ record("flywheel.safe_mode.material_denied", denied.status === 409 && denied.jso
   code: denied.json?.error?.code,
 });
 
-// Material C2 outside safe-mode is expected to fail-closed without signed Beacon v2 on mainCompat.
-record("flywheel.command.synth_c2_beacon_v2_gate_observed", synth.status === 409 && synth.json?.error?.code === "GOVERNANCE_MISSING_BEACON", {
-  status: synth.status,
-  code: synth.json?.error?.code,
-  note: "mainCompat resolves legacy_v1; governance requires verified_v2 for approvalRequired commands",
-});
-
 const deployDenied = await req(`/api/flywheel/runs/${run.id}/commands`, {
   method: "POST",
   token,
@@ -218,24 +281,40 @@ record("flywheel.deploy.permanently_denied", deployDenied.status === 403 && depl
 const health = await req("/api/system/status");
 record("system.status", health.status === 200, { status: health.status });
 
-const okCore = steps
-  .filter((s) => !["flywheel.command.synth_c2_awaits_approval", "flywheel.command.approve"].includes(s.step))
-  .every((s) => s.ok);
-const okFullApprovalPath = steps.every((s) => s.ok);
+const c2StepNames = new Set([
+  "flywheel.command.synth_c2_awaits_approval",
+  "flywheel.command.approve",
+  "flywheel.command.synth_c2_beacon_v2_gate_observed",
+]);
+const coreSteps = steps.filter((step) => !c2StepNames.has(step.step));
+const c2Steps = steps.filter((step) => c2StepNames.has(step.step));
+const okCore = coreSteps.every((step) => step.ok);
+const okExpectedC2Path = c2Steps.length > 0 && c2Steps.every((step) => step.ok);
+const ok = okCore && okExpectedC2Path;
 const report = {
-  ok: okCore,
-  okFullApprovalPath,
-  missionId: "FW-V38-STAGING-DEPLOY-20260719-001",
+  ok,
+  okCore,
+  okExpectedC2Path,
+  okFullApprovalPath: c2Expectation === "await-approval" ? okExpectedC2Path : null,
+  missionId,
+  smokeRunMissionId,
+  c2Expectation,
   base,
   deployVersionId: process.env.DEPLOY_VERSION_ID || null,
   deploySha: process.env.GIT_COMMIT_SHA || null,
   runId: run.id,
   steps,
-  remainingBlockers: okFullApprovalPath
+  remainingBlockers: ok
     ? []
-    : ["C2 approval path requires Beacon status verified_v2; mainCompat currently resolves legacy_v1/invalid"],
+    : [
+        c2Expectation === "await-approval"
+          ? "Configured C2 approval path did not complete successfully"
+          : "Configured Beacon denial boundary was not observed",
+      ],
   generatedAt: new Date().toISOString(),
 };
-writeFileSync(outPath, JSON.stringify(report, null, 2));
-console.log(`SMOKE_CORE_OK=${okCore} SMOKE_FULL_OK=${okFullApprovalPath} report=${outPath}`);
-process.exit(okCore ? 0 : 1);
+writeReport(report);
+console.log(
+  `SMOKE_OK=${ok} SMOKE_CORE_OK=${okCore} SMOKE_C2_OK=${okExpectedC2Path} C2_EXPECTATION=${c2Expectation} report=${outPath}`,
+);
+process.exit(ok ? 0 : 1);
