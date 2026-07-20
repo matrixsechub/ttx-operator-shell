@@ -1,6 +1,11 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { RequireAuth } from "../lib/RequireAuth";
+
+// Pearl pilot — lazy-loaded so it never enters the default cockpit bundle.
+// Auth-guarded (inside RequireAuth) and gated by a feature flag that defaults OFF.
+const PearlPilotRoute = lazy(() => import("../pearl-theme/pilot/PearlPilotRoute"));
 
 import { Login } from "../pages/Login";
 
@@ -89,6 +94,14 @@ export const router = createBrowserRouter([
 
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/dashboard/flywheel", element: <FlywheelDashboard /> },
+      {
+        path: "/dashboard/pearl-pilot",
+        element: (
+          <Suspense fallback={<div className="p-8 text-xs uppercase tracking-widest text-op-text-dim">Loading Pearl pilot…</div>}>
+            <PearlPilotRoute />
+          </Suspense>
+        ),
+      },
 
       { path: "/status", element: <Status /> },
 
