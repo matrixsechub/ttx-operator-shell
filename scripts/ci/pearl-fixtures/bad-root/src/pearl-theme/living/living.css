@@ -1,0 +1,6 @@
+/* BAD Living CSS: animates with NO reduced-motion block (L2), and two distinct
+   ambient animations on one primitive (L6). */
+[data-living="on"] .pearl-orb--beacon { animation: pearl-beacon-pulse 6s ease infinite; }
+[data-living="on"] .pearl-orb--beacon { animation: pearl-beacon-spin 8s linear infinite; }
+@keyframes pearl-beacon-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.9; } }
+@keyframes pearl-beacon-spin { to { transform: rotate(360deg); } }
