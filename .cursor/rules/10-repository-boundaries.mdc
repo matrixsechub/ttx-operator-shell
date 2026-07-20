@@ -1,0 +1,29 @@
+---
+description: Repository boundaries — dirty tree, secrets, no irreversible defaults
+alwaysApply: true
+---
+
+# Repository boundaries
+
+## Default deny
+
+Unless Operator mission explicitly authorizes it, do not:
+
+- Modify product source under `src/`, `worker/`, `shared/`, or build configs
+- `git commit`, `git push`, `git pull`, `git merge`, `git rebase`, destructive resets/cleans
+- Create or modify PRs; deploy (`wrangler deploy`); change secrets; apply migrations; access production
+
+## Preserve state
+
+- Leave unrelated and dirty-tree changes untouched
+- Do not stage, revert, or “clean up” files outside mission scope
+- Keep `.cursor/agents/FLYWHEEL_RELEASE_CANDIDATE_OPERATOR.md` unless Operator says otherwise
+
+## Secrets and generated noise
+
+- Never read aloud or rewrite `.dev.vars`, `.env*`, wrangler secrets, or credential files
+- Prefer excluding generated/local paths via `.cursorignore` / `.gitignore` conventions
+
+## Phase 1 bootstrap note
+
+Engineering Division bootstrap may edit only the ten approved Cursor instruction files when Operator authorizes that mission.

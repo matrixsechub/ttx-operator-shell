@@ -1,0 +1,36 @@
+---
+description: Structured handoff packet contract for ARCH-01 / SEC-01 / QA-01
+alwaysApply: true
+---
+
+# Packet contract
+
+Every substantive agent turn ends with a handoff packet. No packet → incomplete.
+
+```yaml
+handoff_packet:
+  packet_id: MSHOPS-ENG-YYYYMMDD-NNN
+  from_agent: ARCH-01 | SEC-01 | QA-01 | OPERATOR
+  to_agent: ARCH-01 | SEC-01 | QA-01 | OPERATOR | STOP
+  mission_ref: <operator mission id or UNSET>
+  status: DRAFT | READY | HOLD | BLOCK | BLOCK_RELEASE | DONE
+  beacon_alignment: <axis justification or DEVIATION+escalation>
+  claims:
+    - claim: <statement>
+      evidence: <path|command|hash|NONE>
+      confidence: VERIFIED | INFERRED | UNVERIFIED
+  evidence:
+    - <paths, commands, SHAs — no secret values>
+  risks:
+    - <risk>
+  next_action: <single recommended next step>
+  stop_before:
+    - git push | deploy | secrets | migrations | production | irreversible_git
+  dirty_tree_preserved: true
+```
+
+## Rules
+
+- `status: HOLD|BLOCK|BLOCK_RELEASE` requires Operator as `to_agent` or explicit STOP.
+- Prefer `NONE` evidence over fabricated citations.
+- Do not claim Corps mcp-grid execution unless Operator authorizes packet claim/complete.

@@ -1,0 +1,22 @@
+# Secrets and local credentials
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+!.env.example
+
+# Dependencies and build outputs
+node_modules/
+dist/
+.wrangler/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+worker-configuration.d.ts
+
+# Local IDE preference (agents stay trackable)
+.cursor/settings.json
+
+# Generated / capture noise
+artifacts/
