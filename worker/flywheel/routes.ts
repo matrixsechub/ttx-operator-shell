@@ -24,6 +24,7 @@ export type FlywheelRouteEnv = Env & {
   FLYWHEEL: DurableObjectNamespace<FlywheelDO>;
   GOVERNANCE_RECEIPT_SIGNING_KEY?: string;
   AUTH_SIGNING_KEY?: string;
+  BEACON_SIGNING_KEY?: string;
 };
 
 function meta(traceId = crypto.randomUUID()) { return { traceId, timestamp: new Date().toISOString(), version: "1.0" as const }; }
