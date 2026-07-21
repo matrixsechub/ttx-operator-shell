@@ -9,7 +9,7 @@
  *   - STRIPE adapter: active iff STRIPE_SECRET_KEY is configured. Creates
  *     a hosted Checkout Session via REST; grants happen ONLY from the
  *     signature-verified webhook (provider state wins).
- *   - SANDBOX adapter: active iff BILLING_SANDBOX === "true" or
+ *   - SANDBOX adapter: active iff BILLING_SANDBOX === "true" and
  *     DEPLOY_ENV is not production (and Stripe is not configured).
  *     Grants synchronously and stamps `sandbox: true` on the acquisition.
  *   - Neither: 503 "billing not configured" — production without keys
@@ -69,7 +69,7 @@ export function resolveProvider(env: BillingEnv): BillingProviderName | null {
   if (env.STRIPE_SECRET_KEY) return "stripe";
   const sandboxFlag = (env.BILLING_SANDBOX ?? "").toLowerCase() === "true";
   const nonProduction = (env.DEPLOY_ENV ?? "").toLowerCase() !== "production";
-  if (sandboxFlag || nonProduction) return "sandbox";
+  if (sandboxFlag && nonProduction) return "sandbox";
   return null;
 }
 

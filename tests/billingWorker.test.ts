@@ -55,9 +55,17 @@ describe("billing provider resolution", () => {
   it("production without keys has NO provider (503 path)", () => {
     assert.equal(resolveProvider({ DEPLOY_ENV: "production" }), null);
   });
-  it("sandbox activates outside production or via explicit flag", () => {
-    assert.equal(resolveProvider({ DEPLOY_ENV: "staging" }), "sandbox");
-    assert.equal(resolveProvider({ DEPLOY_ENV: "production", BILLING_SANDBOX: "true" }), "sandbox");
+  it("staging with BILLING_SANDBOX unset fails closed", () => {
+    assert.equal(resolveProvider({ DEPLOY_ENV: "staging" }), null);
+  });
+  it("staging with BILLING_SANDBOX false fails closed", () => {
+    assert.equal(resolveProvider({ DEPLOY_ENV: "staging", BILLING_SANDBOX: "false" }), null);
+  });
+  it("staging with BILLING_SANDBOX explicitly true enables sandbox", () => {
+    assert.equal(resolveProvider({ DEPLOY_ENV: "staging", BILLING_SANDBOX: "true" }), "sandbox");
+  });
+  it("production with BILLING_SANDBOX explicitly true never enables sandbox", () => {
+    assert.equal(resolveProvider({ DEPLOY_ENV: "production", BILLING_SANDBOX: "true" }), null);
   });
   it("stripe wins when configured", () => {
     assert.equal(resolveProvider({ DEPLOY_ENV: "production", STRIPE_SECRET_KEY: "sk_test" }), "stripe");
@@ -95,6 +103,7 @@ describe("checkout-session endpoint", () => {
     const response = (await handleBillingRoute(checkoutRequest(itemId), "/api/billing/checkout-session", {
       TTX_STATE: kv,
       DEPLOY_ENV: "staging",
+      BILLING_SANDBOX: "true",
     })) as Response;
     assert.equal(response.status, 201);
     const payload = (await response.json()) as { acquisitionId: string; status: string; sandbox: boolean };
@@ -127,7 +136,30 @@ describe("checkout-session endpoint", () => {
     })) as Response;
     assert.equal(response.status, 503);
     assert.equal(store.has(`pearl:entitlements:${SUBJECT}`), false);
+    assert.equal([...store.keys()].some((key) => key.startsWith("pearl:acquisition:")), false);
   });
+
+  for (const testCase of [
+    { name: "staging plus unset BILLING_SANDBOX", env: { DEPLOY_ENV: "staging" } },
+    { name: "staging plus false BILLING_SANDBOX", env: { DEPLOY_ENV: "staging", BILLING_SANDBOX: "false" } },
+    { name: "production plus true BILLING_SANDBOX", env: { DEPLOY_ENV: "production", BILLING_SANDBOX: "true" } },
+  ] as const) {
+    it(`${testCase.name} fails closed without acquisition or entitlement writes`, async () => {
+      const { kv, store } = createKv();
+      const itemId = packItemId();
+      if (!itemId) return;
+      await writeTier({ TTX_STATE: kv }, SUBJECT, "operator");
+
+      const response = (await handleBillingRoute(checkoutRequest(itemId), "/api/billing/checkout-session", {
+        TTX_STATE: kv,
+        ...testCase.env,
+      })) as Response;
+
+      assert.equal(response.status, 503);
+      assert.equal(store.has(`pearl:entitlements:${SUBJECT}`), false);
+      assert.equal([...store.keys()].some((key) => key.startsWith("pearl:acquisition:")), false);
+    });
+  }
 });
 
 describe("billing webhook", () => {
