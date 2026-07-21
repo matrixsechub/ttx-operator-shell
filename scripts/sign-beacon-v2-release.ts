@@ -11,6 +11,10 @@
  */
 import { writeFileSync } from "node:fs";
 import {
+  BEACON_FIXTURE_KEY_DENIED,
+  isBeaconFixtureSigningKey,
+} from "../msh-ops/beacon/beaconFixtureKeys.ts";
+import {
   BEACON_SIGNING_KEY_ID,
   buildUnsignedBeaconV2Release,
   signBeaconRelease,
@@ -78,6 +82,14 @@ if (key.length < 32) {
 
 const { out, version, environment: envArg } = parseArgs(process.argv.slice(2));
 const environment = resolveTargetEnv(envArg);
+
+// Defense-in-depth: refuse fixture keys before unsigned build or any file write.
+// Authority remains signBeaconRelease — message must not include key material.
+if (isBeaconFixtureSigningKey(key)) {
+  console.error(BEACON_FIXTURE_KEY_DENIED);
+  process.exit(1);
+}
+
 const publishedAt = process.env.BEACON_PUBLISHED_AT?.trim() || undefined;
 const unsigned = await buildUnsignedBeaconV2Release(version, {
   environment,

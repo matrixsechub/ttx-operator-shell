@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
+import {
+  BEACON_FIXTURE_KEY_DENIED,
+  BEACON_FIXTURE_SIGNING_KEY_DENYLIST,
+} from "../../msh-ops/beacon/beaconFixtureKeys.ts";
 import { BUNDLED_BEACON_V2_PRODUCTION_RELEASE } from "../../msh-ops/beacon/releases/bundledProductionRelease.ts";
 import { BUNDLED_BEACON_V2_STAGING_RELEASE } from "../../msh-ops/beacon/releases/bundledStagingRelease.ts";
 import {
@@ -16,7 +23,7 @@ import {
   setBundledBeaconReleaseForTests,
 } from "../../worker/beacon/beaconRelease.ts";
 import {
-  BEACON_FIXTURE_SIGNING_KEY_DENYLIST,
+  BEACON_FIXTURE_SIGNING_KEY_DENYLIST as WORKER_FIXTURE_DENYLIST,
   normalizeDeployEnv,
   resolveBeaconSigningKey,
 } from "../../worker/beacon/beaconSigning.ts";
@@ -234,14 +241,15 @@ describe("Phase 4 — Beacon env isolation", () => {
   });
 
   describe("fixture key denial", () => {
-    it("exports the exact denylist fixture string", () => {
+    it("exports the exact denylist fixture string from msh-ops and worker re-export", () => {
       assert.deepEqual(BEACON_FIXTURE_SIGNING_KEY_DENYLIST, [
         "test-only-beacon-signing-key-do-not-use-in-production-01",
       ]);
+      assert.deepEqual(WORKER_FIXTURE_DENYLIST, [...BEACON_FIXTURE_SIGNING_KEY_DENYLIST]);
       assert.equal(FIXTURE_BEACON_KEY, BEACON_FIXTURE_SIGNING_KEY_DENYLIST[0]);
     });
 
-    it("allows fixture key only in unprotected unit context", () => {
+    it("allows fixture key only in unprotected unit context via resolve", () => {
       const unprotected = resolveBeaconSigningKey({
         BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY,
         DEPLOY_ENV: "development",
@@ -262,11 +270,47 @@ describe("Phase 4 — Beacon env isolation", () => {
       assert.equal(production, null);
     });
 
-    it("reports BEACON_FIXTURE_KEY_DENIED for protected envs", async () => {
-      const release = await signForEnv("staging", FIXTURE_BEACON_KEY);
+    it("rejects fixture key at sign-time for staging and production before crypto", async () => {
+      for (const environment of ["staging", "production"] as const) {
+        await assert.rejects(
+          async () => signForEnv(environment, FIXTURE_BEACON_KEY),
+          (err: unknown) => {
+            assert.ok(err instanceof Error);
+            assert.equal(err.message, BEACON_FIXTURE_KEY_DENIED);
+            assert.equal(err.message.includes(FIXTURE_BEACON_KEY), false);
+            assert.equal(String(err).includes(FIXTURE_BEACON_KEY), false);
+            return true;
+          },
+        );
+      }
+    });
+
+    it("does not write an output artifact when fixture key is denied", async () => {
+      const dir = mkdtempSync(join(tmpdir(), "beacon-sign-deny-"));
+      const outPath = join(dir, "denied-release.json");
+      try {
+        await assert.rejects(async () => {
+          const unsigned = await buildUnsignedBeaconV2Release("2.0.0-deny", {
+            environment: "staging",
+            publishedAt: "2026-07-19T00:00:00.000Z",
+          });
+          await signBeaconRelease(unsigned, FIXTURE_BEACON_KEY);
+          // Unreachable — would be the only write path under test.
+          throw new Error("signBeaconRelease must throw before any write");
+        });
+        assert.equal(existsSync(outPath), false);
+        assert.deepEqual(getBeaconReleaseHistory(), []);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    });
+
+    it("reports BEACON_FIXTURE_KEY_DENIED for protected envs at runtime resolve", async () => {
+      // Release signed with a non-fixture unit key; env key is the denylisted fixture.
+      const release = await signForEnv("staging", UNIT_TEST_KEY);
       for (const deployEnv of ["staging", "production"] as const) {
         const envRelease =
-          deployEnv === "staging" ? release : await signForEnv("production", FIXTURE_BEACON_KEY);
+          deployEnv === "staging" ? release : await signForEnv("production", UNIT_TEST_KEY);
         const state = await getVerifiedBeaconV2State(
           { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: deployEnv },
           { release: envRelease },
@@ -275,6 +319,15 @@ describe("Phase 4 — Beacon env isolation", () => {
         assert.equal(state.reason, "BEACON_FIXTURE_KEY_DENIED");
         assert.equal(JSON.stringify(state).includes(FIXTURE_BEACON_KEY), false);
       }
+    });
+
+    it("allows non-fixture unit key to sign in-memory without mutating history or slots", async () => {
+      const release = await signForEnv("staging", UNIT_TEST_KEY);
+      assert.equal(release.environment, "staging");
+      assert.equal(typeof release.signature.value, "string");
+      assert.deepEqual(getBeaconReleaseHistory(), []);
+      assert.equal(BUNDLED_BEACON_V2_STAGING_RELEASE, null);
+      assert.equal(BUNDLED_BEACON_V2_PRODUCTION_RELEASE, null);
     });
 
     it("fails closed on missing/empty/<32 key without AUTH fallback in protected envs", () => {

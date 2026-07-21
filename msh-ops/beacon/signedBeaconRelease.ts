@@ -1,7 +1,14 @@
+import { assertBeaconSigningKeyAllowedForRelease } from "./beaconFixtureKeys";
 import { getBeaconV2Draft, type BeaconV2 } from "./beaconV2Schema";
 
 export const BEACON_RELEASE_DOMAIN = "MSHOPS::BEACON_RELEASE::V2";
 export const BEACON_SIGNING_KEY_ID = "beacon-signing-key-v1";
+export {
+  BEACON_FIXTURE_KEY_DENIED,
+  BEACON_FIXTURE_SIGNING_KEY_DENYLIST,
+  assertBeaconSigningKeyAllowedForRelease,
+  isBeaconFixtureSigningKey,
+} from "./beaconFixtureKeys";
 
 export type BeaconReleaseEnvironment = "staging" | "production";
 
@@ -76,6 +83,8 @@ export async function signBeaconRelease(
   if (!isBeaconReleaseEnvironment(release.environment)) {
     throw new Error("signBeaconRelease requires environment staging|production");
   }
+  // Fail closed before any crypto, artifact construction, or file write.
+  assertBeaconSigningKeyAllowedForRelease(signingKey, release.environment);
   const envelope = canonicalizeBeaconReleaseEnvelope({
     environment: release.environment,
     version: release.version,
