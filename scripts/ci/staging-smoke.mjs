@@ -255,10 +255,17 @@ async function probeWithRetry(baseUrl, contract, maxAttempts = 5) {
 }
 
 export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
+  // Internal gate — do not rely on CLI callers. Fail before any fetch/DNS/auth.
+  const validated = validateStagingBaseUrl(baseUrl);
+  if (!validated.ok) {
+    throw new Error(validated.error);
+  }
+  const safeBaseUrl = validated.baseUrl;
+
   const contracts = options.contracts ?? SMOKE_ROUTE_CONTRACTS;
   const checks = [];
   for (const contract of contracts) {
-    checks.push(await probeWithRetry(baseUrl, contract, options.maxAttempts ?? 5));
+    checks.push(await probeWithRetry(safeBaseUrl, contract, options.maxAttempts ?? 5));
   }
 
   const summary = {
@@ -270,7 +277,7 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
   const report = {
     schema_version: "1.0",
     environment: "staging",
-    base_url: baseUrl,
+    base_url: safeBaseUrl,
     worker_name: STAGING_WORKER,
     commit_sha: commitSha,
     tested_at: new Date().toISOString(),

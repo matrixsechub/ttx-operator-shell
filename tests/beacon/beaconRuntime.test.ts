@@ -136,10 +136,11 @@ describe("Beacon v2 runtime classification", () => {
     assert.notEqual(state.status, "verified_v2");
   });
 
-  it("denies denylisted fixture key under staging", async () => {
+  it("denies denylisted fixture key under staging at runtime resolve", async () => {
+    // Artifact must be signed with a non-fixture key; fixture is refused at sign-time.
     const release = await makeFixtureRelease({
       environment: "staging",
-      key: FIXTURE_BEACON_KEY,
+      key: UNIT_TEST_KEY,
     });
     const verified = await getVerifiedBeaconV2State(
       { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" },
@@ -147,5 +148,6 @@ describe("Beacon v2 runtime classification", () => {
     );
     assert.equal(verified.verified, false);
     assert.equal(verified.reason, "BEACON_FIXTURE_KEY_DENIED");
+    assert.equal(JSON.stringify(verified).includes(FIXTURE_BEACON_KEY), false);
   });
 });
