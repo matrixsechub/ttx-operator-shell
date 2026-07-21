@@ -3,6 +3,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { validateStagingBaseUrl } from "../lib/stagingBaseUrl.mjs";
 import { STAGING_WORKER } from "./verify-staging-config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -281,11 +282,17 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
 }
 
 async function main() {
-  const baseUrl = process.argv[2] ?? process.env.STAGING_BASE_URL ?? "https://ttx-operator-shell-staging.sogellagepul.workers.dev";
+  const rawBase = process.argv[2] ?? process.env.STAGING_BASE_URL;
+  const validated = validateStagingBaseUrl(rawBase);
+  if (!validated.ok) {
+    console.error(validated.error);
+    process.exit(1);
+  }
+
   const commitSha = process.argv[3] ?? process.env.COMMIT_SHA ?? "unknown";
   const outputPath = process.argv[4] ?? join(root, "artifacts", "staging-smoke-report.json");
 
-  const report = await runStagingSmoke(baseUrl, commitSha);
+  const report = await runStagingSmoke(validated.baseUrl, commitSha);
   mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, JSON.stringify(report, null, 2));
 

@@ -16,7 +16,8 @@ import {
   resolveBeaconRuntimeState,
 } from "../../worker/flywheel/mainCompat.ts";
 
-const FIXTURE_BEACON_KEY = "test-only-beacon-signing-key-do-not-use-in-production-01";
+/** Non-denylisted unit key for verified_v2 under staging/production. */
+const UNIT_TEST_KEY = "unit-test-beacon-hmac-key-32chars-minimum!!";
 
 const baseRun = (overrides: Partial<FlywheelRun> = {}): FlywheelRun => ({
   id: "run-1",
@@ -57,7 +58,7 @@ describe("Flywheel Beacon gate", () => {
   });
 
   it("denies C2 under legacy_v1 and allows C0/C1", async () => {
-    setBundledBeaconReleaseForTests(null);
+    setBundledBeaconReleaseForTests("staging", null);
     const env = { DEPLOY_ENV: "staging" };
     const c2 = await evaluateFlywheelGovernance(env, "tenant-1", baseRun(), command());
     assert.equal(c2.allowed, false);
@@ -97,11 +98,12 @@ describe("Flywheel Beacon gate", () => {
 
   it("reaches approval-required under verified_v2 for a new v2-stamped run", async () => {
     const unsigned = await buildUnsignedBeaconV2Release("2.0.0-test", {
+      environment: "staging",
       publishedAt: "2026-07-19T00:00:00.000Z",
     });
-    const release = await signBeaconRelease(unsigned, FIXTURE_BEACON_KEY);
-    setBundledBeaconReleaseForTests(release);
-    const env = { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" };
+    const release = await signBeaconRelease(unsigned, UNIT_TEST_KEY);
+    setBundledBeaconReleaseForTests("staging", release);
+    const env = { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" };
 
     const state = await resolveBeaconRuntimeState(env);
     assert.equal(state.status, "verified_v2");
@@ -119,11 +121,12 @@ describe("Flywheel Beacon gate", () => {
 
   it("does not silently upgrade an old v1 run when v2 becomes active", async () => {
     const unsigned = await buildUnsignedBeaconV2Release("2.0.0-test", {
+      environment: "staging",
       publishedAt: "2026-07-19T00:00:00.000Z",
     });
-    const release = await signBeaconRelease(unsigned, FIXTURE_BEACON_KEY);
-    setBundledBeaconReleaseForTests(release);
-    const env = { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" };
+    const release = await signBeaconRelease(unsigned, UNIT_TEST_KEY);
+    setBundledBeaconReleaseForTests("staging", release);
+    const env = { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" };
 
     const state = await resolveBeaconRuntimeState(env);
     assert.equal(state.status, "verified_v2");
@@ -139,11 +142,12 @@ describe("Flywheel Beacon gate", () => {
 
   it("new verified reads return the v2 hash, distinct from legacy v1", async () => {
     const unsigned = await buildUnsignedBeaconV2Release("2.0.0-test", {
+      environment: "staging",
       publishedAt: "2026-07-19T00:00:00.000Z",
     });
-    const release = await signBeaconRelease(unsigned, FIXTURE_BEACON_KEY);
-    setBundledBeaconReleaseForTests(release);
-    const env = { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" };
+    const release = await signBeaconRelease(unsigned, UNIT_TEST_KEY);
+    setBundledBeaconReleaseForTests("staging", release);
+    const env = { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" };
     const hash = await getBeaconHashForReads(env);
     assert.equal(hash, release.beaconHash);
     assert.notEqual(hash, EXPECTED_BEACON_SHA256);

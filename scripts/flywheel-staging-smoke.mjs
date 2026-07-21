@@ -3,7 +3,7 @@
  * Authenticated Flywheel staging smoke.
  *
  * Required environment variables:
- * - STAGING_BASE_URL
+ * - STAGING_BASE_URL (validated before any auth/network)
  * - SMOKE_MISSION_ID
  * - FLYWHEEL_C2_EXPECTATION: await-approval | beacon-deny
  * - OPERATOR_CALLSIGN
@@ -20,17 +20,11 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { validateStagingBaseUrl } from "./lib/stagingBaseUrl.mjs";
 
 const outPath = process.env.SMOKE_REPORT_PATH?.trim() || "docs/evidence/_flywheel-staging-smoke-raw.json";
-const rawBase = process.env.STAGING_BASE_URL?.trim();
-const missionId = process.env.SMOKE_MISSION_ID?.trim();
-const c2Expectation = process.env.FLYWHEEL_C2_EXPECTATION?.trim();
-const callsign = process.env.OPERATOR_CALLSIGN?.trim();
-const password = process.env.OPERATOR_PASSWORD;
-const allowedC2Expectations = new Set(["await-approval", "beacon-deny"]);
-
-let base = rawBase || null;
 const steps = [];
+let base = null;
 
 function writeReport(report) {
   mkdirSync(dirname(outPath), { recursive: true });
@@ -40,9 +34,9 @@ function writeReport(report) {
 function failClosed(message) {
   writeReport({
     ok: false,
-    missionId: missionId || null,
+    missionId: null,
     base,
-    c2Expectation: c2Expectation || null,
+    c2Expectation: null,
     message,
     steps,
     generatedAt: new Date().toISOString(),
@@ -51,8 +45,20 @@ function failClosed(message) {
   process.exit(1);
 }
 
+// Validate staging URL before reading auth credentials or opening network.
+const stagingUrl = validateStagingBaseUrl(process.env.STAGING_BASE_URL);
+if (!stagingUrl.ok) {
+  failClosed(stagingUrl.error);
+}
+base = stagingUrl.baseUrl;
+
+const missionId = process.env.SMOKE_MISSION_ID?.trim();
+const c2Expectation = process.env.FLYWHEEL_C2_EXPECTATION?.trim();
+const callsign = process.env.OPERATOR_CALLSIGN?.trim();
+const password = process.env.OPERATOR_PASSWORD;
+const allowedC2Expectations = new Set(["await-approval", "beacon-deny"]);
+
 const configErrors = [];
-if (!rawBase) configErrors.push("STAGING_BASE_URL");
 if (!missionId) configErrors.push("SMOKE_MISSION_ID");
 if (!c2Expectation) configErrors.push("FLYWHEEL_C2_EXPECTATION");
 if (!callsign) configErrors.push("OPERATOR_CALLSIGN");
@@ -64,16 +70,6 @@ if (configErrors.length > 0) {
 
 if (!allowedC2Expectations.has(c2Expectation)) {
   failClosed("FLYWHEEL_C2_EXPECTATION must be either 'await-approval' or 'beacon-deny'.");
-}
-
-try {
-  const parsedBase = new URL(rawBase);
-  if (!new Set(["http:", "https:"]).has(parsedBase.protocol)) {
-    throw new Error("unsupported protocol");
-  }
-  base = parsedBase.toString().replace(/\/$/, "");
-} catch {
-  failClosed("STAGING_BASE_URL must be a valid HTTP(S) URL.");
 }
 
 function record(step, ok, detail = {}) {
