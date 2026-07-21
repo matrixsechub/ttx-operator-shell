@@ -116,6 +116,27 @@ function isCloudflareErrorPage(text) {
   return /cloudflare ray id|error code 5\d\d/i.test(text);
 }
 
+/**
+ * Resolve Cloudflare Access service-token credentials from the environment.
+ * Fail closed with a non-secret message when either value is missing.
+ * Never log credential values.
+ */
+export function resolveStagingAccessCredentials(env = process.env) {
+  const clientId = typeof env.STAGING_ACCESS_CLIENT_ID === "string" ? env.STAGING_ACCESS_CLIENT_ID.trim() : "";
+  const clientSecret =
+    typeof env.STAGING_ACCESS_CLIENT_SECRET === "string" ? env.STAGING_ACCESS_CLIENT_SECRET.trim() : "";
+  const missing = [];
+  if (!clientId) missing.push("STAGING_ACCESS_CLIENT_ID");
+  if (!clientSecret) missing.push("STAGING_ACCESS_CLIENT_SECRET");
+  if (missing.length > 0) {
+    return {
+      ok: false,
+      error: `Missing required Cloudflare Access credentials: ${missing.join(", ")}. Set them in the GitHub Environment "staging".`,
+    };
+  }
+  return { ok: true, clientId, clientSecret };
+}
+
 function classifyStatus(contract, status) {
   if (contract.expectStatus !== undefined) return status === contract.expectStatus;
   if (contract.expectStatusClass === "4xx") return status >= 400 && status < 500;
@@ -137,13 +158,22 @@ function checkSecurityHeaders(headers, notes) {
   return failed;
 }
 
-async function probe(baseUrl, contract) {
+function buildSmokeRequestHeaders(contract, access) {
+  return {
+    Accept: contract.contentTypeIncludes?.includes("json") ? "application/json" : "*/*",
+    "Cache-Control": "no-cache",
+    "CF-Access-Client-Id": access.clientId,
+    "CF-Access-Client-Secret": access.clientSecret,
+  };
+}
+
+async function probe(baseUrl, contract, access) {
   const url = new URL(contract.path, baseUrl).toString();
   const started = Date.now();
   const response = await fetch(url, {
     method: contract.method,
     redirect: "manual",
-    headers: { Accept: contract.contentTypeIncludes?.includes("json") ? "application/json" : "*/*", "Cache-Control": "no-cache" },
+    headers: buildSmokeRequestHeaders(contract, access),
   });
   const durationMs = Date.now() - started;
   const contentType = response.headers.get("content-type") ?? "";
@@ -241,10 +271,10 @@ async function probe(baseUrl, contract) {
   };
 }
 
-async function probeWithRetry(baseUrl, contract, maxAttempts = 5) {
+async function probeWithRetry(baseUrl, contract, access, maxAttempts = 5) {
   let last = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    last = await probe(baseUrl, contract);
+    last = await probe(baseUrl, contract, access);
     if (last.result === "PASS" || last.result === "WARNING") return last;
     if (last.status >= 400 && last.status < 500 && contract.expectStatusClass !== "4xx" && contract.expectStatus !== last.status) {
       return last;
@@ -262,10 +292,15 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
   }
   const safeBaseUrl = validated.baseUrl;
 
+  const access = resolveStagingAccessCredentials(options.env ?? process.env);
+  if (!access.ok) {
+    throw new Error(access.error);
+  }
+
   const contracts = options.contracts ?? SMOKE_ROUTE_CONTRACTS;
   const checks = [];
   for (const contract of contracts) {
-    checks.push(await probeWithRetry(safeBaseUrl, contract, options.maxAttempts ?? 5));
+    checks.push(await probeWithRetry(safeBaseUrl, contract, access, options.maxAttempts ?? 5));
   }
 
   const summary = {
@@ -293,6 +328,12 @@ async function main() {
   const validated = validateStagingBaseUrl(rawBase);
   if (!validated.ok) {
     console.error(validated.error);
+    process.exit(1);
+  }
+
+  const access = resolveStagingAccessCredentials(process.env);
+  if (!access.ok) {
+    console.error(access.error);
     process.exit(1);
   }
 
