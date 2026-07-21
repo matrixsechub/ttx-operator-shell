@@ -26,6 +26,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-cues.css" />
     <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
     <link rel="stylesheet" href="/styles/rgbgold-components.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
@@ -77,6 +79,11 @@
             <span class="hud-tag a11y-override-badge">Access // Request</span>
             <p class="section-label mono">[ MSHOPS_ECOSYSTEM_REGISTRATION ]</p>
             <h1 class="glow-pulse cinematic-hook">MSHOPS Ecosystem Registration</h1>
+            <p class="entity-voice mono" data-entity="hsx">
+              <span class="entity-voice-orb" aria-hidden="true"></span>
+              <strong>HSX</strong>
+              <span>Trains &amp; protects — access requests route through the security plane before anything activates.</span>
+            </p>
             <p class="hero-sub register-hero-copy">
               Request access to the MSHOPS ecosystem. Submissions are reviewed by operators before any
               workspace or operator surfaces are unlocked.
@@ -135,7 +142,7 @@
                 ></textarea>
               </label>
               <div class="cta-row">
-                <button class="register-cta-enterprise pulse mono" id="register-submit" type="submit">Request Access</button>
+                <button class="register-cta-enterprise pulse mono" id="register-submit" type="submit" data-flow-cta="register-request-access">Request Access</button>
                 <a class="button secondary" href="/enter">Back to Funnel</a>
               </div>
               <p class="register-cta-subtext mono">
