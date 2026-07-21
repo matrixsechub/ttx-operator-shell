@@ -30,6 +30,7 @@ export const cockpitRouter = createBrowserRouter([
   {
     element: <RequireAuth />,
     children: [
+      { path: "/operator", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/dashboard/flywheel", element: <FlywheelDashboard /> },
       { path: "/status", element: <Status /> },

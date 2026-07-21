@@ -58,18 +58,28 @@ import { handleTelemetryRoute, recordTelemetrySample } from "./telemetry";
 import { handleUsageRoute } from "./usage";
 import { handleFlowEventRoute } from "./flowRoute";
 import { handleFlowIntelligenceRoute } from "./flowIntelligenceRoute";
+import { handleQualificationRoute } from "./qualificationRuntime";
+import { handleEntitlementsRoute } from "./entitlementsWorker";
+import { handleTierRoute } from "./tierWorker";
+import { handleBillingRoute } from "./marketplaceBillingWorker";
+import { handleRecommendationRoute } from "./recommendationEngine";
+import { handleMarketplaceIntentRoute } from "./marketplaceIntentRouter";
+import { handleBlueprintRoute } from "./blueprintGenerator";
+import { handleNotificationsRoute } from "./operatorNotifications";
 import { handleBehaviorIntelligenceRoute } from "./behaviorRoute";
 import { handleExperimentationRoute } from "./experimentationRoute";
 import { handleTrafficActivationRoute } from "./trafficActivation";
-import { handleLiveTtxRoute } from "./liveTtxRoute";
+import { handleLiveTtxRoute, type LiveTtxEnv } from "./liveTtxRoute";
 import { handleWildcardRoute } from "./wildcardAdvancement";
 import { handleAuditLiteRoute } from "./auditLite";
 import { handleRecoveredFunnelApi, isRecoveredPublicRoute, serveRecoveredPublicRoute } from "./funnelRecovery";
 import { handleOperatorFulfillmentAgentApi } from "./fulfillmentAgentRoutes";
-import { handleFlywheelRoute } from "./flywheel/routes";
+import { handleFlywheelRoute, type FlywheelRouteEnv } from "./flywheel/routes";
 export { LiveTtxSession } from "./liveSession";
 export { ReceiptAuthority } from "./do/receiptAuthority";
 export { FlywheelDO } from "./flywheel/do";
+
+type RuntimeEnv = WorkerEnv & BackboneEnv & LiveTtxEnv & FlywheelRouteEnv;
 
 await assertBeaconOnStartup();
 await ensureAgentGovernance();
@@ -129,6 +139,30 @@ function isRateLimited(clientId: string): boolean {
 export default {
 
   async fetch(request, env): Promise<Response> {
+    // R0 restoration: every request path is guaranteed the standard
+    // { error } envelope — an unhandled exception may never escape as a
+    // raw platform 500. The structured log line carries no payload data
+    // and no secrets; per-route latency/status telemetry stays with
+    // recordTelemetrySample.
+    try {
+      return await handleFetch(request, env as RuntimeEnv);
+    } catch (err) {
+      console.error(
+        JSON.stringify({
+          level: "error",
+          scope: "worker",
+          method: request.method,
+          pathname: new URL(request.url).pathname,
+          message: err instanceof Error ? err.message : String(err),
+        }),
+      );
+      return Response.json({ error: "Internal error" }, { status: 500 });
+    }
+  },
+
+} satisfies ExportedHandler<Env>;
+
+async function handleFetch(request: Request, env: RuntimeEnv): Promise<Response> {
 
     const edgeEnv = env as WorkerEnv;
 
@@ -137,58 +171,6 @@ export default {
     const pathname = url.pathname;
 
     const mode = resolveSurfaceMode(env);
-
-
-
-    // #region agent log
-
-    if (
-
-      pathname === "/" ||
-
-      pathname === "/welcome" ||
-
-      pathname === "/login" ||
-
-      pathname === "/marketplace" ||
-
-      pathname.startsWith("/ops/")
-
-    ) {
-
-      console.log("TRACE: PATHNAME =", pathname);
-
-      console.log("TRACE: SURFACE =", mode);
-
-      fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-
-        method: "POST",
-
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-
-        body: JSON.stringify({
-
-          sessionId: "14ea90",
-
-          runId: "funnel-primary",
-
-          hypothesisId: "H-entry",
-
-          location: "worker/index.ts:fetch",
-
-          message: "html path entry",
-
-          data: { pathname, mode, method: request.method },
-
-          timestamp: Date.now(),
-
-        }),
-
-      }).catch(() => {});
-
-    }
-
-    // #endregion
 
 
 
@@ -391,7 +373,7 @@ export default {
 
       if (url.pathname.startsWith("/api/ttx/live")) {
 
-        const liveResponse = await handleLiveTtxRoute(request, url.pathname, env as WorkerEnv);
+        const liveResponse = await handleLiveTtxRoute(request, url.pathname, env);
 
         if (liveResponse) return liveResponse;
 
@@ -487,6 +469,58 @@ export default {
         return flowIntelligenceResponse;
       }
 
+      // Pearl-Spectral structural runtimes (Track 5): qualification,
+      // entitlements, tier, marketplace billing.
+      const qualificationResponse = await handleQualificationRoute(request, url.pathname, env as WorkerEnv);
+      if (qualificationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, qualificationResponse.status);
+        return qualificationResponse;
+      }
+
+      const entitlementsResponse = await handleEntitlementsRoute(request, url.pathname, env as WorkerEnv);
+      if (entitlementsResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, entitlementsResponse.status);
+        return entitlementsResponse;
+      }
+
+      const tierResponse = await handleTierRoute(request, url.pathname, env as WorkerEnv);
+      if (tierResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, tierResponse.status);
+        return tierResponse;
+      }
+
+      const billingResponse = await handleBillingRoute(request, url.pathname, env as WorkerEnv);
+      if (billingResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, billingResponse.status);
+        return billingResponse;
+      }
+
+      // Autonomy layer (Track 6): recommendation, intent routing,
+      // blueprint, operator notifications.
+      const recommendationResponse = await handleRecommendationRoute(request, url.pathname, env as WorkerEnv);
+      if (recommendationResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, recommendationResponse.status);
+        return recommendationResponse;
+      }
+
+      const intentResponse = await handleMarketplaceIntentRoute(request, url.pathname, env as WorkerEnv);
+      if (intentResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, intentResponse.status);
+        return intentResponse;
+      }
+
+      const blueprintResponse = await handleBlueprintRoute(request, url.pathname, env as WorkerEnv);
+      if (blueprintResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, blueprintResponse.status);
+        return blueprintResponse;
+      }
+
+      const notificationsResponse = await handleNotificationsRoute(request, url.pathname, env as WorkerEnv);
+      if (notificationsResponse) {
+        await recordTelemetrySample(env, url.pathname, Date.now() - apiStarted, notificationsResponse.status);
+        return notificationsResponse;
+      }
+
       const behaviorResponse = await handleBehaviorIntelligenceRoute(request, url.pathname, env as WorkerEnv);
 
       if (behaviorResponse) {
@@ -557,9 +591,7 @@ export default {
 
     return injectSecurityHeaders(assetResponse);
 
-  },
-
-} satisfies ExportedHandler<Env>;
+}
 
 
 

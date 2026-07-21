@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { GovernanceStatePanel } from "../components/GovernanceStatePanel";
+import { EntityVoice } from "../components/EntityVoice";
+import { AdvisorPanel } from "../pearl/upgradeAdvisor";
 import { OperatorShell } from "../components/OperatorShell";
 import { SystemHUD } from "../components/SystemHUD";
 import { SystemTelemetryPanel } from "../components/SystemTelemetryPanel";
@@ -32,9 +34,12 @@ export function Dashboard() {
           <div>
             <h1 className="text-lg uppercase tracking-widest text-op-accent">Operator Cockpit</h1>
             <p className="mt-1 text-xs text-op-text-dim">Session overview and quick actions.</p>
+            <EntityVoice entity="operator">every panel reports here; the operator decides.</EntityVoice>
           </div>
           <EngineStatusIndicator />
         </div>
+
+        <AdvisorPanel />
 
         <TelemetryPanel />
 

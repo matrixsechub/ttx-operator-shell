@@ -1,7 +1,7 @@
 /** Architectural HTML surfaces — each maps to a distinct SPA shell. */
 export type HtmlSurface = "ecosystem" | "storefront" | "cockpit" | "auth" | "governance";
 
-const COCKPIT_PREFIXES = ["/ops", "/systems", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about", "/join"] as const;
+const COCKPIT_PREFIXES = ["/operator", "/ops", "/systems", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about", "/join"] as const;
 
 const STOREFRONT_PATHS = ["/marketplace", "/enter", "/storefront"] as const;
 
@@ -9,6 +9,9 @@ export function resolveHtmlSurface(pathname: string): HtmlSurface {
   const normalized = pathname.replace(/\/$/, "") || "/";
 
   if (normalized === "/") return "ecosystem";
+  // Track 5 structural rebuild: /onboarding is the live wizard on the
+  // ecosystem surface (the static pager was retired from the route map).
+  if (normalized === "/onboarding" || normalized.startsWith("/onboarding/")) return "ecosystem";
   if (normalized === "/login") return "auth";
   if (normalized === "/council" || normalized.startsWith("/council/")) return "governance";
 

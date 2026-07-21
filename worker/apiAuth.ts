@@ -33,6 +33,21 @@ export function isPublicApiRoute(pathname: string, method: string): boolean {
   if (matchesPath(pathname, method, "/api/engagements/status", "GET")) return true;
   if (matchesPath(pathname, method, "/api/public/demo-mode", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register", "POST")) return true;
+  // Pearl-Spectral structural runtimes (Track 5). get/set surfaces for
+  // entitlements and tier are NOT listed — they stay default-deny and
+  // self-check operator auth in their handlers.
+  if (matchesPath(pathname, method, "/api/qualification/evidence", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/qualification/state", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/entitlements/resolve", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/tier/get", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/billing/checkout-session", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/billing/acquisition", "GET")) return true;
+  if (matchesPath(pathname, method, "/api/webhooks/billing", "POST")) return true;
+  // Autonomy layer (Track 6). /api/notifications/recent is NOT listed —
+  // it stays default-deny (operator JWT).
+  if (matchesPath(pathname, method, "/api/recommendation/evaluate", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/marketplace/intent", "POST")) return true;
+  if (matchesPath(pathname, method, "/api/blueprint", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register-lifecycle", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register-security", "GET")) return true;
   if (matchesPath(pathname, method, "/api/register-queue", "GET")) return true;
