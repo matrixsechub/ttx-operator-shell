@@ -2,13 +2,12 @@ import {
   BEACON_RELEASE_DOMAIN,
   BEACON_SIGNING_KEY_ID,
 } from "../../msh-ops/beacon/signedBeaconRelease";
+import {
+  BEACON_FIXTURE_SIGNING_KEY_DENYLIST,
+  isBeaconFixtureSigningKey,
+} from "../../msh-ops/beacon/beaconFixtureKeys";
 
-export { BEACON_RELEASE_DOMAIN, BEACON_SIGNING_KEY_ID };
-
-/** Exact fixture key string denied in staging/production. */
-export const BEACON_FIXTURE_SIGNING_KEY_DENYLIST = [
-  "test-only-beacon-signing-key-do-not-use-in-production-01",
-] as const;
+export { BEACON_RELEASE_DOMAIN, BEACON_SIGNING_KEY_ID, BEACON_FIXTURE_SIGNING_KEY_DENYLIST };
 
 export type BeaconSigningEnv = {
   BEACON_SIGNING_KEY?: string;
@@ -36,10 +35,6 @@ export function normalizeDeployEnv(raw?: string): NormalizedDeployEnv {
   return "unprotected";
 }
 
-function isDenylistedFixtureKey(key: string): boolean {
-  return (BEACON_FIXTURE_SIGNING_KEY_DENYLIST as readonly string[]).includes(key);
-}
-
 /**
  * Resolve the Beacon HMAC signing key.
  *
@@ -54,7 +49,7 @@ export function resolveBeaconSigningKey(env: BeaconSigningEnv): ResolvedBeaconSi
   const key = env.BEACON_SIGNING_KEY?.trim() ?? "";
 
   if (key) {
-    if (runtime !== "unprotected" && isDenylistedFixtureKey(key)) {
+    if (runtime !== "unprotected" && isBeaconFixtureSigningKey(key)) {
       return null;
     }
     if (key.length < 32) {
@@ -89,7 +84,7 @@ export function beaconSigningKeyDenialReason(
 ): "BEACON_FIXTURE_KEY_DENIED" | "BEACON_SIGNING_KEY_MISSING" {
   const runtime = normalizeDeployEnv(env.DEPLOY_ENV);
   const key = env.BEACON_SIGNING_KEY?.trim() ?? "";
-  if (key && runtime !== "unprotected" && isDenylistedFixtureKey(key)) {
+  if (key && runtime !== "unprotected" && isBeaconFixtureSigningKey(key)) {
     return "BEACON_FIXTURE_KEY_DENIED";
   }
   return "BEACON_SIGNING_KEY_MISSING";
