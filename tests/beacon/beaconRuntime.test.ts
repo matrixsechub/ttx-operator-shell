@@ -13,19 +13,24 @@ import {
 import { resolveBeaconRuntimeState } from "../../worker/governance/beaconRuntime.ts";
 import { EXPECTED_BEACON_SHA256 } from "../../msh-ops/beacon/beaconHash.ts";
 
-/** Explicitly non-production fixture key for local tests only. */
+/** Non-denylisted unit key for verified_v2 under staging/production. */
+const UNIT_TEST_KEY = "unit-test-beacon-hmac-key-32chars-minimum!!";
+/** Fixture key — unprotected denial tests and fixture-denied-in-protected tests only. */
 const FIXTURE_BEACON_KEY = "test-only-beacon-signing-key-do-not-use-in-production-01";
 
 async function makeFixtureRelease(overrides: {
   key?: string;
+  environment?: "staging" | "production";
   mutateBeacon?: (release: SignedBeaconRelease) => void;
   mutateHash?: string;
   mutateSignature?: string;
 } = {}): Promise<SignedBeaconRelease> {
+  const environment = overrides.environment ?? "staging";
   const unsigned = await buildUnsignedBeaconV2Release("2.0.0-test", {
+    environment,
     publishedAt: "2026-07-19T00:00:00.000Z",
   });
-  const release = await signBeaconRelease(unsigned, overrides.key ?? FIXTURE_BEACON_KEY);
+  const release = await signBeaconRelease(unsigned, overrides.key ?? UNIT_TEST_KEY);
   if (overrides.mutateBeacon) overrides.mutateBeacon(release);
   if (overrides.mutateHash) release.beaconHash = overrides.mutateHash;
   if (overrides.mutateSignature) release.signature.value = overrides.mutateSignature;
@@ -37,10 +42,10 @@ describe("Beacon v2 runtime classification", () => {
     resetBeaconReleaseCacheForTests();
   });
 
-  it("returns verified_v2 for a valid fixture release and matching key", async () => {
-    const release = await makeFixtureRelease();
+  it("returns verified_v2 for a valid env-matched release and non-fixture key", async () => {
+    const release = await makeFixtureRelease({ environment: "staging" });
     const state = await resolveBeaconRuntimeState(
-      { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" },
+      { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" },
       { release },
     );
     assert.equal(state.status, "verified_v2");
@@ -51,7 +56,7 @@ describe("Beacon v2 runtime classification", () => {
   });
 
   it("fails closed to legacy_v1 when the signing key is missing", async () => {
-    const release = await makeFixtureRelease();
+    const release = await makeFixtureRelease({ environment: "staging" });
     const state = await resolveBeaconRuntimeState(
       { DEPLOY_ENV: "staging" },
       { release },
@@ -66,9 +71,9 @@ describe("Beacon v2 runtime classification", () => {
   });
 
   it("fails closed to legacy_v1 when the release is missing", async () => {
-    setBundledBeaconReleaseForTests(null);
+    setBundledBeaconReleaseForTests("staging", null);
     const state = await resolveBeaconRuntimeState(
-      { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" },
+      { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" },
     );
     assert.equal(state.status, "legacy_v1");
     assert.equal(state.hash, EXPECTED_BEACON_SHA256);
@@ -78,7 +83,7 @@ describe("Beacon v2 runtime classification", () => {
   });
 
   it("fails closed on incorrect key / signature", async () => {
-    const release = await makeFixtureRelease();
+    const release = await makeFixtureRelease({ environment: "staging" });
     const state = await resolveBeaconRuntimeState(
       {
         BEACON_SIGNING_KEY: "wrong-key-wrong-key-wrong-key-wrong-key-99",
@@ -91,7 +96,7 @@ describe("Beacon v2 runtime classification", () => {
       assert.equal(state.reasonCode, "BEACON_SIGNATURE_INVALID");
     }
     const verified = await getVerifiedBeaconV2State(
-      { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" },
+      { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" },
       { release: await makeFixtureRelease({ mutateSignature: "00".repeat(32) }) },
     );
     assert.equal(verified.verified, false);
@@ -105,7 +110,7 @@ describe("Beacon v2 runtime classification", () => {
       },
     });
     const tamperedState = await getVerifiedBeaconV2State(
-      { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" },
+      { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" },
       { release: tampered },
     );
     assert.equal(tamperedState.verified, false);
@@ -115,7 +120,7 @@ describe("Beacon v2 runtime classification", () => {
       mutateHash: "ab".repeat(32),
     });
     const hashState = await getVerifiedBeaconV2State(
-      { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" },
+      { BEACON_SIGNING_KEY: UNIT_TEST_KEY, DEPLOY_ENV: "staging" },
       { release: hashMismatch },
     );
     assert.equal(hashState.verified, false);
@@ -123,11 +128,24 @@ describe("Beacon v2 runtime classification", () => {
   });
 
   it("keeps healthy v1 classification as legacy_v1 and never as verified_v2", async () => {
-    setBundledBeaconReleaseForTests(null);
+    setBundledBeaconReleaseForTests("staging", null);
     const state = await resolveBeaconRuntimeState({ DEPLOY_ENV: "staging" });
     assert.equal(state.status, "legacy_v1");
     assert.equal(state.hash, EXPECTED_BEACON_SHA256);
     assert.equal(state.mutationAllowed, false);
     assert.notEqual(state.status, "verified_v2");
+  });
+
+  it("denies denylisted fixture key under staging", async () => {
+    const release = await makeFixtureRelease({
+      environment: "staging",
+      key: FIXTURE_BEACON_KEY,
+    });
+    const verified = await getVerifiedBeaconV2State(
+      { BEACON_SIGNING_KEY: FIXTURE_BEACON_KEY, DEPLOY_ENV: "staging" },
+      { release },
+    );
+    assert.equal(verified.verified, false);
+    assert.equal(verified.reason, "BEACON_FIXTURE_KEY_DENIED");
   });
 });
