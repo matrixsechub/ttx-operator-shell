@@ -46,4 +46,16 @@ describe("staging-deploy workflow staging-smoke binding", () => {
     assert.doesNotMatch(stagingWorkflow, /CF-Access-Client-/i);
     assert.doesNotMatch(stagingWorkflow, /client_secret:\s*["'][^$]/i);
   });
+
+  it("uploads the staging-smoke report with if: always()", () => {
+    const job = extractStagingSmokeJob(stagingWorkflow);
+    assert.match(
+      job,
+      /uses:\s*actions\/upload-artifact@[0-9a-f]{40}[^\n]*\n\s+if:\s*always\(\)/,
+    );
+    assert.match(job, /name:\s*staging-smoke-report/);
+    assert.match(job, /path:\s*artifacts\/staging-smoke-report\.json/);
+    assert.match(job, /retention-days:\s*14/);
+    assert.match(job, /if-no-files-found:\s*error/);
+  });
 });

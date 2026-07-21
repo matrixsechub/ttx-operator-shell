@@ -1,8 +1,15 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, it, mock } from "node:test";
 import {
+  buildFailureDiagnostic,
+  emitFailedProbeDiagnostics,
+  persistStagingSmokeReport,
   resolveStagingAccessCredentials,
   runStagingSmoke,
+  sanitizeDiagnosticText,
 } from "../../scripts/ci/staging-smoke.mjs";
 import { validateStagingBaseUrl } from "../../scripts/lib/stagingBaseUrl.mjs";
 
@@ -242,6 +249,98 @@ describe("staging-smoke", () => {
     } finally {
       globalThis.fetch = originalFetch;
     }
+  });
+
+  it("writes a report with sanitized diagnostics when probes fail", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (_input, init) => {
+      assertAccessHeaders(init);
+      return new Response("<html>Cloudflare Access login</html>", {
+        status: 302,
+        headers: {
+          location: `https://evil.example/callback?token=${FAKE_ACCESS_SECRET}&client_id=${FAKE_ACCESS_ID}`,
+          "content-type": "text/html",
+        },
+      });
+    };
+
+    const dir = mkdtempSync(join(tmpdir(), "staging-smoke-"));
+    const outputPath = join(dir, "staging-smoke-report.json");
+    const emitted = [];
+    try {
+      const report = await runStagingSmoke(
+        ALLOWED,
+        "abc123",
+        smokeOptions({
+          contracts: [
+            {
+              name: "ecosystem_root",
+              method: "GET",
+              path: "/",
+              expectStatus: 200,
+              contentTypeIncludes: "text/html",
+              htmlIncludes: ["MSHOPS.NET"],
+            },
+          ],
+        }),
+      );
+
+      assert.equal(report.summary.failed, 1);
+      assert.equal(report.checks[0].result, "FAIL");
+      assert.ok(report.checks[0].diagnostic);
+      assert.equal(report.checks[0].diagnostic.route, "GET /");
+      assert.equal(report.checks[0].diagnostic.status, 302);
+      assert.equal(report.checks[0].diagnostic.hostname, "evil.example");
+      assert.match(report.checks[0].diagnostic.content_type, /text\/html/);
+      assert.match(report.checks[0].diagnostic.expected, /status=200/);
+      assert.equal(typeof report.checks[0].diagnostic.reason, "string");
+      assert.ok(report.checks[0].diagnostic.reason.length > 0);
+
+      persistStagingSmokeReport(report, outputPath);
+      const onDisk = readFileSync(outputPath, "utf8");
+      assert.ok(onDisk.includes('"failed": 1'));
+      assert.ok(onDisk.includes('"diagnostic"'));
+
+      emitFailedProbeDiagnostics(report.checks, (line) => emitted.push(String(line)));
+      assert.equal(emitted.length, 1);
+      assert.match(emitted[0], /^SMOKE_DIAG /);
+
+      const combined = `${JSON.stringify(report)}\n${emitted.join("\n")}\n${onDisk}`;
+      assert.doesNotMatch(combined, new RegExp(FAKE_ACCESS_ID));
+      assert.doesNotMatch(combined, new RegExp(FAKE_ACCESS_SECRET));
+      assert.doesNotMatch(combined, /token=/i);
+      assert.doesNotMatch(combined, /CF-Access-Client-/i);
+      assert.doesNotMatch(combined, /Authorization/i);
+      assert.doesNotMatch(combined, /Cookie/i);
+      assert.doesNotMatch(combined, /Cloudflare Access login/);
+    } finally {
+      globalThis.fetch = originalFetch;
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("sanitizeDiagnosticText never retains credential-shaped values", () => {
+    const dirty = [
+      `redirect https://login.example/start?id=${FAKE_ACCESS_ID}&secret=${FAKE_ACCESS_SECRET}`,
+      `Authorization: Bearer ${FAKE_ACCESS_SECRET}`,
+      `CF-Access-Client-Secret: ${FAKE_ACCESS_SECRET}`,
+      `Cookie: session=${FAKE_ACCESS_ID}`,
+    ].join(" | ");
+    const clean = sanitizeDiagnosticText(dirty);
+    assert.doesNotMatch(clean, new RegExp(FAKE_ACCESS_ID));
+    assert.doesNotMatch(clean, new RegExp(FAKE_ACCESS_SECRET));
+    assert.match(clean, /login\.example|\[redacted/);
+    const diag = buildFailureDiagnostic({
+      contract: { method: "GET", path: "/login", expectStatus: 200 },
+      baseUrl: ALLOWED,
+      status: 403,
+      contentType: "text/html",
+      location: `https://access.example/?client_secret=${FAKE_ACCESS_SECRET}`,
+      notes: [dirty],
+    });
+    assert.equal(diag.hostname, "access.example");
+    assert.doesNotMatch(JSON.stringify(diag), new RegExp(FAKE_ACCESS_SECRET));
+    assert.doesNotMatch(JSON.stringify(diag), new RegExp(FAKE_ACCESS_ID));
   });
 
   it("fails on 5xx responses for allowlisted host", async () => {
