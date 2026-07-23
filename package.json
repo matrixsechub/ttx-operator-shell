@@ -24,7 +24,7 @@
     "test:operator-auth": "node --import tsx --test tests/operatorAuth.test.ts",
     "organizer": "node --import tsx msh-ops/agents/runOrganizer.ts",
     "organizer:scheduled": "node scripts/run-organizer-scheduled.mjs",
-    "lint:egress": "node scripts/ci/forbidden-egress-scan.mjs src"
+    "lint:egress": "node scripts/ci/forbidden-egress-scan.mjs src worker"
   },
   "dependencies": {
     "react": "^19.0.0",

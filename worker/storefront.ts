@@ -42,38 +42,8 @@ export async function serveStorefrontSpa(
   });
   const response = await assets.fetch(shellRequest);
   const html = await response.text();
-  const title = html.match(/<title>([^<]+)/)?.[1] ?? "missing";
   const storefrontOk = isStorefrontShellHtml(html);
   const legacyLeak = isLegacyOperatorShellHtml(html);
-
-  // #region agent log
-  console.log("TRACE: STOREFRONT_SHELL =", shellUrl.pathname);
-  console.log("TRACE: STOREFRONT_STATUS =", response.status);
-  console.log("TRACE: STOREFRONT_TITLE =", title);
-  console.log("TRACE: STOREFRONT_VALID =", storefrontOk);
-  console.log("TRACE: LEGACY_LEAK =", legacyLeak);
-  fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-    body: JSON.stringify({
-      sessionId: "14ea90",
-      runId: "storefront-primary",
-      hypothesisId: "H-storefront-shell",
-      location: "worker/storefront.ts:serveStorefrontSpa",
-      message: "storefront shell resolved",
-      data: {
-        shellPath: shellUrl.pathname,
-        status: response.status,
-        title,
-        storefrontOk,
-        legacyLeak,
-        htmlLen: html.length,
-        bundleRef: html.match(/\/app\/assets\/[^"']+/)?.[0] ?? null,
-      },
-      timestamp: Date.now(),
-    }),
-  }).catch(() => {});
-  // #endregion
 
   if (!storefrontOk || legacyLeak || !response.ok) {
     return Response.json(
