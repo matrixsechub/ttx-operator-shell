@@ -1,0 +1,9 @@
+/* Clean Living CSS fixture: one ambient behavior per primitive, reduced-motion nulled. */
+[data-living="on"] .pearl-orb--beacon { animation: pearl-beacon-pulse 6s ease infinite; }
+[data-living="on"] .pearl-tide { animation: pearl-tide 14s ease infinite; }
+@keyframes pearl-beacon-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.94; } }
+@keyframes pearl-tide { to { transform: translateX(200%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pearl-orb--beacon, .pearl-tide { animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,9 @@
+@theme {
+  --color-pearl-ground: #f4f6fb;
+  /* STATE tokens (evidence-backed only) */
+  --color-state-verified: #0e7a4f;
+  --color-state-critical: #b3261e;
+  /* Entity identities */
+  --color-pearl-entity-beacon: #b9c6dd;
+}
+[data-theme="pearl"] .pearl-gold-btn { background: var(--color-champagne-metal-a); }

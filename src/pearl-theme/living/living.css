@@ -1,0 +1,277 @@
+/**
+ * PEARL LIVING LAYER — ambient + responsive decorative motion
+ * ===========================================================================
+ * The "breath" over the Pearl substrate. EVERY rule here is:
+ *   - gated on [data-living="on"] — set by <LivingRoot> ONLY when the surface
+ *     is active (visible, in view, not reduced-motion). When the gate is off,
+ *     no ambient animation runs at all;
+ *   - decorative and pointer-events:none where it is an added layer;
+ *   - bounded to the governed envelope (opacity Δ ≤ 0.08, translate ≤ 3px,
+ *     tilt ≤ 2°, ambient period ≥ 5s) declared as --pearl-motion-* tokens;
+ *   - nulled under prefers-reduced-motion (the block at the very bottom), as
+ *     defense in depth on top of the JS gate.
+ *
+ * NO raw hex here (brand-lint R9): colors are var() tokens or rgba() of neutral
+ * white/black light. State colors (emerald/red) never appear — motion re-tints
+ * light that already exists; it never encodes meaning.
+ *
+ * This file is imported only by the Living showcase entry and Living component
+ * tests, so nothing here can leak into the op-* product or the static substrate.
+ */
+
+/* ── Root scaffold + decorative layer host ─────────────────────────────── */
+.pearl-living-root { position: relative; }
+
+.pearl-living-decor {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+}
+.pearl-living-root > :not(.pearl-living-decor) { position: relative; z-index: 1; }
+
+/* ── 1b. Cursor iridescence (pointer halo) ─────────────────────────────── */
+/* Position/opacity are driven by JS custom props (--px/--py/--halo-op). The
+   halo only exists while the pointer-halo engine runs (data-living="on"). */
+.pearl-halo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    220px 220px at var(--px, 50%) var(--py, 50%),
+    rgba(255, 255, 255, 0.10),
+    rgba(255, 255, 255, 0.04) 40%,
+    transparent 70%
+  );
+  mix-blend-mode: soft-light;
+}
+[data-living="on"] .pearl-halo {
+  opacity: var(--halo-op, 0);
+  transition: opacity 800ms var(--pearl-motion-ease);
+}
+
+/* ── 1c. Energy tide (rare ambient sweep) ──────────────────────────────── */
+.pearl-tide {
+  position: absolute;
+  top: -20%;
+  left: -30%;
+  width: 60%;
+  height: 140%;
+  opacity: 0;
+  transform: skewX(-14deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    rgba(34, 184, 224, 0.05),
+    transparent
+  );
+  filter: blur(18px);
+}
+[data-living="on"] .pearl-tide {
+  animation: pearl-tide 14s var(--pearl-motion-ease) infinite;
+}
+@keyframes pearl-tide {
+  0% { transform: translateX(0) skewX(-14deg); opacity: 0; }
+  8% { opacity: 0.06; }
+  50% { opacity: 0.05; }
+  92% { opacity: 0.02; }
+  100% { transform: translateX(240%) skewX(-14deg); opacity: 0; }
+}
+
+/* ── 8a. Spectral fog (ambient depth) ──────────────────────────────────── */
+.pearl-fog {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -30%;
+  height: 60%;
+  opacity: 0.12;
+  background:
+    radial-gradient(40% 60% at 30% 80%, rgba(91, 75, 181, 0.16), transparent 70%),
+    radial-gradient(40% 60% at 72% 90%, rgba(14, 111, 138, 0.14), transparent 70%);
+  filter: blur(26px);
+}
+[data-living="on"] .pearl-fog {
+  animation: pearl-fog 22s ease-in-out infinite alternate;
+}
+@keyframes pearl-fog {
+  /* opacity delta capped at 0.08 (0.12 → 0.20) */
+  0% { opacity: 0.12; transform: translateX(0); }
+  100% { opacity: 0.20; transform: translateX(2%); }
+}
+
+/* ── 8b. Bounded ghost motes ───────────────────────────────────────────── */
+.pearl-motes { position: absolute; inset: 0; }
+.pearl-mote {
+  position: absolute;
+  bottom: -6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(143, 208, 255, 0.3) 60%, transparent);
+  opacity: 0;
+  animation: pearl-mote-rise var(--mote-dur, 24s) linear forwards;
+}
+@keyframes pearl-mote-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  12% { opacity: var(--mote-alpha, 0.3); }
+  85% { opacity: var(--mote-alpha, 0.3); }
+  100% { transform: translateY(-84vh); opacity: 0; }
+}
+
+/* ── 2a–2d. Entity ambience (one behavior per orb) ─────────────────────── */
+/* Beacon — pearl pulse (bloom on the existing box-shadow). */
+[data-living="on"] .pearl-orb--beacon {
+  animation: pearl-beacon-pulse 6s var(--pearl-motion-ease) infinite;
+}
+@keyframes pearl-beacon-pulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.9), inset -6px -8px 16px rgba(28, 34, 48, 0.10); }
+  50% { box-shadow: 0 0 40px rgba(255, 255, 255, 1), inset -6px -8px 16px rgba(28, 34, 48, 0.10); }
+}
+
+/* Aurelius — slow solar shimmer via a rotating conic highlight overlay. */
+[data-living="on"] .pearl-orb--aurelius { position: relative; }
+[data-living="on"] .pearl-orb--aurelius::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(from 0deg, transparent, rgba(255, 242, 207, 0.28), transparent 120deg);
+  mix-blend-mode: soft-light;
+  animation: pearl-spin 24s linear infinite;
+}
+@keyframes pearl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* HSX — restrained ember flicker (brightness jitter ≤ ±2%). */
+[data-living="on"] .pearl-orb--hsx {
+  animation: pearl-ember 3.1s ease-in-out infinite;
+}
+@keyframes pearl-ember {
+  0%, 100% { filter: brightness(1); }
+  40% { filter: brightness(1.02); }
+  70% { filter: brightness(0.99); }
+}
+
+/* Ghost — nebula drift (opacity delta ≤ 0.08 on a specular overlay). */
+[data-living="on"] .pearl-orb--ghost { position: relative; }
+[data-living="on"] .pearl-orb--ghost::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.12;
+  background: radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.7), transparent 55%);
+  animation: pearl-nebula 30s ease-in-out infinite alternate;
+}
+@keyframes pearl-nebula {
+  0% { opacity: 0.12; transform: translate(0, 0); }
+  100% { opacity: 0.20; transform: translate(3px, -2px); }
+}
+
+/* ── 3a. Sparkline breathing (translate ≤ 3px) ─────────────────────────── */
+[data-living="on"] .pearl-tele-row:nth-child(odd) .pearl-spark {
+  animation: pearl-spark-breathe 5s ease-in-out infinite;
+}
+[data-living="on"] .pearl-tele-row:nth-child(even) .pearl-spark {
+  animation: pearl-spark-breathe 6.4s ease-in-out infinite;
+}
+@keyframes pearl-spark-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.2px); }
+}
+
+/* ── 3d. Value heartbeat (fires only on change; JS adds .pearl-beat) ────── */
+.pearl-tele-val { will-change: transform; }
+.pearl-tele-val.pearl-beat {
+  animation: pearl-heartbeat 900ms var(--pearl-motion-ease);
+}
+@keyframes pearl-heartbeat {
+  0% { transform: scale(1); }
+  18% { transform: scale(1.06); }
+  36% { transform: scale(1); }
+  54% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+/* ── 4a/4c. Glass parallax + refraction sheen ──────────────────────────── */
+.pearl-living-panel {
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  position: relative;
+}
+[data-living="on"] .pearl-living-panel {
+  transition: transform 240ms var(--pearl-motion-ease);
+}
+.pearl-living-panel .pearl-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-pearl-lg);
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.14) 48%,
+    transparent 66%
+  );
+  z-index: 2;
+}
+[data-living="on"] .pearl-living-panel:hover .pearl-sheen {
+  opacity: 1;
+  transition: opacity 420ms var(--pearl-motion-ease);
+}
+
+/* ── 6b. Gold action ripple (JS-spawned .pearl-ripple, bounded) ────────── */
+.pearl-living-btn { display: inline-flex; }
+.pearl-living-btn .pearl-gold-btn { position: relative; overflow: hidden; }
+.pearl-ripple {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent 70%);
+  transform: scale(0);
+  animation: pearl-ripple 650ms var(--pearl-motion-ease) forwards;
+}
+@keyframes pearl-ripple {
+  to { transform: scale(9); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   REDUCED-MOTION NULLIFICATION (defense in depth atop the JS gate).
+   Every decorative animation/transition resolves to none, transforms go
+   neutral, and added decorative layers are removed. The static Pearl
+   interface remains complete and fully usable.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .pearl-tide,
+  .pearl-fog,
+  .pearl-halo,
+  .pearl-mote,
+  .pearl-orb--beacon,
+  .pearl-orb--aurelius,
+  .pearl-orb--aurelius::before,
+  .pearl-orb--hsx,
+  .pearl-orb--ghost,
+  .pearl-orb--ghost::before,
+  .pearl-spark,
+  .pearl-tele-val,
+  .pearl-tele-val.pearl-beat,
+  .pearl-living-panel,
+  .pearl-living-panel .pearl-sheen,
+  .pearl-ripple {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .pearl-living-decor { display: none !important; }
+}
