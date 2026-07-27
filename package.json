@@ -27,6 +27,7 @@
     "test:unit": "vitest run",
     "test:browser": "playwright test --config playwright.pearl.config.ts",
     "test:browser:living": "playwright test --config playwright.living.config.ts",
+    "test:browser:cockpit": "playwright test --config playwright.cockpit.config.ts",
     "organizer": "node --import tsx msh-ops/agents/runOrganizer.ts",
     "organizer:scheduled": "node scripts/run-organizer-scheduled.mjs",
     "lint:egress": "node scripts/ci/forbidden-egress-scan.mjs src worker",
