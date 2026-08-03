@@ -72,6 +72,19 @@ describe("HSX scope gate schema and risk", () => {
     if (!result.valid) assert.ok(result.errors.some((error) => error.includes("bypass_governance")));
   });
 
+  it("accepts a packet that includes mission_id at the root", () => {
+    const value = { ...packet(), mission_id: "mission-abc-123" };
+    const result = validateHsxScopeGatePacket(value);
+    assert.equal(result.valid, true);
+  });
+
+  it("still rejects other unknown root fields when mission_id is present", () => {
+    const value = { ...packet(), mission_id: "mission-abc-123", bypass_governance: true };
+    const result = validateHsxScopeGatePacket(value);
+    assert.equal(result.valid, false);
+    if (!result.valid) assert.ok(result.errors.some((e) => e.includes("bypass_governance")));
+  });
+
   it("scores production deploys as critical", () => {
     const value = packet({
       target: { system: "engine", resource: "service/demo", environment: "production" },

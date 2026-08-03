@@ -55,7 +55,7 @@ export function validateHsxScopeGatePacket(value: unknown): HsxPacketValidation 
   const errors: string[] = [];
   const root = objectValue(value);
   if (!root) return { valid: false, errors: ["body must be a JSON object"], packetId: "invalid", correlationId: "invalid" };
-  rejectUnexpectedKeys(root, ["version", "packet_id", "correlation_id", "issued_at", "actor", "target", "action", "engagement", "evidence", "approval"], "$", errors);
+  rejectUnexpectedKeys(root, ["version", "packet_id", "correlation_id", "issued_at", "mission_id", "actor", "target", "action", "engagement", "evidence", "approval"], "$", errors);
 
   const version = requiredString(root, "version", "$", errors);
   const packetId = requiredString(root, "packet_id", "$", errors);
