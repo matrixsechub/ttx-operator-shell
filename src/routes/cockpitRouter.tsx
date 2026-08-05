@@ -14,6 +14,7 @@ import { TTXInjects } from "../operator/ttx/injects";
 import { TTXTimeline } from "../operator/ttx/timeline";
 import { TTXRoles } from "../operator/ttx/roles";
 import { TTXScore } from "../operator/ttx/score";
+import { TTXHistory } from "../operator/ttx/history";
 import { TTXPacksCategory } from "../pages/marketplace/TTXPacksCategory";
 import { FutureIndex } from "../future/FutureIndex";
 import { FutureModulePage } from "../future/FutureModulePage";
@@ -49,6 +50,7 @@ export const cockpitRouter = createBrowserRouter([
           { path: "timeline", element: <TTXTimeline /> },
           { path: "roles", element: <TTXRoles /> },
           { path: "score", element: <TTXScore /> },
+          { path: "history", element: <TTXHistory /> },
           { path: "packs", element: <TTXPacksCategory embedded /> },
         ],
       },
