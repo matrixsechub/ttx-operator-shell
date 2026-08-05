@@ -122,15 +122,55 @@ async function writeScore(kv: KVNamespace, packet: ScorePacket): Promise<void> {
   await kv.put(`${SCORE_PREFIX}${packet.sessionId}`, JSON.stringify(packet), { expirationTtl: SCORE_TTL_SECONDS });
 }
 
+// Upper bound on a single retention/list scan. Retention holds the live
+// set at MAX_STORED_SCORES, so this headroom only matters if a previous
+// cleanup failed; it caps the blast radius either way.
+const SCORE_SCAN_LIMIT = 1000;
+
+interface StoredScore {
+  key: string;
+  packet: ScorePacket;
+}
+
+// kv.list returns keys in lexicographic order, and score keys are
+// score:<crypto.randomUUID()> — random, so key order carries no
+// chronology at all. Every caller that cares about age must sort on
+// computedAt itself; that's why this helper deliberately returns the
+// packets rather than the keys. computedAt is an ISO-8601 UTC string, so
+// lexicographic comparison is chronological, the same property
+// worker/ttxHistory.ts relies on for completedAt.
+async function readStoredScores(kv: KVNamespace, keyNames: string[]): Promise<StoredScore[]> {
+  const raw = await Promise.all(
+    keyNames.map(async (key) => ({ key, value: await kv.get(key) })),
+  );
+  return raw
+    .filter((entry): entry is { key: string; value: string } => entry.value !== null)
+    .map((entry) => ({ key: entry.key, packet: JSON.parse(entry.value) as ScorePacket }));
+}
+
+function newestFirst(a: ScorePacket, b: ScorePacket): number {
+  return b.computedAt.localeCompare(a.computedAt);
+}
+
 // Oldest-excess-deleted retention, same shape as worker/ttxAnalytics.ts's
 // sibling features — keeps the "average/last score" telemetry query
 // (handleListScores below) bounded without needing a separate cleanup job.
+// The common path is still a single list call: packets are only read when
+// the set is actually over cap and something has to be chosen for deletion.
 async function enforceRetention(kv: KVNamespace): Promise<void> {
   try {
-    const listed = await kv.list({ prefix: SCORE_PREFIX, limit: 1000 });
+    const listed = await kv.list({ prefix: SCORE_PREFIX, limit: SCORE_SCAN_LIMIT });
     if (listed.keys.length <= MAX_STORED_SCORES) return;
-    const excess = listed.keys.length - MAX_STORED_SCORES;
-    await Promise.all(listed.keys.slice(0, excess).map((key) => kv.delete(key.name)));
+
+    const stored = await readStoredScores(
+      kv,
+      listed.keys.map((key) => key.name),
+    );
+    const excess = stored.length - MAX_STORED_SCORES;
+    if (excess <= 0) return;
+
+    const oldestFirst = [...stored].sort((a, b) => newestFirst(b.packet, a.packet));
+    await Promise.all(oldestFirst.slice(0, excess).map((entry) => kv.delete(entry.key)));
   } catch (err) {
     console.error("ttxScoring: retention cleanup failed", err instanceof Error ? err.message : err);
   }
@@ -192,11 +232,23 @@ async function handleGetScore(request: Request, env: ScoringEnv): Promise<Respon
 // Shared by handleListScores below and worker/ttxHistory.ts (Phase 34) —
 // history is derived from this exact list rather than stored as its own
 // packet, so both features read through one function.
+// Returns newest-first, capped at MAX_STORED_SCORES. The cap is applied
+// after sorting on computedAt, not by kv.list's limit: list order is
+// lexicographic over random UUIDs, so limiting the scan would return an
+// arbitrary subset rather than the most recent one — and both the history
+// join and the intelligence trend would then be computed over a sample
+// that only looked chronological.
 export async function listScorePackets(kv: KVNamespace): Promise<ScorePacket[]> {
   try {
-    const listed = await kv.list({ prefix: SCORE_PREFIX, limit: MAX_STORED_SCORES });
-    const raw = await Promise.all(listed.keys.map((key) => kv.get(key.name)));
-    return raw.filter((value): value is string => value !== null).map((value) => JSON.parse(value) as ScorePacket);
+    const listed = await kv.list({ prefix: SCORE_PREFIX, limit: SCORE_SCAN_LIMIT });
+    const stored = await readStoredScores(
+      kv,
+      listed.keys.map((key) => key.name),
+    );
+    return stored
+      .map((entry) => entry.packet)
+      .sort(newestFirst)
+      .slice(0, MAX_STORED_SCORES);
   } catch (err) {
     console.error("ttxScoring: failed to list scores", err instanceof Error ? err.message : err);
     return [];
