@@ -50,6 +50,8 @@ import { TTXScore } from "../operator/ttx/score";
 
 import { TTXHistory } from "../operator/ttx/history";
 
+import { TTXIntelligence } from "../operator/ttx/intelligence";
+
 import { TTXPacksCategory } from "../pages/marketplace/TTXPacksCategory";
 
 
@@ -131,6 +133,8 @@ export const router = createBrowserRouter([
           { path: "score", element: <TTXScore /> },
 
           { path: "history", element: <TTXHistory /> },
+
+          { path: "intelligence", element: <TTXIntelligence /> },
 
           { path: "packs", element: <TTXPacksCategory embedded /> },
 
