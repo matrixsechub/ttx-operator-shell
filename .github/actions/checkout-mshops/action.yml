@@ -1,0 +1,39 @@
+name: Checkout private MSHOPS storefront
+description: Authenticated checkout of the private MSHOPS repository with fail-closed preflight.
+
+inputs:
+  repository:
+    description: MSHOPS repository slug
+    required: false
+    default: matrixsechub/MSHOPS
+  path:
+    description: Checkout path relative to workspace
+    required: false
+    default: MSHOPS
+  mshops-checkout-token:
+    description: Read-only PAT for private MSHOPS repository access
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Preflight MSHOPS checkout token
+      shell: bash
+      env:
+        MSHOPS_CHECKOUT_TOKEN: ${{ inputs.mshops-checkout-token }}
+      run: node scripts/ci/preflight-mshops-checkout.mjs token
+
+    - name: Checkout MSHOPS storefront source
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        repository: ${{ inputs.repository }}
+        token: ${{ inputs.mshops-checkout-token }}
+        path: ${{ inputs.path }}
+        persist-credentials: false
+
+    - name: Validate MSHOPS checkout layout
+      shell: bash
+      env:
+        MSHOPS_ROOT: ${{ github.workspace }}/${{ inputs.path }}
+        MSHOPS_CHECKOUT_REPORT_PATH: artifacts/mshops-checkout-report.json
+      run: node scripts/ci/preflight-mshops-checkout.mjs layout

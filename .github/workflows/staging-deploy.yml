@@ -68,6 +68,7 @@ jobs:
   build-test:
     needs: [authorize, preflight]
     uses: ./.github/workflows/_reusable-build-test.yml
+    secrets: inherit
     with:
       ref: ${{ needs.authorize.outputs.commit_sha }}
       git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
@@ -78,6 +79,7 @@ jobs:
   staging-dry-run:
     needs: [authorize, preflight]
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    secrets: inherit
     with:
       ref: ${{ needs.authorize.outputs.commit_sha }}
       git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
@@ -101,11 +103,11 @@ jobs:
           ref: ${{ needs.authorize.outputs.commit_sha }}
 
       - name: Checkout MSHOPS storefront source
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: ./.github/actions/checkout-mshops
         with:
           repository: ${{ vars.MSHOPS_REPOSITORY || 'matrixsechub/MSHOPS' }}
           path: MSHOPS
-          token: ${{ secrets.GITHUB_TOKEN }}
+          mshops-checkout-token: ${{ secrets.MSHOPS_CHECKOUT_TOKEN }}
 
       - uses: ./.github/actions/setup-node-npm
         with:

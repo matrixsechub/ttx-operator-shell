@@ -27,10 +27,16 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
+          submodules: false
 
       - run: node scripts/ci/workflow-permissions-lint.mjs
 
       - run: node scripts/ci/audit-action-pins.mjs
+
+      - run: node scripts/ci/verify-mshops-workflow-contract.mjs
+
+      - run: node scripts/ci/verify-gitlink-integrity.mjs
 
       - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
 
@@ -43,13 +49,29 @@ jobs:
         run: node scripts/ci/workflow-permissions-lint.mjs --advisory "$BASE_SHA"
 
   build-test:
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/_reusable-build-test.yml
+    secrets: inherit
     permissions:
       contents: read
       actions: write
 
   wrangler-dry-run:
+    if: >
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    secrets: inherit
     permissions:
       contents: read
       actions: write
+
+  fork-pr-storefront-blocked:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "::warning::Private MSHOPS checkout skipped for fork PR — secret-free pr-gate controls still run."
+          echo "MSHOPS_CHECKOUT::SKIPPED_FORK_PR"
