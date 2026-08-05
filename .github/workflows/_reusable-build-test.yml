@@ -30,6 +30,7 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.ref }}
           persist-credentials: false
+          submodules: false
 
       - name: Checkout MSHOPS storefront source
         uses: ./.github/actions/checkout-mshops

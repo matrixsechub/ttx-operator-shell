@@ -17,6 +17,11 @@ export const FAILURE_CODES = {
 
 export const ECOSYSTEM_SHELL_MARKERS = ["Ecosystem Entry", "ecosystem-shell.html"];
 
+/**
+ * Resolve MSHOPS storefront root.
+ * CI always sets MSHOPS_ROOT (workspace/MSHOPS after authenticated checkout).
+ * Sibling ../MSHOPS is a local-dev fallback only — never rely on it in CI.
+ */
 export function resolveMshopsRoot(root) {
   return process.env.MSHOPS_ROOT?.trim() || join(root, "..", "MSHOPS");
 }
