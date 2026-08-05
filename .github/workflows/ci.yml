@@ -35,6 +35,8 @@ jobs:
 
       - run: node scripts/ci/verify-mshops-workflow-contract.mjs
 
+      - run: node scripts/ci/verify-gitlink-integrity.mjs
+
       - run: node scripts/ci/verify-ai-fulfillment-scope.mjs
 
       - run: npm run verify:cron-triggers
