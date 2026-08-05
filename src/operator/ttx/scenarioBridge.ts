@@ -70,12 +70,6 @@ export async function loadMergedScenarios(): Promise<ApiResult<MergedScenarioRes
   return { ok: true, data: { scenarios, localById }, status: 200 };
 }
 
-export async function fetchLocalScenario(id: string): Promise<TtxLocalScenario | null> {
-  const result = await ttxLocalScenarioService.list();
-  if (!result.ok) return null;
-  return result.data.scenarios.find((scenario: TtxLocalScenario) => scenario.id === id) ?? null;
-}
-
 export function createEmptyLocalDraft(title: string, summary: string, division?: string): Parameters<typeof ttxLocalScenarioService.create>[0] {
   const entry = "start";
   return {

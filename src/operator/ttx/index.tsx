@@ -17,6 +17,7 @@ const TABS = [
   { to: "/ttx/score", label: "Score" },
   { to: "/ttx/history", label: "History" },
   { to: "/ttx/intelligence", label: "Intelligence" },
+  { to: "/ttx/packs", label: "Packs" },
 ];
 
 export function TTXShell() {
