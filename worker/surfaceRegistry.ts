@@ -3,7 +3,26 @@ export type HtmlSurface = "ecosystem" | "storefront" | "cockpit" | "auth" | "gov
 
 const COCKPIT_PREFIXES = ["/operator", "/ops", "/systems", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about", "/join"] as const;
 
-const STOREFRONT_PATHS = ["/marketplace", "/enter", "/storefront"] as const;
+const STOREFRONT_PATHS = [
+  "/marketplace",
+  "/enter",
+  "/storefront",
+  "/app",
+  "/products",
+  "/pearl-os",
+  "/flywheel",
+  "/gates",
+  "/vault",
+  "/brand",
+  "/academy",
+  "/blog",
+  "/portfolio",
+  "/book",
+  "/assessment",
+  "/ghost-layer",
+  "/checkout",
+  "/billing",
+] as const;
 
 export function resolveHtmlSurface(pathname: string): HtmlSurface {
   const normalized = pathname.replace(/\/$/, "") || "/";
