@@ -157,6 +157,7 @@ jobs:
   staging-smoke:
     needs: [authorize, deploy-staging]
     runs-on: ubuntu-latest
+    environment: staging
     permissions:
       contents: read
     steps:
@@ -168,9 +169,12 @@ jobs:
         env:
           STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
           COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
+          STAGING_ACCESS_CLIENT_ID: ${{ secrets.STAGING_ACCESS_CLIENT_ID }}
+          STAGING_ACCESS_CLIENT_SECRET: ${{ secrets.STAGING_ACCESS_CLIENT_SECRET }}
         run: node scripts/ci/staging-smoke.mjs "$STAGING_BASE_URL" "$COMMIT_SHA"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
         with:
           name: staging-smoke-report
           path: artifacts/staging-smoke-report.json
