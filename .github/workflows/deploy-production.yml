@@ -1,0 +1,61 @@
+# Auto-deploy to Cloudflare Workers on push to main.
+# Requires secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
+# Also clones MSHOPS for the storefront artifact (Option C).
+
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    env:
+      GIT_COMMIT_SHA: ${{ github.sha }}
+      BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: ./.github/actions/setup-node-npm
+        with:
+          node-version: "24"
+
+      - name: Clone MSHOPS storefront artifact
+        run: |
+          git clone --depth 1 https://github.com/${{ github.repository_owner }}/MSHOPS.git ../MSHOPS
+          test -f ../MSHOPS/build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+
+      - name: Build with MSHOPS storefront
+        env:
+          MSHOPS_BUILD_DIR: ../MSHOPS/build-final
+        run: npm run build
+
+      - name: Deploy to Cloudflare
+        run: |
+          npx wrangler deploy \
+            --var BUILD_COMMIT_SHA:${{ github.sha }} \
+            --var BUILD_TIMESTAMP:"${{ github.event.head_commit.timestamp }}"
+
+      - name: Smoke test
+        run: |
+          sleep 15
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.mshops.net/pearl-os)
+          echo "Pearl OS route status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "WARNING: /pearl-os returned $STATUS (may need DNS propagation)"
+          fi
