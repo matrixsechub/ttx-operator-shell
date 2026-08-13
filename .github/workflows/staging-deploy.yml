@@ -69,6 +69,7 @@ jobs:
     with:
       ref: ${{ needs.authorize.outputs.commit_sha }}
       git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
+      vite_pearl_pilot: "on"
     permissions:
       contents: read
       actions: write
@@ -79,6 +80,7 @@ jobs:
     with:
       ref: ${{ needs.authorize.outputs.commit_sha }}
       git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
+      vite_pearl_pilot: "on"
     permissions:
       contents: read
       actions: write
@@ -92,6 +94,7 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
       BUILD_TIMESTAMP: ${{ github.run_started_at }}
+      VITE_PEARL_PILOT: "on"
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:

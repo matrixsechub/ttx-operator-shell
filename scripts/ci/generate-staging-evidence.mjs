@@ -29,6 +29,8 @@ function main() {
     smoke: smokeReport?.summary?.failed ? "FAIL" : smokeReport ? "PASS" : "NOT_RUN",
   };
 
+  const vite_pearl_pilot = process.env.VITE_PEARL_PILOT ? "on" : "off";
+
   const releaseMetadata = {
     schema_version: "1.0",
     environment: "staging",
@@ -44,6 +46,7 @@ function main() {
     wrangler_version: process.env.WRANGLER_VERSION ?? "unknown",
     deployed_at: process.env.DEPLOYED_AT ?? new Date().toISOString(),
     build_hash: buildManifest ? createHash("sha256").update(JSON.stringify(buildManifest)).digest("hex") : null,
+    vite_pearl_pilot,
     validation,
   };
 
@@ -51,6 +54,7 @@ function main() {
     schema_version: "1.0",
     environment: "staging",
     generated_at: new Date().toISOString(),
+    vite_pearl_pilot,
     validation,
     smoke_summary: smokeReport?.summary ?? null,
   };

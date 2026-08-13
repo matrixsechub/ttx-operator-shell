@@ -172,8 +172,6 @@ async function handleFetch(request: Request, env: RuntimeEnv): Promise<Response>
 
     const mode = resolveSurfaceMode(env);
 
-
-
     if (pathname.startsWith(API_PREFIX)) {
 
       const apiStarted = Date.now();

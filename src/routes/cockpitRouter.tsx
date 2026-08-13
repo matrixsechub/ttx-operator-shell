@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RequireAuth } from "../lib/RequireAuth";
 import { Dashboard } from "../pages/Dashboard";
@@ -23,6 +24,11 @@ import { DeployOps } from "../pages/ops/DeployOps";
 import LiveJoin from "../pages/LiveJoin";
 import { FlywheelDashboard } from "../pages/dashboard/FlywheelDashboard";
 
+// Pearl pilot — lazy-loaded so it forms a distinct chunk and never enters the
+// default cockpit bundle. Auth-guarded (inside RequireAuth) and gated by a
+// feature flag that defaults OFF (see src/pearl-theme/pilot/featureFlag.ts).
+const PearlPilotRoute = lazy(() => import("../pearl-theme/pilot/PearlPilotRoute"));
+
 /** Operator cockpit surface — systems, ops, divisions, ttx (no storefront/auth routes). */
 export const cockpitRouter = createBrowserRouter([
   // /join is public — join token is the auth, no operator session required.
@@ -33,6 +39,14 @@ export const cockpitRouter = createBrowserRouter([
       { path: "/operator", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/dashboard/flywheel", element: <FlywheelDashboard /> },
+      {
+        path: "/dashboard/pearl-pilot",
+        element: (
+          <Suspense fallback={<div className="p-8 text-xs uppercase tracking-widest text-op-text-dim">Loading Pearl pilot…</div>}>
+            <PearlPilotRoute />
+          </Suspense>
+        ),
+      },
       { path: "/status", element: <Status /> },
       { path: "/about", element: <AboutPage /> },
       { path: "/divisions", element: <DivisionsIndex /> },
