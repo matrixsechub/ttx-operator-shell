@@ -8,6 +8,11 @@ import { handleWildcardRoute } from "../worker/wildcardAdvancement.ts";
 
 const EDGE_SECRET = "test-edge-secret-key-32chars!";
 const AUTH_SIGNING_KEY = "test-auth-signing-key-32chars!!";
+const OPERATOR_PASSWORD = "operator-test-password";
+// pbkdf2 hash of OPERATOR_PASSWORD (generated via scripts/hash-password.mjs;
+// verified by worker/edge/crypto.ts verifyPasswordHash).
+const OPERATOR_PASSWORD_HASH =
+  "pbkdf2$100000$y-8IL4i5gy6WLBINADO03g$-yz25LrGEzIIUDX3B-eIUU4nBz3pnEXWGo5WlLQ2dhk";
 
 function createMockKv(): KVNamespace {
   const store = new Map<string, string>();
@@ -71,8 +76,17 @@ function edgeEnv() {
     OPERATOR_SECRET: EDGE_SECRET,
     AUTH_SIGNING_KEY: AUTH_SIGNING_KEY,
     OPERATOR_PASSWORD: "test-password",
+    OPERATOR_PASSWORD_HASH,
     OPERATOR_USERNAME: "operator",
   };
+}
+
+function sessionRequest(body?: Record<string, unknown>): Request {
+  return new Request("https://example.com/api/operator/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
 }
 
 function apiAuthEnv() {
@@ -162,7 +176,7 @@ describe("edgeAuthGate — operator routes", () => {
 
   it("allows valid edge token from POST /api/operator/session", async () => {
     const sessionResponse = await handleOperatorSession(
-      new Request("https://example.com/api/operator/session", { method: "POST" }),
+      sessionRequest({ password: OPERATOR_PASSWORD }),
       "/api/operator/session",
       edgeEnv(),
     );
@@ -191,6 +205,65 @@ describe("edgeAuthGate — operator routes", () => {
     assert.equal(health?.status, 200);
     const healthBody = await readJson(health!);
     assert.equal(healthBody.agent, "WildcardAdvancementAgent");
+  });
+});
+
+describe("handleOperatorSession — credential gating (F-CRIT-1)", () => {
+  it("returns 503 and no token when OPERATOR_PASSWORD_HASH is not configured", async () => {
+    const env = edgeEnv();
+    delete (env as { OPERATOR_PASSWORD_HASH?: string }).OPERATOR_PASSWORD_HASH;
+    const response = await handleOperatorSession(
+      sessionRequest({ password: OPERATOR_PASSWORD }),
+      "/api/operator/session",
+      env,
+    );
+    assert.ok(response);
+    assert.equal(response?.status, 503);
+    const body = await readJson(response!);
+    assert.equal(body.error, "operator auth not configured");
+    assert.equal(body.token, undefined);
+    assert.equal(body.operator_token, undefined);
+  });
+
+  it("rejects with 401 and no token when no credential is supplied", async () => {
+    const response = await handleOperatorSession(
+      sessionRequest(),
+      "/api/operator/session",
+      edgeEnv(),
+    );
+    assert.ok(response);
+    assert.equal(response?.status, 401);
+    const body = await readJson(response!);
+    assert.equal(body.error, "invalid credentials");
+    assert.equal(body.token, undefined);
+    assert.equal(body.operator_token, undefined);
+  });
+
+  it("rejects with 401 and no token when the password is wrong", async () => {
+    const response = await handleOperatorSession(
+      sessionRequest({ password: "not-the-password" }),
+      "/api/operator/session",
+      edgeEnv(),
+    );
+    assert.ok(response);
+    assert.equal(response?.status, 401);
+    const body = await readJson(response!);
+    assert.equal(body.error, "invalid credentials");
+    assert.equal(body.token, undefined);
+    assert.equal(body.operator_token, undefined);
+  });
+
+  it("issues a token only when the correct password is supplied", async () => {
+    const response = await handleOperatorSession(
+      sessionRequest({ password: OPERATOR_PASSWORD }),
+      "/api/operator/session",
+      edgeEnv(),
+    );
+    assert.ok(response);
+    assert.equal(response?.status, 200);
+    const body = await readJson(response!);
+    const token = String(body.operator_token || body.token);
+    assert.ok(token.length > 20);
   });
 });
 

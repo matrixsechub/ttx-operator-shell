@@ -1,5 +1,5 @@
 import { classifyRoute } from "./routeClass";
-import { makeCtxHash, signToken, timingSafeEqual, verifyToken } from "./crypto";
+import { makeCtxHash, signToken, timingSafeEqual, verifyPasswordHash, verifyToken } from "./crypto";
 import { rateLimitFor } from "./rateLimit";
 
 export interface EdgeEnv {
@@ -7,6 +7,7 @@ export interface EdgeEnv {
   MARKETPLACE_SECRET?: string;
   AUTH_SIGNING_KEY?: string;
   OPERATOR_PASSWORD?: string;
+  OPERATOR_PASSWORD_HASH?: string;
   OPERATOR_USERNAME?: string;
 }
 
@@ -59,7 +60,12 @@ export async function handleOperatorAuth(
 
 /**
  * WILDCARD Cycle 1 — operator session bootstrap (edge JWT).
- * FEDGRADE: Compliance preserved — public bootstrap route; token required for protected APIs.
+ * FEDGRADE: Compliance preserved — credential-gated bootstrap; token required for protected APIs.
+ *
+ * SECURITY (F-CRIT-1): A validated operator credential is required before any
+ * token is minted. The supplied password is verified, in constant time, against
+ * the configured OPERATOR_PASSWORD_HASH (pbkdf2 format). Without a valid
+ * credential no token is ever issued.
  */
 export async function handleOperatorSession(
   request: Request,
@@ -69,11 +75,23 @@ export async function handleOperatorSession(
   if (pathname !== "/api/operator/session" || request.method !== "POST") return null;
 
   const opSecret = operatorSecret(env);
-  if (!opSecret) {
+  if (!opSecret || !env.OPERATOR_PASSWORD_HASH) {
     return Response.json(
-      { error: "operator credentials not configured", code: "OPERATOR_AUTH_UNAVAILABLE" },
+      { error: "operator auth not configured", code: "OPERATOR_AUTH_UNAVAILABLE" },
       { status: 503 },
     );
+  }
+
+  let body: { password?: string; username?: string };
+  try {
+    body = (await request.json()) as { password?: string; username?: string };
+  } catch {
+    body = {};
+  }
+
+  const passOk = await verifyPasswordHash(body.password || "", env.OPERATOR_PASSWORD_HASH);
+  if (!passOk) {
+    return Response.json({ error: "invalid credentials" }, { status: 401 });
   }
 
   const now = Math.floor(Date.now() / 1000);

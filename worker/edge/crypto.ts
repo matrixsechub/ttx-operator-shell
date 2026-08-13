@@ -68,6 +68,39 @@ export async function makeCtxHash(ip: string, ua: string): Promise<string> {
   return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
 }
 
+/**
+ * Verify a password against a stored hash in the canonical
+ * `pbkdf2$<iterations>$<saltB64Url>$<hashB64Url>` format produced by
+ * scripts/hash-password.mjs and consumed by worker/auth.ts. Uses the same
+ * Web Crypto PBKDF2/SHA-256 derivation (256 bits) and a constant-time compare
+ * so the same OPERATOR_PASSWORD_HASH secret verifies identically here.
+ */
+export async function verifyPasswordHash(password: string, stored: string): Promise<boolean> {
+  const parts = (stored || "").split("$");
+  if (parts.length !== 4 || parts[0] !== "pbkdf2") return false;
+  const iterations = Number(parts[1]);
+  if (!Number.isInteger(iterations) || iterations < 1) return false;
+  try {
+    const salt = b64urlDecode(parts[2]);
+    const expected = b64urlDecode(parts[3]);
+    const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, [
+      "deriveBits",
+    ]);
+    const bits = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt, iterations },
+      key,
+      256,
+    );
+    const actual = new Uint8Array(bits);
+    if (actual.length !== expected.length) return false;
+    let diff = 0;
+    for (let i = 0; i < actual.length; i++) diff |= actual[i]! ^ expected[i]!;
+    return diff === 0;
+  } catch {
+    return false;
+  }
+}
+
 export async function timingSafeEqual(a: string, b: string): Promise<boolean> {
   const key = (await crypto.subtle.generateKey(
     { name: "HMAC", hash: "SHA-256" },

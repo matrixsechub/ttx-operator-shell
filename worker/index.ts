@@ -289,7 +289,20 @@ async function handleFetch(request: Request, env: RuntimeEnv): Promise<Response>
             return marketBlocked;
           }
         } catch {
-          // Governance DO unavailable — continue without injection.
+          // SECURITY (F-CRIT-2): fail closed. If governance cannot be contacted
+          // or evaluated we must NOT fall through to the protected action.
+          // Block the request with a 503 instead of silently continuing.
+          const governanceUnavailable = Response.json(
+            { error: "governance unavailable", code: "GOVERNANCE_UNAVAILABLE" },
+            { status: 503 },
+          );
+          await recordTelemetrySample(
+            env,
+            url.pathname,
+            Date.now() - apiStarted,
+            governanceUnavailable.status,
+          );
+          return governanceUnavailable;
         }
       }
 

@@ -162,12 +162,16 @@ async function fetchMarketplaceState(env: BackboneEnv): Promise<SystemState["mar
 export async function resolveEffectiveKernelContext(
   env: BackboneEnv & GhostEnv & TelemetryEnv,
 ): Promise<KernelContext> {
-  const governanceResult = await fetchGovernanceStateSafe(env);
+  // SECURITY (F-CRIT-2): governance enforcement must fail closed. Use the
+  // throwing fetch (not the fallback-returning "safe" variant) so that a
+  // governance Durable Object outage propagates to the caller, which blocks
+  // the protected action rather than continuing with default policy.
+  const governance = await fetchGovernanceState(env);
   const [telemetry, ghost] = await Promise.all([getTelemetrySummary(env), fetchGhostSignals(env)]);
-  const baseline = buildGovernancePolicy(governanceResult.state);
+  const baseline = buildGovernancePolicy(governance);
   const signalStates = evaluateSignalStates(ghost, telemetry);
   const policy = applySignalPolicyOverlay(baseline, signalStates);
-  return { governance: governanceResult.state, policy, signalStates };
+  return { governance, policy, signalStates };
 }
 
 /** @deprecated Use resolveEffectiveKernelContext for signal-adjusted policy. */
