@@ -30,16 +30,13 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with:
-          repository: ${{ github.repository_owner }}/MSHOPS
-          token: ${{ secrets.GH_PAT }}
-          path: ../MSHOPS
-          sparse-checkout: build-final
-
-      - name: Verify MSHOPS artifact
+      - name: Clone MSHOPS storefront artifact
         run: |
-          test -f ../MSHOPS/build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          git clone --depth 1 --filter=blob:none --sparse \
+            https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/MSHOPS.git \
+            MSHOPS
+          cd MSHOPS && git sparse-checkout set build-final
+          test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
           echo "MSHOPS storefront artifact found"
 
       - uses: ./.github/actions/setup-node-npm
@@ -48,7 +45,7 @@ jobs:
 
       - name: Build with MSHOPS storefront
         env:
-          MSHOPS_BUILD_DIR: ../MSHOPS/build-final
+          MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
         run: npm run build
 
       - name: Deploy to Cloudflare
