@@ -41,6 +41,17 @@
   --rgbgold-critical: #ff5470;
   --rgbgold-critical-soft: #ffb3c0;
 
+  /* Gold ramp extremes + ink surfaces (Track 1 token-discipline pass:
+     these values previously lived as raw hex in nav.css,
+     intake-demo-banner.css and rgbgold-components.css; they now have a
+     single source of truth here). */
+  --rgbgold-gold-hi: #ffd87a;
+  --rgbgold-gold-dim: #c9a03d;
+  --rgbgold-ink: #0b0b0b;
+  --rgbgold-ink-cyan: #03111f;
+  --rgbgold-ink-gold: #241505;
+  --rgbgold-white: #ffffff;
+
   /* Gradients */
   --rgbgold-gradient-main: linear-gradient(120deg, #08d9ff 0%, #945cff 45%, #ff4dd8 100%);
   --rgbgold-gradient-rgbgold: linear-gradient(115deg, #3cf2ff 0%, #945cff 28%, #ff4dd8 54%, #f5c451 82%, #3cf2ff 100%);

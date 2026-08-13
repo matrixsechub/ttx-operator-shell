@@ -1,4 +1,5 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 // Permission boundary: authenticated vs not, nothing finer-grained. No
@@ -7,6 +8,13 @@ import { useAuth } from "./AuthContext";
 export function RequireAuth() {
   const { isAuthenticated, initializing } = useAuth();
   const location = useLocation();
+
+  useEffect(() => {
+    if (initializing || isAuthenticated) return;
+
+    const returnPath = `${location.pathname}${location.search}${location.hash}`;
+    window.location.replace(`/login?from=${encodeURIComponent(returnPath)}`);
+  }, [initializing, isAuthenticated, location.hash, location.pathname, location.search]);
 
   if (initializing) {
     return (
@@ -17,7 +25,11 @@ export function RequireAuth() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <div className="flex h-dvh w-full items-center justify-center bg-op-bg text-xs uppercase tracking-widest text-op-text-dim">
+        Redirecting to login...
+      </div>
+    );
   }
 
   return <Outlet />;

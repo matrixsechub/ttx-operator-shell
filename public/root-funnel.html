@@ -19,6 +19,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-cues.css" />
     <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
     <link rel="stylesheet" href="/styles/rgbgold-components.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
@@ -58,6 +60,11 @@
             <span class="hud-tag a11y-override-badge">Public // Funnel</span>
             <p class="section-label mono">[ MSHOPS_SERVICE_SELECTION ]</p>
             <h1 class="glow-pulse cinematic-hook">MSHOPS.NET service selection starts here.</h1>
+            <p class="entity-voice mono" data-entity="beacon">
+              <span class="entity-voice-orb" aria-hidden="true"></span>
+              <strong>BEACON</strong>
+              <span>Governs northstar — every path from here stays inside the governed public boundary.</span>
+            </p>
             <p class="hero-sub splash-hero-copy">
               Choose the right AI service path, carry that context into guided intake, and keep every operator-facing
               surface behind the existing public handoff boundary.
@@ -65,9 +72,9 @@
           </header>
           <div class="rgbgold-module-shell-body">
             <div class="cta-row">
-              <a class="button primary" href="/services" aria-label="Start service selection">Start Service Selection</a>
-              <a class="register-cta-enterprise pulse mono" href="/enter" aria-label="Open the guided intake funnel">Open Guided Intake</a>
-              <a class="button secondary" href="/register" aria-label="Register for access updates">Register for Access</a>
+              <a class="button primary" href="/services" data-flow-cta="root-funnel-services" aria-label="Start service selection">Start Service Selection</a>
+              <a class="register-cta-enterprise pulse mono" href="/enter" data-flow-cta="root-funnel-enter" aria-label="Open the guided intake funnel">Open Guided Intake</a>
+              <a class="button secondary" href="/register" data-flow-cta="root-funnel-register" aria-label="Register for access updates">Register for Access</a>
               <a class="button secondary" href="/ecosystem" aria-label="Explore the ecosystem overview">Explore Ecosystem</a>
               <a class="button secondary" href="/apps/ai-service-quote" aria-label="Get an AI service quote">Get AI Service Quote</a>
               <a class="button secondary" href="/apps/automation-builder" aria-label="Plan an AI automation build">Plan an AI Automation Build</a>
@@ -115,6 +122,8 @@
     <script src="/scripts/rgbgold-motion.js" defer></script>
     <script src="/scripts/a11y.js" defer></script>
     <script src="/scripts/growth-indicators.js" defer></script>
-    <script src="/scripts/splash.js" defer></script>
+    <!-- /scripts/splash.js was a dead include (file never existed); removed in the
+         Track 1 conformance pass. Capture coverage below is flow-tracker.js. -->
+    <script src="/scripts/flow-tracker.js" defer></script>
   </body>
 </html>

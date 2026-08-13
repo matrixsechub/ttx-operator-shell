@@ -164,7 +164,6 @@ const RECOVERED_ROUTE_MAP: Record<string, string> = {
   "/enter": "/enter.html",
   "/intake": "/intake.html",
   "/mission": "/mission.html",
-  "/onboarding": "/onboarding.html",
   "/register": "/register.html",
   "/roadmap": "/roadmap.html",
   "/scenario": "/scenario.html",
@@ -595,6 +594,26 @@ async function listEngagements(kv: KVNamespace): Promise<EngagementRecord[]> {
 
 async function getRegisterById(kv: KVNamespace, registerId: string): Promise<RegisterRecord | null> {
   return readKvJson<RegisterRecord | null>(kv, buildKvKey("register", registerId), null);
+}
+
+/**
+ * Capture-anchor lookup for the qualification runtime (Track 5): a
+ * qualification lifecycle may only attach to a real register record.
+ * Accepts either the register_id or the public register_lookup_id.
+ */
+export async function findRegisterCapture(
+  kv: KVNamespace,
+  captureId: string,
+): Promise<{ registerId: string; createdAt: string | null } | null> {
+  const direct = await getRegisterById(kv, captureId);
+  if (direct) {
+    return { registerId: direct.register_id, createdAt: direct.created_at ?? null };
+  }
+  const byLookup = await findRegisterByLookupId(kv, captureId);
+  if (byLookup) {
+    return { registerId: byLookup.register_id, createdAt: byLookup.created_at ?? null };
+  }
+  return null;
 }
 
 async function getEngagementById(kv: KVNamespace, engagementId: string): Promise<EngagementRecord | null> {

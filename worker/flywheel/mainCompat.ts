@@ -1,10 +1,15 @@
 /**
  * Flywheel main-compat shims.
- * origin/main lacks worker/governance/**, worker/beacon/**, and worker/codex/**.
- * These local implementations keep Flywheel fail-closed using msh-ops beacon + TTX_STATE.
+ * Proposal/receipt/codex helpers remain local; Beacon runtime classification
+ * delegates to the shared signed Beacon v2 verifier (fail-closed).
  */
-import { ensureBeaconLoaded } from "../../msh-ops/beacon/loadBeacon";
+import type { BeaconReleaseEnv, BeaconRuntimeState } from "../governance/beaconRuntime";
+import {
+  getBeaconHashForReads as resolveBeaconHashForReads,
+  resolveBeaconRuntimeState as resolveSharedBeaconRuntimeState,
+} from "../governance/beaconRuntime";
 
+export type { BeaconReleaseEnv, BeaconRuntimeState };
 export type ActionClass = "C0" | "C1" | "C2" | "C3" | "C4" | "C5" | "C6";
 export type ProposalStatus = "draft" | "pending" | "approved" | "denied" | "executed" | "expired" | "rolled_back";
 export type RuntimeEnvironment = "development" | "staging" | "production";
@@ -78,13 +83,6 @@ export interface ExecutionReceipt {
   rollbackReference: string;
   auditBundleId: string;
 }
-
-export type BeaconReleaseEnv = object;
-
-export type BeaconRuntimeState =
-  | { status: "verified_v2"; hash: string; version: string; mutationAllowed: true }
-  | { status: "legacy_v1"; hash: string; mutationAllowed: false; reasonCode: "SIGNED_BEACON_NOT_ACTIVE" }
-  | { status: "invalid"; hash: string | null; mutationAllowed: false; reasonCode: string };
 
 export interface CodexManifestSnapshot {
   manifestHash: string;
@@ -161,29 +159,12 @@ async function hmacSign(payload: string, key: string): Promise<string> {
   return [...new Uint8Array(signature)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export async function resolveBeaconRuntimeState(_env: BeaconReleaseEnv): Promise<BeaconRuntimeState> {
-  const loaded = await ensureBeaconLoaded();
-  if (loaded.integrityHash && !loaded.safeMode) {
-    return {
-      status: "legacy_v1",
-      hash: loaded.integrityHash,
-      mutationAllowed: false,
-      reasonCode: "SIGNED_BEACON_NOT_ACTIVE",
-    };
-  }
-  return {
-    status: "invalid",
-    hash: loaded.integrityHash || null,
-    mutationAllowed: false,
-    reasonCode: loaded.safeMode ? "BEACON_SAFE_MODE" : "BEACON_INVALID",
-  };
+export async function resolveBeaconRuntimeState(env: BeaconReleaseEnv): Promise<BeaconRuntimeState> {
+  return resolveSharedBeaconRuntimeState(env);
 }
 
 export async function getBeaconHashForReads(env: BeaconReleaseEnv): Promise<string> {
-  const state = await resolveBeaconRuntimeState(env);
-  if (state.hash) return state.hash;
-  const loaded = await ensureBeaconLoaded();
-  return loaded.integrityHash;
+  return resolveBeaconHashForReads(env);
 }
 
 export async function getCodexManifestSnapshot(): Promise<CodexManifestSnapshot> {

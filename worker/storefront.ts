@@ -7,6 +7,21 @@ const LEGACY_OPERATOR_MARKERS = ["Operator Terminal"] as const;
 const STOREFRONT_SPA_PATHS = new Set([
   "/storefront",
   "/marketplace",
+  "/enter",
+  "/products",
+  "/pearl-os",
+  "/flywheel",
+  "/gates",
+  "/vault",
+  "/brand",
+  "/academy",
+  "/blog",
+  "/portfolio",
+  "/book",
+  "/assessment",
+  "/ghost-layer",
+  "/checkout",
+  "/billing",
 ]);
 
 /** Built MSHOPS bundle assets (vite base: /app). */

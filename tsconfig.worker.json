@@ -3,14 +3,17 @@
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.worker.tsbuildinfo",
     "target": "ES2022",
-    "lib": ["ES2022"],
-    "types": ["@cloudflare/workers-types"],
+    "lib": [
+      "ES2022"
+    ],
+    "types": [
+      "@cloudflare/workers-types"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "skipLibCheck": true,
     "noEmit": true,
     "moduleDetection": "force",
-
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -20,6 +23,9 @@
   "include": [
     "worker",
     "shared/flywheel",
+    "src/pearl/entityNames.ts",
+    "src/pearl/qualificationContract.ts",
+    "src/pearl/qualificationMachine.ts",
     "msh-ops/beacon",
     "msh-ops/agent",
     "msh-ops/governance/checkAutonomy.ts",

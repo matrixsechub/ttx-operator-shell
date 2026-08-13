@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { CatalogItem } from "../lib/types";
 import { StatusPill } from "./StatusPill";
 import { InfoCard } from "./InfoCard";
+import { MarketplacePurchase } from "../pearl/marketplacePurchase";
 
 export function CatalogDetailModal({ item, onClose }: { item: CatalogItem; onClose: () => void }) {
   useEffect(() => {
@@ -130,6 +131,8 @@ export function CatalogDetailModal({ item, onClose }: { item: CatalogItem; onClo
             </InfoCard>
           </div>
         )}
+
+        <MarketplacePurchase item={item} />
       </div>
     </div>
   );

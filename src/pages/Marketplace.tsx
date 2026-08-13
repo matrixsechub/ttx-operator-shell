@@ -5,6 +5,7 @@ import { SystemTelemetryPanel } from "../components/SystemTelemetryPanel";
 import { CatalogDetailModal } from "../components/CatalogDetailModal";
 import { CatalogGrid } from "../components/CatalogGrid";
 import { Breadcrumbs } from "../components/Breadcrumbs";
+import { EntityVoice } from "../components/EntityVoice";
 import { api } from "../lib/apiClient";
 import { useApiResource } from "../lib/useApiResource";
 import type { CatalogItem } from "../lib/types";
@@ -37,6 +38,7 @@ export function Marketplace() {
           <div>
             <h1 className="text-lg uppercase tracking-widest text-op-accent">Marketplace</h1>
             <p className="mt-1 text-xs text-op-text-dim">Catalog of items and services from the engine.</p>
+            <EntityVoice entity="aurelius">the catalog is read against your mission context.</EntityVoice>
           </div>
           <button
             type="button"

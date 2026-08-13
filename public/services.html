@@ -15,6 +15,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-cues.css" />
     <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
     <link rel="stylesheet" href="/styles/rgbgold-components.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
@@ -47,13 +49,18 @@
             <span class="hud-tag">Signal // Live</span>
             <p class="section-label mono">[ PUBLIC_ROUTE :: /SERVICES ]</p>
             <h1 class="glow-pulse">Find the right AI service for your team.</h1>
+            <p class="entity-voice mono" data-entity="beacon">
+              <span class="entity-voice-orb" aria-hidden="true"></span>
+              <strong>BEACON</strong>
+              <span>Governs northstar — the selector recommends a governed service path, nothing outside it.</span>
+            </p>
             <p class="hero-sub">
               Use the public questionnaire to match into the correct MSH OPS service path without exposing operator-only
               surfaces. The result hands off directly into the existing <span class="mono">/enter</span> funnel with
               preserved routing context.
             </p>
             <div class="cta-row">
-              <a class="button primary" href="#selector">[ START SELECTOR ]</a>
+              <a class="button primary" href="#selector" data-flow-cta="services-start-selector">[ START SELECTOR ]</a>
               <a class="button secondary" href="#catalog">[ VIEW CATALOG ]</a>
               <a class="button secondary" href="/apps/ai-agent-readiness-checker">[ CHECK AI AGENT READINESS ]</a>
               <a class="button secondary" href="/apps/automation-roi-calculator">[ CALCULATE AUTOMATION ROI ]</a>

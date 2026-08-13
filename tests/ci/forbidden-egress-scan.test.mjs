@@ -125,8 +125,8 @@ describe("forbidden debug-egress scan", () => {
     const src = readFileSync(path.join(REPO, "src", "lib", "RequireAuth.tsx"), "utf8");
     assert.ok(!/fetch\s*\(/.test(src), "RequireAuth must not issue any fetch");
     assert.ok(!/127\.0\.0\.1|localhost|X-Debug-Session-Id|\/ingest\//.test(src), "RequireAuth must not reference debug egress");
-    assert.ok(/Navigate\s+to="\/login"/.test(src), "unauthenticated redirect to /login preserved");
-    assert.ok(/state=\{\{\s*from:\s*location\s*\}\}/.test(src), "redirect preserves the `from` location state");
+    assert.ok(/window\.location\.replace\(`\/login\?from=/.test(src), "unauthenticated redirect to /login preserved");
+    assert.ok(/encodeURIComponent\(returnPath\)/.test(src), "redirect preserves the return path");
     assert.ok(/initializing/.test(src), "loading (initializing) branch preserved");
     assert.ok(/<Outlet\s*\/>/.test(src), "authenticated users still render <Outlet/>");
   });

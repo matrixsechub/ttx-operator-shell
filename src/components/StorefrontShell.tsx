@@ -11,6 +11,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
           </Link>
           <Link
             to="/login"
+            data-flow-cta="storefront-operator-login"
             className="rounded-sm border border-op-border-bright px-2.5 py-1 text-[11px] uppercase tracking-wider text-op-text-dim hover:border-op-accent/50 hover:text-op-accent"
           >
             Operator login

@@ -21,6 +21,10 @@ describe("surfaceRegistry storefront contract", () => {
   it("does not map /systems to storefront", () => {
     assert.equal(resolveHtmlSurface("/systems"), "cockpit");
   });
+
+  it("maps /operator to the auth-gated cockpit shell", () => {
+    assert.equal(resolveHtmlSurface("/operator"), "cockpit");
+  });
 });
 
 describe("assemble-operator-dist script", () => {

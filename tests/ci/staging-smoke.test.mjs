@@ -474,6 +474,7 @@ describe("staging-smoke", () => {
             return true;
           },
         );
+        // Same policy as the canonical CLI helper.
         assert.equal(validateStagingBaseUrl(raw).ok, false);
       }
       assert.equal(fetchMock.mock.callCount(), 0);

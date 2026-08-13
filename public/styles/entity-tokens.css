@@ -1,0 +1,80 @@
+/**
+ * PEARL-SPECTRAL OS — ENTITY IDENTITY TOKENS (Track 1: Conformance)
+ * -----------------------------------------------------------------------
+ * The governed entity identity layer for the MSHOPS / Operator OS surface
+ * set. Each governing entity gets a stable token family used by every
+ * surface that speaks in that entity's voice:
+ *
+ *   BEACON    — governs (northstar)         pearl / signal white
+ *   AURELIUS  — interprets intent           champagne gold
+ *   HSX       — trains & protects           ember / guarded red-orange
+ *   GHOST     — evolves & adapts            spectral cyan
+ *   OPERATOR  — decides                     authority gold
+ *
+ * NAMESPACING DOCTRINE (inherits rgbgold-tokens.css rules):
+ *   1. Every custom property here is prefixed `--entity-`. No token in
+ *      this file may redeclare any pre-existing app token (--gold, --blue,
+ *      --neon-cyan, --space-*, ...) or any `--rgbgold-*` token.
+ *   2. Where an entity color intentionally matches an existing brand
+ *      token, it aliases via var() with a fallback equal to the canonical
+ *      value, so the palette has exactly one source of truth.
+ *   3. Raw hex is permitted ONLY in this file's custom-property
+ *      declarations (this file is a registered token source for the
+ *      brand-conformance lint). Consumers must use var(--entity-*).
+ *   4. Base entity text tokens must hold >= 4.5:1 contrast against the
+ *      app background (--bg, #050608). The brand-conformance lint
+ *      verifies this on every CI run.
+ *
+ * Load order: entity-tokens.css loads with the other token layers, before
+ * component/page CSS. Custom properties resolve at use-time, so ordering
+ * relative to rgbgold-tokens.css / styles.css is not correctness-critical.
+ *
+ * DRIFT-MARKER: layer=tokens file=public/styles/entity-tokens.css version=1.0
+ */
+
+:root {
+  /* ── BEACON — governs (northstar) ─────────────────────────────────── */
+  --entity-beacon: #f4f6fb;
+  --entity-beacon-dim: #c8d2e0;
+  --entity-beacon-glow: rgba(244, 246, 251, 0.55);
+  --entity-beacon-veil: rgba(244, 246, 251, 0.07);
+  --entity-beacon-line: rgba(244, 246, 251, 0.32);
+
+  /* ── AURELIUS — interprets intent ─────────────────────────────────── */
+  --entity-aurelius: var(--rgbgold-gold, #f5c451);
+  --entity-aurelius-dim: var(--rgbgold-gold-deep, #9a6a1c);
+  --entity-aurelius-glow: rgba(245, 196, 81, 0.55);
+  --entity-aurelius-veil: rgba(245, 196, 81, 0.08);
+  --entity-aurelius-line: rgba(245, 196, 81, 0.35);
+
+  /* ── HSX — trains & protects ──────────────────────────────────────── */
+  --entity-hsx: #ff8f6b;
+  --entity-hsx-dim: #b8543a;
+  --entity-hsx-glow: rgba(255, 143, 107, 0.5);
+  --entity-hsx-veil: rgba(255, 143, 107, 0.08);
+  --entity-hsx-line: rgba(255, 143, 107, 0.35);
+
+  /* ── GHOST — evolves & adapts ─────────────────────────────────────── */
+  --entity-ghost: var(--neon-cyan, #4dfcf0);
+  --entity-ghost-dim: #2fa39b;
+  --entity-ghost-glow: rgba(77, 252, 240, 0.5);
+  --entity-ghost-veil: rgba(77, 252, 240, 0.07);
+  --entity-ghost-line: rgba(77, 252, 240, 0.32);
+
+  /* ── OPERATOR — decides (authority gold) ──────────────────────────── */
+  --entity-operator: var(--gold, #f2c14e);
+  --entity-operator-dim: var(--rgbgold-gold-dim, #c9a03d);
+  --entity-operator-glow: rgba(242, 193, 78, 0.55);
+  --entity-operator-veil: rgba(242, 193, 78, 0.08);
+  --entity-operator-line: rgba(242, 193, 78, 0.35);
+
+  /* ── Shared entity-voice surface tokens ───────────────────────────── */
+  --entity-voice-surface: rgba(5, 6, 8, 0.72);
+  --entity-voice-text: var(--text, #f0eee8);
+  --entity-voice-radius: var(--radius-sm, 12px);
+
+  /* Reserved for future entities (ATLAS cockpit, marketplace guardians).
+     Same rules as --rgbgold-future-*: rename into a permanent
+     --entity-<name> home in the change that ships the surface. */
+  --entity-future-reserved: initial;
+}

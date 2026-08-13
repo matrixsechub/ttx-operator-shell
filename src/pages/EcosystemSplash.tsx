@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { AdaptiveEntryHero } from "../components/AdaptiveEntryHero";
+import { EntityVoice } from "../components/EntityVoice";
 import { useAdaptiveEntryMode } from "../lib/useAdaptiveEntryMode";
 import { recordUsageEvent } from "../lib/usageBeacon";
 import { DIVISIONS } from "./divisions/data";
@@ -76,6 +77,7 @@ export function EcosystemSplash() {
       <AdaptiveEntryHero uiMode={uiMode} />
 
       <main className="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-12 sm:px-10">
+        <EntityVoice entity="beacon">the ecosystem graph below is the governed map of everything public.</EntityVoice>
         <section>
           <SectionHeader index="01" title="Divisions" subtitle="Organizational lanes across the operator graph." />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
