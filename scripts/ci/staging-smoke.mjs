@@ -8,6 +8,7 @@ import {
   extractAssetReferences,
   isPlaceholderHtml,
 } from "../lib/storefrontBundle.mjs";
+import { validateStagingBaseUrl } from "../lib/stagingBaseUrl.mjs";
 import { STAGING_WORKER } from "./verify-staging-config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -142,6 +143,27 @@ function isCloudflareErrorPage(text) {
   return /cloudflare ray id|error code 5\d\d/i.test(text);
 }
 
+/**
+ * Resolve Cloudflare Access service-token credentials from the environment.
+ * Fail closed with a non-secret message when either value is missing.
+ * Never log credential values.
+ */
+export function resolveStagingAccessCredentials(env = process.env) {
+  const clientId = typeof env.STAGING_ACCESS_CLIENT_ID === "string" ? env.STAGING_ACCESS_CLIENT_ID.trim() : "";
+  const clientSecret =
+    typeof env.STAGING_ACCESS_CLIENT_SECRET === "string" ? env.STAGING_ACCESS_CLIENT_SECRET.trim() : "";
+  const missing = [];
+  if (!clientId) missing.push("STAGING_ACCESS_CLIENT_ID");
+  if (!clientSecret) missing.push("STAGING_ACCESS_CLIENT_SECRET");
+  if (missing.length > 0) {
+    return {
+      ok: false,
+      error: `Missing required Cloudflare Access credentials: ${missing.join(", ")}. Set them in the GitHub Environment "staging".`,
+    };
+  }
+  return { ok: true, clientId, clientSecret };
+}
+
 function classifyStatus(contract, status) {
   if (contract.expectStatus !== undefined) return status === contract.expectStatus;
   if (contract.expectStatusClass === "4xx") return status >= 400 && status < 500;
@@ -163,13 +185,96 @@ function checkSecurityHeaders(headers, notes) {
   return failed;
 }
 
-async function probe(baseUrl, contract) {
+function buildSmokeRequestHeaders(contract, access) {
+  return {
+    Accept: contract.contentTypeIncludes?.includes("json") ? "application/json" : "*/*",
+    "Cache-Control": "no-cache",
+    "CF-Access-Client-Id": access.clientId,
+    "CF-Access-Client-Secret": access.clientSecret,
+  };
+}
+
+/** Hostname only — never path, query, fragment, or userinfo. */
+export function resolveProbeHostname(baseUrl, location) {
+  try {
+    if (location) return new URL(location, baseUrl).hostname || "(none)";
+    return new URL(baseUrl).hostname || "(none)";
+  } catch {
+    return "(invalid)";
+  }
+}
+
+export function formatExpectedCondition(contract) {
+  const parts = [];
+  if (contract.expectStatus !== undefined) parts.push(`status=${contract.expectStatus}`);
+  if (contract.expectStatusClass) parts.push(`status_class=${contract.expectStatusClass}`);
+  if (contract.contentTypeIncludes) parts.push(`content_type_includes=${contract.contentTypeIncludes}`);
+  if (contract.htmlIncludes?.length) parts.push(`html_markers=${contract.htmlIncludes.length}`);
+  if (contract.redirectIncludes) parts.push(`redirect_includes=${contract.redirectIncludes}`);
+  if (contract.jsonFields?.length) parts.push(`json_fields=${contract.jsonFields.join(",")}`);
+  if (contract.securityHeaders) parts.push("security_headers=required");
+  return parts.join("; ") || "none";
+}
+
+/**
+ * Strip URLs, query strings, and credential-shaped tokens from diagnostic text.
+ * Never retain Authorization, cookies, Access secrets, or response bodies.
+ */
+export function sanitizeDiagnosticText(text) {
+  if (typeof text !== "string" || text.length === 0) return "";
+  let out = text;
+  out = out.replace(/https?:\/\/[^\s"'<>]+/gi, (match) => {
+    try {
+      return new URL(match).hostname || "[redacted-host]";
+    } catch {
+      return "[redacted-url]";
+    }
+  });
+  out = out.replace(/\b(Bearer|Basic)\s+\S+/gi, "$1 [redacted]");
+  out = out.replace(/\b(CF-Access-Client-(?:Id|Secret)|Authorization|Cookie|Set-Cookie)\b\s*[:=]?\s*\S+/gi, "$1=[redacted]");
+  out = out.replace(/[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, "[redacted-jwt]");
+  return out;
+}
+
+export function buildFailureDiagnostic({
+  contract,
+  baseUrl,
+  status,
+  contentType,
+  location,
+  notes,
+}) {
+  const reason = sanitizeDiagnosticText((notes ?? []).join("; ")) || "unspecified failure";
+  return {
+    route: `${contract.method} ${contract.path}`,
+    status,
+    hostname: resolveProbeHostname(baseUrl, location),
+    content_type: contentType || "(none)",
+    expected: formatExpectedCondition(contract),
+    reason,
+  };
+}
+
+export function emitFailedProbeDiagnostics(checks, log = console.error) {
+  for (const check of checks ?? []) {
+    if (check?.result !== "FAIL" || !check.diagnostic) continue;
+    log(`SMOKE_DIAG ${JSON.stringify(check.diagnostic)}`);
+  }
+}
+
+export function persistStagingSmokeReport(report, outputPath) {
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, JSON.stringify(report, null, 2));
+  return outputPath;
+}
+
+async function probe(baseUrl, contract, access) {
   const url = new URL(contract.path, baseUrl).toString();
   const started = Date.now();
   const response = await fetch(url, {
     method: contract.method,
     redirect: "manual",
-    headers: { Accept: contract.contentTypeIncludes?.includes("json") ? "application/json" : "*/*", "Cache-Control": "no-cache" },
+    headers: buildSmokeRequestHeaders(contract, access),
   });
   const durationMs = Date.now() - started;
   const contentType = response.headers.get("content-type") ?? "";
@@ -241,7 +346,8 @@ async function probe(baseUrl, contract) {
 
   if (contract.redirectIncludes && (!location || !location.includes(contract.redirectIncludes))) {
     result = "FAIL";
-    notes.push(`redirect location ${location ?? "(none)"} missing ${contract.redirectIncludes}`);
+    const redirectHost = location ? resolveProbeHostname(baseUrl, location) : "(none)";
+    notes.push(`redirect host ${redirectHost} missing ${contract.redirectIncludes}`);
   }
 
   if (location) {
@@ -294,7 +400,7 @@ async function probe(baseUrl, contract) {
 
   const assetRefs = contract.validateStorefrontAssets ? extractAssetReferences(text) : [];
 
-  return {
+  const check = {
     name: contract.name,
     method: contract.method,
     path: contract.path,
@@ -311,12 +417,25 @@ async function probe(baseUrl, contract) {
         }
       : undefined,
   };
+
+  if (result === "FAIL") {
+    check.diagnostic = buildFailureDiagnostic({
+      contract,
+      baseUrl,
+      status: response.status,
+      contentType,
+      location,
+      notes,
+    });
+  }
+
+  return check;
 }
 
-async function probeWithRetry(baseUrl, contract, maxAttempts = 5) {
+async function probeWithRetry(baseUrl, contract, access, maxAttempts = 5) {
   let last = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    last = await probe(baseUrl, contract);
+    last = await probe(baseUrl, contract, access);
     if (last.result === "PASS" || last.result === "WARNING") return last;
     if (last.status >= 400 && last.status < 500 && contract.expectStatusClass !== "4xx" && contract.expectStatus !== last.status) {
       return last;
@@ -327,10 +446,22 @@ async function probeWithRetry(baseUrl, contract, maxAttempts = 5) {
 }
 
 export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
+  // Internal gate — do not rely on CLI callers. Fail before any fetch/DNS/auth.
+  const validated = validateStagingBaseUrl(baseUrl);
+  if (!validated.ok) {
+    throw new Error(validated.error);
+  }
+  const safeBaseUrl = validated.baseUrl;
+
+  const access = resolveStagingAccessCredentials(options.env ?? process.env);
+  if (!access.ok) {
+    throw new Error(access.error);
+  }
+
   const contracts = options.contracts ?? SMOKE_ROUTE_CONTRACTS;
   const checks = [];
   for (const contract of contracts) {
-    checks.push(await probeWithRetry(baseUrl, contract, options.maxAttempts ?? 5));
+    checks.push(await probeWithRetry(safeBaseUrl, contract, access, options.maxAttempts ?? 5));
   }
 
   const summary = {
@@ -342,7 +473,7 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
   const report = {
     schema_version: "1.0",
     environment: "staging",
-    base_url: baseUrl,
+    base_url: safeBaseUrl,
     worker_name: STAGING_WORKER,
     commit_sha: commitSha,
     tested_at: new Date().toISOString(),
@@ -354,14 +485,26 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
 }
 
 async function main() {
-  const baseUrl = process.argv[2] ?? process.env.STAGING_BASE_URL ?? "https://ttx-operator-shell-staging.sogellagepul.workers.dev";
+  const rawBase = process.argv[2] ?? process.env.STAGING_BASE_URL;
+  const validated = validateStagingBaseUrl(rawBase);
+  if (!validated.ok) {
+    console.error(validated.error);
+    process.exit(1);
+  }
+
+  const access = resolveStagingAccessCredentials(process.env);
+  if (!access.ok) {
+    console.error(access.error);
+    process.exit(1);
+  }
+
   const commitSha = process.argv[3] ?? process.env.COMMIT_SHA ?? "unknown";
   const outputPath = process.argv[4] ?? join(root, "artifacts", "staging-smoke-report.json");
 
-  const report = await runStagingSmoke(baseUrl, commitSha);
-  mkdirSync(dirname(outputPath), { recursive: true });
-  writeFileSync(outputPath, JSON.stringify(report, null, 2));
-
+  const report = await runStagingSmoke(validated.baseUrl, commitSha);
+  // Persist before exit so artifact upload (if: always()) can recover failed runs.
+  persistStagingSmokeReport(report, outputPath);
+  emitFailedProbeDiagnostics(report.checks);
   console.log(JSON.stringify(report.summary, null, 2));
   process.exit(report.summary.failed > 0 ? 1 : 0);
 }

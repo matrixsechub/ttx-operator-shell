@@ -14,6 +14,17 @@
   --color-op-amber: #ffb02e;
   --color-op-danger: #ff4d4d;
 
+  /* Pearl-Spectral entity bridge (Track 3). Aliases the canonical
+     --entity-* tokens (public/styles/entity-tokens.css, linked by every
+     shell) into Tailwind so utilities like text-entity-ghost exist.
+     Values stay var() references — entity-tokens.css remains the single
+     source of truth; no hex is duplicated here. */
+  --color-entity-beacon: var(--entity-beacon);
+  --color-entity-aurelius: var(--entity-aurelius);
+  --color-entity-hsx: var(--entity-hsx);
+  --color-entity-ghost: var(--entity-ghost);
+  --color-entity-operator: var(--entity-operator);
+
   --font-mono-op: "Share Tech Mono", ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
 
   --animate-scan: scan 6s linear infinite;

@@ -18,8 +18,25 @@ describe("surfaceRegistry storefront contract", () => {
     assert.equal(resolveHtmlSurface("/marketplace/mission-packs"), "storefront");
   });
 
+  it("maps Pearl OS storefront routes to storefront", () => {
+    assert.equal(resolveHtmlSurface("/products"), "storefront");
+    assert.equal(resolveHtmlSurface("/pearl-os"), "storefront");
+    assert.equal(resolveHtmlSurface("/flywheel"), "storefront");
+    assert.equal(resolveHtmlSurface("/gates"), "storefront");
+    assert.equal(resolveHtmlSurface("/vault"), "storefront");
+    assert.equal(resolveHtmlSurface("/blog"), "storefront");
+    assert.equal(resolveHtmlSurface("/academy"), "storefront");
+    assert.equal(resolveHtmlSurface("/brand"), "storefront");
+    assert.equal(resolveHtmlSurface("/portfolio"), "storefront");
+    assert.equal(resolveHtmlSurface("/book"), "storefront");
+  });
+
   it("does not map /systems to storefront", () => {
     assert.equal(resolveHtmlSurface("/systems"), "cockpit");
+  });
+
+  it("maps /operator to the auth-gated cockpit shell", () => {
+    assert.equal(resolveHtmlSurface("/operator"), "cockpit");
   });
 });
 
@@ -34,9 +51,10 @@ describe("assemble-operator-dist script", () => {
 });
 
 describe("build pipeline storefront integration", () => {
-  it("runs storefront vite build before assembly", () => {
+  it("uses MSHOPS build-final artifact (Option C)", () => {
     const script = readFileSync(join(root, "scripts", "build.mjs"), "utf8");
-    assert.match(script, /vite\.storefront\.config\.ts/);
+    assert.match(script, /MSHOPS/);
+    assert.match(script, /build-final/);
     assert.match(script, /assemble-operator-dist\.mjs/);
   });
 });

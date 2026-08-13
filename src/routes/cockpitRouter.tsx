@@ -28,6 +28,7 @@ import { DeployOps } from "../pages/ops/DeployOps";
 import { UiUxExpertPage } from "../pages/ops/UiUxExpertPage";
 import { PrismTriagePage } from "../pages/ops/PrismTriagePage";
 import LiveJoin from "../pages/LiveJoin";
+import { FlywheelDashboard } from "../pages/dashboard/FlywheelDashboard";
 
 /** Operator cockpit surface — systems, ops, divisions, ttx (no storefront/auth routes). */
 export const cockpitRouter = createBrowserRouter([
@@ -36,6 +37,7 @@ export const cockpitRouter = createBrowserRouter([
   {
     element: <RequireAuth />,
     children: [
+      { path: "/operator", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/dashboard/beacon", element: <BeaconDashboard /> },
       { path: "/dashboard/runtime", element: <Navigate to="/dashboard" replace /> },
@@ -45,6 +47,7 @@ export const cockpitRouter = createBrowserRouter([
       { path: "/operator/governance", element: <GovernanceConsole /> },
       { path: "/dashboard/subscription", element: <Navigate to="/dashboard" replace /> },
       { path: "/dashboard/audit", element: <AuditDashboard /> },
+      { path: "/dashboard/flywheel", element: <FlywheelDashboard /> },
       { path: "/status", element: <Status /> },
       { path: "/about", element: <AboutPage /> },
       { path: "/divisions", element: <DivisionsIndex /> },

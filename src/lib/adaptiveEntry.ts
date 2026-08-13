@@ -67,38 +67,38 @@ export function getAdaptiveEntryCopy(mode: AdaptiveEntryUiMode): AdaptiveEntryCo
   switch (mode) {
     case "CONFUSION":
       return {
-        eyebrow: "MatrixSecHub // Operator OS",
-        title: "Operator Entry",
-        subtitle: "One secure surface for missions, systems, and marketplace modules.",
-        helper: "Tap below to open the operator cockpit — no account needed to browse.",
-        primaryCta: { label: "Enter System", to: "/enter", event: "entry_click" },
+        eyebrow: "Pearl OS // Governed AI Operations",
+        title: "Pearl OS",
+        subtitle: "The governed operating system for AI agents. Bounded autonomy, evidence-first execution, fail-closed gates.",
+        helper: "Browse the marketplace below or enter the operator cockpit.",
+        primaryCta: { label: "Explore Pearl OS", to: "/marketplace", event: "marketplace_click" },
       };
     case "FRICTION":
       return {
-        eyebrow: "MatrixSecHub // Operator OS",
-        title: "Ecosystem Entry",
-        subtitle: "Browse public marketplace modules, then enter when you are ready to operate.",
-        trustSignal: "Catalog includes mission packs, TTX scenarios, and operator tooling previews.",
-        primaryCta: { label: "Explore Marketplace", to: "/marketplace", event: "marketplace_click" },
-        secondaryCta: { label: "Enter System", to: "/enter", event: "entry_click" },
+        eyebrow: "Pearl OS // Governed AI Operations",
+        title: "Pearl OS Marketplace",
+        subtitle: "Templates, automation kits, and operator tooling for teams that ship governed AI.",
+        trustSignal: "Every product built in production. Governance diagrams, n8n workflows, and spec systems.",
+        primaryCta: { label: "Browse Products", to: "/marketplace", event: "marketplace_click" },
+        secondaryCta: { label: "Enter Cockpit", to: "/enter", event: "entry_click" },
       };
     case "ENGAGED":
       return {
-        eyebrow: "MatrixSecHub // Operator OS",
-        title: "You Are Cleared",
-        subtitle: "Operators like you are exploring modules — pick up where the graph left off.",
-        progression: "Next step: start a session or drill into a marketplace lane.",
+        eyebrow: "Pearl OS // Governed AI Operations",
+        title: "Welcome Back",
+        subtitle: "Pick up where you left off. Your operator surface is ready.",
+        progression: "Next: start a mission or explore new marketplace modules.",
         primaryCta: { label: "Start Session", to: "/enter", event: "entry_click" },
-        secondaryCta: { label: "Explore Modules", to: "/marketplace", event: "marketplace_click" },
+        secondaryCta: { label: "Browse Marketplace", to: "/marketplace", event: "marketplace_click" },
       };
     case "DEFAULT":
       return {
-        eyebrow: "MatrixSecHub // Operator OS",
-        title: "Ecosystem Entry",
+        eyebrow: "Pearl OS // Governed AI Operations",
+        title: "Pearl OS",
         subtitle:
-          "Unified operator surface — divisions, agents, systems, and marketplace modules wired into one MatrixSecHub deployment graph.",
-        primaryCta: { label: "Enter System", to: "/enter", event: "entry_click" },
-        secondaryCta: { label: "Explore Marketplace", to: "/marketplace", event: "marketplace_click" },
+          "The governed operating system for AI agents. Agent-native process management, bounded autonomy, and cryptographic evidence trails.",
+        primaryCta: { label: "Explore Pearl OS", to: "/marketplace", event: "marketplace_click" },
+        secondaryCta: { label: "Enter Cockpit", to: "/enter", event: "entry_click" },
       };
     default: {
       const _exhaustive: never = mode;

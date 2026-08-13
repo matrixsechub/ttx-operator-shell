@@ -1,9 +1,26 @@
-import { useState, type FormEvent } from "react";
-import { Navigate, useLocation, useNavigate, type Location } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
+import { useLocation, type Location } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
 import { EngineStatusIndicator } from "../components/EngineStatusIndicator";
+import { EntityVoice } from "../components/EntityVoice";
 
 type LoginMode = "password" | "token";
+
+function safeReturnPath(statePath: string | undefined, queryPath: string | null): string {
+  const candidate = statePath ?? queryPath;
+  if (!candidate || !candidate.startsWith("/") || candidate.startsWith("//") || candidate.startsWith("/login")) {
+    return "/dashboard";
+  }
+  return candidate;
+}
+
+function CrossSurfaceRedirect({ to }: { to: string }) {
+  useEffect(() => {
+    window.location.replace(to);
+  }, [to]);
+
+  return null;
+}
 
 export function Login() {
   const [mode, setMode] = useState<LoginMode>("password");
@@ -11,20 +28,22 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [token, setTokenInput] = useState("");
   const { login, loginWithToken, loggingIn, loginError, sessionEndedReason, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as { from?: Location } | null)?.from?.pathname ?? "/dashboard";
+  const statePath = (location.state as { from?: Location } | null)?.from?.pathname;
+  const queryPath = new URLSearchParams(location.search).get("from");
+  const from = safeReturnPath(statePath, queryPath);
 
-  // Already authenticated (e.g. navigated here directly) — skip the form.
+  // Auth and cockpit use distinct SPA shells, so crossing the boundary must
+  // reload through the Worker instead of navigating inside the auth router.
   if (isAuthenticated) {
-    return <Navigate to={from} replace />;
+    return <CrossSurfaceRedirect to={from} />;
   }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const ok = mode === "password" ? await login({ username, password }) : await loginWithToken(token);
-    if (ok) navigate(from, { replace: true });
+    if (ok) window.location.replace(from);
   }
 
   return (
@@ -46,6 +65,7 @@ export function Login() {
           <span className="text-[11px] uppercase tracking-[0.4em] text-op-text-dim">MatrixSecHub // Ops Division</span>
           <h1 className="mt-2 text-lg uppercase tracking-widest text-op-accent">Operator Login</h1>
           <p className="mt-1 text-xs text-op-text-dim">Authenticate the link to enter the system.</p>
+          <EntityVoice entity="hsx">authentication routes through the security plane.</EntityVoice>
         </div>
 
         {sessionEndedReason && (

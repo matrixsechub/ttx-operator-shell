@@ -38,6 +38,7 @@ import {
 import { getUsageSummary } from "./usage";
 import { buildOperatorOsStatusSnapshot, type OperatorOsStatusSnapshot } from "./operatorStatus";
 import { buildRuntimeHealth, type RuntimeHealth } from "./runtimeHealth";
+/** Phase 2B: cockpit HTML prefixes are session-gated at the worker. */
 const COCKPIT_HTML_PREFIXES = ["/systems", "/ops", "/operator", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about"] as const;
 const COCKPIT_API_PREFIXES = ["/api/ops"] as const;
 const WILDCARD_API_PATHS = [/^\/api\/ttx\/local-scenarios\/import$/];
@@ -105,10 +106,8 @@ function doRequest(stub: DurableObjectStub, path: string, init?: RequestInit): P
 
 export function isCockpitProtectedPath(pathname: string): boolean {
   const normalized = pathname.replace(/\/$/, "") || "/";
-  if (normalized.startsWith("/api/")) {
-    return COCKPIT_API_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`));
-  }
-  return COCKPIT_HTML_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`));
+  if (!normalized.startsWith("/api/")) return false;
+  return COCKPIT_API_PREFIXES.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`));
 }
 
 export function buildGovernancePolicy(state: GovernanceState): GovernancePolicy {
@@ -333,20 +332,16 @@ export async function enforceCockpitSession(
   env: BackboneEnv & TelemetryEnv,
   pathname: string,
 ): Promise<Response | null> {
-  // Browsers never send an Authorization header on HTML navigation — the
-  // access token lives in localStorage, not a cookie. Gating HTML routes
-  // here would block the cockpit shell from loading for any direct URL
-  // access. Client-side RequireAuth handles the /login redirect instead.
+  // Defense in depth: HTML/SPA documents are never session-gated here.
+  // Browsers do not send Authorization on document navigation; RequireAuth
+  // owns unauthenticated cockpit client redirects to /login.
   if (!pathname.startsWith("/api/")) return null;
   if (!isCockpitProtectedPath(pathname)) return null;
 
   const operator = await getAccessTokenOperator(request, env);
   if (!operator) {
     await recordSessionEvent(env, "session_reject");
-    if (pathname.startsWith("/api/")) {
-      return Response.json({ error: "Cockpit session required", code: "SESSION_REQUIRED" }, { status: 401 });
-    }
-    return Response.redirect(new URL("/login", request.url).toString(), 302);
+    return Response.json({ error: "Cockpit session required", code: "SESSION_REQUIRED" }, { status: 401 });
   }
 
   let session = await getOperatorSession(env, operator.id);
@@ -359,19 +354,13 @@ export async function enforceCockpitSession(
   if (!session) {
     await recordSessionEvent(env, "session_reject");
     await recordSubsystemFailure(env, "session", "SessionDO create failed during enforcement");
-    if (pathname.startsWith("/api/")) {
-      return Response.json({ error: "Session DO validation failed", code: "SESSION_INVALID" }, { status: 401 });
-    }
-    return Response.redirect(new URL("/login", request.url).toString(), 302);
+    return Response.json({ error: "Session DO validation failed", code: "SESSION_INVALID" }, { status: 401 });
   }
 
   const validated = await validateOperatorSession(env, session.sessionId);
   if (!validated.valid || !session.active || Date.parse(session.expiresAt) <= Date.now()) {
     await recordSessionEvent(env, "session_reject");
-    if (pathname.startsWith("/api/")) {
-      return Response.json({ error: "Session DO validation failed", code: "SESSION_INVALID" }, { status: 401 });
-    }
-    return Response.redirect(new URL("/login", request.url).toString(), 302);
+    return Response.json({ error: "Session DO validation failed", code: "SESSION_INVALID" }, { status: 401 });
   }
 
   await recordSessionEvent(env, "session_validate");

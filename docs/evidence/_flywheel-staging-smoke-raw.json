@@ -1,0 +1,115 @@
+{
+  "ok": true,
+  "okFullApprovalPath": false,
+  "missionId": "FW-V38-STAGING-DEPLOY-20260719-001",
+  "base": "https://ttx-operator-shell-staging.sogellagepul.workers.dev",
+  "deployVersionId": "e25bb3e2-3a40-43f4-94a6-60771fcac159",
+  "deploySha": "da1bbd3cf27031d0832d6d30ed47df9a115a3464",
+  "runId": "77510c64-f994-49de-ba41-82f4acc35f7f",
+  "steps": [
+    {
+      "step": "auth.login",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-19T08:34:26.714Z"
+    },
+    {
+      "step": "flywheel.stages.requires_auth",
+      "ok": true,
+      "status": 401,
+      "at": "2026-07-19T08:34:27.072Z"
+    },
+    {
+      "step": "flywheel.stages",
+      "ok": true,
+      "status": 200,
+      "stageCount": 10,
+      "at": "2026-07-19T08:34:27.512Z"
+    },
+    {
+      "step": "flywheel.run.create",
+      "ok": true,
+      "status": 201,
+      "runId": "77510c64-f994-49de-ba41-82f4acc35f7f",
+      "state": "queued",
+      "at": "2026-07-19T08:34:27.978Z"
+    },
+    {
+      "step": "flywheel.command.analyze_c0",
+      "ok": true,
+      "status": 200,
+      "commandState": "completed",
+      "at": "2026-07-19T08:34:28.429Z"
+    },
+    {
+      "step": "flywheel.command.scan_c1_creates_evidence",
+      "ok": true,
+      "status": 200,
+      "commandState": "completed",
+      "at": "2026-07-19T08:34:28.918Z"
+    },
+    {
+      "step": "flywheel.run.evidence_after_scan",
+      "ok": true,
+      "status": 200,
+      "evidenceCount": 1,
+      "at": "2026-07-19T08:34:29.280Z"
+    },
+    {
+      "step": "flywheel.command.synth_c2_awaits_approval",
+      "ok": false,
+      "status": 409,
+      "code": "GOVERNANCE_MISSING_BEACON",
+      "hasProposalId": false,
+      "hasCommandId": false,
+      "optionalUntilBeaconV2": true,
+      "at": "2026-07-19T08:34:29.533Z"
+    },
+    {
+      "step": "flywheel.command.approve",
+      "ok": false,
+      "skipped": true,
+      "reason": "missing proposal/command id",
+      "at": "2026-07-19T08:34:29.533Z"
+    },
+    {
+      "step": "flywheel.intervention.safe_mode",
+      "ok": true,
+      "status": 200,
+      "runState": "safe_mode",
+      "at": "2026-07-19T08:34:30.203Z"
+    },
+    {
+      "step": "flywheel.safe_mode.material_denied",
+      "ok": true,
+      "status": 409,
+      "code": "GOVERNANCE_SAFE_MODE_ACTIVE",
+      "at": "2026-07-19T08:34:30.543Z"
+    },
+    {
+      "step": "flywheel.command.synth_c2_beacon_v2_gate_observed",
+      "ok": true,
+      "status": 409,
+      "code": "GOVERNANCE_MISSING_BEACON",
+      "note": "mainCompat resolves legacy_v1; governance requires verified_v2 for approvalRequired commands",
+      "at": "2026-07-19T08:34:30.543Z"
+    },
+    {
+      "step": "flywheel.deploy.permanently_denied",
+      "ok": true,
+      "status": 403,
+      "code": "PRODUCTION_DEPLOY_NOT_AUTHORIZED",
+      "at": "2026-07-19T08:34:30.916Z"
+    },
+    {
+      "step": "system.status",
+      "ok": true,
+      "status": 200,
+      "at": "2026-07-19T08:34:32.278Z"
+    }
+  ],
+  "remainingBlockers": [
+    "C2 approval path requires Beacon status verified_v2; mainCompat currently resolves legacy_v1/invalid"
+  ],
+  "generatedAt": "2026-07-19T08:34:32.278Z"
+}

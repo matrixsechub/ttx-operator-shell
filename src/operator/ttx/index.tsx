@@ -3,6 +3,7 @@ import { NavLink, Outlet, Link } from "react-router-dom";
 import { OperatorShell } from "../../components/OperatorShell";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { StatusPill } from "../../components/StatusPill";
+import { EntityVoice } from "../../components/EntityVoice";
 import { setCurrentSessionId } from "../../lib/ttxSessionStorage";
 import { ttxSessionService } from "../../lib/ttxSessionService";
 import { ScenarioProvider, useScenarioContext } from "./ScenarioContext";
@@ -26,6 +27,7 @@ export function TTXShell() {
           <div>
             <h1 className="text-lg uppercase tracking-widest text-op-accent">MSH TTX</h1>
             <p className="mt-1 text-xs text-op-text-dim">Tabletop exercise scenario builder, runtime, and scoring.</p>
+            <EntityVoice entity="ghost">the simulation adapts to your scenario decisions.</EntityVoice>
             <p className="mt-1 text-[11px] text-op-text-dim">
               Integrated with{" "}
               <Link to="/divisions/operations" className="text-op-accent hover:underline">

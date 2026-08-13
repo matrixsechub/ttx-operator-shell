@@ -2,6 +2,7 @@ import { OperatorShell } from "../components/OperatorShell";
 import { GovernanceStatePanel } from "../components/GovernanceStatePanel";
 import { StatusPill } from "../components/StatusPill";
 import { Breadcrumbs } from "../components/Breadcrumbs";
+import { EntityVoice } from "../components/EntityVoice";
 import { api } from "../lib/apiClient";
 import { useApiResource } from "../lib/useApiResource";
 
@@ -23,6 +24,7 @@ export function Status() {
           <div>
             <h1 className="text-lg uppercase tracking-widest text-op-accent">System Status</h1>
             <p className="mt-1 text-xs text-op-text-dim">Unified kernel state, polled every 10s.</p>
+            <EntityVoice entity="beacon">kernel state is the governance signal of record.</EntityVoice>
           </div>
           <button
             type="button"

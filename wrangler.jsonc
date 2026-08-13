@@ -7,25 +7,13 @@
     "enabled": true,
     "head_sampling_rate": 1
   },
-  // Explicitly clear orphaned dashboard cron triggers — no scheduled() handler exists.
-  // Organizer runs via GitHub Actions (organizer-schedule.yml), not Worker cron.
-  "triggers": {
-    "crons": []
-  },
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     "run_worker_first": true
   },
-  "ai": {
-    "binding": "AI"
-  },
   "vars": {
-    "AI_GATEWAY_ID": "mshops-net-governance",
-    "AI_GATEWAY_ACCOUNT_ID": "f02eebce2a5c46b33b0d204f3cd4950a",
-    "EXPECTED_BEACON_SHA256": "5f5101f0bc8aea36bc43ceac0e9df8a4a0ec4e2dc768ab79c3016ef6b605e283",
-    "AI_FULFILLMENT_ENABLED": "false",
     "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
     // Display-only identity labels rolled into the auth token — never
     // enforced against anything (no RBAC, per scope lock). Secrets
@@ -41,7 +29,8 @@
     "BUILD_COMMIT_SHA": "unknown",
     "BUILD_TIMESTAMP": "",
     "SYSTEM_MODE": "PRODUCTION",
-    "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev"
+    "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev",
+    "FLYWHEEL_TENANT_ID": "mshops"
   },
   // Revoked-refresh-token denylist (Phase 16). Production namespace —
   // staging uses dedicated namespaces in env.staging (see docs/RELEASE.md).
@@ -57,7 +46,8 @@
       { "name": "SESSION", "class_name": "SessionDO" },
       { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
       { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
-      { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
+      { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" },
+      { "name": "FLYWHEEL", "class_name": "FlywheelDO" }
     ]
   },
   "migrations": [
@@ -72,6 +62,10 @@
     {
       "tag": "v37-receipt-authority",
       "new_sqlite_classes": ["ReceiptAuthority"]
+    },
+    {
+      "tag": "v38-flywheel-engine",
+      "new_sqlite_classes": ["FlywheelDO"]
     }
   ],
   "services": [
@@ -80,17 +74,7 @@
   "env": {
     "staging": {
       "name": "ttx-operator-shell-staging",
-      "triggers": {
-        "crons": []
-      },
-      "ai": {
-        "binding": "AI"
-      },
       "vars": {
-        "AI_GATEWAY_ID": "mshops-net-governance",
-        "AI_GATEWAY_ACCOUNT_ID": "f02eebce2a5c46b33b0d204f3cd4950a",
-        "EXPECTED_BEACON_SHA256": "5f5101f0bc8aea36bc43ceac0e9df8a4a0ec4e2dc768ab79c3016ef6b605e283",
-        "AI_FULFILLMENT_ENABLED": "false",
         "ENGINE_API_URL": "https://msh-ops-os-harness.sogellagepul.workers.dev",
         "OPERATOR_ROLE": "operator",
         "OPERATOR_ACCESS_LEVEL": "internal",
@@ -99,7 +83,8 @@
         "BUILD_COMMIT_SHA": "unknown",
         "BUILD_TIMESTAMP": "",
         "SYSTEM_MODE": "OPERATOR_BETA",
-        "ORIGIN_URL": "https://ttx-operator-shell-staging.sogellagepul.workers.dev"
+        "ORIGIN_URL": "https://ttx-operator-shell-staging.sogellagepul.workers.dev",
+        "FLYWHEEL_TENANT_ID": "mshops-staging"
       },
       "kv_namespaces": [
         // Replace each id with the output of the corresponding create command (run once before first staging deploy):
@@ -118,7 +103,8 @@
           { "name": "SESSION", "class_name": "SessionDO" },
           { "name": "MARKETPLACE", "class_name": "MarketplaceDO" },
           { "name": "LIVE_TTX_SESSIONS", "class_name": "LiveTtxSession" },
-          { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" }
+          { "name": "RECEIPT_AUTHORITY", "class_name": "ReceiptAuthority" },
+          { "name": "FLYWHEEL", "class_name": "FlywheelDO" }
         ]
       },
       "migrations": [
@@ -133,6 +119,10 @@
         {
           "tag": "v37-receipt-authority",
           "new_sqlite_classes": ["ReceiptAuthority"]
+        },
+        {
+          "tag": "v38-flywheel-engine",
+          "new_sqlite_classes": ["FlywheelDO"]
         }
       ],
       "services": [

@@ -63,6 +63,7 @@ import { FedGradeOps } from "../pages/ops/FedGradeOps";
 import { SecurityOps } from "../pages/ops/SecurityOps";
 
 import { DeployOps } from "../pages/ops/DeployOps";
+import { FlywheelDashboard } from "../pages/dashboard/FlywheelDashboard";
 
 
 
@@ -87,6 +88,7 @@ export const router = createBrowserRouter([
     children: [
 
       { path: "/dashboard", element: <Dashboard /> },
+      { path: "/dashboard/flywheel", element: <FlywheelDashboard /> },
 
       { path: "/status", element: <Status /> },
 

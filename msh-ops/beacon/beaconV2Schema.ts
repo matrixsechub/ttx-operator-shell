@@ -1,4 +1,4 @@
-import northstarV2Document from "../../msh-ops/beacon/northstar-v2.json" with { type: "json" };
+import northstarV2Document from "./northstar-v2.json" with { type: "json" };
 import {
   BEACON_AXIS_ORDER,
   BeaconValidationError,

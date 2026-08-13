@@ -110,21 +110,6 @@ export async function edgeAuthGate(
   const authHeader = request.headers.get("Authorization") || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
   if (!token) {
-    // #region agent log
-    fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-      body: JSON.stringify({
-        sessionId: "14ea90",
-        location: "worker/edge/gate.ts:missing-token",
-        message: "edge gate blocked — missing token",
-        data: { pathname, routeClass },
-        timestamp: Date.now(),
-        hypothesisId: "H1",
-        runId: "step5-gate",
-      }),
-    }).catch(() => {});
-    // #endregion
     const hint =
       routeClass === "marketplace"
         ? "POST /api/marketplace/session to obtain token"
@@ -148,40 +133,9 @@ export async function edgeAuthGate(
     const ctxHash = await makeCtxHash(ip, request.headers.get("User-Agent") || "");
     const tokenCtx = verified.payload.ctx;
     if (typeof tokenCtx !== "string" || tokenCtx !== ctxHash) {
-      // #region agent log
-      fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-        body: JSON.stringify({
-          sessionId: "14ea90",
-          location: "worker/edge/gate.ts:binding-mismatch",
-          message: "edge gate blocked — binding_mismatch",
-          data: { pathname, routeClass },
-          timestamp: Date.now(),
-          hypothesisId: "H2",
-          runId: "step5-gate",
-        }),
-      }).catch(() => {});
-      // #endregion
       return Response.json({ error: "forbidden", reason: "binding_mismatch" }, { status: 403 });
     }
   }
-
-  // #region agent log
-  fetch("http://127.0.0.1:7654/ingest/c1420f4a-f03f-408c-822d-3c63b334f1b9", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "14ea90" },
-    body: JSON.stringify({
-      sessionId: "14ea90",
-      location: "worker/edge/gate.ts:pass",
-      message: "edge gate passed",
-      data: { pathname, routeClass },
-      timestamp: Date.now(),
-      hypothesisId: "H3",
-      runId: "step5-gate",
-    }),
-  }).catch(() => {});
-  // #endregion
 
   return null;
 }

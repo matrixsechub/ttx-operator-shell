@@ -77,6 +77,13 @@
   transform: translateX(30px);
 }
 
+@media (max-width: 720px) {
+  .reveal[data-reveal="left"],
+  .reveal[data-reveal="right"] {
+    transform: translateY(24px);
+  }
+}
+
 .reveal.is-visible {
   opacity: 1;
   transform: translate(0, 0);

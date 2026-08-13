@@ -52,7 +52,7 @@ body.demo-mode-active .topbar {
   padding: 0.85rem 1rem;
   border: 1px solid rgba(242, 193, 78, 0.55);
   border-radius: 6px;
-  background: #0b0b0b;
+  background: var(--rgbgold-ink, #0b0b0b);
   color: var(--gold, #f2c14e);
   box-shadow:
     0 0 0 1px rgba(242, 193, 78, 0.15),

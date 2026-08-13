@@ -15,6 +15,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/rgbgold-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-tokens.css" />
+    <link rel="stylesheet" href="/styles/entity-cues.css" />
     <link rel="stylesheet" href="/styles/rgbgold-motion.css" />
     <link rel="stylesheet" href="/styles/rgbgold-components.css" />
     <link rel="stylesheet" href="/styles/rgbgold-hud.css" />
@@ -47,12 +49,17 @@
             <p class="section-label mono">[ PUBLIC_FUNNEL :: /ENTER ]</p>
             <p class="section-label mono" id="enter-context-badge">Service context pending.</p>
             <h1 id="enter-context-heading">Start your guided intake</h1>
+            <p class="entity-voice mono" data-entity="aurelius">
+              <span class="entity-voice-orb" aria-hidden="true"></span>
+              <strong>AURELIUS</strong>
+              <span>Interprets intent — your answers shape the guided path before anything is committed.</span>
+            </p>
             <p class="hero-sub">
               This public-safe funnel preserves your selected route, captures project context, and keeps private
               review surfaces isolated behind the existing engagement flow.
             </p>
             <div class="cta-row">
-              <a class="button primary" href="#lead-form-shell" data-scroll-target="lead-form-shell">[ START INTAKE ]</a>
+              <a class="button primary" href="#lead-form-shell" data-scroll-target="lead-form-shell" data-flow-cta="enter-start-intake">[ START INTAKE ]</a>
               <a class="button secondary" href="#calendly-shell" data-scroll-target="calendly-shell">[ BOOK CALENDLY ]</a>
               <a class="button ghost" href="/services">[ RETURN TO SERVICES ]</a>
             </div>
@@ -179,7 +186,7 @@
                 <input id="hidden-deployment-plan-id" name="deployment_plan_id" type="hidden" />
 
                 <div class="cta-row">
-                  <button class="button primary" id="enter-submit" type="submit">[ CAPTURE LEAD ]</button>
+                  <button class="button primary" id="enter-submit" type="submit" data-flow-cta="enter-capture-lead">[ CAPTURE LEAD ]</button>
                   <a class="button secondary" href="/services">[ REVIEW SERVICES ]</a>
                 </div>
               </form>
