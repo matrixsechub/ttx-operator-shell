@@ -1,2 +1,3 @@
-2026-08-12T21:31:00-06:00
-Trigger: MSHOPS build-final regenerated with Pearl OS storefront (6b74a11)
+2026-08-13T18:44:00-06:00
+Trigger: Operator confirmed CLOUDFLARE_ACCOUNT_ID is correct (f02eeb...)
+All secrets verified present. Deploy should go green.
