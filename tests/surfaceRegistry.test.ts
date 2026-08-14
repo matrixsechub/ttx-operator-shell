@@ -38,9 +38,11 @@ describe("assemble-operator-dist script", () => {
 });
 
 describe("build pipeline storefront integration", () => {
-  it("runs storefront vite build before assembly", () => {
+  it("merges MSHOPS storefront artifact before assembly", () => {
     const script = readFileSync(join(root, "scripts", "build.mjs"), "utf8");
-    assert.match(script, /vite\.storefront\.config\.ts/);
+    assert.match(script, /mergeMshopsStorefront/);
+    assert.match(script, /MSHOPS/);
     assert.match(script, /assemble-operator-dist\.mjs/);
+    assert.match(script, /MSHOPS_OPTIONAL/);
   });
 });
