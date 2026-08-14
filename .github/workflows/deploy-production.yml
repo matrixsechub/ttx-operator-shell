@@ -47,14 +47,14 @@ jobs:
         env:
           MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
           GIT_COMMIT_SHA: ${{ github.sha }}
-          BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp || '2026-01-01T00:00:00Z' }}
+          BUILD_TIMESTAMP: "2026-08-14"
         run: npm run build
 
       - name: Deploy to Cloudflare Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler deploy --env "" --var BUILD_COMMIT_SHA:${{ github.sha }} --var BUILD_TIMESTAMP:$(date -u +%Y-%m-%dT%H-%M-%SZ)
+        run: npx wrangler deploy
 
       - name: Smoke test
         run: |
@@ -64,5 +64,5 @@ jobs:
           if [ "$STATUS" != "200" ]; then
             echo "/pearl-os returned $STATUS"
           else
-            echo "Pearl OS is live"
+            echo "Pearl OS is live!"
           fi
