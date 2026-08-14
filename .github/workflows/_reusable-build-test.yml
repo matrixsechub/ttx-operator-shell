@@ -48,6 +48,7 @@ jobs:
         uses: ./.github/actions/checkout-mshops-artifact
         with:
           token: ${{ secrets.GH_PAT }}
+          repository: ${{ github.repository_owner }}/MSHOPS
 
       - name: Prove later steps cannot read GH_PAT
         run: node scripts/ci/assert-no-mshops-token.mjs
