@@ -13,7 +13,7 @@ on:
         type: string
     secrets:
       GH_PAT:
-        description: PAT with read access to private MSHOPS storefront artifact
+        description: PAT with read access to private MSHOPS storefront artifact (clone step only)
         required: false
 
 permissions:
@@ -25,11 +25,10 @@ jobs:
     permissions:
       contents: read
       actions: write
+    # Intentionally no GH_PAT in job env — token is step-scoped to the clone action only.
     env:
       GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
-      # Authenticated MSHOPS clone; build.mjs fails closed if artifact unavailable.
-      GH_PAT: ${{ secrets.GH_PAT }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -41,15 +40,32 @@ jobs:
 
       - run: npm run verify:staging-config
 
-      - run: npm run build
+      - name: Clone MSHOPS storefront artifact
+        uses: ./.github/actions/checkout-mshops-artifact
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Prove later steps cannot read GH_PAT
+        run: node scripts/ci/assert-no-mshops-token.mjs
+
+      - name: Build with pre-cloned MSHOPS artifact
+        run: |
+          node scripts/ci/assert-no-mshops-token.mjs
+          test -n "${MSHOPS_BUILD_DIR:?MSHOPS_BUILD_DIR missing after clone step}"
+          test -f "$MSHOPS_BUILD_DIR/app/index.html"
+          npm run build
 
       - run: mkdir -p .artifacts/wrangler-production .artifacts/wrangler-staging
 
       - name: Wrangler production dry run
-        run: npx wrangler deploy --dry-run --outdir .artifacts/wrangler-production
+        run: |
+          node scripts/ci/assert-no-mshops-token.mjs
+          npx wrangler deploy --dry-run --outdir .artifacts/wrangler-production
 
       - name: Wrangler staging dry run
-        run: npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging
+        run: |
+          node scripts/ci/assert-no-mshops-token.mjs
+          npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

@@ -1,0 +1,70 @@
+name: Checkout MSHOPS storefront artifact
+description: >-
+  Sparse-clone the private MSHOPS build-final artifact with a token that is
+  scoped only to the clone step inside this composite action. Fail-closed if
+  the real artifact is missing. Does not export the token to the caller job.
+
+inputs:
+  token:
+    description: PAT with read access to private MSHOPS (step-scoped inside this action)
+    required: true
+  repository:
+    description: owner/name of the MSHOPS repository
+    required: false
+    default: ""
+  path:
+    description: Workspace-relative clone destination
+    required: false
+    default: MSHOPS
+
+outputs:
+  mshops-build-dir:
+    description: Absolute path to MSHOPS build-final directory
+    value: ${{ steps.clone.outputs.mshops-build-dir }}
+
+runs:
+  using: composite
+  steps:
+    - name: Clone MSHOPS build-final (token scoped to this step only)
+      id: clone
+      shell: bash
+      env:
+        MSHOPS_TOKEN: ${{ inputs.token }}
+        MSHOPS_PATH: ${{ inputs.path }}
+        MSHOPS_REPOSITORY: ${{ inputs.repository }}
+      run: |
+        set -euo pipefail
+        if [ -z "${MSHOPS_TOKEN}" ]; then
+          echo "ERROR: MSHOPS checkout token required (fail-closed)"
+          exit 1
+        fi
+
+        owner_repo="${MSHOPS_REPOSITORY}"
+        if [ -z "${owner_repo}" ]; then
+          owner_repo="${GITHUB_REPOSITORY_OWNER}/MSHOPS"
+        fi
+
+        dest="${GITHUB_WORKSPACE}/${MSHOPS_PATH}"
+        rm -rf "${dest}"
+
+        # Prefer Authorization header over embedding the token in the remote URL.
+        basic="$(printf 'x-access-token:%s' "${MSHOPS_TOKEN}" | base64 -w0)"
+        git -c "http.extraheader=AUTHORIZATION: basic ${basic}" \
+          clone --depth 1 --filter=blob:none --sparse \
+          "https://github.com/${owner_repo}.git" "${dest}"
+
+        git -C "${dest}" sparse-checkout set build-final
+
+        artifact="${dest}/build-final/app/index.html"
+        if [ ! -f "${artifact}" ]; then
+          echo "ERROR: MSHOPS build-final/app/index.html missing after clone (fail-closed)"
+          exit 1
+        fi
+
+        build_dir="${dest}/build-final"
+        echo "mshops-build-dir=${build_dir}" >> "${GITHUB_OUTPUT}"
+        echo "MSHOPS_BUILD_DIR=${build_dir}" >> "${GITHUB_ENV}"
+        echo "Cloned MSHOPS artifact at ${build_dir}"
+
+        # Drop shell copies before the step ends (token never written to GITHUB_ENV).
+        unset MSHOPS_TOKEN basic

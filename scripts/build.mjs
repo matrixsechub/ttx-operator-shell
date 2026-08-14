@@ -11,9 +11,21 @@ function run(command, cwd = root) {
   execSync(command, { stdio: "inherit", shell: true, cwd });
 }
 
+function assertNoMshopsTokenInActions() {
+  if (process.env.GITHUB_ACTIONS !== "true") return;
+  for (const key of ["GH_PAT", "MSHOPS_TOKEN", "MSHOPS_CHECKOUT_TOKEN"]) {
+    if (process.env[key]?.trim()) {
+      throw new Error(
+        `${key} is visible during build under GitHub Actions. MSHOPS credentials must be clone-step-scoped only.`,
+      );
+    }
+  }
+}
+
 /**
- * Resolve MSHOPS clone URL. Prefer explicit MSHOPS_REPO_URL; otherwise use
- * GH_PAT / GITHUB_TOKEN for private-repo auth. Never log the token.
+ * Resolve MSHOPS clone URL for local/non-Actions use.
+ * Prefer explicit MSHOPS_REPO_URL; otherwise use GH_PAT / GITHUB_TOKEN.
+ * Never log the token. GitHub Actions must not reach this path.
  */
 function resolveMshopsRepoUrl() {
   const explicit = process.env.MSHOPS_REPO_URL?.trim();
@@ -38,12 +50,15 @@ function redactRepoUrl(repoUrl) {
  * Resolution order:
  * 1. MSHOPS_BUILD_DIR (points at a build-final directory)
  * 2. Sibling checkout ../MSHOPS/build-final
- * 3. Shallow clone of matrixsechub/MSHOPS into .deps/MSHOPS (needs git auth for private repo)
+ * 3. Shallow clone of matrixsechub/MSHOPS into .deps/MSHOPS (local only; needs git auth)
  *
  * Fail-closed: if the real MSHOPS artifact is unavailable, the build fails.
- * No CI stub / optional skip — production validation must see the real artifact.
+ * Under GitHub Actions, cloning with GH_PAT from build scripts is forbidden —
+ * CI must pre-clone via the dedicated step-scoped action and set MSHOPS_BUILD_DIR.
  */
 function resolveMshopsBuildFinal() {
+  assertNoMshopsTokenInActions();
+
   const envDir = process.env.MSHOPS_BUILD_DIR?.trim();
   const candidates = [
     envDir,
@@ -55,6 +70,12 @@ function resolveMshopsBuildFinal() {
     if (existsSync(join(candidate, "app", "index.html"))) {
       return candidate;
     }
+  }
+
+  if (process.env.GITHUB_ACTIONS === "true") {
+    throw new Error(
+      "MSHOPS artifact unavailable in GitHub Actions (fail-closed). Pre-clone via .github/actions/checkout-mshops-artifact (step-scoped token) and set MSHOPS_BUILD_DIR. Build scripts must not receive GH_PAT.",
+    );
   }
 
   const depsRepo = join(root, ".deps", "MSHOPS");
@@ -97,6 +118,7 @@ function mergeMshopsStorefront() {
   }
 }
 
+assertNoMshopsTokenInActions();
 run("npm run cf-typegen");
 run("npx tsc -b");
 run("npx vite build");
