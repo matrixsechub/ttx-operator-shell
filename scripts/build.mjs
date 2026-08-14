@@ -88,9 +88,9 @@ function resolveMshopsBuildFinal() {
   console.log(`> cloning MSHOPS for storefront artifact (${redactRepoUrl(repoUrl)})`);
   try {
     run(`git clone --depth 1 "${repoUrl}" "${depsRepo}"`);
-  } catch (error) {
+  } catch {
     throw new Error(
-      `MSHOPS clone failed (fail-closed). Set GH_PAT (or MSHOPS_REPO_URL / MSHOPS_BUILD_DIR) so the real storefront artifact is available. ${error instanceof Error ? error.message : String(error)}`,
+      "MSHOPS clone failed (fail-closed). Set GH_PAT (or MSHOPS_REPO_URL / MSHOPS_BUILD_DIR) so the real storefront artifact is available.",
     );
   }
 
