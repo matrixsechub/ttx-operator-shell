@@ -1,14 +1,15 @@
-# Auto-deploy to Cloudflare Workers on push to main.
-# Requires secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, GH_PAT
-# Also clones MSHOPS for the storefront artifact (Option C).
-
 name: Deploy Production
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
   workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: Type DEPLOY_PRODUCTION
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -18,47 +19,87 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  authorize-manual:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Validate manual authorization
+        env:
+          CONFIRM: ${{ inputs.confirm_deploy }}
+        run: test "$CONFIRM" = "DEPLOY_PRODUCTION"
+
+  manual-build-test:
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_reusable-build-test.yml
+    with:
+      ref: main
+      git_commit_sha: ${{ github.sha }}
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
     permissions:
       contents: read
+      actions: write
+
+  manual-dry-run:
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    with:
+      ref: main
+      git_commit_sha: ${{ github.sha }}
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
+    permissions:
+      contents: read
+      actions: write
+
+  deploy:
+    needs: [authorize-manual, manual-build-test, manual-dry-run]
+    if: >-
+      always() && (
+        (github.event_name == 'workflow_run' &&
+         github.event.workflow_run.conclusion == 'success' &&
+         github.event.workflow_run.head_branch == 'main') ||
+        (github.event_name == 'workflow_dispatch' &&
+         needs.authorize-manual.result == 'success' &&
+         needs.manual-build-test.result == 'success' &&
+         needs.manual-dry-run.result == 'success')
+      )
+    runs-on: ubuntu-22.04
+    environment: production
     env:
-      GIT_COMMIT_SHA: ${{ github.sha }}
-      BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp || '' }}
+      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+          fetch-depth: 0
+      - name: Verify deploy SHA is current main
+        run: |
+          git fetch origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
       - name: Clone MSHOPS storefront artifact
         run: |
-          git clone --depth 1 --filter=blob:none --sparse \
-            https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/MSHOPS.git \
-            MSHOPS
+          git clone --depth 1 --filter=blob:none --sparse https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository_owner }}/MSHOPS.git MSHOPS
           cd MSHOPS && git sparse-checkout set build-final
-          test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
-          echo "MSHOPS storefront artifact found"
-
+          test -f build-final/app/index.html
       - uses: ./.github/actions/setup-node-npm
         with:
           node-version: "24"
-
-      - name: Build with MSHOPS storefront
+      - name: Final build
         env:
           MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
+          GIT_COMMIT_SHA: ${{ env.DEPLOY_SHA }}
         run: npm run build
-
-      - name: Deploy to Cloudflare
-        run: |
-          npx wrangler deploy \
-            --var BUILD_COMMIT_SHA:${{ github.sha }} \
-            --var BUILD_TIMESTAMP:"${BUILD_TIMESTAMP:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
-
-      - name: Smoke test
+      - name: Final dry run
+        run: npx wrangler deploy --dry-run --outdir .artifacts/production-predeploy
+      - name: Deploy exact gated SHA
+        run: npx wrangler deploy --var BUILD_COMMIT_SHA:${DEPLOY_SHA} --var BUILD_TIMESTAMP:${{ github.run_started_at }}
+      - name: Smoke test (hard gate)
         run: |
           sleep 15
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.mshops.net/pearl-os)
-          echo "Pearl OS route status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
-            echo "WARNING: /pearl-os returned $STATUS (may need DNS propagation)"
-          fi
+          for route in / /pearl-os /products /status; do
+            code=$(curl -sS -L -o /tmp/body -w "%{http_code}" "https://www.mshops.net$route")
+            test "$code" = "200" || { cat /tmp/body; exit 1; }
+          done

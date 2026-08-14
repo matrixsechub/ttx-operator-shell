@@ -16,6 +16,10 @@ on:
         required: false
         type: string
         default: "off"
+    secrets:
+      GH_PAT:
+        description: PAT with read access to private MSHOPS storefront artifact
+        required: false
 
 permissions:
   contents: read
@@ -30,6 +34,10 @@ jobs:
       GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
       VITE_PEARL_PILOT: ${{ inputs.vite_pearl_pilot }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+      # Try authenticated MSHOPS clone when GH_PAT is present; fall back to a
+      # CI stub so brand/tests/wrangler gates are not blocked by private-repo access.
+      MSHOPS_OPTIONAL: "1"
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:

@@ -40,12 +40,16 @@ jobs:
 
   build-test:
     uses: ./.github/workflows/_reusable-build-test.yml
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
     permissions:
       contents: read
       actions: write
 
   wrangler-dry-run:
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
     permissions:
       contents: read
       actions: write
