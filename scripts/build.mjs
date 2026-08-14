@@ -12,6 +12,26 @@ function run(command, cwd = root) {
 }
 
 /**
+ * Resolve MSHOPS clone URL. Prefer explicit MSHOPS_REPO_URL; otherwise use
+ * GH_PAT / GITHUB_TOKEN for private-repo auth. Never log the token.
+ */
+function resolveMshopsRepoUrl() {
+  const explicit = process.env.MSHOPS_REPO_URL?.trim();
+  if (explicit) return explicit;
+
+  const owner = process.env.GITHUB_REPOSITORY_OWNER?.trim() || "matrixsechub";
+  const pat = process.env.GH_PAT?.trim() || process.env.GITHUB_TOKEN?.trim();
+  if (pat) {
+    return `https://x-access-token:${pat}@github.com/${owner}/MSHOPS.git`;
+  }
+  return `https://github.com/${owner}/MSHOPS.git`;
+}
+
+function redactRepoUrl(repoUrl) {
+  return repoUrl.replace(/x-access-token:[^@]+@/i, "x-access-token:***@");
+}
+
+/**
  * Option C launch fix: serve the MSHOPS Pearl OS storefront under /app/*
  * instead of the legacy TTX vite.storefront marketplace bundle.
  *
@@ -19,6 +39,9 @@ function run(command, cwd = root) {
  * 1. MSHOPS_BUILD_DIR (points at a build-final directory)
  * 2. Sibling checkout ../MSHOPS/build-final
  * 3. Shallow clone of matrixsechub/MSHOPS into .deps/MSHOPS (needs git auth for private repo)
+ *
+ * Fail-closed: if the real MSHOPS artifact is unavailable, the build fails.
+ * No CI stub / optional skip — production validation must see the real artifact.
  */
 function resolveMshopsBuildFinal() {
   const envDir = process.env.MSHOPS_BUILD_DIR?.trim();
@@ -40,16 +63,20 @@ function resolveMshopsBuildFinal() {
     rmSync(depsRepo, { recursive: true, force: true });
   }
 
-  const repoUrl =
-    process.env.MSHOPS_REPO_URL?.trim() ||
-    "https://github.com/matrixsechub/MSHOPS.git";
-  console.log(`> cloning MSHOPS for storefront artifact (${repoUrl})`);
-  run(`git clone --depth 1 ${repoUrl} "${depsRepo}"`);
+  const repoUrl = resolveMshopsRepoUrl();
+  console.log(`> cloning MSHOPS for storefront artifact (${redactRepoUrl(repoUrl)})`);
+  try {
+    run(`git clone --depth 1 "${repoUrl}" "${depsRepo}"`);
+  } catch (error) {
+    throw new Error(
+      `MSHOPS clone failed (fail-closed). Set GH_PAT (or MSHOPS_REPO_URL / MSHOPS_BUILD_DIR) so the real storefront artifact is available. ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 
   const cloned = join(depsRepo, "build-final");
   if (!existsSync(join(cloned, "app", "index.html"))) {
     throw new Error(
-      "MSHOPS build-final/app/index.html missing after clone. Set MSHOPS_BUILD_DIR or ensure MSHOPS main has a committed Pages artifact.",
+      "MSHOPS build-final/app/index.html missing after clone (fail-closed). Set MSHOPS_BUILD_DIR or ensure MSHOPS main has a committed Pages artifact.",
     );
   }
   return cloned;

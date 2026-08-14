@@ -11,6 +11,10 @@ on:
         description: Build provenance commit SHA
         required: false
         type: string
+    secrets:
+      GH_PAT:
+        description: PAT with read access to private MSHOPS storefront artifact
+        required: false
 
 permissions:
   contents: read
@@ -24,6 +28,8 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
+      # Authenticated MSHOPS clone; build.mjs fails closed if artifact unavailable.
+      GH_PAT: ${{ secrets.GH_PAT }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
