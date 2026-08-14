@@ -46,6 +46,8 @@ jobs:
     with:
       ref: main
       git_commit_sha: ${{ github.sha }}
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
     permissions:
       contents: read
       actions: write
