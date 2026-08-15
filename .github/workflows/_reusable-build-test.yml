@@ -13,7 +13,9 @@ on:
         type: string
     secrets:
       GH_PAT:
-        description: PAT with read access to private MSHOPS storefront artifact (clone step only)
+        description: >-
+          Prefer caller-passed MSHOPS_CHECKOUT_TOKEN (dedicated read-only MSHOPS
+          credential). Legacy GH_PAT accepted until Operator completes the split.
         required: false
 
 permissions:

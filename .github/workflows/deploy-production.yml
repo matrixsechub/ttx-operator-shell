@@ -35,7 +35,8 @@ jobs:
       ref: main
       git_commit_sha: ${{ github.sha }}
     secrets:
-      GH_PAT: ${{ secrets.GH_PAT }}
+      # Prefer dedicated MSHOPS_CHECKOUT_TOKEN; fall back to GH_PAT until Operator splits.
+      GH_PAT: ${{ secrets.MSHOPS_CHECKOUT_TOKEN || secrets.GH_PAT }}
     permissions:
       contents: read
       actions: write
@@ -47,7 +48,7 @@ jobs:
       ref: main
       git_commit_sha: ${{ github.sha }}
     secrets:
-      GH_PAT: ${{ secrets.GH_PAT }}
+      GH_PAT: ${{ secrets.MSHOPS_CHECKOUT_TOKEN || secrets.GH_PAT }}
     permissions:
       contents: read
       actions: write
@@ -90,7 +91,7 @@ jobs:
       - name: Clone MSHOPS storefront artifact
         uses: ./.github/actions/checkout-mshops-artifact
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.MSHOPS_CHECKOUT_TOKEN || secrets.GH_PAT }}
           repository: ${{ github.repository_owner }}/MSHOPS
       - name: Prove later steps cannot read GH_PAT
         run: node scripts/ci/assert-no-mshops-token.mjs
