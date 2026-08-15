@@ -74,14 +74,19 @@ jobs:
           ref: ${{ env.DEPLOY_SHA }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Verify deploy SHA is current main
+      - name: Verify checked-out SHA is the gated deploy SHA
         env:
           GIT_CONFIG_COUNT: "1"
           GIT_CONFIG_KEY_0: http.extraheader
           GIT_CONFIG_VALUE_0: "AUTHORIZATION: bearer ${{ github.token }}"
         run: |
-          git fetch origin main
-          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+          set -euo pipefail
+          # Pin to the CI-/dispatch-gated SHA. Do not require equality with
+          # origin/main tip (main may advance after the gated CI run).
+          test "$(git rev-parse HEAD)" = "$DEPLOY_SHA"
+          git fetch --no-tags origin main
+          # Fail-closed if the gated SHA is no longer on main history.
+          git merge-base --is-ancestor "$DEPLOY_SHA" origin/main
       - name: Clone MSHOPS storefront artifact
         uses: ./.github/actions/checkout-mshops-artifact
         with:
@@ -107,10 +112,25 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy --var BUILD_COMMIT_SHA:${DEPLOY_SHA} --var BUILD_TIMESTAMP:${{ github.run_started_at }}
-      - name: Smoke test (hard gate)
+      - name: Smoke test (hard gate, retry/backoff)
         run: |
-          sleep 15
+          set -euo pipefail
+          sleep 20
           for route in / /pearl-os /products /status; do
-            code=$(curl -sS -L -o /tmp/body -w "%{http_code}" "https://www.mshops.net$route")
-            test "$code" = "200" || { cat /tmp/body; exit 1; }
+            ok=0
+            for attempt in 1 2 3 4 5 6; do
+              code=$(curl -sS -L -o /tmp/body -w "%{http_code}" "https://www.mshops.net$route" || true)
+              if [ "$code" = "200" ]; then
+                ok=1
+                echo "OK $route (attempt $attempt)"
+                break
+              fi
+              echo "WARN $route returned ${code:-curl-fail} on attempt $attempt"
+              sleep $((attempt * 5))
+            done
+            if [ "$ok" != "1" ]; then
+              echo "ERROR: $route failed smoke after retries"
+              cat /tmp/body || true
+              exit 1
+            fi
           done
