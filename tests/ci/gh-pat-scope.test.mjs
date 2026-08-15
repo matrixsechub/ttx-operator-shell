@@ -60,6 +60,37 @@ describe("GH_PAT least-privilege scope", () => {
     }
   });
 
+  it("does not expose inputs.token to later composite run steps", () => {
+    const action = read(".github/actions/checkout-mshops-artifact/action.yml");
+    const [, ...named] = action.split("\n    - name:");
+    const validate = named.find((block) => block.startsWith(" Validate MSHOPS artifact"));
+    assert.ok(validate, "validate composite step must exist");
+    assert.doesNotMatch(validate, /inputs\.token/);
+    assert.doesNotMatch(validate, /env:\s*\$\{\{\s*inputs\s*\}\}/);
+    assert.match(validate, /assert-no-mshops-token\.mjs/);
+    const checkout = named.find((block) => block.startsWith(" Checkout MSHOPS"));
+    assert.ok(checkout);
+    assert.match(checkout, /token:\s*\$\{\{\s*inputs\.token\s*\}\}/);
+  });
+
+  it("rejects INPUT_TOKEN the same as GH_PAT", () => {
+    const script = join(root, "scripts/ci/assert-no-mshops-token.mjs");
+    const clean = spawnSync(process.execPath, [script], {
+      cwd: root,
+      env: { ...process.env, GH_PAT: "", INPUT_TOKEN: "" },
+      encoding: "utf8",
+    });
+    assert.equal(clean.status, 0, clean.stderr || clean.stdout);
+
+    const leaked = spawnSync(process.execPath, [script], {
+      cwd: root,
+      env: { ...process.env, INPUT_TOKEN: "gho_should_not_leak" },
+      encoding: "utf8",
+    });
+    assert.notEqual(leaked.status, 0);
+    assert.match(String(leaked.stderr || leaked.stdout), /INPUT_TOKEN/);
+  });
+
   it("does not pass GH_PAT into npm test or npm run build steps", () => {
     for (const rel of [
       ".github/workflows/_reusable-build-test.yml",

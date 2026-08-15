@@ -44,11 +44,11 @@ runs:
         MSHOPS_PATH: ${{ inputs.path }}
       run: |
         set -euo pipefail
-        # Prove the credential was not leaked into this follow-up step's env.
-        if [ -n "${GH_PAT:-}" ] || [ -n "${MSHOPS_TOKEN:-}" ]; then
-          echo "ERROR: MSHOPS credential visible outside checkout step"
-          exit 1
-        fi
+        # Composite inputs are not auto-exported as INPUT_* (actions/runner#665).
+        # Fail closed if a runner or env mapping leaked the clone credential,
+        # including the INPUT_TOKEN name used for a token action input.
+        # Do not interpolate the token input context in this step.
+        node "${GITHUB_WORKSPACE}/scripts/ci/assert-no-mshops-token.mjs"
 
         build_dir="${GITHUB_WORKSPACE}/${MSHOPS_PATH}/build-final"
         artifact="${build_dir}/app/index.html"

@@ -13,7 +13,14 @@ function run(command, cwd = root) {
 
 function assertNoMshopsTokenInActions() {
   if (process.env.GITHUB_ACTIONS !== "true") return;
-  for (const key of ["GH_PAT", "MSHOPS_TOKEN", "MSHOPS_CHECKOUT_TOKEN"]) {
+  for (const key of [
+    "GH_PAT",
+    "MSHOPS_TOKEN",
+    "MSHOPS_CHECKOUT_TOKEN",
+    "INPUT_TOKEN",
+    "INPUT_GH_PAT",
+    "INPUT_MSHOPS_TOKEN",
+  ]) {
     if (process.env[key]?.trim()) {
       throw new Error(
         `${key} is visible during build under GitHub Actions. MSHOPS credentials must be clone-step-scoped only.`,
