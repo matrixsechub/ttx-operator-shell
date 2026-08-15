@@ -1,0 +1,49 @@
+# Baseline CI template (fail-closed)
+# Apply to sibling repos that still use warning-only test fallbacks.
+# Pin actions by SHA before production use. No repository secrets required.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        run: |
+          set -euo pipefail
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          elif [ -f pyproject.toml ]; then
+            pip install -e .
+          else
+            echo "BASELINE_CI::FAIL::no install manifest" >&2
+            exit 1
+          fi
+
+      - name: Test (fail-closed)
+        run: |
+          set -euo pipefail
+          pip install pytest
+          pytest --tb=short

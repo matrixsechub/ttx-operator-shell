@@ -32,6 +32,8 @@ jobs:
 
       - run: node scripts/ci/audit-action-pins.mjs
 
+      - run: node scripts/ci/workflow-contract-lint.mjs
+
       - name: Sensitive path advisory
         if: github.event_name == 'pull_request'
         env:

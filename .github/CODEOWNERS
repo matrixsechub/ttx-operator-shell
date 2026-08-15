@@ -1,0 +1,19 @@
+# Launch-hold workflow trust (COC-24 / COC-25).
+# Require org-owner review for privileged automation and deploy surfaces.
+# Operator configures branch protection to enforce these owners.
+
+* @matrixsechub
+
+# GitHub Actions — workflow trust + trigger surface
+.github/workflows/ @matrixsechub
+.github/actions/ @matrixsechub
+.github/CODEOWNERS @matrixsechub
+
+# Deploy + Cloudflare config
+wrangler.jsonc @matrixsechub
+wrangler.toml @matrixsechub
+scripts/deploy*.mjs @matrixsechub
+scripts/ci/ @matrixsechub
+
+# Governance / beacon (fail-closed authority)
+msh-ops/beacon/ @matrixsechub

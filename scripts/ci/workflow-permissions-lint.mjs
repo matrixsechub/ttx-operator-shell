@@ -25,6 +25,8 @@ const DOCUMENTED_WRITE_ALLOWLIST = new Map([
   ["ci.yml", new Set(["actions: write"])],
   ["staging-deploy.yml", new Set(["actions: write"])],
   ["security-pr.yml", new Set()],
+  // Deploy gate: contents read only — no undocumented writes allowed.
+  ["deploy-production.yml", new Set()],
 ]);
 
 const SENSITIVE_PATH_PREFIXES = [
