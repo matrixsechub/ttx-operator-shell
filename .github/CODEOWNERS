@@ -1,0 +1,15 @@
+# CODEOWNERS — launch-hold workflow trust (COC-24 / COC-25)
+# Requires Operator (@matrixsechub) review on critical CI/deploy surfaces.
+# Branch protection must enable "Require review from Code Owners" (Operator task).
+
+# Workflow and composite actions
+.github/workflows/ @matrixsechub
+.github/actions/ @matrixsechub
+.github/CODEOWNERS @matrixsechub
+
+# CI scripts and MSHOPS artifact merge path
+scripts/ci/ @matrixsechub
+scripts/build.mjs @matrixsechub
+
+# Security/governance evidence for release gates
+docs/security/ @matrixsechub

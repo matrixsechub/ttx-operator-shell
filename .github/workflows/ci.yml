@@ -32,6 +32,8 @@ jobs:
 
       - run: node scripts/ci/audit-action-pins.mjs
 
+      - run: node scripts/ci/audit-workflow-triggers.mjs
+
       - name: Sensitive path advisory
         if: github.event_name == 'pull_request'
         env:
@@ -41,7 +43,8 @@ jobs:
   build-test:
     uses: ./.github/workflows/_reusable-build-test.yml
     secrets:
-      GH_PAT: ${{ secrets.GH_PAT }}
+      # Prefer dedicated MSHOPS_CHECKOUT_TOKEN; fall back to GH_PAT until Operator splits.
+      GH_PAT: ${{ secrets.MSHOPS_CHECKOUT_TOKEN || secrets.GH_PAT }}
     permissions:
       contents: read
       actions: write
@@ -49,7 +52,7 @@ jobs:
   wrangler-dry-run:
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
     secrets:
-      GH_PAT: ${{ secrets.GH_PAT }}
+      GH_PAT: ${{ secrets.MSHOPS_CHECKOUT_TOKEN || secrets.GH_PAT }}
     permissions:
       contents: read
       actions: write
