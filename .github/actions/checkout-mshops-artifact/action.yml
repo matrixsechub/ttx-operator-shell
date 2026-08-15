@@ -1,0 +1,62 @@
+name: Checkout MSHOPS storefront artifact
+description: >-
+  Sparse-checkout the private MSHOPS build-final artifact with a token that is
+  scoped only to the actions/checkout step inside this composite action.
+  Fail-closed if the real artifact is missing. Does not export the token to
+  the caller job.
+
+inputs:
+  token:
+    description: PAT with read access to private MSHOPS (step-scoped inside this action)
+    required: true
+  repository:
+    description: owner/name of the MSHOPS repository
+    required: false
+    default: matrixsechub/MSHOPS
+  path:
+    description: Workspace-relative clone destination
+    required: false
+    default: MSHOPS
+
+outputs:
+  mshops-build-dir:
+    description: Absolute path to MSHOPS build-final directory
+    value: ${{ steps.validate.outputs.mshops-build-dir }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout MSHOPS (token scoped to this checkout step only)
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      with:
+        repository: ${{ inputs.repository }}
+        token: ${{ inputs.token }}
+        path: ${{ inputs.path }}
+        sparse-checkout: build-final
+        sparse-checkout-cone-mode: true
+        persist-credentials: false
+        fetch-depth: 1
+
+    - name: Validate MSHOPS artifact (fail-closed)
+      id: validate
+      shell: bash
+      env:
+        MSHOPS_PATH: ${{ inputs.path }}
+      run: |
+        set -euo pipefail
+        # Composite inputs are not auto-exported as INPUT_* (actions/runner#665).
+        # Fail closed if a runner or env mapping leaked the clone credential,
+        # including the INPUT_TOKEN name used for a token action input.
+        # Do not interpolate the token input context in this step.
+        node "${GITHUB_WORKSPACE}/scripts/ci/assert-no-mshops-token.mjs"
+
+        build_dir="${GITHUB_WORKSPACE}/${MSHOPS_PATH}/build-final"
+        artifact="${build_dir}/app/index.html"
+        if [ ! -f "${artifact}" ]; then
+          echo "ERROR: MSHOPS build-final/app/index.html missing after clone (fail-closed)"
+          exit 1
+        fi
+
+        echo "mshops-build-dir=${build_dir}" >> "${GITHUB_OUTPUT}"
+        echo "MSHOPS_BUILD_DIR=${build_dir}" >> "${GITHUB_ENV}"
+        echo "Cloned MSHOPS artifact at ${build_dir}"
