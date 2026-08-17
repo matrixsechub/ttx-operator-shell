@@ -11,6 +11,14 @@ function run(command, cwd = root) {
   execSync(command, { stdio: "inherit", shell: true, cwd });
 }
 
+function tryGitHead(cwd) {
+  try {
+    return execSync("git rev-parse HEAD", { cwd, encoding: "utf8" }).trim();
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Option C launch fix: serve the MSHOPS Pearl OS storefront under /app/*
  * instead of the legacy TTX vite.storefront marketplace bundle.
@@ -19,6 +27,8 @@ function run(command, cwd = root) {
  * 1. MSHOPS_BUILD_DIR (points at a build-final directory)
  * 2. Sibling checkout ../MSHOPS/build-final
  * 3. Shallow clone of matrixsechub/MSHOPS into .deps/MSHOPS (needs git auth for private repo)
+ *
+ * @returns {{ buildFinal: string, commitSha: string }}
  */
 function resolveMshopsBuildFinal() {
   const envDir = process.env.MSHOPS_BUILD_DIR?.trim();
@@ -30,7 +40,13 @@ function resolveMshopsBuildFinal() {
 
   for (const candidate of candidates) {
     if (existsSync(join(candidate, "app", "index.html"))) {
-      return candidate;
+      const repoRoot = join(candidate, "..");
+      const commitSha =
+        process.env.MSHOPS_COMMIT_SHA?.trim() ||
+        tryGitHead(repoRoot) ||
+        tryGitHead(candidate) ||
+        "unavailable";
+      return { buildFinal: candidate, commitSha };
     }
   }
 
@@ -52,15 +68,18 @@ function resolveMshopsBuildFinal() {
       "MSHOPS build-final/app/index.html missing after clone. Set MSHOPS_BUILD_DIR or ensure MSHOPS main has a committed Pages artifact.",
     );
   }
-  return cloned;
+  const commitSha =
+    process.env.MSHOPS_COMMIT_SHA?.trim() || tryGitHead(depsRepo) || "unavailable";
+  return { buildFinal: cloned, commitSha };
 }
 
 function mergeMshopsStorefront() {
-  const mshopsBuild = resolveMshopsBuildFinal();
+  const { buildFinal: mshopsBuild, commitSha } = resolveMshopsBuildFinal();
+  process.env.MSHOPS_COMMIT_SHA = commitSha;
   const sourceApp = join(mshopsBuild, "app");
   const target = join(root, "dist", "app");
 
-  console.log(`> merging MSHOPS storefront from ${mshopsBuild}`);
+  console.log(`> merging MSHOPS storefront from ${mshopsBuild} (sha=${commitSha})`);
   rmSync(target, { recursive: true, force: true });
   mkdirSync(join(root, "dist"), { recursive: true });
   cpSync(sourceApp, target, { recursive: true });
@@ -75,3 +94,4 @@ run("npx tsc -b");
 run("npx vite build");
 mergeMshopsStorefront();
 run("node scripts/assemble-operator-dist.mjs");
+run("node scripts/generate-release-manifest.mjs");
