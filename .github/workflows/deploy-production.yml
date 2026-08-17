@@ -1,13 +1,19 @@
-# Auto-deploy to Cloudflare Workers on push to main.
+# Production deploy follows successful CI on current main only.
 # Requires secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, GH_PAT
+# Deploy SHA must equal origin/main. Smoke routes fail the workflow on non-200.
 
 name: Deploy Production
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
   workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: Type DEPLOY_PRODUCTION to authorize a manual production deploy
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -17,25 +23,66 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  authorize-manual:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate manual authorization
+        env:
+          CONFIRM: ${{ inputs.confirm_deploy }}
+        run: |
+          set -euo pipefail
+          test "$CONFIRM" = "DEPLOY_PRODUCTION"
+
   deploy:
+    needs: [authorize-manual]
+    if: >-
+      always() && (
+        (github.event_name == 'workflow_run' &&
+         github.event.workflow_run.conclusion == 'success' &&
+         github.event.workflow_run.head_branch == 'main') ||
+        (github.event_name == 'workflow_dispatch' &&
+         needs.authorize-manual.result == 'success')
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+          fetch-depth: 0
+
+      - name: Verify deploy SHA equals current main
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          HEAD_SHA="$(git rev-parse HEAD)"
+          MAIN_SHA="$(git rev-parse origin/main)"
+          echo "HEAD_SHA=$HEAD_SHA"
+          echo "MAIN_SHA=$MAIN_SHA"
+          echo "DEPLOY_SHA=$DEPLOY_SHA"
+          test "$HEAD_SHA" = "$DEPLOY_SHA"
+          test "$HEAD_SHA" = "$MAIN_SHA"
 
       - name: Clone MSHOPS storefront artifact
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
+          set -euo pipefail
           git clone --depth 1 --filter=blob:none --sparse \
-            https://x-access-token:${GH_PAT}@github.com/${{ github.repository_owner }}/MSHOPS.git \
+            "https://x-access-token:${GH_PAT}@github.com/${{ github.repository_owner }}/MSHOPS.git" \
             MSHOPS
           cd MSHOPS && git sparse-checkout set build-final
-          test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          test -f build-final/app/index.html || {
+            echo "ERROR: MSHOPS build-final/app/index.html missing"
+            exit 1
+          }
           echo "MSHOPS storefront artifact found"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
           cache: "npm"
@@ -46,8 +93,8 @@ jobs:
       - name: Build
         env:
           MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
-          GIT_COMMIT_SHA: ${{ github.sha }}
-          BUILD_TIMESTAMP: "2026-08-14"
+          GIT_COMMIT_SHA: ${{ env.DEPLOY_SHA }}
+          BUILD_TIMESTAMP: ${{ github.run_started_at }}
         run: npm run build
 
       - name: Deploy to Cloudflare Workers
@@ -56,13 +103,16 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx wrangler deploy
 
-      - name: Smoke test
+      - name: Smoke test (hard gate)
         run: |
+          set -euo pipefail
           sleep 20
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.mshops.net/pearl-os)
-          echo "Pearl OS route status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
-            echo "/pearl-os returned $STATUS"
-          else
-            echo "Pearl OS is live!"
-          fi
+          for route in / /pearl-os /products /status; do
+            STATUS="$(curl -sS -L -o /tmp/smoke-body -w "%{http_code}" "https://www.mshops.net${route}" || true)"
+            echo "Route ${route} status: ${STATUS}"
+            if [ "$STATUS" != "200" ]; then
+              echo "ERROR: ${route} returned ${STATUS:-curl-fail} (expected 200)"
+              cat /tmp/smoke-body || true
+              exit 1
+            fi
+          done
