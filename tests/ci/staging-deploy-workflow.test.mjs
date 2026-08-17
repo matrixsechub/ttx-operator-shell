@@ -58,4 +58,9 @@ describe("staging-deploy workflow staging-smoke binding", () => {
     assert.match(job, /retention-days:\s*14/);
     assert.match(job, /if-no-files-found:\s*error/);
   });
+
+  it("injects VITE_PEARL_PILOT=on into staging builds", () => {
+    assert.match(stagingWorkflow, /vite_pearl_pilot:\s*"on"/);
+    assert.match(stagingWorkflow, /VITE_PEARL_PILOT:\s*"on"/);
+  });
 });

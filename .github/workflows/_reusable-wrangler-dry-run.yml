@@ -11,6 +11,11 @@ on:
         description: Build provenance commit SHA
         required: false
         type: string
+      vite_pearl_pilot:
+        description: Optional VITE_PEARL_PILOT value (set to "on" for staging Pearl OS pilot)
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -24,6 +29,7 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
+      VITE_PEARL_PILOT: ${{ inputs.vite_pearl_pilot }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:

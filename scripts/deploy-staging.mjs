@@ -26,6 +26,8 @@ const buildTimestamp =
 
 process.env.GIT_COMMIT_SHA = commitSha;
 process.env.BUILD_TIMESTAMP = buildTimestamp;
+// Pearl OS pilot features are staging-visible by default for local staging deploys.
+process.env.VITE_PEARL_PILOT = process.env.VITE_PEARL_PILOT?.trim() || "on";
 
 run("node scripts/build.mjs");
 run(
