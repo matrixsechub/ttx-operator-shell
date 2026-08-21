@@ -349,7 +349,11 @@ function walk(dir, exts, out = []) {
   return out;
 }
 
-const SRC_TOKEN_SOURCE = path.join(SRC, "styles", "index.css");
+// R9 token sources: hex only inside custom-property declarations (@theme / :root).
+const SRC_TOKEN_SOURCES = new Set([
+  path.join(SRC, "styles", "index.css"),
+  path.join(SRC, "pearl-theme", "pearl-theme.css"),
+]);
 const NAMED_PALETTE_RE =
   /\b(?:text|bg|border|ring|from|to|via|outline|fill|stroke|decoration|divide|accent|caret|shadow)-(?:gray|slate|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]{2,3}\b/;
 const ARBITRARY_HEX_UTILITY_RE = /-\[#[0-9a-fA-F]{3,8}\]/;
@@ -357,7 +361,7 @@ const ARBITRARY_HEX_UTILITY_RE = /-\[#[0-9a-fA-F]{3,8}\]/;
 for (const file of walk(SRC, [".tsx", ".ts", ".css"])) {
   const rel = path.relative(ROOT, file);
   const text = readFileSync(file, "utf8");
-  const isTokenSource = file === SRC_TOKEN_SOURCE;
+  const isTokenSource = SRC_TOKEN_SOURCES.has(file);
 
   text.split("\n").forEach((line, index) => {
     const lineNo = index + 1;
