@@ -69,6 +69,29 @@ describe("cockpit session boundary", () => {
     assert.doesNotMatch(source, /Response\.redirect/);
   });
 
+  it("COCKPIT_ROUTER_WRAPS_OPERATOR_ROUTES_IN_REQUIRE_AUTH", () => {
+    const source = readFileSync(new URL("../src/routes/cockpitRouter.tsx", import.meta.url), "utf8");
+    assert.match(source, /element:\s*<RequireAuth\s*\/>/);
+    // Public join stays outside the auth gate; cockpit operator paths stay inside children.
+    assert.match(source, /path:\s*"\/join"/);
+    for (const path of [
+      "/dashboard",
+      "/status",
+      "/systems",
+      "/ttx",
+      "/ops/fedgrade",
+      "/ops/security",
+      "/ops/deploy",
+      "/future",
+    ]) {
+      assert.match(source, new RegExp(`path:\\s*"${path.replaceAll("/", "\\/")}"`));
+    }
+    // Pre-#152 guardrail: do not invent Chat/Settings routes without source transfer.
+    assert.doesNotMatch(source, /path:\s*"\/cockpit\/chat/);
+    assert.doesNotMatch(source, /path:\s*"\/cockpit\/settings/);
+    assert.doesNotMatch(source, /path:\s*"\/settings\/integrations/);
+  });
+
   it("UNAUTHENTICATED_COCKPIT_API_RETURNS_JSON_401", async () => {
     const blocked = await enforceCockpitSession(
       new Request("https://example.com/api/ops/status"),
