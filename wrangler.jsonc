@@ -30,7 +30,9 @@
     "BUILD_TIMESTAMP": "",
     "SYSTEM_MODE": "PRODUCTION",
     "ORIGIN_URL": "https://ttx-operator-shell.sogellagepul.workers.dev",
-    "FLYWHEEL_TENANT_ID": "mshops"
+    "FLYWHEEL_TENANT_ID": "mshops",
+    // Evidence identity for /api/build-info — must match top-level Worker `name`.
+    "WORKER_NAME": "ttx-operator-shell"
   },
   // Revoked-refresh-token denylist (Phase 16). Production namespace —
   // staging uses dedicated namespaces in env.staging (see docs/RELEASE.md).
@@ -84,7 +86,9 @@
         "BUILD_TIMESTAMP": "",
         "SYSTEM_MODE": "OPERATOR_BETA",
         "ORIGIN_URL": "https://ttx-operator-shell-staging.sogellagepul.workers.dev",
-        "FLYWHEEL_TENANT_ID": "mshops-staging"
+        "FLYWHEEL_TENANT_ID": "mshops-staging",
+        // Evidence identity for /api/build-info — must match env.staging.name.
+        "WORKER_NAME": "ttx-operator-shell-staging"
       },
       "kv_namespaces": [
         // Replace each id with the output of the corresponding create command (run once before first staging deploy):

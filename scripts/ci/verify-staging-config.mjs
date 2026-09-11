@@ -97,6 +97,20 @@ function parseWrangler() {
     errors.push("Staging ORIGIN_URL must differ from production ORIGIN_URL");
   }
 
+  // /api/build-info workerName evidence must match Worker names (staging smoke contract).
+  const productionWorkerNameVar = extractQuoted(prodSection, "WORKER_NAME");
+  const stagingWorkerNameVar = extractQuoted(stagingBlock, "WORKER_NAME");
+  if (productionWorkerNameVar !== PRODUCTION_WORKER) {
+    errors.push(
+      `Production vars.WORKER_NAME must be "${PRODUCTION_WORKER}" (found "${productionWorkerNameVar ?? "null"}")`,
+    );
+  }
+  if (stagingWorkerNameVar !== STAGING_WORKER) {
+    errors.push(
+      `Staging vars.WORKER_NAME must be "${STAGING_WORKER}" (found "${stagingWorkerNameVar ?? "null"}")`,
+    );
+  }
+
   if (stagingCompatibilityDate && !/^\d{4}-\d{2}-\d{2}$/.test(stagingCompatibilityDate)) {
     errors.push(`Invalid staging compatibility_date "${stagingCompatibilityDate}"`);
   }
