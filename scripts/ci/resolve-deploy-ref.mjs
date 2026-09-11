@@ -5,6 +5,7 @@ import { appendFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export const CONFIRM_PHRASE = "DEPLOY_STAGING";
+export const FULL_SHA_PATTERN = /^[0-9a-f]{40}$/i;
 export const UNSAFE_REF_PATTERNS = [
   /^pull\//i,
   /^refs\/pull\//i,
@@ -19,6 +20,11 @@ export function validateConfirmDeploy(confirm) {
   return { ok: true };
 }
 
+/**
+ * Staging Deploy requires an immutable full commit SHA.
+ * Mutable refs (main/branches/tags/short SHAs) are rejected so an accidental
+ * default cannot be treated as an exact release candidate.
+ */
 export function validateTargetRef(targetRef) {
   const ref = targetRef?.trim();
   if (!ref) {
@@ -28,6 +34,12 @@ export function validateTargetRef(targetRef) {
     if (pattern.test(ref)) {
       return { ok: false, error: `unsafe target_ref "${ref}"` };
     }
+  }
+  if (!FULL_SHA_PATTERN.test(ref)) {
+    return {
+      ok: false,
+      error: `target_ref must be a full 40-char commit SHA (got "${ref}")`,
+    };
   }
   return { ok: true, ref };
 }
@@ -39,9 +51,17 @@ export function resolveCommitSha(targetRef, exec = execSync) {
   try {
     const commitSha = exec(`git rev-parse "${refCheck.ref}^{commit}"`, {
       encoding: "utf8",
-    }).trim();
-    if (!/^[0-9a-f]{40}$/i.test(commitSha)) {
+    })
+      .trim()
+      .toLowerCase();
+    if (!FULL_SHA_PATTERN.test(commitSha)) {
       return { ok: false, error: `resolved SHA is invalid for ref "${refCheck.ref}"` };
+    }
+    if (commitSha !== refCheck.ref.toLowerCase()) {
+      return {
+        ok: false,
+        error: `resolved SHA ${commitSha} does not match requested target_ref ${refCheck.ref}`,
+      };
     }
     return { ok: true, ref: refCheck.ref, commitSha };
   } catch {
@@ -64,7 +84,12 @@ function writeOutputs(requestedRef, commitSha) {
 
 function main() {
   const confirm = process.env.CONFIRM_DEPLOY?.trim() ?? process.argv[2]?.trim();
-  const targetRef = process.env.TARGET_REF?.trim() ?? process.argv[3]?.trim() ?? "main";
+  const targetRef = process.env.TARGET_REF?.trim() ?? process.argv[3]?.trim();
+
+  if (!targetRef) {
+    console.error("DEPLOY_REF::FAIL::target_ref is required (full 40-char commit SHA; no default)");
+    process.exit(1);
+  }
 
   const result = authorizeDeployment(confirm, targetRef);
   if (!result.ok) {
@@ -72,7 +97,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`DEPLOY_REF::PASS::${result.ref}::${result.commitSha}`);
+  console.log(`DEPLOY_REF::PASS::requested_ref=${result.ref}::commit_sha=${result.commitSha}`);
   writeOutputs(result.ref, result.commitSha);
 }
 

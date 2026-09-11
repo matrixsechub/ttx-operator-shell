@@ -11,9 +11,8 @@ on:
         required: true
         type: string
       target_ref:
-        description: Git ref to deploy (branch, tag, or SHA)
+        description: Full 40-char commit SHA to deploy (mutable refs like main are rejected)
         required: true
-        default: main
         type: string
       reason:
         description: Optional deployment reason for audit logs
