@@ -18,6 +18,14 @@ const cockpitRouter = readFileSync(new URL("../src/routes/cockpitRouter.tsx", im
 const operatorShell = readFileSync(new URL("../src/components/OperatorShell.tsx", import.meta.url), "utf8");
 const surfaceRegistry = readFileSync(new URL("../worker/surfaceRegistry.ts", import.meta.url), "utf8");
 const requireAuth = readFileSync(new URL("../src/lib/RequireAuth.tsx", import.meta.url), "utf8");
+const pearlCss = readFileSync(
+  new URL("../src/styles/pearl-chat-integrations.css", import.meta.url),
+  "utf8",
+);
+const chatIntegrationsFixtures = readFileSync(
+  new URL("../src/pearl/chatIntegrations/fixtures/chat-integrations-fixtures.js", import.meta.url),
+  "utf8",
+);
 
 describe("pearl chat + integrations preview reconcile", () => {
   it("routes chat and integrations behind RequireAuth only", () => {
@@ -46,6 +54,19 @@ describe("pearl chat + integrations preview reconcile", () => {
 
   it("keeps RequireAuth fail-closed redirect contract", () => {
     assert.match(requireAuth, /\/login\?from=/);
+  });
+
+  it("keeps pearl surface CSS free of raw hex (brand R9)", () => {
+    assert.equal((pearlCss.match(/#[0-9a-fA-F]{3,8}\b/g) || []).length, 0);
+    assert.match(pearlCss, /var\(--pearl-room-pearl\)/);
+    assert.match(pearlCss, /var\(--pearl-embedded-bg\)/);
+  });
+
+  it("preserves fail-closed governance invariants in fixtures", () => {
+    assert.match(chatIntegrationsFixtures, /grantsAuthority:\s*false/);
+    assert.doesNotMatch(chatIntegrationsFixtures, /grantsAuthority:\s*true/);
+    assert.match(chatIntegrationsFixtures, /CHAMBER_FACTORY_GATE_ENABLED=false/);
+    assert.match(chatIntegrationsFixtures, /simulation/i);
   });
 
   it("fixtures never grant authority and simulation decisions stay local", () => {

@@ -1,17 +1,17 @@
 /* PEARL Chat + Settings/Integrations — additive layout on certified tokens.
    Identity colours are room identity only — never disposition.
-   HOLD amber and gold-deep come from pearl-tokens.css (#150 tip). */
+   HOLD amber and gold-deep come from pearl-tokens.css (PR 150 tip). */
 
 .pearl-ci {
-  --room-pearl: #F6F7F9;
-  --room-champagne: #C9A961;
-  --room-cyan: #19C6E6;
-  --room-electric: #3D7BFF;
-  --room-magenta: #D64FD6;
-  --room-violet: #7C5CFF;
-  --room-indigo: #4B5FE8;
-  --room-rose: #F06FA8;
-  --room-graphite: #666E7A;
+  --room-pearl: var(--pearl-room-pearl);
+  --room-champagne: var(--pearl-room-champagne);
+  --room-cyan: var(--pearl-room-cyan);
+  --room-electric: var(--pearl-room-electric);
+  --room-magenta: var(--pearl-room-magenta);
+  --room-violet: var(--pearl-room-violet);
+  --room-indigo: var(--pearl-room-indigo);
+  --room-rose: var(--pearl-room-rose);
+  --room-graphite: var(--pearl-room-graphite);
 
   min-height: 100vh;
   background: var(--pearl);
@@ -390,28 +390,28 @@
 
 /* Embedded cockpit adaptations — do not depend on full pearl-tokens.css */
 .pearl-ci--embedded {
-  --pearl: #0b1017;
-  --ink: #e8eef7;
-  --ink-dim: #9aa7b8;
+  --pearl: var(--pearl-embedded-bg);
+  --ink: var(--pearl-embedded-ink);
+  --ink-dim: var(--pearl-embedded-ink-dim);
   --line: rgba(255,255,255,.08);
-  --white: #121821;
-  --obsidian: #070b10;
-  --gold: #c9a961;
+  --white: var(--pearl-embedded-white);
+  --obsidian: var(--pearl-embedded-obsidian);
+  --gold: var(--pearl-embedded-gold);
   --font-sans: ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --tap: 44px;
-  --room-pearl: #F6F7F9;
-  --room-champagne: #C9A961;
-  --room-cyan: #19C6E6;
-  --room-electric: #3D7BFF;
-  --room-magenta: #D64FD6;
-  --room-violet: #7C5CFF;
-  --room-indigo: #4B5FE8;
-  --room-rose: #F06FA8;
-  --room-graphite: #666E7A;
+  --room-pearl: var(--pearl-room-pearl);
+  --room-champagne: var(--pearl-room-champagne);
+  --room-cyan: var(--pearl-room-cyan);
+  --room-electric: var(--pearl-room-electric);
+  --room-magenta: var(--pearl-room-magenta);
+  --room-violet: var(--pearl-room-violet);
+  --room-indigo: var(--pearl-room-indigo);
+  --room-rose: var(--pearl-room-rose);
+  --room-graphite: var(--pearl-room-graphite);
   min-height: calc(100dvh - 64px);
   background: transparent;
   color: var(--ink);

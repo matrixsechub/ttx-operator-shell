@@ -35,6 +35,26 @@
   --animate-rise: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Pearl Chat + Integrations identity tokens (R9-allowed token source).
+   Room hues are identity-only — never disposition/authority. */
+:root {
+  --pearl-room-pearl: #F6F7F9;
+  --pearl-room-champagne: #C9A961;
+  --pearl-room-cyan: #19C6E6;
+  --pearl-room-electric: #3D7BFF;
+  --pearl-room-magenta: #D64FD6;
+  --pearl-room-violet: #7C5CFF;
+  --pearl-room-indigo: #4B5FE8;
+  --pearl-room-rose: #F06FA8;
+  --pearl-room-graphite: #666E7A;
+  --pearl-embedded-bg: #0b1017;
+  --pearl-embedded-ink: #e8eef7;
+  --pearl-embedded-ink-dim: #9aa7b8;
+  --pearl-embedded-white: #121821;
+  --pearl-embedded-obsidian: #070b10;
+  --pearl-embedded-gold: #c9a961;
+}
+
 @keyframes scan {
   0% {
     transform: translateY(-100%);
