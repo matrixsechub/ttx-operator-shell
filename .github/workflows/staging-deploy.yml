@@ -92,6 +92,9 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
       BUILD_TIMESTAMP: ${{ github.run_started_at }}
+      # Staging Cockpit/Pearl preview does not require private MSHOPS clone.
+      # Production deploy workflow continues to clone + set MSHOPS_BUILD_DIR.
+      SKIP_MSHOPS_STOREFRONT: "1"
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:

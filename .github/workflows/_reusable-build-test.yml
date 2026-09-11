@@ -24,6 +24,8 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
+      # Cockpit/Pearl CI does not need private MSHOPS; production deploy still clones.
+      SKIP_MSHOPS_STOREFRONT: "1"
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:

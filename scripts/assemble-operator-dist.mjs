@@ -10,6 +10,10 @@ const dist = join(root, "dist");
 
 const STOREFRONT_MARKERS = ["MSH OPS Storefront", 'id="root"'];
 
+function shouldSkipMshopsStorefront(env = process.env) {
+  return String(env.SKIP_MSHOPS_STOREFRONT ?? "").trim() === "1";
+}
+
 function resolveCommitSha() {
   if (process.env.GIT_COMMIT_SHA?.trim()) return process.env.GIT_COMMIT_SHA.trim();
   if (process.env.GITHUB_SHA?.trim()) return process.env.GITHUB_SHA.trim();
@@ -51,7 +55,23 @@ for (const [source, target] of shellRenames) {
   renameSync(join(dist, source), join(dist, target));
 }
 
-assertStorefrontShell(join(dist, "app", "index.html"));
+const skipStorefront = shouldSkipMshopsStorefront();
+const storefrontPath = join(dist, "app", "index.html");
+let storefrontIncluded = false;
+
+if (skipStorefront) {
+  if (existsSync(storefrontPath)) {
+    assertStorefrontShell(storefrontPath);
+    storefrontIncluded = true;
+  } else {
+    console.warn(
+      "> SKIP_MSHOPS_STOREFRONT=1 — assembling cockpit/Pearl shells without dist/app storefront (storefront routes fail closed)",
+    );
+  }
+} else {
+  assertStorefrontShell(storefrontPath);
+  storefrontIncluded = true;
+}
 
 const ecosystemShell = readFileSync(join(dist, "ecosystem-shell.html"), "utf8");
 writeFileSync(join(dist, "index.html"), ecosystemShell);
@@ -60,6 +80,11 @@ const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const commitSha = resolveCommitSha();
 const buildTimestamp = process.env.BUILD_TIMESTAMP?.trim() || new Date().toISOString();
 
+const shells = [...shellRenames.map(([, target]) => `/${target}`)];
+if (storefrontIncluded) {
+  shells.push("/app/index.html");
+}
+
 const manifest = {
   commitSha,
   buildTimestamp,
@@ -67,7 +92,9 @@ const manifest = {
   environment: "build",
   assembledAt: new Date().toISOString(),
   source: "scripts/assemble-operator-dist.mjs",
-  shells: [...shellRenames.map(([, target]) => `/${target}`), "/app/index.html"],
+  shells,
+  storefrontIncluded,
+  skipMshopsStorefront: skipStorefront,
 };
 
 writeFileSync(join(dist, ".build-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);

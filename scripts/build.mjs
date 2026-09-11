@@ -2,7 +2,7 @@
 
 import { execSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -15,11 +15,21 @@ function run(command, cwd = root) {
  * Option C launch fix: serve the MSHOPS Pearl OS storefront under /app/*
  * instead of the legacy TTX vite.storefront marketplace bundle.
  *
- * Resolution order:
+ * Resolution order (default / production):
  * 1. MSHOPS_BUILD_DIR (points at a build-final directory)
  * 2. Sibling checkout ../MSHOPS/build-final
  * 3. Shallow clone of matrixsechub/MSHOPS into .deps/MSHOPS (needs git auth for private repo)
+ *
+ * Staging / CI cockpit-only path:
+ * Set SKIP_MSHOPS_STOREFRONT=1 to skip private clone + storefront merge.
+ * Cockpit/Pearl shells (/chat, /settings, …) still build from this repo.
+ * Storefront routes fail closed at runtime when /app/index.html is absent.
+ * Production deploy must NOT set this flag.
  */
+export function shouldSkipMshopsStorefront(env = process.env) {
+  return String(env.SKIP_MSHOPS_STOREFRONT ?? "").trim() === "1";
+}
+
 function resolveMshopsBuildFinal() {
   const envDir = process.env.MSHOPS_BUILD_DIR?.trim();
   const candidates = [
@@ -55,7 +65,14 @@ function resolveMshopsBuildFinal() {
   return cloned;
 }
 
-function mergeMshopsStorefront() {
+export function mergeMshopsStorefront() {
+  if (shouldSkipMshopsStorefront()) {
+    console.warn(
+      "> SKIP_MSHOPS_STOREFRONT=1 — skipping private MSHOPS clone/merge (cockpit/Pearl only; storefront routes fail closed)",
+    );
+    return false;
+  }
+
   const mshopsBuild = resolveMshopsBuildFinal();
   const sourceApp = join(mshopsBuild, "app");
   const target = join(root, "dist", "app");
@@ -68,10 +85,18 @@ function mergeMshopsStorefront() {
   if (!existsSync(join(target, "index.html"))) {
     throw new Error("MSHOPS storefront merge failed — dist/app/index.html missing");
   }
+  return true;
 }
 
-run("npm run cf-typegen");
-run("npx tsc -b");
-run("npx vite build");
-mergeMshopsStorefront();
-run("node scripts/assemble-operator-dist.mjs");
+function main() {
+  run("npm run cf-typegen");
+  run("npx tsc -b");
+  run("npx vite build");
+  mergeMshopsStorefront();
+  run("node scripts/assemble-operator-dist.mjs");
+}
+
+const entry = process.argv[1] ? resolve(process.argv[1]) : "";
+if (entry && entry === fileURLToPath(import.meta.url)) {
+  main();
+}
