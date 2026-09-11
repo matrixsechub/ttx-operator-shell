@@ -22,6 +22,8 @@ import { SecurityOps } from "../pages/ops/SecurityOps";
 import { DeployOps } from "../pages/ops/DeployOps";
 import LiveJoin from "../pages/LiveJoin";
 import { FlywheelDashboard } from "../pages/dashboard/FlywheelDashboard";
+import { PearlChatPage } from "../pages/pearl/PearlChatPage";
+import { PearlIntegrationsPage } from "../pages/pearl/PearlIntegrationsPage";
 
 /** Operator cockpit surface — systems, ops, divisions, ttx (no storefront/auth routes). */
 export const cockpitRouter = createBrowserRouter([
@@ -57,6 +59,8 @@ export const cockpitRouter = createBrowserRouter([
       { path: "/ops/fedgrade", element: <FedGradeOps /> },
       { path: "/ops/security", element: <SecurityOps /> },
       { path: "/ops/deploy", element: <DeployOps /> },
+      { path: "/chat", element: <PearlChatPage /> },
+      { path: "/settings/integrations", element: <PearlIntegrationsPage /> },
     ],
   },
   { path: "*", element: <NotFound /> },

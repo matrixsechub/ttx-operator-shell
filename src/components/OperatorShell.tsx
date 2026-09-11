@@ -13,6 +13,8 @@ export const NAV_ITEMS = [
   { to: "/systems", label: "Systems", glyph: "06" },
   { to: "/ttx", label: "TTX SaaS", glyph: "07" },
   { to: "/future", label: "Future", glyph: "08" },
+  { to: "/chat", label: "Chat", glyph: "09" },
+  { to: "/settings/integrations", label: "Integrations", glyph: "10" },
 ];
 
 export function OperatorShell({

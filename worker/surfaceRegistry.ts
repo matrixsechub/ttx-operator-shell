@@ -1,7 +1,7 @@
 /** Architectural HTML surfaces — each maps to a distinct SPA shell. */
 export type HtmlSurface = "ecosystem" | "storefront" | "cockpit" | "auth" | "governance";
 
-const COCKPIT_PREFIXES = ["/operator", "/ops", "/systems", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about", "/join"] as const;
+const COCKPIT_PREFIXES = ["/operator", "/ops", "/systems", "/dashboard", "/divisions", "/ttx", "/future", "/status", "/about", "/join", "/chat", "/settings"] as const;
 
 const STOREFRONT_PATHS = [
   "/marketplace",
