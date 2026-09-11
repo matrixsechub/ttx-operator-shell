@@ -22,12 +22,25 @@ function run(command, cwd = root) {
  *
  * Staging / CI cockpit-only path:
  * Set SKIP_MSHOPS_STOREFRONT=1 to skip private clone + storefront merge.
+ * Also auto-skips when GITHUB_WORKFLOW is exactly "Staging Deploy" so a
+ * main-dispatched Staging Deploy that checks out this SHA still uses the
+ * Cockpit-only artifact even if the caller workflow YAML omits the env flag.
+ * Explicit MSHOPS_BUILD_DIR always wins (production artifact path).
  * Cockpit/Pearl shells (/chat, /settings, …) still build from this repo.
  * Storefront routes fail closed at runtime when /app/index.html is absent.
- * Production deploy must NOT set this flag.
+ * Production deploy must NOT set SKIP_MSHOPS_STOREFRONT and uses MSHOPS_BUILD_DIR.
  */
+export const STAGING_DEPLOY_WORKFLOW_NAME = "Staging Deploy";
+
 export function shouldSkipMshopsStorefront(env = process.env) {
-  return String(env.SKIP_MSHOPS_STOREFRONT ?? "").trim() === "1";
+  if (String(env.MSHOPS_BUILD_DIR ?? "").trim()) {
+    return false;
+  }
+  if (String(env.SKIP_MSHOPS_STOREFRONT ?? "").trim() === "1") {
+    return true;
+  }
+  // Caller workflow name is preserved inside reusable workflow jobs.
+  return String(env.GITHUB_WORKFLOW ?? "").trim() === STAGING_DEPLOY_WORKFLOW_NAME;
 }
 
 function resolveMshopsBuildFinal() {
@@ -68,7 +81,7 @@ function resolveMshopsBuildFinal() {
 export function mergeMshopsStorefront() {
   if (shouldSkipMshopsStorefront()) {
     console.warn(
-      "> SKIP_MSHOPS_STOREFRONT=1 — skipping private MSHOPS clone/merge (cockpit/Pearl only; storefront routes fail closed)",
+      "> cockpit-only build — skipping private MSHOPS clone/merge (Pearl/cockpit only; storefront routes fail closed)",
     );
     return false;
   }

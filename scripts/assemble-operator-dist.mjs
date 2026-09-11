@@ -5,14 +5,12 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { shouldSkipMshopsStorefront } from "./build.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 
 const STOREFRONT_MARKERS = ["MSH OPS Storefront", 'id="root"'];
-
-function shouldSkipMshopsStorefront(env = process.env) {
-  return String(env.SKIP_MSHOPS_STOREFRONT ?? "").trim() === "1";
-}
 
 function resolveCommitSha() {
   if (process.env.GIT_COMMIT_SHA?.trim()) return process.env.GIT_COMMIT_SHA.trim();
@@ -65,7 +63,7 @@ if (skipStorefront) {
     storefrontIncluded = true;
   } else {
     console.warn(
-      "> SKIP_MSHOPS_STOREFRONT=1 — assembling cockpit/Pearl shells without dist/app storefront (storefront routes fail closed)",
+      "> cockpit-only build — assembling cockpit/Pearl shells without dist/app storefront (storefront routes fail closed)",
     );
   }
 } else {

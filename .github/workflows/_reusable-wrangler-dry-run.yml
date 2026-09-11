@@ -37,7 +37,8 @@ jobs:
 
       - run: npm run verify:staging-config
 
-      - run: npm run build
+      # Cockpit/Pearl dry-run artifact; production deploy still clones MSHOPS + sets MSHOPS_BUILD_DIR.
+      - run: npm run build:staging-cockpit
 
       - run: mkdir -p .artifacts/wrangler-production .artifacts/wrangler-staging
 

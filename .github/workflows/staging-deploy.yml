@@ -109,7 +109,8 @@ jobs:
 
       - run: npm test
 
-      - run: npm run build
+      # Cockpit/Pearl staging artifact — never clone private MSHOPS here.
+      - run: npm run build:staging-cockpit
 
       - name: Wrangler staging dry run (pre-deploy gate)
         run: npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging-predeploy

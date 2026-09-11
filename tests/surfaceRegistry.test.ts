@@ -46,7 +46,8 @@ describe("assemble-operator-dist script", () => {
     assert.match(script, /app\/index\.html/);
     assert.match(script, /MSH OPS Storefront/);
     assert.match(script, /\.build-manifest\.json/);
-    assert.match(script, /SKIP_MSHOPS_STOREFRONT/);
+    assert.match(script, /shouldSkipMshopsStorefront/);
+    assert.match(script, /from "\.\/build\.mjs"/);
     assert.doesNotMatch(script, /will degrade until MSHOPS/);
   });
 });
