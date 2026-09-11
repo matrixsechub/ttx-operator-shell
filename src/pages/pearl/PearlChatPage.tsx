@@ -122,31 +122,36 @@ export function PearlChatPage() {
 
           <div className={`pearl-ci-body${sideOpen ? " side-open" : ""}`}>
             <aside className="pearl-ci-rail" aria-label="Rooms">
-              <div className="pearl-ci-band">
-                <div
-                  className="pearl-ci-band__strip"
-                  data-state={presentation.state}
-                  style={{
-                    ["--band-colour" as string]: `var(--room-${presentation.identity?.colour || presentation.strip || "graphite"})`,
-                  }}
+              <div
+                className="pearl-ci-band"
+                data-state={presentation.state}
+                style={{
+                  ["--band-colour" as string]: `var(--room-${presentation.identity?.colour || presentation.strip || "graphite"})`,
+                }}
+              >
+                <div className="strip" aria-hidden="true" />
+                <span>{presentation.label}</span>
+                <span className="state">{presentation.text || presentation.state}</span>
+              </div>
+              <p className="pearl-ci-credits">
+                {wristband.label} · grantsAuthority:{String(wristband.grantsAuthority)}
+              </p>
+              <div className="pearl-ci-actions">
+                <button type="button" className="pearl-btn pearl-btn--ghost pearl-btn--xs" aria-pressed={band === "full"} onClick={() => setBand("full")}>
+                  Full band
+                </button>
+                <button type="button" className="pearl-btn pearl-btn--ghost pearl-btn--xs" aria-pressed={band === "narrow"} onClick={() => setBand("narrow")}>
+                  Narrow band
+                </button>
+                <button
+                  type="button"
+                  className="pearl-btn pearl-btn--ghost pearl-btn--xs"
+                  aria-expanded={sideOpen}
+                  aria-controls="pearl-ci-room-context"
+                  onClick={() => setSideOpen((value) => !value)}
                 >
-                  <span>{presentation.label}</span>
-                  <span className="state">{presentation.text || presentation.state}</span>
-                </div>
-                <p className="pearl-ci-credits">
-                  {wristband.label} · grantsAuthority:{String(wristband.grantsAuthority)}
-                </p>
-                <div className="pearl-ci-actions">
-                  <button type="button" className="pearl-btn pearl-btn--ghost pearl-btn--xs" aria-pressed={band === "full"} onClick={() => setBand("full")}>
-                    Full band
-                  </button>
-                  <button type="button" className="pearl-btn pearl-btn--ghost pearl-btn--xs" aria-pressed={band === "narrow"} onClick={() => setBand("narrow")}>
-                    Narrow band
-                  </button>
-                  <button type="button" className="pearl-btn pearl-btn--ghost pearl-btn--xs" onClick={() => setSideOpen((value) => !value)}>
-                    {sideOpen ? "Hide context" : "Context"}
-                  </button>
-                </div>
+                  {sideOpen ? "Hide context" : "Context"}
+                </button>
               </div>
 
               <div role="listbox" aria-label="Chat rooms" className="pearl-ci-room-list">
@@ -338,7 +343,11 @@ export function PearlChatPage() {
               </p>
             </main>
 
-            <aside className={`pearl-ci-side${sideOpen ? " is-open" : ""}`} aria-label="Room context">
+            <aside
+              id="pearl-ci-room-context"
+              className={`pearl-ci-side${sideOpen ? " is-open" : ""}`}
+              aria-label="Room context"
+            >
               <h2 className="pearl-panel__title">Non-equivalences</h2>
               <ul>
                 {NON_EQUIVALENCES.map((item: string) => (

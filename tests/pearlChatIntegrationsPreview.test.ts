@@ -26,6 +26,14 @@ const chatIntegrationsFixtures = readFileSync(
   new URL("../src/pearl/chatIntegrations/fixtures/chat-integrations-fixtures.js", import.meta.url),
   "utf8",
 );
+const pearlChatPage = readFileSync(
+  new URL("../src/pages/pearl/PearlChatPage.tsx", import.meta.url),
+  "utf8",
+);
+const pearlIntegrationsPage = readFileSync(
+  new URL("../src/pages/pearl/PearlIntegrationsPage.tsx", import.meta.url),
+  "utf8",
+);
 
 describe("pearl chat + integrations preview reconcile", () => {
   it("routes chat and integrations behind RequireAuth only", () => {
@@ -94,5 +102,37 @@ describe("pearl chat + integrations preview reconcile", () => {
     assert.equal(locked.state, "LOCKED");
     assert.equal(locked.grantsAuthority, false);
     assert.ok(CHAT_ROOMS.some((room: { id: string }) => room.id === "marketplace-ops"));
+  });
+
+  it("chat keyboard/a11y contracts: listbox selection + context disclosure", () => {
+    assert.match(pearlChatPage, /role="listbox"/);
+    assert.match(pearlChatPage, /role="option"/);
+    assert.match(pearlChatPage, /aria-selected=\{entry\.id === roomId\}/);
+    assert.match(pearlChatPage, /aria-expanded=\{sideOpen\}/);
+    assert.match(pearlChatPage, /aria-controls="pearl-ci-room-context"/);
+    assert.match(pearlChatPage, /id="pearl-ci-room-context"/);
+    assert.match(pearlChatPage, /htmlFor="pearl-composer"/);
+    assert.match(pearlChatPage, /className="visually-hidden"/);
+    assert.match(pearlChatPage, /aria-pressed=\{band === "full"\}/);
+    assert.match(pearlChatPage, /aria-pressed=\{band === "narrow"\}/);
+  });
+
+  it("integrations keyboard/a11y contracts: pressed views + scroll regions", () => {
+    assert.match(pearlIntegrationsPage, /aria-pressed=\{view === "overview" \|\| view === "detail"\}/);
+    assert.match(pearlIntegrationsPage, /aria-pressed=\{view === "secrets"\}/);
+    assert.match(pearlIntegrationsPage, /className="table-wrap"/);
+    assert.match(pearlIntegrationsPage, /role="region"/);
+    assert.match(pearlIntegrationsPage, /tabIndex=\{0\}/);
+  });
+
+  it("pearl CSS locks focus-visible, selected room, overflow, and reduced-motion", () => {
+    assert.match(pearlCss, /aria-selected="true"/);
+    assert.match(pearlCss, /:focus-visible/);
+    assert.match(pearlCss, /\.table-wrap/);
+    assert.match(pearlCss, /overflow-x:\s*auto/);
+    assert.match(pearlCss, /overflow-wrap:\s*anywhere/);
+    assert.match(pearlCss, /prefers-reduced-motion:\s*reduce/);
+    assert.match(pearlCss, /@media \(max-width:\s*768px\)/);
+    assert.match(pearlCss, /\.pearl-btn\s*\{/);
   });
 });

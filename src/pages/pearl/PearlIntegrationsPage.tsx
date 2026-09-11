@@ -64,10 +64,20 @@ export function PearlIntegrationsPage() {
             <Link to="/settings/integrations" aria-current="page">
               Integrations
             </Link>
-            <button type="button" className="pearl-btn pearl-btn--ghost pearl-btn--xs" onClick={() => setView("overview")}>
+            <button
+              type="button"
+              className="pearl-btn pearl-btn--ghost pearl-btn--xs"
+              aria-pressed={view === "overview" || view === "detail"}
+              onClick={() => setView("overview")}
+            >
               Overview
             </button>
-            <button type="button" className="pearl-btn pearl-btn--ghost pearl-btn--xs" onClick={() => setView("secrets")}>
+            <button
+              type="button"
+              className="pearl-btn pearl-btn--ghost pearl-btn--xs"
+              aria-pressed={view === "secrets"}
+              onClick={() => setView("secrets")}
+            >
               Secret refs
             </button>
             <span className="pearl-ci-credits" style={{ marginLeft: "auto" }}>
