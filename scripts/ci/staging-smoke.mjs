@@ -19,13 +19,19 @@ export const SMOKE_ROUTE_CONTRACTS = [
     securityHeaders: true,
   },
   {
+    // Staging cockpit-only builds set SKIP_MSHOPS_STOREFRONT=1 and omit
+    // dist/app. serveStorefrontSpa then fail-closes discovery with 503 JSON
+    // (no purchase/install/authority). Production still merges MSHOPS and
+    // serves HTML; this smoke contract is staging-path specific.
     name: "marketplace_surface",
     method: "GET",
     path: "/marketplace",
-    expectStatus: 200,
-    contentTypeIncludes: "text/html",
-    htmlIncludes: ["MSH OPS Storefront"],
-    securityHeaders: true,
+    expectStatus: 503,
+    contentTypeIncludes: "application/json",
+    jsonFields: ["error"],
+    expectJson: {
+      error: "MSHOPS storefront shell missing or misconfigured",
+    },
   },
   {
     name: "auth_login_shell",
@@ -305,7 +311,13 @@ async function probe(baseUrl, contract, access) {
     notes.push(`expected status ${contract.expectStatus ?? (contract.expectStatusOneOf ? contract.expectStatusOneOf.join("|") : contract.expectStatusClass)}, got ${response.status}`);
   }
 
-  if (response.status >= 500) {
+  // Unexpected 5xx is always a failure. Intentional fail-closed contracts
+  // (e.g. staging marketplace without MSHOPS) may expect a specific 5xx.
+  const statusExpected =
+    contract.expectStatus === response.status ||
+    (Array.isArray(contract.expectStatusOneOf) &&
+      contract.expectStatusOneOf.includes(response.status));
+  if (response.status >= 500 && !statusExpected) {
     result = "FAIL";
     notes.push("server error status");
   }

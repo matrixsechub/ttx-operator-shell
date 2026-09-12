@@ -526,6 +526,13 @@ describe("staging-smoke", () => {
     assert.equal(byName.access_unauth_fail_closed.omitAccessCredentials, true);
     assert.equal(byName.access_unauth_fail_closed.allowAccessRedirect, true);
     assert.deepEqual(byName.build_info_public.jsonFields, ["commitSha", "deployEnv", "workerName"]);
+    // Cockpit-only staging omits MSHOPS; marketplace must fail closed (no authority).
+    assert.equal(byName.marketplace_surface.path, "/marketplace");
+    assert.equal(byName.marketplace_surface.expectStatus, 503);
+    assert.equal(byName.marketplace_surface.contentTypeIncludes, "application/json");
+    assert.deepEqual(byName.marketplace_surface.expectJson, {
+      error: "MSHOPS storefront shell missing or misconfigured",
+    });
   });
 
   it("normalizeExpectedCommitSha rejects mutable refs and short SHAs", () => {
@@ -606,7 +613,10 @@ describe("staging-smoke", () => {
         return secureHtml("<title>MSHOPS.NET</title><body>Service Selection Funnel</body>");
       }
       if (url.endsWith("/marketplace")) {
-        return secureHtml("<title>MSH OPS Storefront</title><body>MSH OPS Storefront</body>");
+        // Staging cockpit-only path: storefront omitted → fail-closed 503 JSON.
+        return jsonResponse(503, {
+          error: "MSHOPS storefront shell missing or misconfigured",
+        });
       }
       if (url.endsWith("/login")) {
         return secureHtml("<title>Operator Auth</title><body>Operator Login</body>");

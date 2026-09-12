@@ -81,4 +81,15 @@ describe("SKIP_MSHOPS_STOREFRONT staging cockpit path", () => {
     assert.equal(resolveHtmlSurface("/settings/integrations"), "cockpit");
     assert.equal(surfaceShellPath("cockpit"), "/operator-shell.html");
   });
+
+  it("staging smoke expects marketplace fail-closed when MSHOPS is skipped", () => {
+    const smoke = readFileSync(join(root, "scripts", "ci", "staging-smoke.mjs"), "utf8");
+    assert.match(smoke, /name:\s*"marketplace_surface"/);
+    assert.match(smoke, /expectStatus:\s*503/);
+    assert.match(
+      smoke,
+      /MSHOPS storefront shell missing or misconfigured/,
+    );
+    assert.match(smoke, /SKIP_MSHOPS_STOREFRONT/);
+  });
 });
