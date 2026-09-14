@@ -88,7 +88,7 @@ describe("SKIP_MSHOPS_STOREFRONT staging cockpit path", () => {
     assert.match(smoke, /expectStatus:\s*503/);
     assert.match(
       smoke,
-      /MSHOPS storefront shell missing or misconfigured/,
+      /storefront shell missing or misconfigured/,
     );
     assert.match(smoke, /SKIP_MSHOPS_STOREFRONT/);
   });

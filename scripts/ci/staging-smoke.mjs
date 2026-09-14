@@ -20,9 +20,9 @@ export const SMOKE_ROUTE_CONTRACTS = [
   },
   {
     // Staging cockpit-only builds set SKIP_MSHOPS_STOREFRONT=1 and omit
-    // dist/app. serveStorefrontSpa then fail-closes discovery with 503 JSON
-    // (no purchase/install/authority). Production still merges MSHOPS and
-    // serves HTML; this smoke contract is staging-path specific.
+    // dist/app. serveSurfaceSpa("storefront") then fail-closes discovery with
+    // 503 JSON (no purchase/install/authority). Production still merges MSHOPS
+    // and serves HTML; this smoke contract is staging-path specific.
     name: "marketplace_surface",
     method: "GET",
     path: "/marketplace",
@@ -30,7 +30,7 @@ export const SMOKE_ROUTE_CONTRACTS = [
     contentTypeIncludes: "application/json",
     jsonFields: ["error"],
     expectJson: {
-      error: "MSHOPS storefront shell missing or misconfigured",
+      error: "storefront shell missing or misconfigured",
     },
   },
   {

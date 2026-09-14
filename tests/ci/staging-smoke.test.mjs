@@ -531,7 +531,7 @@ describe("staging-smoke", () => {
     assert.equal(byName.marketplace_surface.expectStatus, 503);
     assert.equal(byName.marketplace_surface.contentTypeIncludes, "application/json");
     assert.deepEqual(byName.marketplace_surface.expectJson, {
-      error: "MSHOPS storefront shell missing or misconfigured",
+      error: "storefront shell missing or misconfigured",
     });
   });
 
@@ -615,7 +615,7 @@ describe("staging-smoke", () => {
       if (url.endsWith("/marketplace")) {
         // Staging cockpit-only path: storefront omitted → fail-closed 503 JSON.
         return jsonResponse(503, {
-          error: "MSHOPS storefront shell missing or misconfigured",
+          error: "storefront shell missing or misconfigured",
         });
       }
       if (url.endsWith("/login")) {
