@@ -30,7 +30,7 @@ Cross-acceptance: a System A access token verifies at `edgeAuthGate` (signature 
 
 | ID | Sev | Evidence | Title | Disposition |
 |---|---|---|---|---|
-| F1 | P1 | VERIFIED | Credential-less operator-class token issuance at `POST /api/operator/session` | NEEDS_OPERATOR |
+| F1 | P1 | VERIFIED | Credential-less operator-class token issuance at `POST /api/operator/session` | **REMEDIATED on branch** (options A + C, Operator-approved 2026-09-14; see §7 and `F1-F3-OPERATOR-DECISION.md`) |
 | F2 | P1 | VERIFIED | Production deploy workflow used unpinned actions; repo's own pin audit fails, PR gate red since 2026-08-13 | FIXED (pinned) |
 | F3 | P1 | VERIFIED | Production deploy has no approval gate and no pre-deploy verification; staging has both | NEEDS_OPERATOR |
 | F4 | P2 | VERIFIED | Production build identity reports `commitSha: "unknown"` | NEEDS_OPERATOR |
@@ -178,3 +178,22 @@ Results are recorded in the PR #43 conversation for this commit.
 5. F6/F7: decide whether revocation moves to `SessionDO` and whether logout ends the DO session.
 6. F9/F10/F12/F15: small hardening items; can be batched into one mission.
 7. F16: amend `SCOPE-LOCK.md` to reflect the shipped auth layer, or issue a retirement mission.
+
+## 7. F1 remediation record (2026-09-14, Operator-approved options A + C)
+
+**Harness key check (repo-local only, no live calls):** `worker/edge/canonical/source-meta.ts:8,20` records that this worker's edge JWT layer was recovered from a bundle named `msh-ops-os-harness.js`, so the harness plausibly runs an equivalent operator-JWT gate keyed by its own `OPERATOR_SECRET || AUTH_SIGNING_KEY` (INFERRED). The only harness credential this repo sends is the raw `X-Harness-Secret` header (`worker/ghost.ts:209,288`), which a token holder cannot derive. No repo artifact shows the two workers share a signing secret value; `docs/STEP5-RECONCILIATION.md:130` lists secret alignment as an open gap. Verdict: acceptance of a System B token by the harness is **conditional on an unobservable secret equality**, not proven or strongly indicated. F1 stays P1 with a conditional P0 branch recorded in the decision packet. The remediation below closes the replay-through-proxy path on this worker regardless of harness configuration.
+
+**Changes (worker):**
+- `worker/edge/gate.ts`: `handleOperatorSession` deleted (option A). `edgeAuthGate` additionally accepts a canonical `auth.ts` access token (`type:"access"`, signed by `AUTH_SIGNING_KEY`) on operator-class routes when `OPERATOR_SECRET` differs, so option C cannot lock the Operator out. Marketplace-class handling unchanged.
+- `worker/index.ts`: bootstrap wiring and import removed.
+- `worker/edge/routeClass.ts`: `/api/operator/session` public carve-out removed; it now classifies as `operator`.
+- `worker/apiAuth.ts`: `enforceOperatorApiAuth` no longer skips operator-class routes; only marketplace-class routes are left to the edge gate (option C). Operator-class paths, including those with no local handler that fall through to `proxyToEngine`, now require a canonical access token.
+
+**Preserved:** `POST /api/operator/auth` (credentialed System B issuance), all `/api/auth/*` flows, governance and cockpit gates, marketplace ctx-bound gate.
+
+**Tests:** `tests/operatorAuth.test.ts:163` rewritten (it previously asserted the vulnerable behavior). `tests/operatorAuth.security.test.ts` F1 `todo` converted into executable cases (`F1-A`, `F1-C`, proxied-path negatives across 7 paths × anonymous/System B, positive Operator flow under shared and distinct secrets, marketplace unchanged). `tests/apiAuth.test.ts` gained operator-class and marketplace-class cases. Full run: 304 tests, 302 pass, 0 fail, 2 todo (remaining todo: F7, F9).
+
+**Residual risks after remediation:**
+1. A System B token from `/api/operator/auth` is now insufficient on operator-class routes; any external client relying on it needs a canonical `/api/auth/login` token. No in-repo client mints or stores such a token (`public/*-operator.js` read `sessionStorage.operator_token`, which nothing in this repo writes).
+2. If the harness shares this worker's signing secret, previously minted bootstrap tokens (≤1 h) could still be presented directly to the harness until expiry. Operator action: confirm secret distinctness out of band; set a distinct `OPERATOR_SECRET` / `HARNESS_SECRET` (F5).
+3. F6, F7, F8, F9, F10 unchanged.

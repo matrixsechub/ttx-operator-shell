@@ -1,7 +1,7 @@
 # Security Decision Packet — F1 and F3
 
 **Date:** 2026-09-14 · **Branch:** `claude/eloquent-heisenberg-p2i54y` · **PR:** #43 (draft) · **Source:** `docs/security/AUTH-SESSION-REVIEW.md`
-**Status:** DECISION REQUIRED. Nothing in this packet has been implemented. No worker code, wrangler config, secrets, Beacon, scope-lock, or workflow behavior changed in this turn.
+**Status:** F1 DECIDED AND REMEDIATED ON BRANCH (options A + C, 2026-09-14; see §F1 remediation record). F3 still DECISION REQUIRED. No worker code, wrangler config, secrets, Beacon, scope-lock, or workflow behavior changed in this turn.
 
 Evidence labels: VERIFIED (read and/or executed here), INFERRED (follows from code plus documented platform behavior), UNKNOWN (not determinable from this repo).
 
@@ -203,3 +203,19 @@ Workflow edits: revert the commit. Nothing runs until the next deploy trigger, s
 3. F3 item 2 (trigger change) last, once the team has used the environment approval prompt at least once.
 
 Total code touched across both: about 4 worker lines removed plus test updates (F1), about 45 workflow lines and 3 script lines (F3). No wrangler, secret, Beacon, or scope-lock changes.
+
+---
+
+## F1 remediation record (2026-09-14)
+
+**Operator decision:** A approved, C approved, rewriting `tests/operatorAuth.test.ts:163` approved.
+
+**Pre-implementation harness check:** repo-local only. Evidence: `worker/edge/canonical/source-meta.ts` (edge layer recovered from `msh-ops-os-harness.js` bundle), `worker/ghost.ts:209,288` (harness auth is `X-Harness-Secret`, a raw secret), `docs/STEP5-RECONCILIATION.md:130` (secret alignment open), `wrangler.mshops-public.jsonc` (public edge and harness are distinct workers; secrets not in repo). Verdict: not proven, not strongly indicated; conditional on secret equality that cannot be observed here. P0_HOLD not triggered. Conditional P0 branch: if the Operator finds the secrets equal, rotate/distinguish `OPERATOR_SECRET` and `HARNESS_SECRET` before or at deploy of this fix.
+
+**Implemented:** see `AUTH-SESSION-REVIEW.md` §7. Diff scope: 4 worker files, 3 test files, 2 docs. No wrangler, secret, Beacon, scope-lock, workflow, or session/token-format changes. `npm run typecheck` exit 0; full suite 304 tests, 302 pass, 0 fail, 2 todo.
+
+**Routes now protected by canonical auth (in addition to the edge gate):** every `OPERATOR_PROTECTED` path and `GET /api/engagements/*` other than `/status`: `/api/operator/*` (including the six listing routes and the former `/session` path), `/api/wildcard`, `/api/wildcard/*`, `/api/debug/*`, `/api/audit/*`, `/api/lifecycle/advance/*`, `/api/marketplace/audit`, `/api/fedgrade/*`, `/api/governance/propose|approve`. Marketplace-class (`/api/marketplace/integrity`, `/api/hsx`) unchanged.
+
+**Rollback:** `git revert` of the remediation commit on the PR branch. No data or secret changes to unwind.
+
+**Compatibility consequence accepted:** System B operator tokens alone no longer authorize operator-class routes. The credentialed `/api/operator/auth` still issues them; they remain valid at the edge gate but not past canonical auth.

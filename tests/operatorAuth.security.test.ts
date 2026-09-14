@@ -6,7 +6,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { getAccessTokenOperator, handleAuthRoute } from "../worker/auth.ts";
 import { enforceOperatorApiAuth } from "../worker/apiAuth.ts";
-import { edgeAuthGate, handleOperatorSession } from "../worker/edge/gate.ts";
+import { readFileSync } from "node:fs";
+import { edgeAuthGate } from "../worker/edge/gate.ts";
+import { signToken } from "../worker/edge/crypto.ts";
+import { classifyRoute } from "../worker/edge/routeClass.ts";
 
 const AUTH_SIGNING_KEY = "review-auth-signing-key-32-chars!";
 const CALLSIGN = "operator";
@@ -135,47 +138,86 @@ describe("operator auth — token lifecycle (auth.ts)", () => {
   it.todo("F9 NEEDS_OPERATOR: verifyPassword should enforce a PBKDF2 iteration floor (accepts iterations >= 1 today)");
 });
 
-describe("edge bootstrap token containment (edge/gate.ts vs auth.ts)", () => {
-  // Worst case for key sharing: OPERATOR_SECRET unset, so the edge gate
-  // falls back to AUTH_SIGNING_KEY and both token families share one key.
-  const edgeEnv = { AUTH_SIGNING_KEY };
+describe("F1 remediation — bootstrap removal and canonical auth on operator-class routes", () => {
+  // Shared-key worst case: OPERATOR_SECRET unset, edge gate falls back to AUTH_SIGNING_KEY.
+  const sharedKeyEdgeEnv = { AUTH_SIGNING_KEY };
+  // Distinct-secret case (the F5 recommendation).
+  const distinctEdgeEnv = { OPERATOR_SECRET: "distinct-edge-secret-32-chars!!!", AUTH_SIGNING_KEY };
 
-  async function bootstrapToken(): Promise<string> {
-    const response = await handleOperatorSession(
-      new Request("https://example.com/api/operator/session", { method: "POST" }),
-      "/api/operator/session",
-      edgeEnv,
-    );
-    assert.ok(response);
-    const body = (await response.json()) as { token: string };
-    return body.token;
+  // A System B token as the removed route used to mint it (or as /api/operator/auth
+  // still mints it), simulating a leaked or legacy bearer.
+  async function legacySystemBToken(secret = AUTH_SIGNING_KEY): Promise<string> {
+    const now = Math.floor(Date.now() / 1000);
+    return signToken(secret, { sub: "operator", iat: now, exp: now + 3600 });
   }
 
-  it("CURRENT_BEHAVIOR F1: POST /api/operator/session issues an operator-class token with no credentials", async () => {
-    const token = await bootstrapToken();
-    const gate = await edgeAuthGate(
-      new Request("https://example.com/api/operator/ai-agent-builds", { headers: { Authorization: `Bearer ${token}` } }),
-      "/api/operator/ai-agent-builds",
-      edgeEnv,
-    );
-    assert.equal(gate, null, "edge gate admits the credential-less bootstrap token on operator-class routes");
+  function bearer(path: string, token: string | null, method = "GET"): Request {
+    return new Request(`https://example.com${path}`, {
+      method,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+  }
+
+  it("F1-A: the credential-less bootstrap route no longer exists", async () => {
+    const gateSource = readFileSync(new URL("../worker/edge/gate.ts", import.meta.url), "utf8");
+    const indexSource = readFileSync(new URL("../worker/index.ts", import.meta.url), "utf8");
+    assert.doesNotMatch(gateSource, /handleOperatorSession/);
+    assert.doesNotMatch(indexSource, /handleOperatorSession/);
+    assert.equal(classifyRoute("/api/operator/session", "POST"), "operator");
+    const blocked = await edgeAuthGate(bearer("/api/operator/session", null, "POST"), "/api/operator/session", sharedKeyEdgeEnv);
+    assert.ok(blocked);
+    assert.equal(blocked.status, 401);
   });
 
-  it("bootstrap token is NOT an auth.ts operator session even when keys are shared", async () => {
+  it("F1-C: a System B token passes the edge gate under a shared key but is stopped by canonical auth", async () => {
     const env = await authEnv();
-    const token = await bootstrapToken();
-    const operator = await getAccessTokenOperator(
-      new Request("https://example.com/api/auth/me", { headers: { Authorization: `Bearer ${token}` } }),
-      env,
-    );
-    assert.equal(operator, null);
-  });
-
-  it("bootstrap token does not pass enforceOperatorApiAuth on default-deny routes", async () => {
-    const env = await authEnv();
-    const token = await bootstrapToken();
+    const token = await legacySystemBToken();
+    assert.equal(await edgeAuthGate(bearer("/api/operator/ai-agent-builds", token), "/api/operator/ai-agent-builds", sharedKeyEdgeEnv), null);
     const blocked = await enforceOperatorApiAuth(
-      new Request("https://example.com/api/security/events", { headers: { Authorization: `Bearer ${token}` } }),
+      bearer("/api/operator/ai-agent-builds", token),
+      "/api/operator/ai-agent-builds",
+      env as unknown as Parameters<typeof enforceOperatorApiAuth>[2],
+    );
+    assert.ok(blocked);
+    assert.equal(blocked.status, 401);
+  });
+
+  it("F1-C: proxied operator-class paths require canonical auth (anonymous and System B)", async () => {
+    const env = await authEnv();
+    const token = await legacySystemBToken();
+    const cases: Array<[string, string]> = [
+      ["/api/debug/anything", "GET"],
+      ["/api/audit/anything", "GET"],
+      ["/api/lifecycle/advance/run", "POST"],
+      ["/api/marketplace/audit", "GET"],
+      ["/api/engagements/anything", "GET"],
+      ["/api/wildcard/scan", "POST"],
+      ["/api/fedgrade/health", "GET"],
+    ];
+    for (const [path, method] of cases) {
+      for (const presented of [null, token]) {
+        const blocked = await enforceOperatorApiAuth(
+          bearer(path, presented, method),
+          path,
+          env as unknown as Parameters<typeof enforceOperatorApiAuth>[2],
+        );
+        assert.ok(blocked, `${method} ${path} with ${presented ? "System B token" : "no token"} must be blocked`);
+        assert.equal(blocked.status, 401);
+      }
+    }
+  });
+
+  it("System B token is NOT an auth.ts operator session even when keys are shared", async () => {
+    const env = await authEnv();
+    const token = await legacySystemBToken();
+    assert.equal(await getAccessTokenOperator(bearer("/api/auth/me", token), env), null);
+  });
+
+  it("System B token does not pass enforceOperatorApiAuth on default-deny routes", async () => {
+    const env = await authEnv();
+    const token = await legacySystemBToken();
+    const blocked = await enforceOperatorApiAuth(
+      bearer("/api/security/events", token),
       "/api/security/events",
       env as unknown as Parameters<typeof enforceOperatorApiAuth>[2],
     );
@@ -183,5 +225,26 @@ describe("edge bootstrap token containment (edge/gate.ts vs auth.ts)", () => {
     assert.equal(blocked.status, 401);
   });
 
-  it.todo("F1 NEEDS_OPERATOR: POST /api/operator/session should require operator credentials or be reclassified");
+  it("valid Operator flow preserved: canonical access token passes both gates, shared or distinct secrets", async () => {
+    const env = await authEnv();
+    const { token } = await login(env);
+    for (const edgeEnv of [sharedKeyEdgeEnv, distinctEdgeEnv]) {
+      assert.equal(await edgeAuthGate(bearer("/api/operator/ai-agent-builds", token), "/api/operator/ai-agent-builds", edgeEnv), null);
+    }
+    assert.equal(
+      await enforceOperatorApiAuth(
+        bearer("/api/operator/ai-agent-builds", token),
+        "/api/operator/ai-agent-builds",
+        env as unknown as Parameters<typeof enforceOperatorApiAuth>[2],
+      ),
+      null,
+    );
+  });
+
+  it("marketplace-class routes are unchanged: edge gate still rejects a System B operator token without ctx binding", async () => {
+    const token = await legacySystemBToken();
+    const blocked = await edgeAuthGate(bearer("/api/marketplace/integrity", token), "/api/marketplace/integrity", sharedKeyEdgeEnv);
+    assert.ok(blocked);
+    assert.equal(blocked.status, 403);
+  });
 });

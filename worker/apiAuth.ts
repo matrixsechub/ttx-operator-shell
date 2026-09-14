@@ -84,7 +84,11 @@ export async function enforceOperatorApiAuth(
   if (!pathname.startsWith("/api/")) return null;
 
   const routeClass = classifyRoute(pathname, request.method);
-  if (routeClass !== "public") {
+  // Marketplace-class routes are governed by the ctx-bound edge gate only.
+  // Operator-class routes must ALSO pass canonical auth.ts authentication
+  // (F1 option C): an edge token alone never reaches a local handler or the
+  // Engine proxy just because the route is operator-class.
+  if (routeClass === "marketplace") {
     return null;
   }
 

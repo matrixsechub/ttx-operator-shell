@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { enforceOperatorApiAuth } from "../worker/apiAuth.ts";
-import { edgeAuthGate, handleOperatorSession } from "../worker/edge/gate.ts";
+import { edgeAuthGate } from "../worker/edge/gate.ts";
 import { classifyRoute } from "../worker/edge/routeClass.ts";
 import { signToken } from "../worker/edge/crypto.ts";
 import { handleWildcardRoute } from "../worker/wildcardAdvancement.ts";
@@ -91,7 +91,7 @@ describe("classifyRoute", () => {
     assert.equal(classifyRoute("/api/operator/service-intake", "GET"), "operator");
     assert.equal(classifyRoute("/api/wildcard", "GET"), "operator");
     assert.equal(classifyRoute("/api/wildcard/scan", "POST"), "operator");
-    assert.equal(classifyRoute("/api/operator/session", "POST"), "public");
+    assert.equal(classifyRoute("/api/operator/session", "POST"), "operator");
   });
 });
 
@@ -160,36 +160,55 @@ describe("edgeAuthGate — operator routes", () => {
     assert.equal(blocked?.status, 401);
   });
 
-  it("allows valid edge token from POST /api/operator/session", async () => {
-    const sessionResponse = await handleOperatorSession(
+  it("F1: POST /api/operator/session is no longer a credential-less bootstrap", async () => {
+    assert.equal(classifyRoute("/api/operator/session", "POST"), "operator");
+    const blocked = await edgeAuthGate(
       new Request("https://example.com/api/operator/session", { method: "POST" }),
       "/api/operator/session",
       edgeEnv(),
     );
-    assert.ok(sessionResponse);
-    assert.equal(sessionResponse?.status, 200);
-    const sessionBody = await readJson(sessionResponse!);
-    const token = String(sessionBody.operator_token || sessionBody.token);
-    assert.ok(token.length > 20);
+    assert.ok(blocked);
+    assert.equal(blocked.status, 401);
+  });
 
+  it("allows a credentialed edge token (shape issued by POST /api/operator/auth) through the edge gate", async () => {
+    const token = await createEdgeOperatorToken();
     const gate = await edgeAuthGate(
-      new Request("https://example.com/api/wildcard", {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+      new Request("https://example.com/api/wildcard", { headers: { Authorization: `Bearer ${token}` } }),
       "/api/wildcard",
       edgeEnv(),
     );
     assert.equal(gate, null);
+  });
 
+  it("F1 option C: an edge token alone does not satisfy canonical auth on operator-class routes", async () => {
+    const token = await createEdgeOperatorToken();
+    const blocked = await enforceOperatorApiAuth(
+      new Request("https://example.com/api/wildcard", { headers: { Authorization: `Bearer ${token}` } }),
+      "/api/wildcard",
+      apiAuthEnv(),
+    );
+    assert.ok(blocked);
+    assert.equal(blocked.status, 401);
+  });
+
+  it("canonical auth.ts access token passes both gates on operator routes when OPERATOR_SECRET differs", async () => {
+    const token = await signAuthAccessToken(AUTH_SIGNING_KEY);
+    const request = () =>
+      new Request("https://example.com/api/operator/ai-agent-builds", { headers: { Authorization: `Bearer ${token}` } });
+    assert.equal(await edgeAuthGate(request(), "/api/operator/ai-agent-builds", edgeEnv()), null);
+    assert.equal(await enforceOperatorApiAuth(request(), "/api/operator/ai-agent-builds", apiAuthEnv()), null);
+  });
+
+  it("canonical access token reaches the wildcard handler", async () => {
+    const token = await signAuthAccessToken(AUTH_SIGNING_KEY);
     const health = await handleWildcardRoute(
-      new Request("https://example.com/api/wildcard", {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+      new Request("https://example.com/api/wildcard", { headers: { Authorization: `Bearer ${token}` } }),
       "/api/wildcard",
     );
     assert.ok(health);
-    assert.equal(health?.status, 200);
-    const healthBody = await readJson(health!);
+    assert.equal(health.status, 200);
+    const healthBody = await readJson(health);
     assert.equal(healthBody.agent, "WildcardAdvancementAgent");
   });
 });
