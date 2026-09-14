@@ -21,6 +21,25 @@ function extractStagingSmokeJob(yaml) {
   return nextJob === -1 ? fromJob : fromJob.slice(0, nextJob);
 }
 
+describe("staging-deploy workflow target_ref contract", () => {
+  it("requires a full commit SHA and does not default target_ref to main", () => {
+    assert.match(
+      stagingWorkflow,
+      /target_ref:\n\s+description:\s*Full 40-char commit SHA to deploy/,
+    );
+    assert.doesNotMatch(stagingWorkflow, /target_ref:[\s\S]*?\ndefault:\s*main\b/);
+    assert.match(stagingWorkflow, /node scripts\/ci\/resolve-deploy-ref\.mjs/);
+    assert.match(
+      stagingWorkflow,
+      /requested_ref:\s*\$\{\{\s*steps\.resolve\.outputs\.requested_ref\s*\}\}/,
+    );
+    assert.match(
+      stagingWorkflow,
+      /commit_sha:\s*\$\{\{\s*steps\.resolve\.outputs\.commit_sha\s*\}\}/,
+    );
+  });
+});
+
 describe("staging-deploy workflow staging-smoke binding", () => {
   it("binds staging-smoke to the staging GitHub Environment", () => {
     const job = extractStagingSmokeJob(stagingWorkflow);

@@ -28,7 +28,7 @@ CI (push / pull_request on ubuntu-latest)
 Staging Deploy (workflow_dispatch only)
 ├── authorize
 │   ├── confirm_deploy === DEPLOY_STAGING
-│   └── resolve target_ref → immutable commit SHA
+│   └── require full 40-char target_ref SHA → immutable commit SHA
 ├── preflight
 │   ├── workflow-permissions-lint
 │   ├── audit-action-pins
@@ -91,9 +91,9 @@ Wrangler also needs `CLOUDFLARE_ACCOUNT_ID` as a variable (not a secret).
 2. Open **Actions** → **Staging Deploy**.
 3. Click **Run workflow**.
 4. Set `confirm_deploy` to exactly `DEPLOY_STAGING`.
-5. Set `target_ref` to an approved branch, tag, or full commit SHA (default: `main`).
+5. Set `target_ref` to the **full 40-char commit SHA** of the staging release candidate (mutable refs like `main` are rejected; there is no default).
 6. Optionally enter `reason` for audit logs.
-7. Review the `authorize` job output for the resolved commit SHA.
+7. Review the `authorize` job output for `requested_ref` + resolved `commit_sha` (they must match).
 8. Approve the `staging` environment if required reviewers are configured.
 9. Monitor `deploy-staging` and `staging-smoke`.
 10. Download the `staging-release-evidence` artifact.
@@ -103,8 +103,9 @@ Wrangler also needs `CLOUDFLARE_ACCOUNT_ID` as a variable (not a secret).
 | Symptom | Likely cause | Action |
 |---|---|---|
 | `confirm_deploy must be exactly "DEPLOY_STAGING"` | Wrong confirmation string | Re-run with exact phrase |
-| `unable to resolve target_ref` | Invalid branch/tag/SHA | Use a ref that exists in this repository |
-| `unsafe target_ref` | PR merge ref or pull ref | Deploy `main` or a commit SHA, not `pull/N/merge` |
+| `target_ref must be a full 40-char commit SHA` | Branch/tag/short SHA supplied | Re-run with the exact 40-char commit SHA |
+| `unable to resolve target_ref` | SHA not present in this repository | Push/fetch the commit, then re-run |
+| `unsafe target_ref` | PR merge ref or pull ref | Deploy a full commit SHA, not `pull/N/merge` |
 | `STAGING_CONFIG::FAIL` | Wrangler misconfiguration | Run `npm run verify:staging-config` locally |
 | Identical KV IDs | Staging shares production namespaces | Provision separate staging KV namespaces |
 | Missing `CLOUDFLARE_API_TOKEN` | Secret not set on `staging` environment | Add staging-scoped token |

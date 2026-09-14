@@ -11,9 +11,8 @@ on:
         required: true
         type: string
       target_ref:
-        description: Git ref to deploy (branch, tag, or SHA)
+        description: Full 40-char commit SHA to deploy (mutable refs like main are rejected)
         required: true
-        default: main
         type: string
       reason:
         description: Optional deployment reason for audit logs
@@ -92,6 +91,9 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
       BUILD_TIMESTAMP: ${{ github.run_started_at }}
+      # Staging Cockpit/Pearl preview does not require private MSHOPS clone.
+      # Production deploy workflow continues to clone + set MSHOPS_BUILD_DIR.
+      SKIP_MSHOPS_STOREFRONT: "1"
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
@@ -107,7 +109,8 @@ jobs:
 
       - run: npm test
 
-      - run: npm run build
+      # Cockpit/Pearl staging artifact — never clone private MSHOPS here.
+      - run: npm run build:staging-cockpit
 
       - name: Wrangler staging dry run (pre-deploy gate)
         run: npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging-predeploy

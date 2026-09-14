@@ -4,8 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it, mock } from "node:test";
 import {
+  SMOKE_ROUTE_CONTRACTS,
   buildFailureDiagnostic,
+  correlateBuildInfoToCommit,
   emitFailedProbeDiagnostics,
+  normalizeExpectedCommitSha,
   persistStagingSmokeReport,
   resolveStagingAccessCredentials,
   runStagingSmoke,
@@ -508,6 +511,172 @@ describe("staging-smoke", () => {
       );
       assert.equal(report.base_url, ALLOWED);
       assert.equal(fetchMock.mock.callCount(), 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+
+  it("default contracts cover dashboard/chat/settings and unauth Access fail-closed", () => {
+    const byName = Object.fromEntries(SMOKE_ROUTE_CONTRACTS.map((c) => [c.name, c]));
+    assert.equal(byName.dashboard_cockpit_surface.path, "/dashboard");
+    assert.equal(byName.pearl_chat_cockpit_surface.path, "/chat");
+    assert.equal(byName.pearl_settings_integrations_cockpit_surface.path, "/settings/integrations");
+    assert.deepEqual(byName.access_unauth_fail_closed.expectStatusOneOf, [401, 403, 302]);
+    assert.equal(byName.access_unauth_fail_closed.omitAccessCredentials, true);
+    assert.equal(byName.access_unauth_fail_closed.allowAccessRedirect, true);
+    assert.deepEqual(byName.build_info_public.jsonFields, ["commitSha", "deployEnv", "workerName"]);
+    // Cockpit-only staging omits MSHOPS; marketplace must fail closed (no authority).
+    assert.equal(byName.marketplace_surface.path, "/marketplace");
+    assert.equal(byName.marketplace_surface.expectStatus, 503);
+    assert.equal(byName.marketplace_surface.contentTypeIncludes, "application/json");
+    assert.deepEqual(byName.marketplace_surface.expectJson, {
+      error: "storefront shell missing or misconfigured",
+    });
+  });
+
+  it("normalizeExpectedCommitSha rejects mutable refs and short SHAs", () => {
+    assert.equal(normalizeExpectedCommitSha("main").ok, false);
+    assert.equal(normalizeExpectedCommitSha("c87a944").ok, false);
+    assert.equal(normalizeExpectedCommitSha("c87a944c40f7e998caca958ffaf6d5c04f99f542").ok, true);
+    assert.equal(normalizeExpectedCommitSha("c87a944c40f7e998caca958ffaf6d5c04f99f542").commitSha, "c87a944c40f7e998caca958ffaf6d5c04f99f542");
+  });
+
+  it("correlateBuildInfoToCommit fails closed on SHA/env/worker mismatch", () => {
+    const ok = correlateBuildInfoToCommit(
+      { commitSha: "c87a944c40f7e998caca958ffaf6d5c04f99f542", deployEnv: "staging", workerName: "ttx-operator-shell-staging" },
+      "c87a944c40f7e998caca958ffaf6d5c04f99f542",
+    );
+    assert.equal(ok.ok, true);
+
+    const shaMismatch = correlateBuildInfoToCommit(
+      { commitSha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", deployEnv: "staging", workerName: "ttx-operator-shell-staging" },
+      "c87a944c40f7e998caca958ffaf6d5c04f99f542",
+    );
+    assert.equal(shaMismatch.ok, false);
+    assert.match(shaMismatch.notes.join(" "), /commitSha mismatch/);
+
+    const prodWorker = correlateBuildInfoToCommit(
+      { commitSha: "c87a944c40f7e998caca958ffaf6d5c04f99f542", deployEnv: "staging", workerName: "ttx-operator-shell" },
+      "c87a944c40f7e998caca958ffaf6d5c04f99f542",
+    );
+    assert.equal(prodWorker.ok, false);
+    assert.match(prodWorker.notes.join(" "), /production worker|workerName/);
+
+    const prodEnv = correlateBuildInfoToCommit(
+      { commitSha: "c87a944c40f7e998caca958ffaf6d5c04f99f542", deployEnv: "production", workerName: "ttx-operator-shell-staging" },
+      "c87a944c40f7e998caca958ffaf6d5c04f99f542",
+    );
+    assert.equal(prodEnv.ok, false);
+    assert.match(prodEnv.notes.join(" "), /deployEnv/);
+  });
+
+  it("default smoke correlates build-info to the exact requested SHA and omits Access on unauth probe", async () => {
+    const fetchMock = mock.fn(async (input, init) => {
+      const url = typeof input === "string" ? input : input.toString();
+      const headers = init?.headers ?? {};
+      const hasAccess = Boolean(headers["CF-Access-Client-Id"] || headers["CF-Access-Client-Secret"]);
+      if (url.endsWith("/dashboard") && !hasAccess) {
+        return new Response("", {
+          status: 302,
+          headers: { location: "https://ttx-operator-shell-staging.cloudflareaccess.com/cdn-cgi/access/login" },
+        });
+      }
+      assertAccessHeaders(init);
+      if (url.endsWith("/api/build-info")) {
+        return jsonResponse(200, {
+          commitSha: "c87a944c40f7e998caca958ffaf6d5c04f99f542",
+          deployEnv: "staging",
+          workerName: "ttx-operator-shell-staging",
+        });
+      }
+      if (
+        url.includes("/api/security/events") ||
+        url.includes("/api/ttx/sessions/scenarios") ||
+        url.includes("__staging-smoke-missing-route__")
+      ) {
+        return jsonResponse(401, { error: "Unauthorized" });
+      }
+      if (url.includes("/api/engine/")) {
+        return jsonResponse(200, { ok: true });
+      }
+      const secureHtml = (body) =>
+        htmlResponse(200, body, {
+          "x-content-type-options": "nosniff",
+          "referrer-policy": "no-referrer",
+          "permissions-policy": "camera=()",
+          "strict-transport-security": "max-age=31536000",
+          "content-security-policy": "default-src 'self'",
+          "x-frame-options": "DENY",
+        });
+      if (/workers\.dev\/?$/.test(url)) {
+        return secureHtml("<title>MSHOPS.NET</title><body>Service Selection Funnel</body>");
+      }
+      if (url.endsWith("/marketplace")) {
+        // Staging cockpit-only path: storefront omitted → fail-closed 503 JSON.
+        return jsonResponse(503, {
+          error: "storefront shell missing or misconfigured",
+        });
+      }
+      if (url.endsWith("/login")) {
+        return secureHtml("<title>Operator Auth</title><body>Operator Login</body>");
+      }
+      return secureHtml("<title>MSH OPS // Operator Terminal</title><body>Operator Terminal</body>");
+    });
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = fetchMock;
+    try {
+      const report = await runStagingSmoke(
+        ALLOWED,
+        "c87a944c40f7e998caca958ffaf6d5c04f99f542",
+        smokeOptions({ maxAttempts: 1 }),
+      );
+      assert.equal(report.summary.failed, 0, JSON.stringify(report.checks.filter((c) => c.result === "FAIL"), null, 2));
+      assert.equal(report.commit_sha, "c87a944c40f7e998caca958ffaf6d5c04f99f542");
+      const corr = report.checks.find((c) => c.name === "build_info_commit_correlation");
+      assert.ok(corr);
+      assert.equal(corr.result, "PASS");
+      const unauthCall = fetchMock.mock.calls.find((call) => {
+        const callUrl = String(call.arguments[0]);
+        const callHeaders = call.arguments[1]?.headers ?? {};
+        return callUrl.endsWith("/dashboard") && !callHeaders["CF-Access-Client-Id"];
+      });
+      assert.ok(unauthCall, "expected an unauthenticated /dashboard probe");
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("default smoke fails when live build-info SHA does not match requested target", async () => {
+    const fetchMock = mock.fn(async (input, init) => {
+      const url = typeof input === "string" ? input : input.toString();
+      const headers = init?.headers ?? {};
+      if (url.endsWith("/dashboard") && !headers["CF-Access-Client-Id"]) {
+        return new Response("", { status: 403 });
+      }
+      if (url.endsWith("/api/build-info")) {
+        return jsonResponse(200, {
+          commitSha: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          deployEnv: "staging",
+          workerName: "ttx-operator-shell-staging",
+        });
+      }
+      if (url.includes("/api/security/events") || url.includes("/api/ttx/sessions/scenarios") || url.includes("__staging-smoke-missing-route__")) {
+        return jsonResponse(401, { error: "Unauthorized" });
+      }
+      if (url.includes("/api/engine/")) {
+        return jsonResponse(200, { ok: true });
+      }
+      return htmlResponse(200, "<title>MSH OPS // Operator Terminal</title><body>Operator Terminal</body>");
+    });
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = fetchMock;
+    try {
+      const report = await runStagingSmoke(ALLOWED, "c87a944c40f7e998caca958ffaf6d5c04f99f542", smokeOptions());
+      assert.ok(report.summary.failed >= 1);
+      const corr = report.checks.find((c) => c.name === "build_info_commit_correlation");
+      assert.equal(corr.result, "FAIL");
+      assert.match(corr.notes.join(" "), /commitSha mismatch/);
     } finally {
       globalThis.fetch = originalFetch;
     }

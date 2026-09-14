@@ -1,10 +1,15 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   PRODUCTION_WORKER,
   STAGING_WORKER,
   parseWrangler,
 } from "../../scripts/ci/verify-staging-config.mjs";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 describe("verify-staging-config", () => {
   it("passes on the repository wrangler configuration", () => {
@@ -27,6 +32,14 @@ describe("verify-staging-config", () => {
   it("defines distinct production and staging worker constants", () => {
     assert.notEqual(PRODUCTION_WORKER, STAGING_WORKER);
     assert.equal(STAGING_WORKER, "ttx-operator-shell-staging");
+  });
+
+  it("requires WORKER_NAME vars to match production and staging Worker names", () => {
+    const result = parseWrangler();
+    assert.equal(result.ok, true, result.errors?.join("; "));
+    const raw = readFileSync(join(root, "wrangler.jsonc"), "utf8");
+    assert.match(raw, new RegExp(`"WORKER_NAME"\\s*:\\s*"${PRODUCTION_WORKER}"`));
+    assert.match(raw, new RegExp(`"WORKER_NAME"\\s*:\\s*"${STAGING_WORKER}"`));
   });
 
   it("masks KV identifiers in summary output", () => {

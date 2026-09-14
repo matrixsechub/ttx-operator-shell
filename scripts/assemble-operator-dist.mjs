@@ -5,6 +5,8 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { shouldSkipMshopsStorefront } from "./build.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist = join(root, "dist");
 
@@ -51,7 +53,23 @@ for (const [source, target] of shellRenames) {
   renameSync(join(dist, source), join(dist, target));
 }
 
-assertStorefrontShell(join(dist, "app", "index.html"));
+const skipStorefront = shouldSkipMshopsStorefront();
+const storefrontPath = join(dist, "app", "index.html");
+let storefrontIncluded = false;
+
+if (skipStorefront) {
+  if (existsSync(storefrontPath)) {
+    assertStorefrontShell(storefrontPath);
+    storefrontIncluded = true;
+  } else {
+    console.warn(
+      "> cockpit-only build — assembling cockpit/Pearl shells without dist/app storefront (storefront routes fail closed)",
+    );
+  }
+} else {
+  assertStorefrontShell(storefrontPath);
+  storefrontIncluded = true;
+}
 
 const ecosystemShell = readFileSync(join(dist, "ecosystem-shell.html"), "utf8");
 writeFileSync(join(dist, "index.html"), ecosystemShell);
@@ -60,6 +78,11 @@ const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const commitSha = resolveCommitSha();
 const buildTimestamp = process.env.BUILD_TIMESTAMP?.trim() || new Date().toISOString();
 
+const shells = [...shellRenames.map(([, target]) => `/${target}`)];
+if (storefrontIncluded) {
+  shells.push("/app/index.html");
+}
+
 const manifest = {
   commitSha,
   buildTimestamp,
@@ -67,7 +90,9 @@ const manifest = {
   environment: "build",
   assembledAt: new Date().toISOString(),
   source: "scripts/assemble-operator-dist.mjs",
-  shells: [...shellRenames.map(([, target]) => `/${target}`), "/app/index.html"],
+  shells,
+  storefrontIncluded,
+  skipMshopsStorefront: skipStorefront,
 };
 
 writeFileSync(join(dist, ".build-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);

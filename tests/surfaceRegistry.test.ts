@@ -41,20 +41,23 @@ describe("surfaceRegistry storefront contract", () => {
 });
 
 describe("assemble-operator-dist script", () => {
-  it("requires storefront shell and build manifest output", () => {
+  it("requires storefront shell by default and build manifest output", () => {
     const script = readFileSync(join(root, "scripts", "assemble-operator-dist.mjs"), "utf8");
     assert.match(script, /app\/index\.html/);
     assert.match(script, /MSH OPS Storefront/);
     assert.match(script, /\.build-manifest\.json/);
+    assert.match(script, /shouldSkipMshopsStorefront/);
+    assert.match(script, /from "\.\/build\.mjs"/);
     assert.doesNotMatch(script, /will degrade until MSHOPS/);
   });
 });
 
 describe("build pipeline storefront integration", () => {
-  it("uses MSHOPS build-final artifact (Option C)", () => {
+  it("uses MSHOPS build-final artifact (Option C) with optional staging skip", () => {
     const script = readFileSync(join(root, "scripts", "build.mjs"), "utf8");
     assert.match(script, /MSHOPS/);
     assert.match(script, /build-final/);
     assert.match(script, /assemble-operator-dist\.mjs/);
+    assert.match(script, /SKIP_MSHOPS_STOREFRONT/);
   });
 });

@@ -1,11 +1,17 @@
 import { BUNDLED_APP_VERSION, BUNDLED_BUILD_COMMIT_SHA, BUNDLED_BUILD_TIMESTAMP } from "./bundledBuildInfo";
 import { resolveSystemMode, type ModeEnv } from "./mode";
 
+/** Canonical Worker identity labels — must match wrangler `name` / env.staging.name. */
+export const PRODUCTION_WORKER_NAME = "ttx-operator-shell";
+export const STAGING_WORKER_NAME = "ttx-operator-shell-staging";
+
 export interface BuildInfoEnv {
   APP_VERSION?: string;
   DEPLOY_ENV?: string;
   BUILD_COMMIT_SHA?: string;
   BUILD_TIMESTAMP?: string;
+  /** Explicit Worker identity for /api/build-info evidence. */
+  WORKER_NAME?: string;
 }
 
 export interface BuildInfoPayload {
@@ -16,13 +22,27 @@ export interface BuildInfoPayload {
   workerName: string;
 }
 
-export function resolveBuildInfo(env: BuildInfoEnv, workerName = "ttx-operator-shell"): BuildInfoPayload {
+/**
+ * Resolve the Worker identity reported by /api/build-info.
+ * Prefer explicit WORKER_NAME (wrangler vars). Fall back from DEPLOY_ENV so
+ * staging never silently reports the production Worker name.
+ */
+export function resolveWorkerName(env: BuildInfoEnv): string {
+  const explicit = String(env.WORKER_NAME ?? "").trim();
+  if (explicit) return explicit;
+  if (String(env.DEPLOY_ENV ?? "").trim() === "staging") {
+    return STAGING_WORKER_NAME;
+  }
+  return PRODUCTION_WORKER_NAME;
+}
+
+export function resolveBuildInfo(env: BuildInfoEnv): BuildInfoPayload {
   return {
     version: env.APP_VERSION ?? BUNDLED_APP_VERSION ?? "0.0.0",
     commitSha: env.BUILD_COMMIT_SHA ?? BUNDLED_BUILD_COMMIT_SHA ?? "unknown",
     buildTimestamp: env.BUILD_TIMESTAMP ?? BUNDLED_BUILD_TIMESTAMP ?? "",
     deployEnv: env.DEPLOY_ENV ?? "unknown",
-    workerName,
+    workerName: resolveWorkerName(env),
   };
 }
 

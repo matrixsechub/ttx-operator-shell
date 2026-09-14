@@ -4,7 +4,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateStagingBaseUrl } from "../lib/stagingBaseUrl.mjs";
-import { STAGING_WORKER } from "./verify-staging-config.mjs";
+import { PRODUCTION_WORKER, STAGING_WORKER } from "./verify-staging-config.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -19,13 +19,19 @@ export const SMOKE_ROUTE_CONTRACTS = [
     securityHeaders: true,
   },
   {
+    // Staging cockpit-only builds set SKIP_MSHOPS_STOREFRONT=1 and omit
+    // dist/app. serveSurfaceSpa("storefront") then fail-closes discovery with
+    // 503 JSON (no purchase/install/authority). Production still merges MSHOPS
+    // and serves HTML; this smoke contract is staging-path specific.
     name: "marketplace_surface",
     method: "GET",
     path: "/marketplace",
-    expectStatus: 200,
-    contentTypeIncludes: "text/html",
-    htmlIncludes: ["MSH OPS Storefront"],
-    securityHeaders: true,
+    expectStatus: 503,
+    contentTypeIncludes: "application/json",
+    jsonFields: ["error"],
+    expectJson: {
+      error: "storefront shell missing or misconfigured",
+    },
   },
   {
     name: "auth_login_shell",
@@ -55,12 +61,47 @@ export const SMOKE_ROUTE_CONTRACTS = [
     securityHeaders: true,
   },
   {
+    name: "dashboard_cockpit_surface",
+    method: "GET",
+    path: "/dashboard",
+    expectStatus: 200,
+    contentTypeIncludes: "text/html",
+    htmlIncludes: ["Operator Terminal"],
+    securityHeaders: true,
+  },
+  {
+    name: "pearl_chat_cockpit_surface",
+    method: "GET",
+    path: "/chat",
+    expectStatus: 200,
+    contentTypeIncludes: "text/html",
+    htmlIncludes: ["Operator Terminal"],
+    securityHeaders: true,
+  },
+  {
+    name: "pearl_settings_integrations_cockpit_surface",
+    method: "GET",
+    path: "/settings/integrations",
+    expectStatus: 200,
+    contentTypeIncludes: "text/html",
+    htmlIncludes: ["Operator Terminal"],
+    securityHeaders: true,
+  },
+  {
+    name: "access_unauth_fail_closed",
+    method: "GET",
+    path: "/dashboard",
+    expectStatusOneOf: [401, 403, 302],
+    omitAccessCredentials: true,
+    allowAccessRedirect: true,
+  },
+  {
     name: "build_info_public",
     method: "GET",
     path: "/api/build-info",
     expectStatus: 200,
     contentTypeIncludes: "application/json",
-    jsonFields: ["commitSha", "deployEnv"],
+    jsonFields: ["commitSha", "deployEnv", "workerName"],
   },
   {
     name: "engine_health_public",
@@ -139,6 +180,9 @@ export function resolveStagingAccessCredentials(env = process.env) {
 
 function classifyStatus(contract, status) {
   if (contract.expectStatus !== undefined) return status === contract.expectStatus;
+  if (Array.isArray(contract.expectStatusOneOf) && contract.expectStatusOneOf.length > 0) {
+    return contract.expectStatusOneOf.includes(status);
+  }
   if (contract.expectStatusClass === "4xx") return status >= 400 && status < 500;
   return false;
 }
@@ -159,12 +203,15 @@ function checkSecurityHeaders(headers, notes) {
 }
 
 function buildSmokeRequestHeaders(contract, access) {
-  return {
+  const headers = {
     Accept: contract.contentTypeIncludes?.includes("json") ? "application/json" : "*/*",
     "Cache-Control": "no-cache",
-    "CF-Access-Client-Id": access.clientId,
-    "CF-Access-Client-Secret": access.clientSecret,
   };
+  if (!contract.omitAccessCredentials) {
+    headers["CF-Access-Client-Id"] = access.clientId;
+    headers["CF-Access-Client-Secret"] = access.clientSecret;
+  }
+  return headers;
 }
 
 /** Hostname only — never path, query, fragment, or userinfo. */
@@ -181,6 +228,7 @@ export function formatExpectedCondition(contract) {
   const parts = [];
   if (contract.expectStatus !== undefined) parts.push(`status=${contract.expectStatus}`);
   if (contract.expectStatusClass) parts.push(`status_class=${contract.expectStatusClass}`);
+  if (contract.expectStatusOneOf?.length) parts.push(`status_one_of=${contract.expectStatusOneOf.join("|")}`);
   if (contract.contentTypeIncludes) parts.push(`content_type_includes=${contract.contentTypeIncludes}`);
   if (contract.htmlIncludes?.length) parts.push(`html_markers=${contract.htmlIncludes.length}`);
   if (contract.redirectIncludes) parts.push(`redirect_includes=${contract.redirectIncludes}`);
@@ -256,13 +304,20 @@ async function probe(baseUrl, contract, access) {
 
   const notes = [];
   let result = "PASS";
+  let jsonBody = null;
 
   if (!classifyStatus(contract, response.status)) {
     result = "FAIL";
-    notes.push(`expected status ${contract.expectStatus ?? contract.expectStatusClass}, got ${response.status}`);
+    notes.push(`expected status ${contract.expectStatus ?? (contract.expectStatusOneOf ? contract.expectStatusOneOf.join("|") : contract.expectStatusClass)}, got ${response.status}`);
   }
 
-  if (response.status >= 500) {
+  // Unexpected 5xx is always a failure. Intentional fail-closed contracts
+  // (e.g. staging marketplace without MSHOPS) may expect a specific 5xx.
+  const statusExpected =
+    contract.expectStatus === response.status ||
+    (Array.isArray(contract.expectStatusOneOf) &&
+      contract.expectStatusOneOf.includes(response.status));
+  if (response.status >= 500 && !statusExpected) {
     result = "FAIL";
     notes.push("server error status");
   }
@@ -290,7 +345,16 @@ async function probe(baseUrl, contract, access) {
     try {
       const redirectHost = new URL(location, baseUrl).host;
       const baseHost = new URL(baseUrl).host;
-      if (redirectHost && baseHost && redirectHost !== baseHost && !location.includes("/login")) {
+      const accessChallenge =
+        Boolean(contract.allowAccessRedirect) &&
+        (/cloudflareaccess\.com$/i.test(redirectHost) || /\.cloudflareaccess\.com$/i.test(redirectHost));
+      if (
+        redirectHost &&
+        baseHost &&
+        redirectHost !== baseHost &&
+        !location.includes("/login") &&
+        !accessChallenge
+      ) {
         result = "FAIL";
         notes.push(`unsafe redirect host ${redirectHost}`);
       }
@@ -305,19 +369,26 @@ async function probe(baseUrl, contract, access) {
     notes.push("cloudflare error page detected");
   }
 
-  if (contract.jsonFields?.length) {
-    let json = null;
+  if (contract.jsonFields?.length || contract.expectJson) {
     try {
-      json = JSON.parse(text);
+      jsonBody = JSON.parse(text);
     } catch {
       result = "FAIL";
       notes.push("response is not valid JSON");
     }
-    if (json) {
+    if (jsonBody && contract.jsonFields?.length) {
       for (const field of contract.jsonFields) {
-        if (!(field in json)) {
+        if (!(field in jsonBody)) {
           result = "FAIL";
           notes.push(`missing json field ${field}`);
+        }
+      }
+    }
+    if (jsonBody && contract.expectJson) {
+      for (const [key, expected] of Object.entries(contract.expectJson)) {
+        if (jsonBody[key] !== expected) {
+          result = "FAIL";
+          notes.push(`json field ${key} expected ${expected}, got ${jsonBody[key]}`);
         }
       }
     }
@@ -343,6 +414,7 @@ async function probe(baseUrl, contract, access) {
     result,
     duration_ms: durationMs,
     notes,
+    json_body: jsonBody,
   };
 
   if (result === "FAIL") {
@@ -372,6 +444,51 @@ async function probeWithRetry(baseUrl, contract, access, maxAttempts = 5) {
   return last;
 }
 
+
+export const FULL_COMMIT_SHA_PATTERN = /^[0-9a-f]{40}$/i;
+
+export function normalizeExpectedCommitSha(commitSha) {
+  const value = typeof commitSha === "string" ? commitSha.trim() : "";
+  if (!FULL_COMMIT_SHA_PATTERN.test(value)) {
+    return {
+      ok: false,
+      error: `commitSha must be a full 40-char hex SHA for staging smoke correlation (got "${commitSha}")`,
+    };
+  }
+  return { ok: true, commitSha: value.toLowerCase() };
+}
+
+/**
+ * Prove the live staging artifact matches the requested release candidate.
+ * Fail closed on SHA mismatch, non-staging deployEnv, or production worker identity.
+ */
+export function correlateBuildInfoToCommit(buildInfo, expectedCommitSha, options = {}) {
+  const notes = [];
+  const stagingWorker = options.stagingWorker ?? STAGING_WORKER;
+  const productionWorker = options.productionWorker ?? PRODUCTION_WORKER;
+  const expected = normalizeExpectedCommitSha(expectedCommitSha);
+  if (!expected.ok) {
+    return { ok: false, notes: [expected.error] };
+  }
+  if (!buildInfo || typeof buildInfo !== "object") {
+    return { ok: false, notes: ["build-info payload missing"] };
+  }
+  const actualSha = typeof buildInfo.commitSha === "string" ? buildInfo.commitSha.trim().toLowerCase() : "";
+  if (actualSha !== expected.commitSha) {
+    notes.push(`build-info commitSha mismatch: expected ${expected.commitSha}, got ${actualSha || "(empty)"}`);
+  }
+  if (buildInfo.deployEnv !== "staging") {
+    notes.push(`build-info deployEnv must be "staging" (got ${String(buildInfo.deployEnv)})`);
+  }
+  if (buildInfo.workerName !== stagingWorker) {
+    notes.push(`build-info workerName must be "${stagingWorker}" (got ${String(buildInfo.workerName)})`);
+  }
+  if (buildInfo.workerName === productionWorker) {
+    notes.push(`build-info workerName must not be production worker "${productionWorker}"`);
+  }
+  return { ok: notes.length === 0, notes, expectedCommitSha: expected.commitSha, buildInfo };
+}
+
 export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
   // Internal gate — do not rely on CLI callers. Fail before any fetch/DNS/auth.
   const validated = validateStagingBaseUrl(baseUrl);
@@ -385,10 +502,56 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
     throw new Error(access.error);
   }
 
+  const correlate =
+    options.correlateBuildInfo !== false && options.contracts === undefined
+      ? true
+      : options.correlateBuildInfo === true;
+
+  let normalizedCommit = { ok: true, commitSha };
+  if (correlate) {
+    normalizedCommit = normalizeExpectedCommitSha(commitSha);
+    if (!normalizedCommit.ok) {
+      throw new Error(normalizedCommit.error);
+    }
+  }
+
   const contracts = options.contracts ?? SMOKE_ROUTE_CONTRACTS;
   const checks = [];
   for (const contract of contracts) {
     checks.push(await probeWithRetry(safeBaseUrl, contract, access, options.maxAttempts ?? 5));
+  }
+
+  if (correlate) {
+    const buildInfoCheck = checks.find((c) => c.name === "build_info_public" || c.path === "/api/build-info");
+    const correlation = correlateBuildInfoToCommit(
+      buildInfoCheck?.json_body,
+      normalizedCommit.commitSha,
+    );
+    const corrCheck = {
+      name: "build_info_commit_correlation",
+      method: "GET",
+      path: "/api/build-info",
+      status: buildInfoCheck?.status ?? 0,
+      content_type: buildInfoCheck?.content_type ?? "application/json",
+      result: correlation.ok ? "PASS" : "FAIL",
+      duration_ms: 0,
+      notes: correlation.notes,
+    };
+    if (!correlation.ok) {
+      corrCheck.diagnostic = buildFailureDiagnostic({
+        contract: {
+          method: "GET",
+          path: "/api/build-info",
+          expectStatus: 200,
+        },
+        baseUrl: safeBaseUrl,
+        status: corrCheck.status,
+        contentType: corrCheck.content_type,
+        location: null,
+        notes: correlation.notes,
+      });
+    }
+    checks.push(corrCheck);
   }
 
   const summary = {
@@ -402,7 +565,7 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
     environment: "staging",
     base_url: safeBaseUrl,
     worker_name: STAGING_WORKER,
-    commit_sha: commitSha,
+    commit_sha: correlate ? normalizedCommit.commitSha : commitSha,
     tested_at: new Date().toISOString(),
     summary,
     checks,
