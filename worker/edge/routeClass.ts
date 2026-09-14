@@ -17,7 +17,6 @@ const MARKETPLACE_PROTECTED = [/^\/api\/marketplace\/integrity$/, /^\/api\/hsx$/
 
 export function classifyRoute(pathname: string, method: string): RouteClass {
   if (pathname === "/api/operator/auth") return "public";
-  if (pathname === "/api/operator/session" && method === "POST") return "public";
   if (pathname === "/api/marketplace/session") return "public";
   if (pathname === "/api/hsx/session") return "public";
   if (pathname === "/api/marketplace-lifecycle" || pathname.startsWith("/api/marketplace-lifecycle/")) {

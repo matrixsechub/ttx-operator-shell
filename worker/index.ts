@@ -21,7 +21,7 @@ import { handleSecurityRoute } from "./security";
 
 import { handleTtxRoute } from "./ttx";
 
-import { edgeAuthGate, handleOperatorAuth, handleOperatorSession } from "./edge/gate";
+import { edgeAuthGate, handleOperatorAuth } from "./edge/gate";
 
 import { injectSecurityHeaders } from "./edge/headers";
 
@@ -220,10 +220,6 @@ async function handleFetch(request: Request, env: RuntimeEnv): Promise<Response>
       const operatorAuth = await handleOperatorAuth(request, url.pathname, edgeEnv);
 
       if (operatorAuth) return operatorAuth;
-
-      const operatorSession = await handleOperatorSession(request, url.pathname, edgeEnv);
-
-      if (operatorSession) return operatorSession;
 
 
 

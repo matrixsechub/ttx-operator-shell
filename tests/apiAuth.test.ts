@@ -40,6 +40,24 @@ describe("enforceOperatorApiAuth", () => {
     assert.ok(blocked?.headers.get("X-Build-Commit"));
   });
 
+  it("requires canonical auth on operator-class routes (F1 option C)", async () => {
+    for (const [path, method] of [
+      ["/api/operator/ai-agent-builds", "GET"],
+      ["/api/wildcard", "GET"],
+      ["/api/debug/anything", "GET"],
+      ["/api/lifecycle/advance/run", "POST"],
+    ] as const) {
+      const blocked = await enforceOperatorApiAuth(new Request(`https://example.com${path}`, { method }), path, env);
+      assert.ok(blocked, `${method} ${path}`);
+      assert.equal(blocked.status, 401);
+    }
+  });
+
+  it("leaves marketplace-class routes to the ctx-bound edge gate", async () => {
+    const request = new Request("https://example.com/api/marketplace/integrity");
+    assert.equal(await enforceOperatorApiAuth(request, "/api/marketplace/integrity", env), null);
+  });
+
   it("allows public routes without a token", async () => {
     const request = new Request("https://example.com/api/build-info");
     const blocked = await enforceOperatorApiAuth(request, "/api/build-info", env);
