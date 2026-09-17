@@ -1,6 +1,6 @@
 # Handoff Packet — Budgeted Engineering Pass, September 2026
 
-**Branch:** `claude/eloquent-heisenberg-p2i54y` · **PR:** #43 (DRAFT, deliberately) · **Period:** 2026-09-14 to 2026-09-17
+**Branch:** `claude/eloquent-heisenberg-p2i54y` · **PR:** #43 (DRAFT, deliberately) · **Period:** 2026-09-14 to 2026-09-17 (Task 5 pass appended)
 
 ```yaml
 handoff_packet:
@@ -8,7 +8,7 @@ handoff_packet:
   from_agent: SEC-01
   to_agent: OPERATOR
   mission_ref: budgeted-usage-pass-2026-09
-  status: READY
+  status: HOLD
   beacon_alignment: >
     Aligned. Work was governance-first and fail-closed: one security defect was
     remediated only after explicit Operator approval of options A and C, and every
@@ -16,8 +16,21 @@ handoff_packet:
     file, scope-lock line, secret, Cloudflare resource, or production surface was
     touched. Two scope-lock tensions were documented, not resolved.
   claims:
-    - claim: Full test suite is green and 45 tests larger than at session start
-      evidence: "npm test → 311 tests / 94 suites / 309 pass / 0 fail / 2 todo (was 266/82)"
+    - claim: Full test suite is green and 79 tests larger than at session start
+      evidence: "npm test → 345 tests / 105 suites / 343 pass / 0 fail / 2 todo (was 266/82)"
+      confidence: VERIFIED
+    - claim: Production deploy is now gated behind verification, approval, and fail-closed smoke
+      evidence: "fe67bca, 28cc1a4; tests/ci/production-deploy-workflow.test.mjs (20 invariants, 11 mutations caught)"
+      confidence: VERIFIED
+    - claim: wrangler --var accepts colon-bearing ISO timestamps, so the reason recorded in e2beb63 does not hold
+      evidence: "npx wrangler deploy --dry-run --var BUILD_TIMESTAMP:2026-09-17T12:34:56Z → exit 0, both vars registered"
+      confidence: VERIFIED
+    - claim: npm run lint:brand fails on origin/main and now blocks production deploys
+      evidence: "5 [R9] findings in src/components/BootstrapErrorBoundary.tsx; reproduced on a clean origin/main checkout; _reusable-build-test.yml runs it"
+      confidence: VERIFIED
+    - claim: The governance Durable Object fallback is fail-substituted, not uniformly fail-open
+      evidence: "worker/kernel.ts:100-110,132-142; worker/governanceDefaults.ts:4-34 — wildcard and marketplace land stricter, policy mode lands weaker"
+      confidence: VERIFIED
       confidence: VERIFIED
     - claim: Typecheck passes
       evidence: "npm run typecheck → exit 0"
@@ -48,16 +61,18 @@ handoff_packet:
     - 4266d44 docs: classified root document index
     - "commands: npm ci; npm run typecheck; npm test; node scripts/ci/audit-action-pins.mjs; node scripts/ci/workflow-permissions-lint.mjs"
   risks:
-    - F3 unfixed: production deploys on every push to main with no approval, no tests, no dry run, and a smoke step that cannot fail
-    - F4: production /api/build-info reports commitSha "unknown", so rollback verification is not executable
+    - F18 blocks every production deploy until the brand lint violation on main is resolved
+    - The production approval gate is inert until the Operator creates the production Environment with required reviewers
+    - Production smoke reuses the staging route contracts; that production serves identical content is INFERRED, not VERIFIED
+    - Two approval prompts per deploy (deploy and smoke both bind the environment), matching staging
     - F5: OPERATOR_SECRET may be unset, making one key serve two credential systems
     - Bootstrap tokens minted before this fix deploys stay valid at the edge for up to 1 hour
     - External clients of POST /api/operator/session, if any exist outside this repo, will break
     - Two scope-lock tensions remain open (auth/session, billing/entitlements)
   next_action: >
-    Decide F3 items 1-4 in docs/security/F1-F3-OPERATOR-DECISION.md so production
-    deploy hardening (plan Task 5) can be implemented; it is the only planned task
-    left unstarted and the largest remaining risk.
+    Resolve F18 (brand lint fails on main and now blocks the production pipeline),
+    then perform the manual settings in docs/OPERATOR-SETTINGS-PRODUCTION.md. Until
+    both are done, no production deploy can succeed — which is fail-closed, not broken.
   stop_before:
     - deploy
     - secrets
@@ -78,23 +93,23 @@ handoff_packet:
 | — | F1/F3 decision packet (Operator-inserted) | `docs/security/F1-F3-OPERATOR-DECISION.md` | Done |
 | — | F1 remediation (Operator-approved A + C) | 4 worker files, 3 test files | Done |
 | 4 | Architecture map | `docs/ARCHITECTURE.md` | Done |
-| 5 | Production deploy hardening | — | **Not started: blocked on F3 decisions** |
+| 5 | Production deploy hardening | `.github/workflows/deploy-production.yml`, `scripts/ci/production-smoke.mjs`, `scripts/lib/productionBaseUrl.mjs`, 2 test suites | **Code done; Operator settings + F18 outstanding** |
 | 6 | Root document index | `docs/INDEX.md` | Done |
 | 7 | This handoff packet | `docs/HANDOFF-2026-09.md` | Done |
 | +1 | Gate-ordering regression test (recommended next task #2, executed) | `tests/gateOrdering.test.ts` | Done |
 
-Diff against `main`: 18 files, ~1420 insertions, 62 deletions across 9 commits.
+Diff against `main`: 28 files, 2621 insertions, 96 deletions across 14 commits.
 
 ## 2. What was verified
 
 | Check | Result |
 |---|---|
 | `npm run typecheck` | exit 0 |
-| `npm test` | 311 tests, 94 suites, 309 pass, 0 fail, 2 todo |
+| `npm test` | 345 tests, 105 suites, 343 pass, 0 fail, 2 todo |
 | `node scripts/ci/audit-action-pins.mjs` | exit 0 (was exit 1 on `main`) |
 | `node scripts/ci/workflow-permissions-lint.mjs` | exit 0 |
 
-Test count moved from 266 to 311. The two remaining `todo` markers are F7 (no access-token revocation on logout) and F9 (no PBKDF2 iteration floor); both change auth semantics and await Operator decision.
+Test count moved from 266 to 345. The two remaining `todo` markers are F7 (no access-token revocation on logout) and F9 (no PBKDF2 iteration floor); both change auth semantics and await Operator decision.
 
 ## 3. What is UNVERIFIED
 
@@ -128,3 +143,26 @@ Test count moved from 266 to 311. The two remaining `todo` markers are F7 (no ac
 ## 6. Why the PR is still a draft
 
 The Operator instructed DRAFT on every turn of this pass. The branch is green and self-consistent, but it carries a behavior change to authentication whose blast radius outside this repository is UNKNOWN (see §3). Undraft and merge are Operator actions.
+
+---
+
+## 7. Task 5 appendix — production deploy hardening (2026-09-17)
+
+**Delivered in two commits so the trigger change is independently revertible:**
+
+| Commit | Scope |
+|---|---|
+| `fe67bca` | Verification chain, `production` environment binding, build identity, fail-closed smoke. Trigger untouched. |
+| `28cc1a4` | Removes push-to-main; adds the `authorize` job and per-target confirmation phrases. |
+| `9a3b64e` | Decision packet, governance finding, settings checklist, F3/F4/F18 records. |
+
+**Pipeline now:** `authorize` (phrase + SHA resolution) → `preflight` (permissions lint, pin audit) → reusable `build-test` (typecheck, brand lint, full suite, build) → reusable wrangler dry run → **`production` environment approval** → in-job pre-deploy dry run → deploy with `--var` build identity → fail-closed smoke asserting the deployed commit.
+
+**Two investigations the Operator required:**
+
+1. *Why `b8a68fb` dropped the build-identity flags.* `e2beb63` cites "colon issues in `--var` syntax"; `b8a68fb` cites "`--env`, `--var` flags causing parse failures". The failing command used a **colon-free** timestamp, so the colon rationale does not explain it; `--env ""` is the likely culprit and `--var` went collaterally. Tested directly: a dry run with a colon-bearing ISO timestamp exits 0 and registers both vars. Smallest safe restoration applied.
+2. *Whether the staging smoke could be reused as-is.* No. Three staging-only assumptions: a compile-time hostname allowlist that must not be overridden by environment variables, required Cloudflare Access service-token credentials, and a report stamped `environment: "staging"`. Production therefore got its own entrypoint and validator, reusing the shared probe engine through a minimal seam (conditional Access headers, exported `probeWithRetry`) rather than duplicating the check logic. Staging behavior is unchanged and its suites still pass.
+
+**Mutation evidence:** 11 mutations attempted against the shape test, 11 caught. Two of them exposed defects **in the test itself** rather than the workflow: a YAML comment containing `--dry-run` satisfied an ordering assertion, and another input's `required: true` satisfied the confirmation-input assertion. Both were fixed and re-verified. A shape test that cannot fail is worse than none.
+
+**Not done, by instruction:** governance Durable Object fallback (finding G1), scope-lock amendment (decision packet only), `GH_PAT` clone hygiene (F12), brand lint fix (F18).

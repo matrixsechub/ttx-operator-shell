@@ -66,6 +66,12 @@ Leave these alone. They are used by workflows that must run without production a
 - Do not edit `wrangler.jsonc`, KV or Durable Object binding IDs, or any Worker secret as part of this checklist.
 - Do not rename the environment after the first successful deploy.
 
+## 6b. Expect two approval prompts per deploy
+
+Both the `deploy` job and the `production-smoke` job declare `environment: production`, so with required reviewers GitHub will ask you to approve **twice**: once before the deploy and once before the smoke that verifies it. This mirrors `staging-deploy.yml`, where `deploy-staging` and `staging-smoke` are both bound to the `staging` environment.
+
+This is deliberate but not free. The smoke job needs the environment in order to read `PRODUCTION_BASE_URL`. If the second prompt is annoying in practice, the alternative is to define `PRODUCTION_BASE_URL` as a **repository** variable instead and drop `environment: production` from the smoke job only. That is a one-line workflow change plus a shape-test update; it does not weaken the deploy gate, because the deploy has already happened by then. Tell me if you want it and I will make the change. Do not simply delete the line, because the shape test asserts it.
+
 ## 7. Verification after you configure it
 
 Run these in order. Stop at the first surprise.
@@ -76,6 +82,8 @@ Run these in order. Stop at the first surprise.
 4. **Smoke.** Expected: `production-smoke` passes and uploads `production-smoke-report.json`. Open the artifact and confirm `commit_sha` matches the deployed commit and every check reads `PASS`.
 5. **Confirm F4 is closed.** `curl -s https://ttx-operator-shell.sogellagepul.workers.dev/api/build-info` should report the real `commitSha`, not `unknown`, and `deployEnv: "production"`. This is what makes `ROLLBACK.md` step 1 executable again.
 6. **Confirm the old path is gone.** Merge something harmless to `main` and confirm no production deploy starts.
+
+If the smoke script exits before writing its report, for example because `PRODUCTION_BASE_URL` is unset or mistyped, the artifact upload step will also error with "no files found". That is a second symptom of the same failure, not a separate problem; read the smoke step's own error. `staging-deploy.yml` behaves identically.
 
 If step 4 fails on a content assertion rather than a status code, the smoke route contracts (shared with staging) may not match production content. Report the failing check name; that is a contract question, not a deploy failure, and it is the one place where reusing the staging contracts is INFERRED rather than VERIFIED.
 
