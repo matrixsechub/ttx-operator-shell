@@ -8,7 +8,7 @@ handoff_packet:
   from_agent: SEC-01
   to_agent: OPERATOR
   mission_ref: budgeted-usage-pass-2026-09
-  status: HOLD
+  status: READY
   beacon_alignment: >
     Aligned. Work was governance-first and fail-closed: one security defect was
     remediated only after explicit Operator approval of options A and C, and every
@@ -25,8 +25,14 @@ handoff_packet:
     - claim: wrangler --var accepts colon-bearing ISO timestamps, so the reason recorded in e2beb63 does not hold
       evidence: "npx wrangler deploy --dry-run --var BUILD_TIMESTAMP:2026-09-17T12:34:56Z → exit 0, both vars registered"
       confidence: VERIFIED
-    - claim: npm run lint:brand fails on origin/main and now blocks production deploys
-      evidence: "5 [R9] findings in src/components/BootstrapErrorBoundary.tsx; reproduced on a clean origin/main checkout; _reusable-build-test.yml runs it"
+    - claim: The full code-side gate is green; only GitHub settings remain before a production deploy
+      evidence: "typecheck 0; lint:brand 0; npm test 359/108, 357 pass, 0 fail, 2 todo; pin audit 0; permissions lint 0; tests/ci 84/84"
+      confidence: VERIFIED
+    - claim: F18 is resolved without changing the BootstrapErrorBoundary UI
+      evidence: "fa3afe4; git diff on src/components/BootstrapErrorBoundary.tsx is empty; 14 regression cases; 7 mutations caught"
+      confidence: VERIFIED
+    - claim: R9 previously under-reported raw hex because a /g regex was reused for .test()
+      evidence: "file has 6 raw-hex lines, lint reported 5; stateless probe yields 6 findings repo-wide, all in the exempt file"
       confidence: VERIFIED
     - claim: The governance Durable Object fallback is fail-substituted, not uniformly fail-open
       evidence: "worker/kernel.ts:100-110,132-142; worker/governanceDefaults.ts:4-34 — wildcard and marketplace land stricter, policy mode lands weaker"
@@ -61,7 +67,6 @@ handoff_packet:
     - 4266d44 docs: classified root document index
     - "commands: npm ci; npm run typecheck; npm test; node scripts/ci/audit-action-pins.mjs; node scripts/ci/workflow-permissions-lint.mjs"
   risks:
-    - F18 blocks every production deploy until the brand lint violation on main is resolved
     - The production approval gate is inert until the Operator creates the production Environment with required reviewers
     - Production smoke reuses the staging route contracts; that production serves identical content is INFERRED, not VERIFIED
     - Two approval prompts per deploy (deploy and smoke both bind the environment), matching staging
@@ -70,9 +75,9 @@ handoff_packet:
     - External clients of POST /api/operator/session, if any exist outside this repo, will break
     - Two scope-lock tensions remain open (auth/session, billing/entitlements)
   next_action: >
-    Resolve F18 (brand lint fails on main and now blocks the production pipeline),
-    then perform the manual settings in docs/OPERATOR-SETTINGS-PRODUCTION.md. Until
-    both are done, no production deploy can succeed — which is fail-closed, not broken.
+    Perform the manual GitHub settings in docs/OPERATOR-SETTINGS-PRODUCTION.md.
+    That is the only remaining step before a production deploy can be attempted.
+    State: CODE READY / SETTINGS REQUIRED / NO DEPLOY AUTHORIZED.
   stop_before:
     - deploy
     - secrets
@@ -105,11 +110,12 @@ Diff against `main`: 28 files, 2621 insertions, 96 deletions across 14 commits.
 | Check | Result |
 |---|---|
 | `npm run typecheck` | exit 0 |
-| `npm test` | 345 tests, 105 suites, 343 pass, 0 fail, 2 todo |
+| `npm test` | 359 tests, 108 suites, 357 pass, 0 fail, 2 todo |
+| `npm run lint:brand` | exit 0 (was exit 1 on `main` since 2026-08-13) |
 | `node scripts/ci/audit-action-pins.mjs` | exit 0 (was exit 1 on `main`) |
 | `node scripts/ci/workflow-permissions-lint.mjs` | exit 0 |
 
-Test count moved from 266 to 345. The two remaining `todo` markers are F7 (no access-token revocation on logout) and F9 (no PBKDF2 iteration floor); both change auth semantics and await Operator decision.
+Test count moved from 266 to 359. The two remaining `todo` markers are F7 (no access-token revocation on logout) and F9 (no PBKDF2 iteration floor); both change auth semantics and await Operator decision.
 
 ## 3. What is UNVERIFIED
 
@@ -166,3 +172,19 @@ The Operator instructed DRAFT on every turn of this pass. The branch is green an
 **Mutation evidence:** 11 mutations attempted against the shape test, 11 caught. Two of them exposed defects **in the test itself** rather than the workflow: a YAML comment containing `--dry-run` satisfied an ordering assertion, and another input's `required: true` satisfied the confirmation-input assertion. Both were fixed and re-verified. A shape test that cannot fail is worse than none.
 
 **Not done, by instruction:** governance Durable Object fallback (finding G1), scope-lock amendment (decision packet only), `GH_PAT` clone hygiene (F12), brand lint fix (F18).
+
+---
+
+## 8. F18 appendix — brand lint resolved, code-side production readiness closed (2026-09-17)
+
+`fa3afe4`. `npm run lint:brand` exits 0 with `src/components/BootstrapErrorBoundary.tsx` unchanged byte-for-byte.
+
+**Exception shape.** `scripts/ci/brand-lint-exceptions.mjs` holds a frozen one-entry allowlist matched by exact repository-relative path equality. Applied at one call site guarding only the R9 raw-hex report, so R10, R11 and R15 still apply to the file. A sanctioned path that stops existing now fails the lint. R9 is not disabled and is not weakened anywhere else.
+
+**Second defect found and fixed (F18a).** The component has six raw-hex lines; the lint reported five. `HEX_RE` is a `/g` regex whose `lastIndex` persists across `.test()` calls, so R9 skipped roughly every other violating line. Measured before acting: a stateless probe yields exactly 6 findings repo-wide, all in the exempt file, so fixing it strengthens enforcement without creating a new blocker.
+
+**Evidence.** 14 regression cases using the real lint as a subprocess. Seven mutations attempted, seven caught: removing the exception, adding a second file, `endsWith` matching, substring matching, directory exemption, reverting the stateless fix, un-freezing the allowlist.
+
+**Noted, not acted on:** `BootstrapErrorBoundary` has no importer anywhere in the repository, so the bootstrap error UI it provides is not currently reachable. The exception is correct regardless. Wiring it in or removing it is a separate decision.
+
+**Code-side production readiness: COMPLETE.** Remaining work is GitHub settings only, per `docs/OPERATOR-SETTINGS-PRODUCTION.md`.

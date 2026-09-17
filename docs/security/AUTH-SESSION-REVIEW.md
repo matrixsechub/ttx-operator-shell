@@ -217,4 +217,17 @@ Results are recorded in the PR #43 conversation for this commit.
 - **Blast radius, which grew today:** `lint:brand` runs inside `.github/workflows/_reusable-build-test.yml`. That reusable workflow is consumed by `ci.yml` (so the PR and main gate has been failing on this count since 2026-08-13, the second long-running red gate after F2) **and, as of Task 5, by `deploy-production.yml`**. Consequently a dispatched production deploy will now fail at `build-test` and never reach the approval step.
 - **Assessment:** failing closed is correct behavior for the new pipeline. The defect is the unfixed lint violation, not the gate.
 - **Options:** (a) fix the component by replacing the 5 raw hex values with `op-*` / `entity-*` tokens — smallest, but it is a product UI change outside this mission's scope and alters rendered colors; (b) have the brand lint treat `BootstrapErrorBoundary.tsx` as an explicit, documented exception, since an error boundary must render before the token stylesheet is guaranteed to have loaded, which may be exactly why raw hex was used; (c) leave it and accept that production cannot deploy.
-- **Not fixed here.** It is outside Task 5 and the Operator's "do not expand scope" boundary. Recommend (b) if the pre-stylesheet rendering rationale holds, otherwise (a). **This is the one thing that must be resolved before the first production deploy can succeed.**
+- **RESOLVED 2026-09-17 (Operator-approved Option B).** `npm run lint:brand` exits 0 with `src/components/BootstrapErrorBoundary.tsx` unchanged byte-for-byte. The rendered bootstrap error UI is untouched.
+  - The rationale is factually supported: every color in the component is an inline `style={{…}}` literal with no stylesheet or token dependency, so it renders when the substrate has failed. It is the only file in `src/` structured that way.
+  - The exception lives in `scripts/ci/brand-lint-exceptions.mjs` as a frozen one-entry allowlist matched by exact repository-relative path equality. Not substring, prefix, suffix, glob, or directory. Applied at exactly one call site guarding only the R9 raw-hex report, so R10, R11 and R15 still apply to the file. A listed path that stops existing now fails the lint, so the exception cannot rot after a rename.
+  - R9 is not disabled and is not weakened anywhere else.
+  - Regression coverage: `tests/ci/brand-lint-exception.test.mjs`, 14 cases, running the real lint as a subprocess. Mutation-verified against 7 regressions, all caught.
+
+### F18a — R9 under-reported raw hex because a global regex was reused for boolean tests (P2, VERIFIED, FIXED)
+
+Found while verifying F18. `src/components/BootstrapErrorBoundary.tsx` contains **six** raw-hex lines but the lint reported **five**.
+
+- **Cause:** `HEX_RE` is declared `/g`. A global regex keeps `lastIndex` between `.test()` calls, so alternating calls resumed mid-string, missed, and reset. R9 therefore skipped roughly every other violating line. The same defect affected the R1 inline-style check on governed HTML.
+- **Measured before changing anything:** with a stateless probe the repository yields exactly 6 findings, all in the exempt file. **No other file was hiding a raw-hex violation**, so the fix strengthens enforcement without introducing a new blocker.
+- **Fix:** boolean checks now use a stateless `HEX_TEST`; `HEX_RE` remains for `.match()`, which resets `lastIndex` on its own.
+- **Regression:** a probe component with four raw-hex lines must report four findings, not two.
