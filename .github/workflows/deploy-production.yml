@@ -1,5 +1,14 @@
-# Auto-deploy to Cloudflare Workers on push to main.
-# Requires secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, GH_PAT
+# Production deployment.
+#
+# Fail-closed order: preflight lint -> build+test -> wrangler dry run ->
+# `production` GitHub Environment approval -> deploy -> fail-closed smoke.
+# Nothing reaches Cloudflare until every preceding job is green and a required
+# reviewer on the `production` Environment has approved.
+#
+# Operator settings required (see docs/OPERATOR-SETTINGS-PRODUCTION.md):
+#   - GitHub Environment named `production` with required reviewers
+#   - environment-scoped secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, GH_PAT
+#   - environment variable PRODUCTION_BASE_URL
 
 name: Deploy Production
 
@@ -17,10 +26,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  preflight:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - run: node scripts/ci/workflow-permissions-lint.mjs
+
+      - run: node scripts/ci/audit-action-pins.mjs
+
+  # Typecheck, brand lint, full test suite, build. Reused, not duplicated.
+  build-test:
+    uses: ./.github/workflows/_reusable-build-test.yml
+    permissions:
+      contents: read
+      actions: write
+
+  # Dry run against the real production config before any mutation.
+  production-dry-run:
+    uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    permissions:
+      contents: read
+      actions: write
+
+  deploy:
+    needs: [preflight, build-test, production-dry-run]
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    env:
+      GIT_COMMIT_SHA: ${{ github.sha }}
+      BUILD_TIMESTAMP: ${{ github.run_started_at }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
@@ -35,34 +74,81 @@ jobs:
           test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
           echo "MSHOPS storefront artifact found"
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: ./.github/actions/setup-node-npm
         with:
-          node-version: "22"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
+          node-version: "24"
 
       - name: Build
         env:
           MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
-          GIT_COMMIT_SHA: ${{ github.sha }}
-          BUILD_TIMESTAMP: "2026-08-14"
         run: npm run build
 
+      - name: Wrangler production dry run (pre-deploy gate)
+        run: npx wrangler deploy --dry-run --outdir .artifacts/wrangler-production-predeploy
+
+      # Build identity must be supplied explicitly: wrangler.jsonc pins
+      # BUILD_COMMIT_SHA to "unknown", and env vars take precedence over the
+      # bundled value, so without these flags production cannot report its own
+      # commit (F4). Colon-bearing ISO timestamps parse correctly — verified by
+      # `wrangler deploy --dry-run --var BUILD_TIMESTAMP:<iso>`.
       - name: Deploy to Cloudflare Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler deploy
-
-      - name: Smoke test
         run: |
-          sleep 20
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.mshops.net/pearl-os)
-          echo "Pearl OS route status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
-            echo "/pearl-os returned $STATUS"
-          else
-            echo "Pearl OS is live!"
-          fi
+          npx wrangler deploy \
+            --var BUILD_COMMIT_SHA:${GIT_COMMIT_SHA} \
+            --var BUILD_TIMESTAMP:${BUILD_TIMESTAMP}
+
+      - name: Capture deployment metadata
+        run: |
+          mkdir -p artifacts
+          node --input-type=module -e "
+            import { writeFileSync } from 'node:fs';
+            writeFileSync('artifacts/production-deploy-metadata.json', JSON.stringify({
+              commit_sha: process.env.GIT_COMMIT_SHA,
+              worker_name: 'ttx-operator-shell',
+              deployed_at: new Date().toISOString(),
+              workflow_run_id: '${{ github.run_id }}',
+              actor: '${{ github.actor }}'
+            }, null, 2));
+          "
+          npx wrangler --version | head -n 1 > artifacts/wrangler-version.txt
+          node --version > artifacts/node-version.txt
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: production-deploy-metadata
+          path: |
+            artifacts/production-deploy-metadata.json
+            artifacts/wrangler-version.txt
+            artifacts/node-version.txt
+            dist/.build-manifest.json
+          retention-days: 14
+          if-no-files-found: error
+
+  # Fail-closed: a non-zero exit here fails the workflow. Targets the production
+  # Worker (vars.PRODUCTION_BASE_URL, hostname-allowlisted in the script) and
+  # asserts the deployed build reports the commit we just shipped.
+  production-smoke:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Run production smoke tests
+        env:
+          PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: node scripts/ci/production-smoke.mjs "$PRODUCTION_BASE_URL" "$COMMIT_SHA"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: production-smoke-report
+          path: artifacts/production-smoke-report.json
+          retention-days: 14
+          if-no-files-found: error

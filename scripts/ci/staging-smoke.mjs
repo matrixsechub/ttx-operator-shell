@@ -158,13 +158,20 @@ function checkSecurityHeaders(headers, notes) {
   return failed;
 }
 
-function buildSmokeRequestHeaders(contract, access) {
-  return {
+export function buildSmokeRequestHeaders(contract, access) {
+  const headers = {
     Accept: contract.contentTypeIncludes?.includes("json") ? "application/json" : "*/*",
     "Cache-Control": "no-cache",
-    "CF-Access-Client-Id": access.clientId,
-    "CF-Access-Client-Secret": access.clientSecret,
   };
+  // Cloudflare Access service-token headers are attached only when credentials
+  // are supplied. Staging always supplies them (resolveStagingAccessCredentials
+  // fails closed before any fetch); production sits behind no Access policy, so
+  // it reuses this probe engine with no credentials rather than duplicating it.
+  if (access?.clientId && access?.clientSecret) {
+    headers["CF-Access-Client-Id"] = access.clientId;
+    headers["CF-Access-Client-Secret"] = access.clientSecret;
+  }
+  return headers;
 }
 
 /** Hostname only — never path, query, fragment, or userinfo. */
@@ -359,7 +366,7 @@ async function probe(baseUrl, contract, access) {
   return check;
 }
 
-async function probeWithRetry(baseUrl, contract, access, maxAttempts = 5) {
+export async function probeWithRetry(baseUrl, contract, access, maxAttempts = 5) {
   let last = null;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     last = await probe(baseUrl, contract, access);
