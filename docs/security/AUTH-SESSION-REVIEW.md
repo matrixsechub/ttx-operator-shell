@@ -32,8 +32,8 @@ Cross-acceptance: a System A access token verifies at `edgeAuthGate` (signature 
 |---|---|---|---|---|
 | F1 | P1 | VERIFIED | Credential-less operator-class token issuance at `POST /api/operator/session` | **REMEDIATED on branch** (options A + C, Operator-approved 2026-09-14; see §7 and `F1-F3-OPERATOR-DECISION.md`) |
 | F2 | P1 | VERIFIED | Production deploy workflow used unpinned actions; repo's own pin audit fails, PR gate red since 2026-08-13 | FIXED (pinned) |
-| F3 | P1 | VERIFIED | Production deploy has no approval gate and no pre-deploy verification; staging has both | NEEDS_OPERATOR |
-| F4 | P2 | VERIFIED | Production build identity reports `commitSha: "unknown"` | NEEDS_OPERATOR |
+| F3 | P1 | VERIFIED | Production deploy has no approval gate and no pre-deploy verification; staging has both | **REMEDIATED on branch** (Task 5, Operator-approved 2026-09-17; settings action outstanding, see §8) |
+| F4 | P2 | VERIFIED | Production build identity reports `commitSha: "unknown"` | **REMEDIATED on branch** (Task 5; `--var` restored and asserted by production smoke) |
 | F5 | P2 | VERIFIED | Two parallel credential systems share one signing key by fallback; System B stores a plaintext password secret | NEEDS_OPERATOR |
 | F6 | P2 | INFERRED | Refresh-token single-use depends on eventually-consistent KV | NEEDS_OPERATOR |
 | F7 | P2 | VERIFIED | No access-token or DO-session revocation on logout | NEEDS_OPERATOR |
@@ -197,3 +197,24 @@ Results are recorded in the PR #43 conversation for this commit.
 1. A System B token from `/api/operator/auth` is now insufficient on operator-class routes; any external client relying on it needs a canonical `/api/auth/login` token. No in-repo client mints or stores such a token (`public/*-operator.js` read `sessionStorage.operator_token`, which nothing in this repo writes).
 2. If the harness shares this worker's signing secret, previously minted bootstrap tokens (≤1 h) could still be presented directly to the harness until expiry. Operator action: confirm secret distinctness out of band; set a distinct `OPERATOR_SECRET` / `HARNESS_SECRET` (F5).
 3. F6, F7, F8, F9, F10 unchanged.
+
+## 8. F3 / F4 remediation record (2026-09-17, Operator-approved)
+
+**Why `b8a68fb` removed the build-identity flags (investigated as instructed).** `e2beb63` states the timestamp was simplified "to avoid colon issues in `--var` syntax", and `b8a68fb` states "Remove `--env`, `--var` flags that were causing parse failures". Both cite `ttx-operator-shell#28`. Reading the diff, the failing command was `npx wrangler deploy --env "" --var … --var BUILD_TIMESTAMP:$(date -u +%Y-%m-%dT%H-%M-%SZ)` — note the timestamp already used dashes, so it carried **no colons**. The empty-string `--env ""` is the flag that plausibly failed; `--var` appears to have been removed collaterally.
+
+**Colon claim tested and disproved (VERIFIED).** `npx wrangler deploy --dry-run --var BUILD_COMMIT_SHA:<40-hex> --var BUILD_TIMESTAMP:2026-09-17T12:34:56Z` exits 0 and registers both as environment variables. Wrangler splits on the first colon. `staging-deploy.yml` has been passing a colon-bearing `github.run_started_at` through `--var` all along, which corroborates this. So the smallest safe restoration was to reinstate `--var` without `--env ""`.
+
+**Changes.** `.github/workflows/deploy-production.yml` now runs: `authorize` (confirmation phrase + SHA resolution) → `preflight` (permissions lint, pin audit) → reusable `build-test` (typecheck, brand lint, full suite, build) → reusable wrangler dry run → `production` GitHub Environment approval → in-job pre-deploy dry run → deploy with `--var BUILD_COMMIT_SHA`/`BUILD_TIMESTAMP` → fail-closed production smoke. Push-to-main no longer deploys. Delivered as two commits so the trigger change can be reverted alone.
+
+**Smoke.** `scripts/ci/production-smoke.mjs` replaces the `curl | echo` step. It reuses the staging probe engine rather than duplicating it and asserts the deployed build reports the shipped commit, which is what makes F4 self-enforcing.
+
+**Residual, and one new blocker:** see F18 below. The approval gate itself is inert until the Operator creates the environment (`docs/OPERATOR-SETTINGS-PRODUCTION.md`).
+
+### F18 — `npm run lint:brand` fails on `main`, and now blocks production deploys (P1, VERIFIED, NEEDS_OPERATOR)
+
+- **Observed:** `npm run lint:brand` exits 1 with 5 findings, all `[R9] raw hex in OS surface code` in `src/components/BootstrapErrorBoundary.tsx` at lines 38, 42, 46, 58, 71. Introduced by `e5d06c7` (2026-08-13).
+- **Verified pre-existing:** the identical 5 findings reproduce on a clean `origin/main` checkout. Not caused by this branch.
+- **Blast radius, which grew today:** `lint:brand` runs inside `.github/workflows/_reusable-build-test.yml`. That reusable workflow is consumed by `ci.yml` (so the PR and main gate has been failing on this count since 2026-08-13, the second long-running red gate after F2) **and, as of Task 5, by `deploy-production.yml`**. Consequently a dispatched production deploy will now fail at `build-test` and never reach the approval step.
+- **Assessment:** failing closed is correct behavior for the new pipeline. The defect is the unfixed lint violation, not the gate.
+- **Options:** (a) fix the component by replacing the 5 raw hex values with `op-*` / `entity-*` tokens — smallest, but it is a product UI change outside this mission's scope and alters rendered colors; (b) have the brand lint treat `BootstrapErrorBoundary.tsx` as an explicit, documented exception, since an error boundary must render before the token stylesheet is guaranteed to have loaded, which may be exactly why raw hex was used; (c) leave it and accept that production cannot deploy.
+- **Not fixed here.** It is outside Task 5 and the Operator's "do not expand scope" boundary. Recommend (b) if the pre-stylesheet rendering rationale holds, otherwise (a). **This is the one thing that must be resolved before the first production deploy can succeed.**

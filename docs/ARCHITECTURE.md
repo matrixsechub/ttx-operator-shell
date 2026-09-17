@@ -115,7 +115,7 @@ Secrets (`OPERATOR_CALLSIGN`, `OPERATOR_PASSWORD_HASH`, `AUTH_SIGNING_KEY`, `OPE
 | Rate limit exceeded | 429 with `Retry-After`, per isolate | Advisory only | `index.ts:113-133` |
 | Unhandled exception | Top-level catch returns 500 `Internal error` and logs the pathname | Yes | `index.ts:146-160` |
 
-The governance fallback is the one place the system degrades **open**: when the Durable Object is unreachable, policy is computed from defaults rather than refusing. That is visible in `/api/system/health` as `degraded`, and it is worth an Operator decision if policy is ever load-bearing for a destructive action.
+The governance fallback is the one place the system substitutes invented policy rather than refusing: when the Durable Object is unreachable, policy is computed from `defaultGovernanceState()`. Measured against the derivation, two gates land *more* restrictive and the policy `mode` lands *less* restrictive, so "fails open" is too coarse. It is visible in `/api/system/health` as `degraded`. Full analysis, alternatives, and test strategy: `docs/security/GOVERNANCE-DO-DEGRADATION.md` (finding G1, P2, not fixed).
 
 ## 7. Architectural observations
 

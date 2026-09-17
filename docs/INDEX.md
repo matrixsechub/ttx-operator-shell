@@ -96,5 +96,8 @@ All generated 2026-07-01, before the scope lock took effect the same day. Useful
 - `docs/ARCHITECTURE.md` — worker architecture, gates, failure modes
 - `docs/TEST-BASELINE.md` — test baseline and orphan-suite classifications
 - `docs/security/AUTH-SESSION-REVIEW.md` — 17 security findings
-- `docs/security/F1-F3-OPERATOR-DECISION.md` — F1 remediated, F3 pending
+- `docs/security/F1-F3-OPERATOR-DECISION.md` — F1 and F3 remediated; settings outstanding
+- `docs/security/SCOPE-LOCK-DECISION.md` — decision packet for the two tensions below
+- `docs/security/GOVERNANCE-DO-DEGRADATION.md` — finding G1, governance fallback (P2, not fixed)
+- `docs/OPERATOR-SETTINGS-PRODUCTION.md` — manual settings checklist for the `production` environment
 - `docs/RELEASE.md`, `docs/STAGING_EXECUTION.md`, `docs/STEP5-RECONCILIATION.md`, `docs/evidence/`, `docs/flywheel/` — release and evidence trail

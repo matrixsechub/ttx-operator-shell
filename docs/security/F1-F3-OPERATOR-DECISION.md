@@ -1,7 +1,7 @@
 # Security Decision Packet — F1 and F3
 
 **Date:** 2026-09-14 · **Branch:** `claude/eloquent-heisenberg-p2i54y` · **PR:** #43 (draft) · **Source:** `docs/security/AUTH-SESSION-REVIEW.md`
-**Status:** F1 DECIDED AND REMEDIATED ON BRANCH (options A + C, 2026-09-14; see §F1 remediation record). F3 still DECISION REQUIRED. No worker code, wrangler config, secrets, Beacon, scope-lock, or workflow behavior changed in this turn.
+**Status:** F1 REMEDIATED (options A + C, 2026-09-14). F3 REMEDIATED (2026-09-17, Task 5): code complete, Operator settings outstanding, and blocked on F18. See the F3 record at the end of this document. No worker code, wrangler config, secrets, Beacon, scope-lock, or workflow behavior changed in this turn.
 
 Evidence labels: VERIFIED (read and/or executed here), INFERRED (follows from code plus documented platform behavior), UNKNOWN (not determinable from this repo).
 
@@ -219,3 +219,26 @@ Total code touched across both: about 4 worker lines removed plus test updates (
 **Rollback:** `git revert` of the remediation commit on the PR branch. No data or secret changes to unwind.
 
 **Compatibility consequence accepted:** System B operator tokens alone no longer authorize operator-class routes. The credentialed `/api/operator/auth` still issues them; they remain valid at the edge gate but not past canonical auth.
+
+---
+
+## F3 remediation record (2026-09-17)
+
+**Operator decisions applied:** manual `workflow_dispatch` with a confirmation phrase; build identity restored; `production` GitHub Environment; verification before deploy reusing existing reusable workflows; fail-closed smoke against the real production target; workflow-shape regression test.
+
+**Implemented as two commits, deliberately.** `fe67bca` adds verification, the environment binding, build identity, and the fail-closed smoke while leaving the trigger untouched. `28cc1a4` then removes push-to-main and adds the `authorize` job. The boundary means the trigger-model change can be reverted on its own if manual dispatch proves operationally awkward, without giving up the approval gate or the smoke.
+
+**Item-by-item against the packet's minimum fix:**
+
+| Item | Status |
+|---|---|
+| 1 Approval gate (`environment: production`) | Done in code; **Operator settings action outstanding** |
+| 2 Explicit trigger (dispatch + phrase) | Done; `resolve-deploy-ref.mjs` gained per-target phrases, staging unchanged |
+| 3 Typecheck, tests, dry run | Done by reusing `_reusable-build-test.yml` and `_reusable-wrangler-dry-run.yml` |
+| 4 Fail-closed smoke on the right target | Done; new `scripts/ci/production-smoke.mjs` |
+| 5 Build identity (F4) | Done; colon concern tested and disproved |
+| 6 `MSHOPS` clone left as-is (F12) | Unchanged, as the packet proposed |
+
+**Deviation from the packet worth flagging:** the packet assumed `scripts/ci/staging-smoke.mjs` could be pointed at production. It cannot. `validateStagingBaseUrl` hard-allowlists the staging hostname as a compile-time constant that explicitly must not be overridden by environment variables, `resolveStagingAccessCredentials` requires Cloudflare Access service-token credentials that production does not have, and the report is stamped `environment: "staging"`. Those are three staging-only assumptions, so production got its own entrypoint and hostname validator, reusing the shared probe engine through a minimal seam rather than duplicating the check logic.
+
+**New blocker discovered:** F18 in `docs/security/AUTH-SESSION-REVIEW.md`. `npm run lint:brand` fails on `main`, and the hardened pipeline now depends on it, so no production deploy can currently succeed. Operator decision required.
