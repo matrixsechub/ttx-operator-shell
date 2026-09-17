@@ -12,11 +12,24 @@
 
 name: Deploy Production
 
+# Production is NOT deployed by merging to main. Deployment is an explicit,
+# confirmed, Operator-initiated action.
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: Type DEPLOY_PRODUCTION to authorize deployment
+        required: true
+        type: string
+      target_ref:
+        description: Git ref to deploy (branch, tag, or SHA)
+        required: true
+        default: main
+        type: string
+      reason:
+        description: Optional deployment reason for audit logs
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -26,12 +39,38 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Validates the confirmation phrase and resolves target_ref to an immutable
+  # commit SHA. Every downstream job builds, verifies, and deploys that exact
+  # SHA, so the ref cannot move underneath the pipeline.
+  authorize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      commit_sha: ${{ steps.resolve.outputs.commit_sha }}
+      requested_ref: ${{ steps.resolve.outputs.requested_ref }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate deployment authorization
+        id: resolve
+        env:
+          CONFIRM_DEPLOY: ${{ inputs.confirm_deploy }}
+          TARGET_REF: ${{ inputs.target_ref }}
+          DEPLOY_TARGET: production
+        run: node scripts/ci/resolve-deploy-ref.mjs
+
   preflight:
+    needs: authorize
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
 
       - run: node scripts/ci/workflow-permissions-lint.mjs
 
@@ -39,29 +78,39 @@ jobs:
 
   # Typecheck, brand lint, full test suite, build. Reused, not duplicated.
   build-test:
+    needs: authorize
     uses: ./.github/workflows/_reusable-build-test.yml
+    with:
+      ref: ${{ needs.authorize.outputs.commit_sha }}
+      git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
     permissions:
       contents: read
       actions: write
 
   # Dry run against the real production config before any mutation.
   production-dry-run:
+    needs: authorize
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
+    with:
+      ref: ${{ needs.authorize.outputs.commit_sha }}
+      git_commit_sha: ${{ needs.authorize.outputs.commit_sha }}
     permissions:
       contents: read
       actions: write
 
   deploy:
-    needs: [preflight, build-test, production-dry-run]
+    needs: [authorize, preflight, build-test, production-dry-run]
     runs-on: ubuntu-latest
     environment: production
     permissions:
       contents: read
     env:
-      GIT_COMMIT_SHA: ${{ github.sha }}
+      GIT_COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
       BUILD_TIMESTAMP: ${{ github.run_started_at }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
 
       - name: Clone MSHOPS storefront artifact
         env:
@@ -101,6 +150,8 @@ jobs:
             --var BUILD_TIMESTAMP:${BUILD_TIMESTAMP}
 
       - name: Capture deployment metadata
+        env:
+          DEPLOY_REASON: ${{ inputs.reason }}
         run: |
           mkdir -p artifacts
           node --input-type=module -e "
@@ -109,8 +160,10 @@ jobs:
               commit_sha: process.env.GIT_COMMIT_SHA,
               worker_name: 'ttx-operator-shell',
               deployed_at: new Date().toISOString(),
+              requested_ref: '${{ needs.authorize.outputs.requested_ref }}',
               workflow_run_id: '${{ github.run_id }}',
-              actor: '${{ github.actor }}'
+              actor: '${{ github.actor }}',
+              reason: process.env.DEPLOY_REASON ?? ''
             }, null, 2));
           "
           npx wrangler --version | head -n 1 > artifacts/wrangler-version.txt
@@ -131,18 +184,20 @@ jobs:
   # Worker (vars.PRODUCTION_BASE_URL, hostname-allowlisted in the script) and
   # asserts the deployed build reports the commit we just shipped.
   production-smoke:
-    needs: [deploy]
+    needs: [authorize, deploy]
     runs-on: ubuntu-latest
     environment: production
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ needs.authorize.outputs.commit_sha }}
 
       - name: Run production smoke tests
         env:
           PRODUCTION_BASE_URL: ${{ vars.PRODUCTION_BASE_URL }}
-          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_SHA: ${{ needs.authorize.outputs.commit_sha }}
         run: node scripts/ci/production-smoke.mjs "$PRODUCTION_BASE_URL" "$COMMIT_SHA"
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

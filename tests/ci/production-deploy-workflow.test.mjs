@@ -111,7 +111,9 @@ describe("production deploy — smoke is fail-closed and correctly targeted", ()
   });
 
   it("smoke depends on the deploy it verifies", () => {
-    assert.match(job("production-smoke"), /^ {4}needs: \[deploy\]$/m);
+    const needs = job("production-smoke").match(/^ {4}needs: \[(.+)\]$/m);
+    assert.ok(needs, "production-smoke must declare needs");
+    assert.ok(needs[1].includes("deploy"), "smoke must depend on deploy");
   });
 
   it("uploads the smoke report even on failure", () => {
@@ -139,5 +141,51 @@ describe("production deploy — hygiene", () => {
 
   it("declares least-privilege permissions at workflow level", () => {
     assert.match(header(), /^permissions:\n {2}contents: read$/m);
+  });
+});
+
+describe("production deploy — trigger model", () => {
+  it("is not triggered by pushing or merging to main", () => {
+    const head = stripComments(header());
+    assert.doesNotMatch(head, /^on:\n(?:.*\n)*?\s*push:/m, "production must not deploy on push");
+    assert.doesNotMatch(head, /branches:/, "no branch trigger may deploy production");
+  });
+
+  it("is triggered only by manual dispatch with a confirmation phrase", () => {
+    const head = stripComments(header());
+    assert.match(head, /^ {2}workflow_dispatch:$/m);
+    assert.match(head, /^ {6}confirm_deploy:$/m);
+    assert.match(head, /DEPLOY_PRODUCTION/, "the confirmation phrase must be production-specific");
+    // Scope to the confirm_deploy block: another input's `required: true`
+    // must not satisfy this (caught by mutation testing).
+    const confirmBlock = head.slice(head.indexOf("      confirm_deploy:"));
+    const confirmInput = confirmBlock.slice(0, confirmBlock.slice(1).search(/\n {6}[a-z_]+:\n/) + 1);
+    assert.match(confirmInput, /^ {8}required: true$/m, "confirm_deploy must be a required input");
+  });
+
+  it("resolves the target ref through the authorization script with the production target", () => {
+    const authorize = stripComments(job("authorize"));
+    assert.match(authorize, /node scripts\/ci\/resolve-deploy-ref\.mjs/);
+    assert.match(authorize, /DEPLOY_TARGET: production/);
+    assert.match(authorize, /CONFIRM_DEPLOY: \$\{\{ inputs\.confirm_deploy \}\}/);
+    assert.match(authorize, /commit_sha: \$\{\{ steps\.resolve\.outputs\.commit_sha \}\}/);
+  });
+
+  it("builds, verifies, and deploys the authorized commit rather than a moving ref", () => {
+    for (const name of ["preflight", "build-test", "production-dry-run", "deploy", "production-smoke"]) {
+      const block = stripComments(job(name));
+      assert.match(
+        block,
+        /needs\.authorize\.outputs\.commit_sha/,
+        `${name} must operate on the authorized commit SHA`,
+      );
+    }
+    assert.doesNotMatch(stripComments(job("deploy")), /github\.sha/, "deploy must not fall back to github.sha");
+  });
+
+  it("every job depends on authorization", () => {
+    for (const name of ["preflight", "build-test", "production-dry-run", "deploy", "production-smoke"]) {
+      assert.match(stripComments(job(name)), /^ {4}needs: (authorize|\[authorize)/m, `${name} must need authorize`);
+    }
   });
 });

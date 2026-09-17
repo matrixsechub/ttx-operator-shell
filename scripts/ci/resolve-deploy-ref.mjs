@@ -4,7 +4,24 @@ import { execSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-export const CONFIRM_PHRASE = "DEPLOY_STAGING";
+/**
+ * Per-target confirmation phrases. A phrase authorizes exactly one target:
+ * typing DEPLOY_STAGING can never authorize a production deploy, and vice
+ * versa. An unrecognized target fails closed.
+ */
+export const CONFIRM_PHRASES = Object.freeze({
+  staging: "DEPLOY_STAGING",
+  production: "DEPLOY_PRODUCTION",
+});
+
+export const DEFAULT_DEPLOY_TARGET = "staging";
+
+/** Back-compat export: the staging phrase. */
+export const CONFIRM_PHRASE = CONFIRM_PHRASES.staging;
+
+export function expectedConfirmPhrase(target = DEFAULT_DEPLOY_TARGET) {
+  return Object.prototype.hasOwnProperty.call(CONFIRM_PHRASES, target) ? CONFIRM_PHRASES[target] : null;
+}
 export const UNSAFE_REF_PATTERNS = [
   /^pull\//i,
   /^refs\/pull\//i,
@@ -12,9 +29,13 @@ export const UNSAFE_REF_PATTERNS = [
   /^merge\//i,
 ];
 
-export function validateConfirmDeploy(confirm) {
-  if (confirm?.trim() !== CONFIRM_PHRASE) {
-    return { ok: false, error: `confirm_deploy must be exactly "${CONFIRM_PHRASE}"` };
+export function validateConfirmDeploy(confirm, target = DEFAULT_DEPLOY_TARGET) {
+  const phrase = expectedConfirmPhrase(target);
+  if (!phrase) {
+    return { ok: false, error: `unknown deploy target "${target}"` };
+  }
+  if (confirm?.trim() !== phrase) {
+    return { ok: false, error: `confirm_deploy must be exactly "${phrase}"` };
   }
   return { ok: true };
 }
@@ -49,8 +70,8 @@ export function resolveCommitSha(targetRef, exec = execSync) {
   }
 }
 
-export function authorizeDeployment(confirm, targetRef, exec = execSync) {
-  const confirmResult = validateConfirmDeploy(confirm);
+export function authorizeDeployment(confirm, targetRef, exec = execSync, target = DEFAULT_DEPLOY_TARGET) {
+  const confirmResult = validateConfirmDeploy(confirm, target);
   if (!confirmResult.ok) return confirmResult;
   return resolveCommitSha(targetRef, exec);
 }
@@ -65,8 +86,9 @@ function writeOutputs(requestedRef, commitSha) {
 function main() {
   const confirm = process.env.CONFIRM_DEPLOY?.trim() ?? process.argv[2]?.trim();
   const targetRef = process.env.TARGET_REF?.trim() ?? process.argv[3]?.trim() ?? "main";
+  const target = process.env.DEPLOY_TARGET?.trim() || DEFAULT_DEPLOY_TARGET;
 
-  const result = authorizeDeployment(confirm, targetRef);
+  const result = authorizeDeployment(confirm, targetRef, execSync, target);
   if (!result.ok) {
     console.error(`DEPLOY_REF::FAIL::${result.error}`);
     process.exit(1);
