@@ -17,7 +17,7 @@ handoff_packet:
     touched. Two scope-lock tensions were documented, not resolved.
   claims:
     - claim: Full test suite is green and 45 tests larger than at session start
-      evidence: "npm test → 311 tests / 93 suites / 309 pass / 0 fail / 2 todo (was 266/82)"
+      evidence: "npm test → 311 tests / 94 suites / 309 pass / 0 fail / 2 todo (was 266/82)"
       confidence: VERIFIED
     - claim: Typecheck passes
       evidence: "npm run typecheck → exit 0"
@@ -90,7 +90,7 @@ Diff against `main`: 18 files, ~1420 insertions, 62 deletions across 9 commits.
 | Check | Result |
 |---|---|
 | `npm run typecheck` | exit 0 |
-| `npm test` | 311 tests, 93 suites, 309 pass, 0 fail, 2 todo |
+| `npm test` | 311 tests, 94 suites, 309 pass, 0 fail, 2 todo |
 | `node scripts/ci/audit-action-pins.mjs` | exit 0 (was exit 1 on `main`) |
 | `node scripts/ci/workflow-permissions-lint.mjs` | exit 0 |
 
