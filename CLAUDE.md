@@ -123,5 +123,7 @@ Prompts: `.cursor/agents/*.md`. Always-on rules: `.cursor/rules/00-beacon-govern
 - Branch per task; commits in `type(scope): summary` form (`feat`, `fix`, `chore`, `docs`, `test`).
 - Repo operations follow the MSH-OPS GitHub SOP linked in `README.md`.
 - Before pushing: `npm run typecheck` and `npm test` locally. One validated push over several speculative ones.
-- Root-level `*.md` files are mostly historical planning packets; prefer `docs/` and this file for current state. Index: `docs/INDEX.md` (pending).
+- Root-level `*.md` files are mostly historical planning packets; prefer `docs/` and this file for current state.
+  Classified index: `docs/INDEX.md` (GOVERNING / RECORD / PLANNING / RETIRED-SCOPE / HISTORICAL). Architecture: `docs/ARCHITECTURE.md`.
+- **Second known tension (UNRESOLVED, Operator decision):** `SCOPE-LOCK.md` retires backend marketplace purchase flows and names no billing runtime, yet `worker/marketplaceBillingWorker.ts`, `entitlementsWorker.ts`, and `tierWorker.ts` ship and are tested. Treat the code as real; do not extend billing scope without a mission that also amends the scope lock. See `docs/INDEX.md`.
 - Current planning artifact: `docs/BUDGET-EXECUTION-PLAN.md`.
