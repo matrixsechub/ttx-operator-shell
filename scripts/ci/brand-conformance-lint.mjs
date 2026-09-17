@@ -41,6 +41,15 @@
  * TRACK 3 — OS-WIDE RULES (cockpit / dashboard / marketplace / src)
  *  R9   No raw hex in src/ — the React OS surfaces may declare hex only
  *       in src/styles/index.css custom-property (@theme) declarations.
+ *       ONE sanctioned exception exists, declared as an exact-path allowlist
+ *       in ./brand-lint-exceptions.mjs: src/components/BootstrapErrorBoundary.tsx.
+ *       It is bootstrap/error-recovery infrastructure that must render an
+ *       operator-readable failure state when the token substrate itself has
+ *       failed to load, so its colors are inline literals with no stylesheet
+ *       dependency. The exception covers R9 raw-hex reporting ONLY; R10, R11
+ *       and R15 still apply to that file. See that module for the full
+ *       rationale and the rules for adding an entry (Operator decision, not a
+ *       lint fix). R9 is NOT disabled and is not weakened anywhere else.
  *  R10  No named Tailwind palettes — utilities like text-zinc-400 or
  *       bg-emerald-950 are rogue palettes; only op-* / entity-* token
  *       utilities are governed.
@@ -64,6 +73,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { R9_RAW_HEX_EXEMPT_FILES, isR9RawHexExempt } from "./brand-lint-exceptions.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PUBLIC = path.join(ROOT, "public");
@@ -123,6 +133,13 @@ const FUNNEL_PAGES = [
 const GOVERNED_HTML = [...FUNNEL_PAGES, "splash.html", "welcome.html"];
 
 const HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
+/**
+ * Stateless twin of HEX_RE. A /g regex keeps `lastIndex` between `.test()`
+ * calls, so reusing HEX_RE for boolean tests skipped roughly every other
+ * violating line and under-reported raw hex. Use HEX_RE only with `.match()`
+ * (which resets) and HEX_TEST for every boolean check.
+ */
+const HEX_TEST = /#[0-9a-fA-F]{3,8}\b/;
 const failures = [];
 
 function read(rel) {
@@ -314,7 +331,7 @@ for (const page of GOVERNED_HTML) {
   const inlineStyleRe = /style="([^"]*)"/g;
   let style;
   while ((style = inlineStyleRe.exec(html)) !== null) {
-    if (HEX_RE.test(style[1])) {
+    if (HEX_TEST.test(style[1])) {
       fail(page, "R1", `inline style carries raw hex: style="${style[1]}"`);
     }
   }
@@ -358,13 +375,14 @@ for (const file of walk(SRC, [".tsx", ".ts", ".css"])) {
   const rel = path.relative(ROOT, file);
   const text = readFileSync(file, "utf8");
   const isTokenSource = file === SRC_TOKEN_SOURCE;
+  const rawHexExempt = isR9RawHexExempt(rel);
 
   text.split("\n").forEach((line, index) => {
     const lineNo = index + 1;
 
     if (isTokenSource) {
       // @theme token source: hex only in custom-property declarations.
-      if (HEX_RE.test(line) && !/^\s*--[a-zA-Z0-9-]+\s*:/.test(line)) {
+      if (HEX_TEST.test(line) && !/^\s*--[a-zA-Z0-9-]+\s*:/.test(line)) {
         fail(rel, "R9", `line ${lineNo}: raw hex outside a custom-property declaration`);
       }
       return;
@@ -372,7 +390,9 @@ for (const file of walk(SRC, [".tsx", ".ts", ".css"])) {
 
     // HTML numeric character references (&#9650;) are not colors.
     const deEntitied = line.replace(/&#\d+;/g, "");
-    if (HEX_RE.test(deEntitied) && !/color-scheme|href=|glyph|#root/.test(line)) {
+    // Sanctioned R9 exception (exact path only) — see ./brand-lint-exceptions.mjs.
+    // Scoped to this report site so R10/R11 below still apply to the file.
+    if (HEX_TEST.test(deEntitied) && !/color-scheme|href=|glyph|#root/.test(line) && !rawHexExempt) {
       fail(rel, "R9", `line ${lineNo}: raw hex in OS surface code (use op-*/entity-* tokens)`);
     }
     const named = line.match(NAMED_PALETTE_RE);
@@ -383,6 +403,14 @@ for (const file of walk(SRC, [".tsx", ".ts", ".css"])) {
       fail(rel, "R11", `line ${lineNo}: arbitrary hex utility (use op-*/entity-* tokens)`);
     }
   });
+}
+
+/* R9 exception hygiene: a sanctioned path that no longer exists is a stale
+   exception. Fail loudly rather than carrying a silent, meaningless entry. */
+for (const exempt of R9_RAW_HEX_EXEMPT_FILES) {
+  if (!existsSync(path.join(ROOT, exempt))) {
+    fail(exempt, "R9", "sanctioned raw-hex exception points at a file that does not exist — remove it or fix the path");
+  }
 }
 
 const PUBLIC_SHELLS = ["ecosystem.html", "storefront.html", "index.html"];
