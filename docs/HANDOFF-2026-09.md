@@ -16,8 +16,8 @@ handoff_packet:
     file, scope-lock line, secret, Cloudflare resource, or production surface was
     touched. Two scope-lock tensions were documented, not resolved.
   claims:
-    - claim: Full test suite is green and 38 tests larger than at session start
-      evidence: "npm test → 304 tests / 92 suites / 302 pass / 0 fail / 2 todo (was 266/82)"
+    - claim: Full test suite is green and 45 tests larger than at session start
+      evidence: "npm test → 311 tests / 93 suites / 309 pass / 0 fail / 2 todo (was 266/82)"
       confidence: VERIFIED
     - claim: Typecheck passes
       evidence: "npm run typecheck → exit 0"
@@ -81,19 +81,20 @@ handoff_packet:
 | 5 | Production deploy hardening | — | **Not started: blocked on F3 decisions** |
 | 6 | Root document index | `docs/INDEX.md` | Done |
 | 7 | This handoff packet | `docs/HANDOFF-2026-09.md` | Done |
+| +1 | Gate-ordering regression test (recommended next task #2, executed) | `tests/gateOrdering.test.ts` | Done |
 
-Diff against `main`: 16 files, 1298 insertions, 62 deletions across 8 commits.
+Diff against `main`: 18 files, ~1420 insertions, 62 deletions across 9 commits.
 
 ## 2. What was verified
 
 | Check | Result |
 |---|---|
 | `npm run typecheck` | exit 0 |
-| `npm test` | 304 tests, 92 suites, 302 pass, 0 fail, 2 todo |
+| `npm test` | 311 tests, 93 suites, 309 pass, 0 fail, 2 todo |
 | `node scripts/ci/audit-action-pins.mjs` | exit 0 (was exit 1 on `main`) |
 | `node scripts/ci/workflow-permissions-lint.mjs` | exit 0 |
 
-Test count moved from 266 to 304. The two remaining `todo` markers are F7 (no access-token revocation on logout) and F9 (no PBKDF2 iteration floor); both change auth semantics and await Operator decision.
+Test count moved from 266 to 311. The two remaining `todo` markers are F7 (no access-token revocation on logout) and F9 (no PBKDF2 iteration floor); both change auth semantics and await Operator decision.
 
 ## 3. What is UNVERIFIED
 
@@ -121,7 +122,7 @@ Test count moved from 266 to 304. The two remaining `todo` markers are F7 (no ac
 ## 5. Recommended next three tasks
 
 1. **Production deploy hardening** once F3 is decided. Highest remaining risk: every merge to `main` is an unattended production write.
-2. **Gate-ordering test.** `worker/index.ts` is a 693-line linear dispatcher whose ordering *is* the security model, and that ordering is not asserted end to end. A route-table test would have caught F1 at authoring time.
+2. ~~**Gate-ordering test.**~~ **Done in this pass** (`tests/gateOrdering.test.ts`, 7 cases). It pins the three-gate order, keeps the Engine proxy behind every gate, holds pre-gate handlers to a justified allowlist, and asserts that no operator-class path is in the public API allowlist. Verified by mutation: inserting a handler before the gates fails the suite with a named diagnostic.
 3. **Scope-lock reconciliation.** Two subsystems ship outside the declared scope. Every future phase review inherits the ambiguity until the document matches the tree.
 
 ## 6. Why the PR is still a draft
