@@ -58,39 +58,6 @@ export async function handleOperatorAuth(
 }
 
 /**
- * WILDCARD Cycle 1 — operator session bootstrap (edge JWT).
- * FEDGRADE: Compliance preserved — public bootstrap route; token required for protected APIs.
- */
-export async function handleOperatorSession(
-  request: Request,
-  pathname: string,
-  env: EdgeEnv,
-): Promise<Response | null> {
-  if (pathname !== "/api/operator/session" || request.method !== "POST") return null;
-
-  const opSecret = operatorSecret(env);
-  if (!opSecret) {
-    return Response.json(
-      { error: "operator credentials not configured", code: "OPERATOR_AUTH_UNAVAILABLE" },
-      { status: 503 },
-    );
-  }
-
-  const now = Math.floor(Date.now() / 1000);
-  const token = await signToken(opSecret, { sub: "operator", iat: now, exp: now + 3600 });
-  const expiresAt = new Date((now + 3600) * 1000).toISOString();
-
-  return Response.json({
-    operator_token: token,
-    token,
-    namespace: "session:operator",
-    agent: "WildcardAdvancementAgent",
-    expires_at: expiresAt,
-    expires: 3600,
-  });
-}
-
-/**
  * Live mshops-public edge gate — returns a Response when the request must be
  * blocked; null when the caller should continue handling.
  */
@@ -122,7 +89,15 @@ export async function edgeAuthGate(
     return Response.json({ error: "edge auth secrets not configured" }, { status: 503 });
   }
 
-  const verified = await verifyToken(token, secret);
+  let verified = await verifyToken(token, secret);
+  // F1 option C: the canonical auth.ts access token is always an acceptable
+  // credential on operator-class routes, so requiring canonical auth after
+  // this gate (apiAuth.ts) cannot lock the Operator out when OPERATOR_SECRET
+  // differs from AUTH_SIGNING_KEY. Marketplace routes are unchanged.
+  if (!verified.ok && routeClass === "operator" && env.AUTH_SIGNING_KEY && env.AUTH_SIGNING_KEY !== secret) {
+    const canonical = await verifyToken(token, env.AUTH_SIGNING_KEY);
+    if (canonical.ok && canonical.payload.type === "access") verified = canonical;
+  }
   if (!verified.ok) {
     const status = routeClass === "operator" ? 403 : 401;
     return Response.json({ error: routeClass === "operator" ? "forbidden" : verified.error, reason: verified.error }, { status });
