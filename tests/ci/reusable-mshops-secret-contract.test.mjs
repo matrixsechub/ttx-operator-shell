@@ -16,7 +16,7 @@ const REUSABLES = [
   "_reusable-wrangler-dry-run.yml",
 ];
 
-const CALLERS = ["ci.yml", "staging-deploy.yml"];
+const CALLERS = ["ci.yml", "staging-deploy.yml", "deploy-production.yml"];
 
 describe("reusable MSHOPS private-dependency secret contract (F18b)", () => {
   for (const name of REUSABLES) {
@@ -93,7 +93,6 @@ describe("reusable MSHOPS private-dependency secret contract (F18b)", () => {
     );
     for (const file of files) {
       if (REUSABLES.includes(file) || CALLERS.includes(file)) continue;
-      if (file === "deploy-production.yml") continue; // deploy owns the reference pattern
       const yaml = readWorkflow(file);
       assert.doesNotMatch(
         yaml,
@@ -111,5 +110,6 @@ describe("reusable MSHOPS private-dependency secret contract (F18b)", () => {
       /MSHOPS_BUILD_DIR:\s*\$\{\{\s*github\.workspace\s*\}\}\/MSHOPS\/build-final/,
     );
     assert.match(yaml, /x-access-token:\$\{GH_PAT\}@github\.com/);
+    assert.doesNotMatch(yaml, /secrets:\s*inherit/);
   });
 });

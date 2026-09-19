@@ -86,6 +86,8 @@ jobs:
     permissions:
       contents: read
       actions: write
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
 
   # Dry run against the real production config before any mutation.
   production-dry-run:
@@ -97,6 +99,8 @@ jobs:
     permissions:
       contents: read
       actions: write
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
 
   deploy:
     needs: [authorize, preflight, build-test, production-dry-run]
