@@ -43,9 +43,13 @@ jobs:
     permissions:
       contents: read
       actions: write
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
 
   wrangler-dry-run:
     uses: ./.github/workflows/_reusable-wrangler-dry-run.yml
     permissions:
       contents: read
       actions: write
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}

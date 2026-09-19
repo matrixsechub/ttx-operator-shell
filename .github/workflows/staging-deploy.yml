@@ -72,6 +72,8 @@ jobs:
     permissions:
       contents: read
       actions: write
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
 
   staging-dry-run:
     needs: [authorize, preflight]
@@ -82,6 +84,8 @@ jobs:
     permissions:
       contents: read
       actions: write
+    secrets:
+      GH_PAT: ${{ secrets.GH_PAT }}
 
   deploy-staging:
     needs: [authorize, build-test, staging-dry-run]

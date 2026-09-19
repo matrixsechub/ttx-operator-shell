@@ -11,6 +11,10 @@ on:
         description: Build provenance commit SHA
         required: false
         type: string
+    secrets:
+      GH_PAT:
+        description: PAT used to clone private matrixsechub/MSHOPS for storefront artifact
+        required: true
 
 permissions:
   contents: read
@@ -29,13 +33,32 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.ref }}
 
+      - name: Clone MSHOPS storefront artifact
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_PAT}" ]; then
+            echo "ERROR: GH_PAT secret is required to clone private MSHOPS"
+            exit 1
+          fi
+          git clone --depth 1 --filter=blob:none --sparse \
+            "https://x-access-token:${GH_PAT}@github.com/${{ github.repository_owner }}/MSHOPS.git" \
+            MSHOPS
+          cd MSHOPS && git sparse-checkout set build-final
+          test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          echo "MSHOPS storefront artifact found"
+
       - uses: ./.github/actions/setup-node-npm
         with:
           node-version: "24"
 
       - run: npm run verify:staging-config
 
-      - run: npm run build
+      - name: Build
+        env:
+          MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
+        run: npm run build
 
       - run: mkdir -p .artifacts/wrangler-production .artifacts/wrangler-staging
 
