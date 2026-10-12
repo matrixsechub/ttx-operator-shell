@@ -510,6 +510,11 @@ async function createCheckoutSession(
   const cancelUrl = `${origin}/apps/cloudflare-security-audit-lite?audit_id=${encodeURIComponent(job.id)}&checkout=cancelled`;
   const params = new URLSearchParams();
   params.set("mode", "payment");
+  params.set("billing_address_collection", "auto");
+  params.set("phone_number_collection[enabled]", "false");
+  params.set("automatic_tax[enabled]", "false");
+  params.set("allow_promotion_codes", "false");
+  params.set("submit_type", "auto");
   params.set("client_reference_id", job.id);
   params.set("success_url", successUrl);
   params.set("cancel_url", cancelUrl);
