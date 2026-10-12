@@ -116,6 +116,11 @@ async function createStripeCheckout(
   const origin = env.ORIGIN_URL ?? "";
   const params = new URLSearchParams({
     mode: "payment",
+    billing_address_collection: "auto",
+    "phone_number_collection[enabled]": "false",
+    "automatic_tax[enabled]": "false",
+    allow_promotion_codes: "false",
+    submit_type: "auto",
     "line_items[0][quantity]": "1",
     "line_items[0][price_data][currency]": "usd",
     "line_items[0][price_data][unit_amount]": String(priceUsdCents),
