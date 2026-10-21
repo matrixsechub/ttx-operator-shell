@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {reconcileLedger} from '../../shared/iie/accounting.ts';
+import {generateIncomeBrief} from '../../shared/iie/brief.ts';
+import {evidence,ledger,NOW,op,acceptedOp} from './fixtures.ts';
+const summary=reconcileLedger(ledger(),NOW);
+test('IIE-020: maximum three daily actions',()=>{const ops=Array.from({length:6},(_,i)=>acceptedOp({id:`work-${i}`,externalId:`ext-${i}`}));const brief=generateIncomeBrief(ops,evidence,summary,NOW);assert.equal(brief.actions.length,3);assert.equal(brief.availablePaidWork.length,6);});
+test('income first; confirmed $70 beats advertised $200',()=>{const brief=generateIncomeBrief([op(),acceptedOp()],evidence,summary,NOW);assert.equal(brief.actions[0]?.opportunityId,'work-1');assert.deepEqual(brief.availablePaidWork,['work-1']);});
+test('IIE-022: speculative-only brief has no confirmed work',()=>{const brief=generateIncomeBrief([op()],evidence,summary,NOW);assert.deepEqual(brief.availablePaidWork,[]);assert.equal(brief.sourceCoverage,'SYNTHETIC_ONLY');});
+test('rejected invitation excluded',()=>{const brief=generateIncomeBrief([op({stage:'REJECTED'})],evidence,summary,NOW);assert.equal(brief.actions.length,0);assert.match(brief.recommendation,/No confirmed payable work/);});
+test('time-window priority uses explicit UTC offsets',()=>{const first=acceptedOp({id:'a',externalId:'a',deadlineAt:'2026-10-26T08:00:00Z'});const second=acceptedOp({id:'b',externalId:'b',deadlineAt:'2026-10-24T08:00:00Z'});const brief=generateIncomeBrief([first,second],evidence,summary,NOW);assert.equal(brief.actions[0]?.opportunityId,'b');});

@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {deduplicateOpportunities,opportunityKey} from '../../shared/iie/opportunity.ts';
+import {transitionOpportunity} from '../../shared/iie/validation.ts';
+import {op} from './fixtures.ts';
+test('IIE-001: same provider event deduplicates',()=>{const d=deduplicateOpportunities([op(),op({title:'Updated synthetic test'})]);assert.equal(d.length,1);assert.equal(d[0]?.title,'Updated synthetic test');});
+test('same platform ID, conflicting internal identity raises error',()=>{assert.throws(()=>deduplicateOpportunities([op(),op({id:'other-id'})]),{code:'CONFLICTING_IDENTITY'});});
+test('provider is part of the identity, and case/space normalized',()=>{assert.equal(opportunityKey(op({provider:' SYNTHETIC.QA ',externalId:'A1'})),opportunityKey(op()));assert.equal(deduplicateOpportunities([op(),op({provider:'other.provider',id:'different'})]).length,2);});
+test('IIE-005 state is not payable without independent verified evidence',()=>{const o=transitionOpportunity(op(),'ACCEPTED');assert.equal(o.stage,'ACCEPTED');assert.equal(o.agreedPay,undefined);});
+test('terminal rejection cannot be promoted to accepted',()=>{assert.throws(()=>transitionOpportunity(op({stage:'REJECTED'}),'ACCEPTED'),{code:'INVALID_TRANSITION'});});
