@@ -44,6 +44,24 @@ const allowed: Record<OpportunityStage, readonly OpportunityStage[]> = {
   SUBMITTED:['COMPLETED','REJECTED'],
   COMPLETED:[],REJECTED:[],EXPIRED:[],WITHDRAWN:[],
 };
+/** True when `to` is `from` or a later stage along the allowed transition graph. */
+export function stageCanReach(from: OpportunityStage, to: OpportunityStage): boolean {
+  if (from === to) return true;
+  const seen = new Set<OpportunityStage>([from]);
+  const pending: OpportunityStage[] = [from];
+  while (pending.length > 0) {
+    const current = pending.pop();
+    if (current === undefined) break;
+    for (const next of allowed[current]) {
+      if (next === to) return true;
+      if (!seen.has(next)) {
+        seen.add(next);
+        pending.push(next);
+      }
+    }
+  }
+  return false;
+}
 export function transitionOpportunity(op: OpportunityRecord, to: OpportunityStage): OpportunityRecord {
   validateOpportunity(op);
   assert(allowed[op.stage].includes(to), 'INVALID_TRANSITION', `${op.stage} cannot transition to ${to}`);

@@ -32,13 +32,19 @@ tsc --noEmit --strict --target ES2022 --module NodeNext --moduleResolution NodeN
 
 No `npm install`, migrations, connector reads, or network I/O required.
 
+These commands are outside the repository `npm test` script and `tsconfig.app.json` include paths (`src` and `shared/flywheel` only). Do not treat a green pull-request test job as coverage of this module.
+
 ## Limits and safety
 
 - All tests use fabricated platform names, transactions and time entries.
 - No financial statement is claimed complete unless sources were reconciled; this source-only brief explicitly states `SYNTHETIC_ONLY`.
 - `preTaxCashAfterExpensesMinor` is **not** after-tax spendable take-home.
 - E4 approval proof is required for approved earning status and E5 posted-payment proof for cash, and all amounts are integer minor units.
+- `RATE` promotion uses the exact `termsEvidenceId`. That record must itself be verified, claim `RATE`, meet E3 for agreed pay or E1 for advertised pay, be observed at or before as-of (and inside `maximumAgeDays` when the caller sets it), and assert `currency:amountMinor:unit`. A different evidence id cannot lend its level. Conflicting qualifying `RATE` values still block promotion.
+- Approved earnings require a qualifying `WORK_APPROVED` record whose asserted value is `JSON.stringify([id, assignmentId, payer, currency, amountMinor])`. Posted cash requires a qualifying `PAYMENT_POSTED` record whose asserted value is `JSON.stringify([source, externalId, currency, amountMinor, direction, classification])`. Reuse of that record for a different earning or receipt is rejected. Partial receipts and reversals remain valid when their own subjects match. Duplicate `source` + `externalId` rows still count once.
+- `generateIncomeBrief` deduplicates on provider and external id before qualification. Duplicate observations cannot silently regress to an unreachable earlier stage or replace agreed pay with a different currency, amount, unit, or terms evidence id. Equal stages keep the later observation and the union of evidence ids.
 - Missing or conflicting evidence prevents promotion. Incomplete coverage is not evidence of zero real cash.
+- `npm test` and `tsconfig.app.json` do not include `shared/iie` or `tests/iie`. Those files are invoked directly. This mission does not change existing package scripts or TypeScript project config, so pull-request CI does not run these tests or this typecheck.
 - This domain is **not** a production authorization engine. Neither CHAMBER PASS nor Beacon metadata grants execution permissions here.
 - Existing `worker`, `msh-ops`, `src`, Beacon, Flywheel, CHAMBER, Wrangler, CI, environment, and authentication paths are not modified.
 - No persistence or delivery adapters are provided. All state remains in caller-supplied in-memory fixtures.

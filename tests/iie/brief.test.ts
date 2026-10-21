@@ -9,3 +9,15 @@ test('income first; confirmed $70 beats advertised $200',()=>{const brief=genera
 test('IIE-022: speculative-only brief has no confirmed work',()=>{const brief=generateIncomeBrief([op()],evidence,summary,NOW);assert.deepEqual(brief.availablePaidWork,[]);assert.equal(brief.sourceCoverage,'SYNTHETIC_ONLY');});
 test('rejected invitation excluded',()=>{const brief=generateIncomeBrief([op({stage:'REJECTED'})],evidence,summary,NOW);assert.equal(brief.actions.length,0);assert.match(brief.recommendation,/No confirmed payable work/);});
 test('time-window priority uses explicit UTC offsets',()=>{const first=acceptedOp({id:'a',externalId:'a',deadlineAt:'2026-10-26T08:00:00Z'});const second=acceptedOp({id:'b',externalId:'b',deadlineAt:'2026-10-24T08:00:00Z'});const brief=generateIncomeBrief([first,second],evidence,summary,NOW);assert.equal(brief.actions[0]?.opportunityId,'b');});
+test('duplicate provider observations are deduped before the three-action cap',()=>{
+  const dupA=acceptedOp({id:'dup',externalId:'dup',deadlineAt:'2026-10-22T08:00:00Z'});
+  const dupB=acceptedOp({id:'dup',externalId:'dup',title:'repeat scan',deadlineAt:'2026-10-22T08:00:00Z'});
+  const others=[1,2,3,4].map(i=>acceptedOp({id:`w${i}`,externalId:`e${i}`,deadlineAt:`2026-10-2${i+2}T08:00:00Z`}));
+  const brief=generateIncomeBrief([dupA,dupB,...others],evidence,summary,NOW);
+  const actionIds=brief.actions.map(action=>action.opportunityId);
+  assert.equal(brief.actions.length,3);
+  assert.equal(new Set(actionIds).size,actionIds.length);
+  assert.equal(brief.availablePaidWork.filter(id=>id==='dup').length,1);
+  assert.equal(brief.availablePaidWork.length,5);
+});
+test('conflicting duplicate identities are not both briefed',()=>{assert.throws(()=>generateIncomeBrief([acceptedOp({id:'a',externalId:'same'}),acceptedOp({id:'b',externalId:'same'})],evidence,summary,NOW),{code:'CONFLICTING_IDENTITY'});});

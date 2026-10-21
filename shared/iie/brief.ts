@@ -1,11 +1,13 @@
 import type { EvidenceRecord, IncomeBrief, IncomeBriefAction, IncomeDecision, LedgerSummary, OpportunityRecord } from './contracts.ts';
+import { deduplicateOpportunities } from './opportunity.ts';
 import { qualifyOpportunity } from './qualification.ts';
 import { validateTimestamp } from './validation.ts';
 const PRIORITY_ORDER:Readonly<Record<string,number>>={P0:0,P1:1,P2:2,P3:3,P4:4};
 export function generateIncomeBrief(opportunities:readonly OpportunityRecord[], evidence:readonly EvidenceRecord[], ledger:LedgerSummary, asOf:string):IncomeBrief {
   validateTimestamp(asOf,'asOf');
-  const decisions:IncomeDecision[]=opportunities.map(o=>qualifyOpportunity(o,evidence,asOf));
-  const byId=new Map(opportunities.map(o=>[o.id,o]));
+  const unique=deduplicateOpportunities(opportunities);
+  const decisions:IncomeDecision[]=unique.map(o=>qualifyOpportunity(o,evidence,asOf));
+  const byId=new Map(unique.map(o=>[o.id,o]));
   const actionable=decisions.filter((d):d is IncomeDecision & {verdict:'DO'|'TEST'}=>d.verdict==='DO'||d.verdict==='TEST').sort((a,b)=>{
     const p=PRIORITY_ORDER[a.priority]-PRIORITY_ORDER[b.priority];if(p!==0)return p;
     const da=byId.get(a.opportunityId)?.deadlineAt,db=byId.get(b.opportunityId)?.deadlineAt;

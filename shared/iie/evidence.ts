@@ -12,12 +12,15 @@ export function evidenceForClaim(records: readonly EvidenceRecord[], ids: readon
   if(values.size>1) return {supported:false,ids:qualifying.map(e=>e.id),reason:`Conflicting verified ${claim} evidence`};
   return {supported:true,ids:qualifying.map(e=>e.id)};
 }
-export function verifyTerms(op: OpportunityRecord, evidence: readonly EvidenceRecord[], agreed: boolean, asOf: string): boolean {
+export function verifyTerms(op: OpportunityRecord, evidence: readonly EvidenceRecord[], agreed: boolean, asOf: string, maximumAgeDays?: number): boolean {
   const pay=agreed?op.agreedPay:op.advertisedPay;
   if(!pay) return false;
   if(!op.evidenceIds.includes(pay.termsEvidenceId)) return false;
+  const required=agreed?'E3':'E1';
+  // The referenced record itself must be the qualifying RATE fact. Another id cannot lend its level, verification, or freshness.
+  const gate=evidenceForClaim(evidence,op.evidenceIds,'RATE',required,asOf,maximumAgeDays);
+  if(!gate.supported || !gate.ids.includes(pay.termsEvidenceId)) return false;
   const record=evidence.find(e=>e.id===pay.termsEvidenceId);
-  // The proof must corroborate these exact terms, not merely mention a rate.
   const expected=`${pay.currency}:${pay.amountMinor}:${pay.unit}`;
-  return record?.assertedValue===expected && evidenceForClaim(evidence,op.evidenceIds,'RATE',agreed?'E3':'E1',asOf).supported;
+  return record?.assertedValue===expected;
 }

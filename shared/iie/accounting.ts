@@ -1,7 +1,19 @@
-import type { CashTransaction, CurrencySummary, EarningRecord, IncomeLedgerInput, LedgerSummary } from './contracts.ts';
+import type { CashTransaction, CurrencySummary, EarningRecord, EvidenceClaim, EvidenceLevel, EvidenceRecord, IncomeLedgerInput, LedgerSummary } from './contracts.ts';
 import { evidenceForClaim } from './evidence.ts';
 import { assert, validateEvidence, validateMinor, validateTimestamp } from './validation.ts';
 const MACBOOK_COST_USD_MINOR=46856;
+/** Canonical WORK_APPROVED subject. A record may support only this earning. */
+export function earningApprovalValue(earning: Pick<EarningRecord,'id'|'assignmentId'|'payer'|'currency'|'amountMinor'>): string {
+  return JSON.stringify([earning.id,earning.assignmentId,earning.payer,earning.currency,earning.amountMinor]);
+}
+/** Canonical PAYMENT_POSTED subject. A record may support only this receipt. */
+export function paymentPostedValue(tx: Pick<CashTransaction,'source'|'externalId'|'currency'|'amountMinor'|'direction'|'classification'>): string {
+  return JSON.stringify([tx.source,tx.externalId,tx.currency,tx.amountMinor,tx.direction,tx.classification]);
+}
+function subjectCorroborated(records: readonly EvidenceRecord[], ids: readonly string[], claim: EvidenceClaim, required: EvidenceLevel, expected: string, asOf: string): boolean {
+  const gate=evidenceForClaim(records,ids,claim,required,asOf);
+  return gate.supported && gate.ids.some(id=>records.find(record=>record.id===id)?.assertedValue===expected);
+}
 export function reconcileLedger(input:IncomeLedgerInput,asOf:string):LedgerSummary {
   validateTimestamp(asOf,'asOf');validateEvidence(input.evidence);
   const earnings=new Map<string,EarningRecord>();
@@ -10,7 +22,7 @@ export function reconcileLedger(input:IncomeLedgerInput,asOf:string):LedgerSumma
     assert(!earnings.has(e.id),'DUPLICATE_EARNING',e.id);
     validateMinor(e.amountMinor,'earning');
     assert(/^[A-Z]{3}$/.test(e.currency),'INVALID_CURRENCY',e.id);
-    if(e.status==='APPROVED')assert(evidenceForClaim(input.evidence,e.evidenceIds,'WORK_APPROVED','E4',asOf).supported,'UNVERIFIED_EARNING',e.id);
+    if(e.status==='APPROVED')assert(subjectCorroborated(input.evidence,e.evidenceIds,'WORK_APPROVED','E4',earningApprovalValue(e),asOf),'UNVERIFIED_EARNING',e.id);
     earnings.set(e.id,e);
   }
   const cash=new Map<string,CashTransaction>();
@@ -21,7 +33,7 @@ export function reconcileLedger(input:IncomeLedgerInput,asOf:string):LedgerSumma
     assert(/^[A-Z]{3}$/.test(t.currency),'INVALID_CURRENCY',t.id);
     if(!t.posted)continue;
     assert(Boolean(t.postedEvidenceId),'MISSING_PAYMENT_EVIDENCE',t.id);
-    assert(evidenceForClaim(input.evidence,[t.postedEvidenceId!],'PAYMENT_POSTED','E5',asOf).supported,'UNVERIFIED_PAYMENT',t.id);
+    assert(subjectCorroborated(input.evidence,[t.postedEvidenceId!],'PAYMENT_POSTED','E5',paymentPostedValue(t),asOf),'UNVERIFIED_PAYMENT',t.id);
     const key=JSON.stringify([t.source,t.externalId]);
     const prior=origin.get(key);
     if(prior){
