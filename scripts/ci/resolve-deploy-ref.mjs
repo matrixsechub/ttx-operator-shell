@@ -5,6 +5,12 @@ import { appendFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export const CONFIRM_PHRASE = "DEPLOY_STAGING";
+export const CONFIRM_PHRASES = Object.freeze({
+  staging: CONFIRM_PHRASE,
+  production: "DEPLOY_PRODUCTION",
+});
+// Production may only ship commits already reviewed into main.
+export const MAINLINE_REF = "origin/main";
 export const UNSAFE_REF_PATTERNS = [
   /^pull\//i,
   /^refs\/pull\//i,
@@ -12,11 +18,31 @@ export const UNSAFE_REF_PATTERNS = [
   /^merge\//i,
 ];
 
-export function validateConfirmDeploy(confirm) {
-  if (confirm?.trim() !== CONFIRM_PHRASE) {
-    return { ok: false, error: `confirm_deploy must be exactly "${CONFIRM_PHRASE}"` };
+export function validateDeployTarget(target) {
+  const value = (target ?? "staging").trim();
+  if (!Object.hasOwn(CONFIRM_PHRASES, value)) {
+    return { ok: false, error: `deploy target must be one of: ${Object.keys(CONFIRM_PHRASES).join(", ")}` };
+  }
+  return { ok: true, target: value };
+}
+
+export function validateConfirmDeploy(confirm, target = "staging") {
+  const targetCheck = validateDeployTarget(target);
+  if (!targetCheck.ok) return targetCheck;
+  const phrase = CONFIRM_PHRASES[targetCheck.target];
+  if (confirm?.trim() !== phrase) {
+    return { ok: false, error: `confirm_deploy must be exactly "${phrase}"` };
   }
   return { ok: true };
+}
+
+export function verifyOnMainline(commitSha, exec = execSync) {
+  try {
+    exec(`git merge-base --is-ancestor "${commitSha}" "${MAINLINE_REF}"`, { encoding: "utf8" });
+    return { ok: true };
+  } catch {
+    return { ok: false, error: `commit ${commitSha} is not on ${MAINLINE_REF}; production deploys only reviewed main commits` };
+  }
 }
 
 export function validateTargetRef(targetRef) {
@@ -28,6 +54,10 @@ export function validateTargetRef(targetRef) {
     if (pattern.test(ref)) {
       return { ok: false, error: `unsafe target_ref "${ref}"` };
     }
+  }
+  // The ref is interpolated into a shell command; allow git-ref characters only.
+  if (!/^[A-Za-z0-9._/-]{1,200}$/.test(ref) || ref.includes("..")) {
+    return { ok: false, error: `unsafe target_ref "${ref}"` };
   }
   return { ok: true, ref };
 }
@@ -49,10 +79,13 @@ export function resolveCommitSha(targetRef, exec = execSync) {
   }
 }
 
-export function authorizeDeployment(confirm, targetRef, exec = execSync) {
-  const confirmResult = validateConfirmDeploy(confirm);
+export function authorizeDeployment(confirm, targetRef, exec = execSync, target = "staging") {
+  const confirmResult = validateConfirmDeploy(confirm, target);
   if (!confirmResult.ok) return confirmResult;
-  return resolveCommitSha(targetRef, exec);
+  const resolved = resolveCommitSha(targetRef, exec);
+  if (!resolved.ok || target !== "production") return resolved;
+  const mainline = verifyOnMainline(resolved.commitSha, exec);
+  return mainline.ok ? resolved : mainline;
 }
 
 function writeOutputs(requestedRef, commitSha) {
@@ -65,8 +98,9 @@ function writeOutputs(requestedRef, commitSha) {
 function main() {
   const confirm = process.env.CONFIRM_DEPLOY?.trim() ?? process.argv[2]?.trim();
   const targetRef = process.env.TARGET_REF?.trim() ?? process.argv[3]?.trim() ?? "main";
+  const deployTarget = process.env.DEPLOY_TARGET?.trim() || "staging";
 
-  const result = authorizeDeployment(confirm, targetRef);
+  const result = authorizeDeployment(confirm, targetRef, execSync, deployTarget);
   if (!result.ok) {
     console.error(`DEPLOY_REF::FAIL::${result.error}`);
     process.exit(1);
