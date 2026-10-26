@@ -1,5 +1,7 @@
-# Scheduled organizer runs on self-hosted Windows (local .artifacts cache path).
-# PR CI intentionally uses ubuntu-latest — do not move this job to self-hosted for PRs.
+# Scheduled organizer runs on a GitHub-hosted Windows runner (cmd shell kept).
+# The 72h interval state lives in actions/cache, so no persistent machine is needed.
+# This repository is public: never target self-hosted runners from any workflow
+# (tests/ci/deploy-workflows-hardening.test.mjs enforces this).
 
 name: Organizer Schedule
 
@@ -19,7 +21,7 @@ concurrency:
 
 jobs:
   organizer:
-    runs-on: self-hosted
+    runs-on: windows-latest
     defaults:
       run:
         shell: cmd

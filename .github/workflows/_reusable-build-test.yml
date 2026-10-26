@@ -24,6 +24,10 @@ jobs:
     env:
       GIT_COMMIT_SHA: ${{ inputs.git_commit_sha || github.sha }}
       BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at || github.event.head_commit.timestamp || '' }}
+      # Gate builds use the committed CI sample storefront: no private MSHOPS
+      # clone or token in PR CI. Deploy jobs rebuild with the real artifact and
+      # scripts/ci/assert-real-storefront.mjs refuses the sample.
+      MSHOPS_STOREFRONT: fixture
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
