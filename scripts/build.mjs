@@ -5,6 +5,8 @@ import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { resolveLocalStorefront } from "./lib/storefront-source.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 function run(command, cwd = root) {
@@ -16,22 +18,18 @@ function run(command, cwd = root) {
  * instead of the legacy TTX vite.storefront marketplace bundle.
  *
  * Resolution order:
+ * 0. MSHOPS_STOREFRONT=fixture: committed CI sample (never deployable)
  * 1. MSHOPS_BUILD_DIR (points at a build-final directory)
  * 2. Sibling checkout ../MSHOPS/build-final
  * 3. Shallow clone of matrixsechub/MSHOPS into .deps/MSHOPS (needs git auth for private repo)
  */
 function resolveMshopsBuildFinal() {
-  const envDir = process.env.MSHOPS_BUILD_DIR?.trim();
-  const candidates = [
-    envDir,
-    join(root, "..", "MSHOPS", "build-final"),
-    join(root, ".deps", "MSHOPS", "build-final"),
-  ].filter(Boolean);
-
-  for (const candidate of candidates) {
-    if (existsSync(join(candidate, "app", "index.html"))) {
-      return candidate;
+  const local = resolveLocalStorefront(root);
+  if (local) {
+    if (local.fixture) {
+      console.warn("> using the CI sample storefront (MSHOPS_STOREFRONT=fixture); this build is not deployable");
     }
+    return local.dir;
   }
 
   const depsRepo = join(root, ".deps", "MSHOPS");

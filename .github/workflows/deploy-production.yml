@@ -136,6 +136,9 @@ jobs:
           MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
         run: npm run build
 
+      - name: Refuse the CI sample storefront
+        run: node scripts/ci/assert-real-storefront.mjs
+
       - name: Wrangler production dry run (pre-deploy gate)
         run: npx wrangler deploy --dry-run --outdir .artifacts/wrangler-production-predeploy
 

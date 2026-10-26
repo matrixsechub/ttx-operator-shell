@@ -109,6 +109,9 @@ jobs:
 
       - run: npm run build
 
+      - name: Refuse the CI sample storefront
+        run: node scripts/ci/assert-real-storefront.mjs
+
       - name: Wrangler staging dry run (pre-deploy gate)
         run: npx wrangler deploy --env staging --dry-run --outdir .artifacts/wrangler-staging-predeploy
 
