@@ -1,5 +1,7 @@
 # Manual staging deployment only — requires operator confirmation and GitHub Environment secrets.
 # Does not deploy production. PR code never runs on self-hosted runners.
+# The real MSHOPS storefront is cloned only in deploy-staging (GH_PAT). PR CI uses the
+# committed fixture and must not receive that credential.
 
 name: Staging Deploy
 
@@ -39,6 +41,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Validate deployment authorization
         id: resolve
@@ -56,6 +59,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ needs.authorize.outputs.commit_sha }}
+          persist-credentials: false
 
       - run: node scripts/ci/workflow-permissions-lint.mjs
 
@@ -96,6 +100,18 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ needs.authorize.outputs.commit_sha }}
+          persist-credentials: false
+
+      - name: Clone MSHOPS storefront artifact
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse \
+            https://x-access-token:${GH_PAT}@github.com/${{ github.repository_owner }}/MSHOPS.git \
+            MSHOPS
+          cd MSHOPS && git sparse-checkout set build-final
+          test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          echo "MSHOPS storefront artifact found"
 
       - uses: ./.github/actions/setup-node-npm
         with:
@@ -107,7 +123,10 @@ jobs:
 
       - run: npm test
 
-      - run: npm run build
+      - name: Build
+        env:
+          MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final
+        run: npm run build
 
       - name: Refuse the CI sample storefront
         run: node scripts/ci/assert-real-storefront.mjs
@@ -167,6 +186,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ needs.authorize.outputs.commit_sha }}
+          persist-credentials: false
 
       - name: Run staging smoke tests
         env:
@@ -194,6 +214,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ needs.authorize.outputs.commit_sha }}
+          persist-credentials: false
 
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:

@@ -9,8 +9,10 @@ export function fixtureBuildDir(root) {
 }
 
 /**
- * Local storefront candidates, in priority order. The CI sample is used only
- * when MSHOPS_STOREFRONT=fixture is set explicitly — never as a fallback.
+ * Local storefront candidates. The CI sample is used only when
+ * MSHOPS_STOREFRONT=fixture is set explicitly — never as a fallback, and never
+ * together with MSHOPS_BUILD_DIR. An explicit MSHOPS_BUILD_DIR is the deploy
+ * artifact and must exist; it does not fall through to a sibling checkout.
  * Returns null when nothing local is usable (build.mjs then clones MSHOPS).
  *
  * @param {string} root
@@ -19,7 +21,11 @@ export function fixtureBuildDir(root) {
  */
 export function resolveLocalStorefront(root, env = process.env) {
   const mode = env.MSHOPS_STOREFRONT?.trim();
+  const explicit = env.MSHOPS_BUILD_DIR?.trim();
   if (mode === "fixture") {
+    if (explicit) {
+      throw new Error("MSHOPS_STOREFRONT=fixture cannot be combined with MSHOPS_BUILD_DIR");
+    }
     const dir = fixtureBuildDir(root);
     if (!existsSync(join(dir, "app", "index.html"))) {
       throw new Error(`MSHOPS_STOREFRONT=fixture but ${dir}/app/index.html is missing`);
@@ -30,11 +36,17 @@ export function resolveLocalStorefront(root, env = process.env) {
     throw new Error(`Unknown MSHOPS_STOREFRONT "${mode}" (only "fixture" is supported)`);
   }
 
+  if (explicit) {
+    if (!existsSync(join(explicit, "app", "index.html"))) {
+      throw new Error(`MSHOPS_BUILD_DIR is set but ${explicit}/app/index.html is missing`);
+    }
+    return { dir: explicit, fixture: false };
+  }
+
   const candidates = [
-    env.MSHOPS_BUILD_DIR?.trim(),
     join(root, "..", "MSHOPS", "build-final"),
     join(root, ".deps", "MSHOPS", "build-final"),
-  ].filter(Boolean);
+  ];
   for (const dir of candidates) {
     if (existsSync(join(dir, "app", "index.html"))) return { dir, fixture: false };
   }

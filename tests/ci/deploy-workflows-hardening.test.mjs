@@ -109,4 +109,13 @@ describe("public repository runner policy", () => {
     assert.match(organizer, /runs-on: windows-latest/);
     assert.doesNotMatch(organizer, /pull_request/);
   });
+
+  it("keeps organizer commands compatible with cmd.exe", () => {
+    const job = extractJob(withoutComments(readWorkflow("organizer-schedule.yml")), "organizer");
+    assert.match(job, /shell: cmd/);
+    assert.match(job, /NPM_CONFIG_SCRIPT_SHELL: cmd\.exe/);
+    assert.match(job, /path: \.artifacts\/organizer-last-run\.json/);
+    const runs = [...job.matchAll(/^\s*- run: (.+)$/gm)].map((match) => match[1]);
+    assert.deepEqual(runs, ["npm ci", "npm run organizer:scheduled"]);
+  });
 });
