@@ -116,11 +116,22 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git clone --depth 1 --filter=blob:none --sparse \
-            https://x-access-token:${GH_PAT}@github.com/${{ github.repository_owner }}/MSHOPS.git \
+          set -euo pipefail
+          if [ -z "${GH_PAT}" ]; then
+            echo "ERROR: GH_PAT is required to clone the private MSHOPS storefront"
+            exit 1
+          fi
+          # Command-scoped header. Do not put the token in the remote URL; that
+          # value is written to .git/config and can show up in later git errors.
+          auth=$(printf 'x-access-token:%s' "$GH_PAT" | base64 -w 0)
+          header="AUTHORIZATION: basic ${auth}"
+          git -c "http.extraheader=${header}" clone --depth 1 --filter=blob:none --sparse \
+            "https://github.com/${{ github.repository_owner }}/MSHOPS.git" \
             MSHOPS
-          cd MSHOPS && git sparse-checkout set build-final
-          test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          git -C MSHOPS -c "http.extraheader=${header}" sparse-checkout set build-final
+          unset auth header
+          test -f MSHOPS/build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          rm -rf MSHOPS/.git
           echo "MSHOPS storefront artifact found"
 
       - uses: ./.github/actions/setup-node-npm
@@ -146,20 +157,38 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler deploy
+        run: npx wrangler deploy --var "BUILD_COMMIT_SHA:${GIT_COMMIT_SHA}" --var "BUILD_TIMESTAMP:${BUILD_TIMESTAMP}"
 
-      - name: Smoke test (fails the job on a non-200)
+      - name: Smoke test (fails the job on a non-200 or SHA mismatch)
         env:
           SMOKE_URL: https://www.mshops.net/pearl-os
         run: |
+          set -euo pipefail
+          passed=0
           for attempt in 1 2 3 4 5 6; do
             status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$SMOKE_URL" || echo "000")
             echo "Attempt $attempt: $SMOKE_URL -> $status"
             if [ "$status" = "200" ]; then
-              echo "Smoke test passed"
-              exit 0
+              passed=1
+              break
             fi
             sleep 10
           done
-          echo "::error::Smoke test failed: $SMOKE_URL did not return 200. Roll back with 'npx wrangler rollback' if this deploy caused it."
-          exit 1
+          if [ "$passed" != "1" ]; then
+            echo "::error::Smoke test failed: $SMOKE_URL did not return 200. Roll back with 'npx wrangler rollback' if this deploy caused it."
+            exit 1
+          fi
+          origin=$(node -e 'const u = new URL(process.env.SMOKE_URL); console.log(u.origin)')
+          body=$(curl -fsS --max-time 15 "$origin/api/build-info")
+          node --input-type=module -e '
+            const info = JSON.parse(process.argv[1]);
+            if (info.commitSha !== process.env.GIT_COMMIT_SHA) {
+              console.error("::error::build-info commitSha does not match the authorized production deploy");
+              process.exit(1);
+            }
+            if (info.deployEnv !== "production") {
+              console.error("::error::build-info deployEnv is not production");
+              process.exit(1);
+            }
+          ' "$body"
+          echo "Smoke test passed"

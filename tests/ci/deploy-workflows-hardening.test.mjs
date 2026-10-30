@@ -52,7 +52,7 @@ describe("deploy-production workflow", () => {
     assert.match(job, /run: npm run typecheck/);
     assert.match(job, /run: npm test/);
     const dryRun = job.indexOf("--dry-run");
-    const deploy = job.indexOf("run: npx wrangler deploy\n");
+    const deploy = job.indexOf('npx wrangler deploy --var "BUILD_COMMIT_SHA:${GIT_COMMIT_SHA}"');
     assert.ok(dryRun > 0 && deploy > dryRun, "dry run must precede the real deploy");
     assert.match(extractJob(productionCode, "preflight"), /audit-action-pins\.mjs/);
   });
@@ -62,6 +62,8 @@ describe("deploy-production workflow", () => {
     const smoke = job.slice(job.indexOf("Smoke test"));
     assert.match(smoke, /= "200"/);
     assert.match(smoke, /exit 1/);
+    assert.match(smoke, /commitSha !== process\.env\.GIT_COMMIT_SHA/);
+    assert.match(smoke, /deployEnv !== "production"/);
   });
 
   it("pins every action to a full commit SHA", () => {
@@ -108,5 +110,14 @@ describe("public repository runner policy", () => {
     const organizer = withoutComments(readWorkflow("organizer-schedule.yml"));
     assert.match(organizer, /runs-on: windows-latest/);
     assert.doesNotMatch(organizer, /pull_request/);
+  });
+
+  it("keeps organizer commands compatible with cmd.exe", () => {
+    const job = extractJob(withoutComments(readWorkflow("organizer-schedule.yml")), "organizer");
+    assert.match(job, /shell: cmd/);
+    assert.match(job, /NPM_CONFIG_SCRIPT_SHELL: cmd\.exe/);
+    assert.match(job, /path: \.artifacts\/organizer-last-run\.json/);
+    const runs = [...job.matchAll(/^\s*- run: (.+)$/gm)].map((match) => match[1]);
+    assert.deepEqual(runs, ["npm ci", "npm run organizer:scheduled"]);
   });
 });

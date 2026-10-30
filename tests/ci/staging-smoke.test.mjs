@@ -8,6 +8,7 @@ import {
   emitFailedProbeDiagnostics,
   persistStagingSmokeReport,
   resolveStagingAccessCredentials,
+  bindAuthorizedCommit,
   runStagingSmoke,
   sanitizeDiagnosticText,
 } from "../../scripts/ci/staging-smoke.mjs";
@@ -508,6 +509,37 @@ describe("staging-smoke", () => {
       );
       assert.equal(report.base_url, ALLOWED);
       assert.equal(fetchMock.mock.callCount(), 1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("fails when build-info commitSha does not match the authorized deploy", async () => {
+    const fetchMock = mock.fn(async () => jsonResponse(200, { commitSha: "other", deployEnv: "staging" }));
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = fetchMock;
+    try {
+      const report = await runStagingSmoke(
+        ALLOWED,
+        "abc123",
+        smokeOptions({
+          contracts: bindAuthorizedCommit(
+            [
+              {
+                name: "build_info_public",
+                method: "GET",
+                path: "/api/build-info",
+                expectStatus: 200,
+                contentTypeIncludes: "application/json",
+                jsonFields: ["commitSha", "deployEnv"],
+              },
+            ],
+            "abc123",
+          ),
+        }),
+      );
+      assert.equal(report.summary.failed, 1);
+      assert.match(report.checks[0].notes.join(" "), /commitSha does not match/);
     } finally {
       globalThis.fetch = originalFetch;
     }

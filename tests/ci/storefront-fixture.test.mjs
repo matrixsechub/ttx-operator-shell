@@ -5,11 +5,24 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
-import { FIXTURE_MARKER, fixtureBuildDir, resolveLocalStorefront } from "../../scripts/lib/storefront-source.mjs";
+import {
+  FIXTURE_MARKER,
+  assertWorkersCiStorefront,
+  fixtureBuildDir,
+  resolveLocalStorefront,
+} from "../../scripts/lib/storefront-source.mjs";
 import { checkStorefront } from "../../scripts/ci/assert-real-storefront.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const workflow = (name) => readFileSync(join(root, ".github", "workflows", name), "utf8");
+
+function extractJob(yaml, name) {
+  const start = yaml.indexOf(`\n  ${name}:`);
+  assert.ok(start >= 0, `${name} job must exist`);
+  const fromJob = yaml.slice(start + 1);
+  const nextJob = fromJob.slice(1).search(/\n  [a-zA-Z0-9_-]+:/);
+  return nextJob === -1 ? fromJob : fromJob.slice(0, nextJob + 1);
+}
 
 function tempDist(html) {
   const dir = mkdtempSync(join(tmpdir(), "storefront-"));
@@ -71,6 +84,21 @@ describe("storefront source resolution", () => {
   it("rejects unknown modes", () => {
     assert.throws(() => resolveLocalStorefront(root, { MSHOPS_STOREFRONT: "real" }), /Unknown MSHOPS_STOREFRONT/);
   });
+
+  it("refuses a missing MSHOPS_BUILD_DIR instead of falling through", () => {
+    const missing = join(tmpdir(), "missing-mshops-build-final");
+    assert.throws(
+      () => resolveLocalStorefront(root, { MSHOPS_BUILD_DIR: missing }),
+      /MSHOPS_BUILD_DIR is set but/,
+    );
+  });
+
+  it("refuses to mix the CI sample with an explicit artifact directory", () => {
+    assert.throws(
+      () => resolveLocalStorefront(root, { MSHOPS_STOREFRONT: "fixture", MSHOPS_BUILD_DIR: "/tmp/real" }),
+      /cannot be combined with MSHOPS_BUILD_DIR/,
+    );
+  });
 });
 
 describe("deploy guard", () => {
@@ -102,6 +130,23 @@ describe("deploy guard", () => {
   });
 });
 
+describe("Workers Builds storefront gate", () => {
+  it("allows an explicit fixture preview", () => {
+    assert.doesNotThrow(() => assertWorkersCiStorefront({ dir: "/tmp/fixture", fixture: true }, { WORKERS_CI: "1" }));
+  });
+
+  it("refuses an implicit clone inside Workers Builds", () => {
+    assert.throws(
+      () => assertWorkersCiStorefront(null, { WORKERS_CI: "1" }),
+      /Refusing to clone or discover MSHOPS inside Workers Builds/,
+    );
+  });
+
+  it("does not apply outside Workers Builds", () => {
+    assert.doesNotThrow(() => assertWorkersCiStorefront(null, {}));
+  });
+});
+
 describe("workflow wiring", () => {
   for (const name of ["_reusable-build-test.yml", "_reusable-wrangler-dry-run.yml"]) {
     it(`${name} builds against the sample storefront`, () => {
@@ -109,15 +154,46 @@ describe("workflow wiring", () => {
     });
   }
 
-  for (const name of ["deploy-production.yml", "staging-deploy.yml"]) {
-    it(`${name} runs the guard after build and before any wrangler deploy, and never selects the sample`, () => {
+  for (const [name, jobName] of [
+    ["deploy-production.yml", "deploy-production"],
+    ["staging-deploy.yml", "deploy-staging"],
+  ]) {
+    it(`${name} clones the real MSHOPS artifact, then builds, guards, and deploys`, () => {
       const text = workflow(name);
-      const deployJob = text.slice(text.search(/\n {2}deploy-(production|staging):/));
+      const deployJob = extractJob(text, jobName);
+      const clone = deployJob.indexOf("github.com/${{ github.repository_owner }}/MSHOPS.git");
+      const buildDir = deployJob.indexOf("MSHOPS_BUILD_DIR: ${{ github.workspace }}/MSHOPS/build-final");
       const build = deployJob.indexOf("npm run build");
       const guard = deployJob.indexOf("node scripts/ci/assert-real-storefront.mjs");
       const firstWrangler = deployJob.indexOf("npx wrangler deploy");
-      assert.ok(build > 0 && guard > build && firstWrangler > guard, "build → guard → wrangler");
+      assert.ok(clone > 0 && buildDir > clone && build > buildDir, "clone → MSHOPS_BUILD_DIR → build");
+      assert.ok(guard > build && firstWrangler > guard, "build → guard → wrangler");
+      assert.match(deployJob, /GH_PAT: \$\{\{ secrets\.GH_PAT \}\}/);
+      assert.match(deployJob, /http\.extraheader=/);
+      assert.match(deployJob, /rm -rf MSHOPS\/\.git/);
+      assert.doesNotMatch(deployJob, /https:\/\/x-access-token/);
+      assert.match(deployJob, /persist-credentials: false/);
       assert.doesNotMatch(deployJob, /MSHOPS_STOREFRONT/);
+    });
+  }
+
+  for (const [name, jobName] of [
+    ["deploy-production.yml", "build-test"],
+    ["deploy-production.yml", "production-dry-run"],
+    ["staging-deploy.yml", "build-test"],
+    ["staging-deploy.yml", "staging-dry-run"],
+    ["staging-deploy.yml", "staging-smoke"],
+  ]) {
+    it(`${name} job ${jobName} does not receive GH_PAT`, () => {
+      assert.doesNotMatch(extractJob(workflow(name), jobName), /GH_PAT/);
+    });
+  }
+
+  for (const name of ["_reusable-build-test.yml", "_reusable-wrangler-dry-run.yml", "ci.yml", "security-pr.yml", "organizer-schedule.yml"]) {
+    it(`${name} does not clone private MSHOPS or read GH_PAT`, () => {
+      const text = workflow(name);
+      assert.doesNotMatch(text, /GH_PAT/);
+      assert.doesNotMatch(text, /MSHOPS\.git/);
     });
   }
 });

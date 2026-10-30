@@ -5,7 +5,7 @@ import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { resolveLocalStorefront } from "./lib/storefront-source.mjs";
+import { assertWorkersCiStorefront, resolveLocalStorefront } from "./lib/storefront-source.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -25,6 +25,7 @@ function run(command, cwd = root) {
  */
 function resolveMshopsBuildFinal() {
   const local = resolveLocalStorefront(root);
+  assertWorkersCiStorefront(local);
   if (local) {
     if (local.fixture) {
       console.warn("> using the CI sample storefront (MSHOPS_STOREFRONT=fixture); this build is not deployable");
