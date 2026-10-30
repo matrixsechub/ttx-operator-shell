@@ -52,3 +52,21 @@ export function resolveLocalStorefront(root, env = process.env) {
   }
   return null;
 }
+
+/**
+ * Workers Builds checks out this repo and runs `npm run build` on every branch,
+ * including pull requests. That path must not clone or discover the private
+ * MSHOPS storefront. Preview builds set MSHOPS_STOREFRONT=fixture. Real
+ * artifacts are cloned only in the gated GitHub deploy jobs.
+ *
+ * @param {{ dir: string, fixture: boolean } | null} local
+ * @param {Record<string, string | undefined>} env
+ */
+export function assertWorkersCiStorefront(local, env = process.env) {
+  if (env.WORKERS_CI !== "1") return;
+  if (local?.fixture) return;
+  if (local && env.MSHOPS_BUILD_DIR?.trim()) return;
+  throw new Error(
+    "Refusing to clone or discover MSHOPS inside Workers Builds. Set MSHOPS_STOREFRONT=fixture for previews. Real storefront deploys stay in the gated GitHub workflow.",
+  );
+}

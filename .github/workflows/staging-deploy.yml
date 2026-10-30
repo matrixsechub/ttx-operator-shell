@@ -106,11 +106,22 @@ jobs:
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git clone --depth 1 --filter=blob:none --sparse \
-            https://x-access-token:${GH_PAT}@github.com/${{ github.repository_owner }}/MSHOPS.git \
+          set -euo pipefail
+          if [ -z "${GH_PAT}" ]; then
+            echo "ERROR: GH_PAT is required to clone the private MSHOPS storefront"
+            exit 1
+          fi
+          # Command-scoped header. Do not put the token in the remote URL; that
+          # value is written to .git/config and can show up in later git errors.
+          auth=$(printf 'x-access-token:%s' "$GH_PAT" | base64 -w 0)
+          header="AUTHORIZATION: basic ${auth}"
+          git -c "http.extraheader=${header}" clone --depth 1 --filter=blob:none --sparse \
+            "https://github.com/${{ github.repository_owner }}/MSHOPS.git" \
             MSHOPS
-          cd MSHOPS && git sparse-checkout set build-final
-          test -f build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          git -C MSHOPS -c "http.extraheader=${header}" sparse-checkout set build-final
+          unset auth header
+          test -f MSHOPS/build-final/app/index.html || (echo "ERROR: MSHOPS build-final/app/index.html missing" && exit 1)
+          rm -rf MSHOPS/.git
           echo "MSHOPS storefront artifact found"
 
       - uses: ./.github/actions/setup-node-npm

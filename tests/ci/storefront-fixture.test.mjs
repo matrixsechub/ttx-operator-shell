@@ -5,7 +5,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 
-import { FIXTURE_MARKER, fixtureBuildDir, resolveLocalStorefront } from "../../scripts/lib/storefront-source.mjs";
+import {
+  FIXTURE_MARKER,
+  assertWorkersCiStorefront,
+  fixtureBuildDir,
+  resolveLocalStorefront,
+} from "../../scripts/lib/storefront-source.mjs";
 import { checkStorefront } from "../../scripts/ci/assert-real-storefront.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -125,6 +130,23 @@ describe("deploy guard", () => {
   });
 });
 
+describe("Workers Builds storefront gate", () => {
+  it("allows an explicit fixture preview", () => {
+    assert.doesNotThrow(() => assertWorkersCiStorefront({ dir: "/tmp/fixture", fixture: true }, { WORKERS_CI: "1" }));
+  });
+
+  it("refuses an implicit clone inside Workers Builds", () => {
+    assert.throws(
+      () => assertWorkersCiStorefront(null, { WORKERS_CI: "1" }),
+      /Refusing to clone or discover MSHOPS inside Workers Builds/,
+    );
+  });
+
+  it("does not apply outside Workers Builds", () => {
+    assert.doesNotThrow(() => assertWorkersCiStorefront(null, {}));
+  });
+});
+
 describe("workflow wiring", () => {
   for (const name of ["_reusable-build-test.yml", "_reusable-wrangler-dry-run.yml"]) {
     it(`${name} builds against the sample storefront`, () => {
@@ -147,6 +169,9 @@ describe("workflow wiring", () => {
       assert.ok(clone > 0 && buildDir > clone && build > buildDir, "clone → MSHOPS_BUILD_DIR → build");
       assert.ok(guard > build && firstWrangler > guard, "build → guard → wrangler");
       assert.match(deployJob, /GH_PAT: \$\{\{ secrets\.GH_PAT \}\}/);
+      assert.match(deployJob, /http\.extraheader=/);
+      assert.match(deployJob, /rm -rf MSHOPS\/\.git/);
+      assert.doesNotMatch(deployJob, /https:\/\/x-access-token/);
       assert.match(deployJob, /persist-credentials: false/);
       assert.doesNotMatch(deployJob, /MSHOPS_STOREFRONT/);
     });

@@ -52,7 +52,7 @@ describe("deploy-production workflow", () => {
     assert.match(job, /run: npm run typecheck/);
     assert.match(job, /run: npm test/);
     const dryRun = job.indexOf("--dry-run");
-    const deploy = job.indexOf("run: npx wrangler deploy\n");
+    const deploy = job.indexOf('npx wrangler deploy --var "BUILD_COMMIT_SHA:${GIT_COMMIT_SHA}"');
     assert.ok(dryRun > 0 && deploy > dryRun, "dry run must precede the real deploy");
     assert.match(extractJob(productionCode, "preflight"), /audit-action-pins\.mjs/);
   });
@@ -62,6 +62,8 @@ describe("deploy-production workflow", () => {
     const smoke = job.slice(job.indexOf("Smoke test"));
     assert.match(smoke, /= "200"/);
     assert.match(smoke, /exit 1/);
+    assert.match(smoke, /commitSha !== process\.env\.GIT_COMMIT_SHA/);
+    assert.match(smoke, /deployEnv !== "production"/);
   });
 
   it("pins every action to a full commit SHA", () => {

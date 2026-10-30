@@ -320,6 +320,10 @@ async function probe(baseUrl, contract, access) {
           notes.push(`missing json field ${field}`);
         }
       }
+      if (contract.expectedCommitSha && json.commitSha !== contract.expectedCommitSha) {
+        result = "FAIL";
+        notes.push("commitSha does not match the authorized deploy");
+      }
     }
   }
 
@@ -372,6 +376,13 @@ async function probeWithRetry(baseUrl, contract, access, maxAttempts = 5) {
   return last;
 }
 
+export function bindAuthorizedCommit(contracts, commitSha) {
+  if (!commitSha || commitSha === "unknown") return contracts;
+  return contracts.map((contract) =>
+    contract.path === "/api/build-info" ? { ...contract, expectedCommitSha: commitSha } : contract,
+  );
+}
+
 export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
   // Internal gate — do not rely on CLI callers. Fail before any fetch/DNS/auth.
   const validated = validateStagingBaseUrl(baseUrl);
@@ -385,7 +396,9 @@ export async function runStagingSmoke(baseUrl, commitSha, options = {}) {
     throw new Error(access.error);
   }
 
-  const contracts = options.contracts ?? SMOKE_ROUTE_CONTRACTS;
+  const contracts = options.contracts
+    ? options.contracts
+    : bindAuthorizedCommit(SMOKE_ROUTE_CONTRACTS, commitSha);
   const checks = [];
   for (const contract of contracts) {
     checks.push(await probeWithRetry(safeBaseUrl, contract, access, options.maxAttempts ?? 5));
