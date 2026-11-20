@@ -1,13 +1,16 @@
 import { classifyRoute } from "./routeClass";
 import { makeCtxHash, signToken, timingSafeEqual, verifyToken } from "./crypto";
 import { rateLimitFor } from "./rateLimit";
+import { verifyPassword } from "../passwordHash";
 
 export interface EdgeEnv {
   OPERATOR_SECRET?: string;
   MARKETPLACE_SECRET?: string;
   AUTH_SIGNING_KEY?: string;
   OPERATOR_PASSWORD?: string;
+  OPERATOR_PASSWORD_HASH?: string;
   OPERATOR_USERNAME?: string;
+  OPERATOR_CALLSIGN?: string;
 }
 
 function operatorSecret(env: EdgeEnv): string | undefined {
@@ -16,6 +19,20 @@ function operatorSecret(env: EdgeEnv): string | undefined {
 
 function marketplaceSecret(env: EdgeEnv): string | undefined {
   return env.MARKETPLACE_SECRET || env.OPERATOR_SECRET || env.AUTH_SIGNING_KEY;
+}
+
+function expectedOperatorUsername(env: EdgeEnv): string {
+  return env.OPERATOR_USERNAME || env.OPERATOR_CALLSIGN || "operator";
+}
+
+async function verifyOperatorPassword(password: string, env: EdgeEnv): Promise<boolean> {
+  if (env.OPERATOR_PASSWORD_HASH) {
+    return verifyPassword(password, env.OPERATOR_PASSWORD_HASH);
+  }
+  if (env.OPERATOR_PASSWORD) {
+    return timingSafeEqual(password, env.OPERATOR_PASSWORD);
+  }
+  return false;
 }
 
 /**
@@ -43,7 +60,7 @@ export async function handleOperatorAuth(
     body = {};
   }
 
-  const expectedUser = env.OPERATOR_USERNAME || "operator";
+  const expectedUser = expectedOperatorUsername(env);
   const [userOk, passOk] = await Promise.all([
     timingSafeEqual(body.username || "", expectedUser),
     timingSafeEqual(body.password || "", env.OPERATOR_PASSWORD),
@@ -69,11 +86,30 @@ export async function handleOperatorSession(
   if (pathname !== "/api/operator/session" || request.method !== "POST") return null;
 
   const opSecret = operatorSecret(env);
-  if (!opSecret) {
+  if (!opSecret || (!env.OPERATOR_PASSWORD_HASH && !env.OPERATOR_PASSWORD)) {
     return Response.json(
       { error: "operator credentials not configured", code: "OPERATOR_AUTH_UNAVAILABLE" },
       { status: 503 },
     );
+  }
+
+  let body: { username?: unknown; password?: unknown };
+  try {
+    body = (await request.json()) as { username?: unknown; password?: unknown };
+  } catch {
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+  if (typeof body.username !== "string" || typeof body.password !== "string") {
+    return Response.json({ error: "username and password are required" }, { status: 400 });
+  }
+
+  const expectedUser = expectedOperatorUsername(env);
+  const [userOk, passOk] = await Promise.all([
+    timingSafeEqual(body.username, expectedUser),
+    verifyOperatorPassword(body.password, env),
+  ]);
+  if (!userOk || !passOk) {
+    return Response.json({ error: "invalid credentials" }, { status: 401 });
   }
 
   const now = Math.floor(Date.now() / 1000);
