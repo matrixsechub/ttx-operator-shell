@@ -45,6 +45,14 @@ async function hmacKey(secret: string): Promise<CryptoKey> {
   ]);
 }
 
+async function passwordHashForTest(password: string): Promise<string> {
+  const salt = encoder.encode("operator-session-test-salt");
+  const iterations = 1_000;
+  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations }, key, 256);
+  return `pbkdf2$${iterations}$${bytesToBase64Url(salt)}$${bytesToBase64Url(new Uint8Array(bits))}`;
+}
+
 async function signAuthAccessToken(
   secret: string,
   operator: { id: string; handle: string } = { id: "operator", handle: "operator" },
@@ -160,9 +168,41 @@ describe("edgeAuthGate — operator routes", () => {
     assert.equal(blocked?.status, 401);
   });
 
-  it("allows valid edge token from POST /api/operator/session", async () => {
+  it("rejects missing credentials on POST /api/operator/session", async () => {
     const sessionResponse = await handleOperatorSession(
       new Request("https://example.com/api/operator/session", { method: "POST" }),
+      "/api/operator/session",
+      edgeEnv(),
+    );
+    assert.ok(sessionResponse);
+    assert.equal(sessionResponse?.status, 400);
+    const body = await readJson(sessionResponse!);
+    assert.equal(body.error, "Invalid JSON body");
+  });
+
+  it("rejects invalid credentials on POST /api/operator/session", async () => {
+    const sessionResponse = await handleOperatorSession(
+      new Request("https://example.com/api/operator/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: "operator", password: "wrong-password" }),
+      }),
+      "/api/operator/session",
+      edgeEnv(),
+    );
+    assert.ok(sessionResponse);
+    assert.equal(sessionResponse?.status, 401);
+    const body = await readJson(sessionResponse!);
+    assert.equal(body.error, "invalid credentials");
+  });
+
+  it("allows valid edge token from authenticated POST /api/operator/session", async () => {
+    const sessionResponse = await handleOperatorSession(
+      new Request("https://example.com/api/operator/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: "operator", password: "test-password" }),
+      }),
       "/api/operator/session",
       edgeEnv(),
     );
@@ -191,6 +231,28 @@ describe("edgeAuthGate — operator routes", () => {
     assert.equal(health?.status, 200);
     const healthBody = await readJson(health!);
     assert.equal(healthBody.agent, "WildcardAdvancementAgent");
+  });
+
+  it("allows valid edge token when only OPERATOR_PASSWORD_HASH is configured", async () => {
+    const env = {
+      OPERATOR_SECRET: EDGE_SECRET,
+      AUTH_SIGNING_KEY: AUTH_SIGNING_KEY,
+      OPERATOR_CALLSIGN: "operator",
+      OPERATOR_PASSWORD_HASH: await passwordHashForTest("test-password"),
+    };
+    const sessionResponse = await handleOperatorSession(
+      new Request("https://example.com/api/operator/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: "operator", password: "test-password" }),
+      }),
+      "/api/operator/session",
+      env,
+    );
+    assert.ok(sessionResponse);
+    assert.equal(sessionResponse?.status, 200);
+    const sessionBody = await readJson(sessionResponse!);
+    assert.ok(String(sessionBody.token).length > 20);
   });
 });
 
